@@ -299,6 +299,49 @@
             font-weight: 600;
         }
         
+        /* === FOOTER === */
+        .footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--tus-black);
+            padding: 12px 35px;
+            font-size: 7.5pt;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .footer-company {
+            flex: 1;
+        }
+        
+        .footer-company .name {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 3px;
+        }
+        
+        .footer-company .details {
+            line-height: 1.5;
+        }
+        
+        .footer-legal {
+            text-align: right;
+            line-height: 1.6;
+        }
+        
+        .footer-legal .label {
+            font-weight: 600;
+            color: rgba(255,255,255,0.75);
+        }
+        
         /* === TOTALS === */
         .totals-section {
             padding: 0 35px;
@@ -519,11 +562,11 @@
             
             <div class="party client">
                 <div class="party-label">Client</div>
-                <div class="party-name">{% if invoice.client.company %}{{ invoice.client.company }}{% else %}{{ invoice.client.name }}{% endif %}</div>
+                <div class="party-name">{% if invoice.client.company %}{{ invoice.client.company }}{% else %}{{ invoice.client.full_name }}{% endif %}</div>
                 <div class="party-details">
-                    {% if invoice.client.company %}{{ invoice.client.name }}<br>{% endif %}
-                    {% if invoice.client.address %}{{ invoice.client.address }}<br>{% endif %}
-                    {{ invoice.client.zip_code|default:"" }} {{ invoice.client.city|default:"" }}<br>
+                    {% if invoice.client.company %}{{ invoice.client.full_name }}<br>{% endif %}
+                    {% if invoice.client.address_line %}{{ invoice.client.address_line }}<br>{% endif %}
+                    {% if invoice.client.zip_code or invoice.client.city %}{{ invoice.client.zip_code|default:"" }} {{ invoice.client.city|default:"" }}<br>{% endif %}
                     {{ invoice.client.email }}<br>
                     {% if invoice.client.phone %}{{ invoice.client.phone }}{% endif %}
                 </div>
@@ -655,6 +698,22 @@
         </div>
         {% endif %}
         
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-company">
+                    <div class="name">{{ branding.name }}</div>
+                    <div class="details">
+                        {% if branding.address %}{{ branding.address }} • {% endif %}{{ branding.zip_code }} {{ branding.city }}{% if branding.phone %} • {{ branding.phone }}{% endif %}
+                    </div>
+                </div>
+                <div class="footer-legal">
+                    {% if branding.siret %}<div><span class="label">SIRET:</span> {{ branding.siret }}</div>{% endif %}
+                    {% if branding.tva_intra %}<div><span class="label">TVA:</span> {{ branding.tva_intra }}</div>{% endif %}
+                    {% if branding.iban %}<div><span class="label">IBAN:</span> {{ branding.iban }}</div>{% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>

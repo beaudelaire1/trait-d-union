@@ -23,7 +23,7 @@ class Project(models.Model):
     solution = models.TextField()
     result = models.TextField()
     technologies = models.JSONField(default=list, blank=True)
-    thumbnail = models.ImageField(upload_to='portfolio/thumbnails/')
+    thumbnail = models.ImageField(upload_to='portfolio/thumbnails/', blank=True, null=True)
     url = models.URLField(blank=True)
     is_featured = models.BooleanField(default=False)
     is_published = models.BooleanField(default=True)
