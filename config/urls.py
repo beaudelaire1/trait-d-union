@@ -16,11 +16,14 @@ sitemaps = {
 }
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('tus-gestion-secure/', admin.site.urls),  # URL admin sécurisée
     path('', include('apps.pages.urls')),
     path('portfolio/', include('apps.portfolio.urls')),
     path('contact/', include('apps.leads.urls')),
     path('resources/', include('apps.resources.urls')),
+    # Business apps
+    path('devis/', include('apps.devis.urls')),
+    path('factures/', include('apps.factures.urls')),
     # SEO
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),

@@ -6,20 +6,19 @@ Rationalisation : retrait de la couche expérimentale hexcore pour revenir à un
 import logging
 
 from django.contrib import messages
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from core.decorators import business_admin_required
 
-from devis.models import Quote
+from apps.devis.models import Quote
 from .models import Invoice
 
 logger = logging.getLogger(__name__)
 
 
-@login_required
-@business_admin_required
+@staff_member_required
 def create_invoice(request, quote_id: int):
     """
     Crée une facture à partir d'un devis existant.
@@ -46,8 +45,7 @@ def create_invoice(request, quote_id: int):
     return redirect(reverse("factures:archive"))
 
 
-@login_required
-@business_admin_required
+@staff_member_required
 def download_invoice(request, pk: int):
     """
     Téléchargement du PDF de la facture.
@@ -68,8 +66,7 @@ def download_invoice(request, pk: int):
         raise Http404("Impossible de générer le PDF de la facture")
 
 
-@login_required
-@business_admin_required
+@staff_member_required
 def archive(request):
     """
     Archive des factures.

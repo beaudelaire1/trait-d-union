@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ headline }}</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #07080A;
+            background-color: #F6F7FB;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .header {
+            background-color: #07080A;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            color: #F6F7FB;
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .logo {
+            margin-bottom: 15px;
+        }
+        .logo span {
+            color: #F6F7FB;
+            font-size: 28px;
+            font-weight: 700;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.02em;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .message {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 30px;
+        }
+        .details {
+            background-color: #F6F7FB;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-weight: 500;
+            color: #718096;
+        }
+        .detail-value {
+            font-weight: 600;
+            color: #07080A;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #0B2DFF;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+            transition: background-color 0.2s ease;
+        }
+        .cta-button:hover {
+            background-color: #0825cc;
+        }
+        .footer {
+            background-color: #07080A;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .footer p {
+            color: #a0aec0;
+            margin: 5px 0;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #0B2DFF;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <span>TRAIT D'UNION</span>
+            </div>
+            <h1>{{ headline }}</h1>
+        </div>
+        
+        <div class="content">
+            {% if message %}
+            <p class="message">{{ message }}</p>
+            {% endif %}
+            
+            {% if details %}
+            <div class="details">
+                {% for detail in details %}
+                <div class="detail-item">
+                    <span class="detail-label">{{ detail.label }}</span>
+                    <span class="detail-value">{{ detail.value }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            {% if cta_url %}
+            <div style="text-align: center;">
+                <a href="{{ cta_url }}" class="cta-button">{{ cta_text|default:"Voir les détails" }}</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <p>TRAIT D'UNION STUDIO</p>
+            <p>Agence de création web en Guyane</p>
+            <p><a href="https://traitdunion.it">traitdunion.it</a></p>
+        </div>
+    </div>
+</body>
+</html>

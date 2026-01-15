@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Devis {{ quote.number }}</title>
+    <title>Facture {{ invoice.number }}</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
         
@@ -13,6 +13,7 @@
             --tus-gray: #6B7280;
             --tus-light: #E5E7EB;
             --tus-green: #059669;
+            --tus-red: #DC2626;
         }
         
         @page {
@@ -211,16 +212,17 @@
             color: var(--tus-black);
         }
         
-        /* === VALIDITY INFO === */
-        .validity-info {
+        /* === OVERDUE ALERT === */
+        .overdue-alert {
             margin: 0 35px 20px;
-            background: rgba(11, 45, 255, 0.06);
-            border: 1px solid rgba(11, 45, 255, 0.15);
-            border-left: 4px solid var(--tus-blue);
+            background: rgba(220, 38, 38, 0.08);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            border-left: 4px solid var(--tus-red);
             border-radius: 6px;
             padding: 12px 15px;
+            color: var(--tus-red);
             font-size: 9pt;
-            color: var(--tus-black);
+            font-weight: 500;
         }
         
         /* === ITEMS TABLE === */
@@ -358,6 +360,63 @@
             font-style: italic;
         }
         
+        /* === PAYMENT SECTION === */
+        .payment-section {
+            padding: 20px 35px;
+            display: flex;
+            gap: 30px;
+        }
+        
+        .payment-box {
+            flex: 1;
+            background: var(--tus-white);
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid var(--tus-black);
+        }
+        
+        .payment-box h3 {
+            font-size: 8.5pt;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--tus-black);
+            margin-bottom: 10px;
+        }
+        
+        .payment-box p {
+            font-size: 8.5pt;
+            color: var(--tus-gray);
+            line-height: 1.7;
+        }
+        
+        .bank-details {
+            margin-top: 8px;
+        }
+        
+        .bank-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        
+        .bank-label {
+            font-size: 7.5pt;
+            font-weight: 600;
+            color: var(--tus-black);
+            background: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            min-width: 35px;
+        }
+        
+        .bank-value {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 8.5pt;
+            color: var(--tus-black);
+            letter-spacing: 0.3px;
+        }
+        
         /* === NOTES === */
         .notes-section {
             padding: 0 35px 20px;
@@ -383,35 +442,6 @@
             font-size: 8.5pt;
             color: var(--tus-gray);
             line-height: 1.7;
-        }
-        
-        /* === SIGNATURE SECTION === */
-        .signature-section {
-            padding: 20px 35px;
-            display: flex;
-            gap: 30px;
-        }
-        
-        .signature-box {
-            flex: 1;
-            border: 2px dashed var(--tus-light);
-            border-radius: 8px;
-            padding: 20px;
-            min-height: 70px;
-        }
-        
-        .signature-box h4 {
-            font-size: 8pt;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--tus-gray);
-            margin-bottom: 8px;
-        }
-        
-        .signature-box p {
-            font-size: 8pt;
-            color: var(--tus-gray);
         }
         
     </style>
@@ -441,8 +471,8 @@
             </div>
             
             <div class="doc-header">
-                <div class="doc-type">DEVIS</div>
-                <div class="doc-number">{{ quote.number }}</div>
+                <div class="doc-type">FACTURE</div>
+                <div class="doc-number">{{ invoice.number }}</div>
             </div>
         </div>
         
@@ -450,21 +480,26 @@
         <div class="meta-section">
             <div class="meta-info">
                 <div>
-                    Date : <strong>{{ quote.issue_date|date:"d/m/Y" }}</strong>
+                    Date : <strong>{{ invoice.issue_date|date:"d/m/Y" }}</strong>
                 </div>
                 <div>
-                    Validité : <strong>{{ quote.validity_days|default:"30" }} jours</strong>
+                    Client : <strong>{% if invoice.client.company %}{{ invoice.client.company }}{% else %}{{ invoice.client.name }}{% endif %}</strong>
                 </div>
-                {% if quote.validity_end_date %}
+                {% if invoice.quote %}
                 <div>
-                    Jusqu'au : <strong>{{ quote.validity_end_date|date:"d/m/Y" }}</strong>
+                    Devis : <strong>{{ invoice.quote.number }}</strong>
+                </div>
+                {% endif %}
+                {% if invoice.purchase_order %}
+                <div>
+                    BC : <strong>{{ invoice.purchase_order }}</strong>
                 </div>
                 {% endif %}
             </div>
             <div class="total-box">
                 <div>
                     <div class="label">Total TTC</div>
-                    <div class="amount">{{ quote.total_ttc|floatformat:2 }} €</div>
+                    <div class="amount">{{ invoice.total_ttc|floatformat:2 }} €</div>
                 </div>
             </div>
         </div>
@@ -483,17 +518,24 @@
             </div>
             
             <div class="party client">
-                <div class="party-label">Destinataire</div>
-                <div class="party-name">{% if quote.client.company %}{{ quote.client.company }}{% else %}{{ quote.client.name }}{% endif %}</div>
+                <div class="party-label">Client</div>
+                <div class="party-name">{% if invoice.client.company %}{{ invoice.client.company }}{% else %}{{ invoice.client.name }}{% endif %}</div>
                 <div class="party-details">
-                    {% if quote.client.company %}{{ quote.client.name }}<br>{% endif %}
-                    {% if quote.client.address %}{{ quote.client.address }}<br>{% endif %}
-                    {{ quote.client.zip_code|default:"" }} {{ quote.client.city|default:"" }}<br>
-                    {{ quote.client.email }}<br>
-                    {% if quote.client.phone %}{{ quote.client.phone }}{% endif %}
+                    {% if invoice.client.company %}{{ invoice.client.name }}<br>{% endif %}
+                    {% if invoice.client.address %}{{ invoice.client.address }}<br>{% endif %}
+                    {{ invoice.client.zip_code|default:"" }} {{ invoice.client.city|default:"" }}<br>
+                    {{ invoice.client.email }}<br>
+                    {% if invoice.client.phone %}{{ invoice.client.phone }}{% endif %}
                 </div>
             </div>
         </div>
+        
+        <!-- OVERDUE ALERT -->
+        {% if invoice.is_overdue %}
+        <div class="overdue-alert">
+            ⚠️ Facture en retard de paiement. Échéance dépassée le {{ invoice.due_date|date:"d/m/Y" }}.
+        </div>
+        {% endif %}
         
         <!-- ITEMS TABLE -->
         <div class="items-section">
@@ -508,24 +550,39 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in quote.items.all %}
-                    <tr>
-                        <td>
-                            <div class="item-description">{{ item.description }}</div>
-                            {% if item.detail %}<div class="item-detail">{{ item.detail }}</div>{% endif %}
-                        </td>
-                        <td class="center">{{ item.quantity }}</td>
-                        <td class="right amount-cell">{{ item.unit_price|floatformat:2 }}</td>
-                        <td class="center">{{ item.vat_rate|floatformat:0 }}%</td>
-                        <td class="right amount-cell">{{ item.total_ttc|floatformat:2 }}</td>
-                    </tr>
-                    {% empty %}
+                    {% if invoice.items.all|length %}
+                        {% for item in invoice.items.all %}
+                        <tr>
+                            <td>
+                                <div class="item-description">{{ item.description }}</div>
+                                {% if item.detail %}<div class="item-detail">{{ item.detail }}</div>{% endif %}
+                            </td>
+                            <td class="center">{{ item.quantity }}</td>
+                            <td class="right amount-cell">{{ item.unit_price|floatformat:2 }}</td>
+                            <td class="center">{{ item.vat_rate|floatformat:0 }}%</td>
+                            <td class="right amount-cell">{{ item.total_ttc|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% elif invoice.quote %}
+                        {% for item in invoice.quote.items.all %}
+                        <tr>
+                            <td>
+                                <div class="item-description">{{ item.description }}</div>
+                                {% if item.detail %}<div class="item-detail">{{ item.detail }}</div>{% endif %}
+                            </td>
+                            <td class="center">{{ item.quantity }}</td>
+                            <td class="right amount-cell">{{ item.unit_price|floatformat:2 }}</td>
+                            <td class="center">{{ item.vat_rate|floatformat:0 }}%</td>
+                            <td class="right amount-cell">{{ item.total_ttc|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
                     <tr>
                         <td colspan="5" style="text-align: center; color: var(--tus-gray); padding: 30px;">
                             Aucun élément
                         </td>
                     </tr>
-                    {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
         </div>
@@ -535,15 +592,21 @@
             <div class="totals-box">
                 <div class="totals-row subtotal">
                     <span class="label">Sous-total HT :</span>
-                    <span class="value">{{ quote.total_ht|floatformat:2 }} €</span>
+                    <span class="value">{{ invoice.total_ht|floatformat:2 }} €</span>
                 </div>
                 <div class="totals-row">
                     <span class="label">TVA :</span>
-                    <span class="value">{{ quote.total_vat|floatformat:2 }} €</span>
+                    <span class="value">{{ invoice.total_vat|floatformat:2 }} €</span>
                 </div>
+                {% if invoice.discount_amount %}
+                <div class="totals-row">
+                    <span class="label">Remise :</span>
+                    <span class="value">-{{ invoice.discount_amount|floatformat:2 }} €</span>
+                </div>
+                {% endif %}
                 <div class="totals-row grand-total">
                     <span class="label">Total TTC :</span>
-                    <span class="value">{{ quote.total_ttc|floatformat:2 }} €</span>
+                    <span class="value">{{ invoice.total_ttc|floatformat:2 }} €</span>
                 </div>
             </div>
         </div>
@@ -555,27 +618,42 @@
         </div>
         {% endif %}
         
+        <!-- PAYMENT SECTION -->
+        <div class="payment-section">
+            <div class="payment-box">
+                <h3>Conditions de paiement</h3>
+                <p>
+                    Paiement {{ invoice.payment_terms|default:"à 30 jours" }} à réception de facture.<br>
+                    {% if invoice.due_date %}Échéance : <strong>{{ invoice.due_date|date:"d/m/Y" }}</strong>{% endif %}
+                </p>
+            </div>
+            
+            {% if branding.iban %}
+            <div class="payment-box">
+                <h3>Informations Bancaires</h3>
+                <div class="bank-details">
+                    {% if branding.bic %}<div class="bank-row">
+                        <span class="bank-label">BIC</span>
+                        <span class="bank-value">{{ branding.bic }}</span>
+                    </div>{% endif %}
+                    {% if branding.iban %}<div class="bank-row">
+                        <span class="bank-label">IBAN</span>
+                        <span class="bank-value">{{ branding.iban }}</span>
+                    </div>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
         <!-- NOTES -->
-        {% if quote.message %}
+        {% if invoice.notes %}
         <div class="notes-section">
             <div class="notes-box">
-                <h4>Notes & Conditions</h4>
-                <p>{{ quote.message|linebreaks }}</p>
+                <h4>Notes</h4>
+                <p>{{ invoice.notes|linebreaks }}</p>
             </div>
         </div>
         {% endif %}
-        
-        <!-- SIGNATURE SECTION -->
-        <div class="signature-section">
-            <div class="signature-box">
-                <h4>Bon pour accord</h4>
-                <p>Date et signature du client</p>
-            </div>
-            <div class="signature-box">
-                <h4>{{ branding.name }}</h4>
-                <p>Signature de l'émetteur</p>
-            </div>
-        </div>
         
     </div>
 </body>

@@ -18,7 +18,7 @@ from typing import Iterable, Optional, Union
 from django.db import transaction
 
 from .models import Quote, QuoteItem
-from factures.models import Invoice, InvoiceItem
+from apps.factures.models import Invoice, InvoiceItem
 
 
 @dataclass

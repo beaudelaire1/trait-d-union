@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Code expiré - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-[#F6F7FB] flex items-center justify-center py-20">
+    <div class="max-w-md mx-auto px-6 text-center">
+        <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+
+        <h1 class="font-display text-2xl font-bold text-[#07080A] mb-4">
+            Code expiré
+        </h1>
+        
+        <p class="text-gray-600 mb-8">
+            Le code de validation pour le devis <strong>{{ quote.number }}</strong> a expiré.
+            Veuillez demander un nouveau code.
+        </p>
+
+        <a href="{% url 'devis:quote_validate_start' token=quote.public_token %}" 
+           class="inline-flex items-center gap-2 bg-[#0B2DFF] text-white py-3 px-6 rounded-xl font-semibold hover:bg-[#0922cc] transition-colors">
+            Recevoir un nouveau code
+        </a>
+    </div>
+</section>
+{% endblock %}

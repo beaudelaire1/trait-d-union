@@ -15,7 +15,7 @@ class FacturesConfig(AppConfig):
     """AppConfig pour l’app moderne de facturation."""
 
     default_auto_field = "django.db.models.BigAutoField"
-    name = "factures"
+    name = "apps.factures"
     verbose_name = "Factures"
 
     def ready(self) -> None:

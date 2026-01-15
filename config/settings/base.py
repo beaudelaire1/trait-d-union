@@ -55,6 +55,9 @@ INSTALLED_APPS = [
     'apps.portfolio',
     'apps.leads',
     'apps.resources',
+    'apps.devis',
+    'apps.factures',
+    'services',
 ]
 
 MIDDLEWARE = [
@@ -163,3 +166,27 @@ LOGGING = {
         'level': 'WARNING',
     },
 }
+
+# Branding pour les devis et factures
+INVOICE_BRANDING = {
+    'name': 'Trait d\'Union Studio',
+    'tagline': "Quand l'élégance se conçoit, la performance se déploie",
+    'address': '97300 Cayenne',
+    'city': 'Cayenne',
+    'zip_code': '97300',
+    'region': 'Guyane',
+    'country': 'France',
+    'phone': '',
+    'email': 'contact@traitdunion.it',
+    'website': 'https://traitdunion.it',
+    'siret': '',
+    'tva_intra': '',
+    'iban': '',
+    'bic': '',
+    'logo_url': '/static/img/tus-logo.svg',
+}
+
+QUOTE_BRANDING = INVOICE_BRANDING  # Alias pour les devis
+
+# Site URL (pour les emails)
+SITE_URL = os.environ.get('SITE_URL', 'https://traitdunion.it')

@@ -105,7 +105,7 @@ class DevisForm(forms.Form):
 
     service = forms.ModelChoiceField(
         label="Service souhaité",
-        queryset=Service.objects.filter(is_active=True).order_by("title"),
+        queryset=Service.objects.filter(is_active=True).order_by("name"),
         required=False,
         widget=forms.Select(attrs={"class": "select"}),
     )

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Archive des factures - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-[#F6F7FB] py-20">
+    <div class="max-w-6xl mx-auto px-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="font-display text-3xl font-bold text-[#07080A]">
+                    Archive des factures
+                </h1>
+                <p class="text-gray-600 mt-1">{{ invoices.count }} facture{{ invoices.count|pluralize }}</p>
+            </div>
+            <a href="/tus-gestion-secure/factures/invoice/" 
+               class="inline-flex items-center gap-2 bg-[#0B2DFF] text-white py-2 px-4 rounded-lg font-medium hover:bg-[#0922cc] transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Nouvelle facture
+            </a>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            {% if invoices %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-[#07080A] text-white">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Numéro</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Date</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Client</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Montant TTC</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold">Statut</th>
+                            <th class="px-6 py-4 text-right text-sm font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for invoice in invoices %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="font-mono font-medium text-[#07080A]">{{ invoice.number }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600">
+                                {{ invoice.issue_date|date:"d/m/Y" }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if invoice.quote and invoice.quote.client %}
+                                    {{ invoice.quote.client.full_name }}
+                                {% else %}
+                                    <span class="text-gray-400">—</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 font-semibold text-[#07080A]">
+                                {{ invoice.total_ttc|floatformat:2 }} €
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if invoice.status == 'paid' %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Payée
+                                    </span>
+                                {% elif invoice.status == 'sent' %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        Envoyée
+                                    </span>
+                                {% elif invoice.status == 'overdue' %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        En retard
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        {{ invoice.get_status_display }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{% url 'factures:download' pk=invoice.pk %}" 
+                                       class="p-2 text-gray-600 hover:text-[#0B2DFF] hover:bg-[#0B2DFF]/10 rounded-lg transition-colors"
+                                       title="Télécharger PDF">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                    </a>
+                                    <a href="/tus-gestion-secure/factures/invoice/{{ invoice.pk }}/change/" 
+                                       class="p-2 text-gray-600 hover:text-[#07080A] hover:bg-gray-100 rounded-lg transition-colors"
+                                       title="Modifier">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="py-16 text-center">
+                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <p class="text-gray-500 text-lg">Aucune facture pour l'instant</p>
+                <a href="/tus-gestion-secure/factures/invoice/add/" 
+                   class="inline-flex items-center gap-2 mt-4 text-[#0B2DFF] font-medium hover:underline">
+                    Créer votre première facture
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -15,7 +15,7 @@ class DevisConfig(AppConfig):
     """AppConfig pour la gestion des devis modernisés."""
 
     default_auto_field = "django.db.models.BigAutoField"
-    name = "devis"
+    name = "apps.devis"
     verbose_name = "Devis"
 
     def ready(self) -> None:

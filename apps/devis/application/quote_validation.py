@@ -6,8 +6,8 @@ from typing import Optional
 
 from django.db import transaction
 
-from devis.email_service import send_quote_validation_code
-from devis.models import Quote, QuoteValidation
+from apps.devis.email_service import send_quote_validation_code
+from apps.devis.models import Quote, QuoteValidation
 
 logger = logging.getLogger(__name__)
 
@@ -90,9 +90,8 @@ def confirm_quote_validation_code(
 
     # Best-effort: notify admins/clients
     try:
-        from core.services.notification_service import NotificationService
-
-        NotificationService().notify_quote_validation(quote)
+        # Notification service removed - no external notifications in this project
+        logger.info("Devis %s validé avec succès", getattr(quote, "number", quote.pk))
     except Exception:
         logger.exception("Echec notification après validation devis (%s)", getattr(quote, "number", quote.pk))
 

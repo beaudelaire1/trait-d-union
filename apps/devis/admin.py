@@ -2,16 +2,15 @@ from django.contrib import admin, messages
 from django.urls import path, reverse
 from django.shortcuts import get_object_or_404, redirect
 from django import forms
-from tinymce.widgets import TinyMCE
 from .models import Quote, QuoteItem, Client
 
 
 class QuoteAdminForm(forms.ModelForm):
-    """Custom admin form for Quote with TinyMCE for notes field."""
+    """Custom admin form for Quote with Textarea for notes field."""
     
     notes = forms.CharField(
         label="Notes internes",
-        widget=TinyMCE(attrs={'cols': 80, 'rows': 15}),
+        widget=forms.Textarea(attrs={'cols': 80, 'rows': 15}),
         required=False,
         help_text="Notes internes pour le devis"
     )

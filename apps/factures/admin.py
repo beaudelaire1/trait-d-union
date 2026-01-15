@@ -10,20 +10,18 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.core.files.base import ContentFile
 from django import forms
-from tinymce.widgets import TinyMCE
 import os
 from django.urls import reverse
 
 from .models import Invoice, InvoiceItem
-from core.services.email_service import PremiumEmailService
 
 
 class InvoiceAdminForm(forms.ModelForm):
-    """Custom admin form for Invoice with TinyMCE for notes field."""
+    """Custom admin form for Invoice with Textarea for notes field."""
     
     notes = forms.CharField(
         label="Notes",
-        widget=TinyMCE(attrs={'cols': 80, 'rows': 15}),
+        widget=forms.Textarea(attrs={'cols': 80, 'rows': 15}),
         required=False,
         help_text="Notes pour la facture"
     )

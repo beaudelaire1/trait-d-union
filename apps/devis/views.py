@@ -13,10 +13,9 @@ from services.models import Service
 from .forms import QuoteRequestForm, QuoteAdminForm
 from .models import QuoteRequest, Quote, QuoteRequestPhoto, QuoteValidation
 from .services import create_invoice_from_quote
-from core.services.document_generator import DocumentGenerator
 from .email_service import send_quote_email
 from .forms import QuoteValidationCodeForm
-from devis.application.quote_validation import (
+from apps.devis.application.quote_validation import (
     QuoteNotValidatableError,
     QuoteValidationExpiredError,
     confirm_quote_validation_code,
@@ -80,7 +79,7 @@ def admin_quote_edit(request, pk):
         if form.is_valid():
             form.save()
             if action == "generate_pdf":
-                DocumentGenerator.generate_quote_pdf(quote, attach=True)
+                quote.generate_pdf(attach=True)
                 messages.success(request, "PDF généré.")
             elif action == "send_email":
                 if not quote.pdf:
