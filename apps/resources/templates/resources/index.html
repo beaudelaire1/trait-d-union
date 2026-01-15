@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% block title %}Ressources gratuites – Trait d'Union Studio{% endblock %}
+{% block meta_description %}Téléchargez nos ressources gratuites : checklists, modèles de cahier des charges et guides pour réussir votre projet web.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen relative overflow-hidden">
+    <!-- Arrière-plan -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-tus-blue/15 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-tus-blue/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="py-20 px-6 relative z-10">
+        <div class="max-w-6xl mx-auto text-center animate-fade-in">
+            <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue text-sm font-medium mb-6">100% gratuit</span>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
+                Ressources <span class="text-tus-blue">premium</span>
+            </h1>
+            <p class="text-tus-white/70 text-lg max-w-2xl mx-auto">
+                Des outils concrets pour préparer et réussir votre projet web. Téléchargez gratuitement nos guides et templates.
+            </p>
+        </div>
+    </section>
+
+    <!-- Resources Grid -->
+    <section class="py-16 px-6 relative z-10">
+        <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
+            
+            <!-- Checklist -->
+            <div class="group relative animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-tus-blue/50 to-tus-blue/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                <div class="relative bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 h-full hover:border-tus-blue/30 transition-all duration-500">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-tus-blue/10 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="inline-block px-2 py-1 bg-green-500/10 text-green-400 text-xs font-medium rounded mb-2">PDF</span>
+                            <h3 class="text-xl font-display font-bold">Checklist projet web premium</h3>
+                        </div>
+                    </div>
+                    <p class="text-tus-white/60 mb-6">
+                        Les 25 étapes essentielles pour préparer un projet web haut de gamme. De la définition des objectifs au lancement, ne manquez aucune étape cruciale.
+                    </p>
+                    <ul class="space-y-2 text-sm text-tus-white/70 mb-8">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            25 points de contrôle détaillés
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Conseils d'experts inclus
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Format imprimable
+                        </li>
+                    </ul>
+                    <a href="{% url 'resources:download' 'checklist' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-tus-blue rounded-xl text-tus-white font-medium hover:shadow-lg hover:shadow-tus-blue/30 hover:-translate-y-0.5 transition-all duration-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Télécharger gratuitement
+                    </a>
+                </div>
+            </div>
+
+            <!-- Cahier des charges -->
+            <div class="group relative animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-tus-blue/50 to-tus-blue/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                <div class="relative bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 h-full hover:border-tus-blue/30 transition-all duration-500">
+                    <div class="flex items-start gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-tus-blue/10 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="inline-block px-2 py-1 bg-blue-500/10 text-blue-400 text-xs font-medium rounded mb-2">DOCX</span>
+                            <h3 class="text-xl font-display font-bold">Modèle de cahier des charges</h3>
+                        </div>
+                    </div>
+                    <p class="text-tus-white/60 mb-6">
+                        Un template professionnel pour rédiger votre cahier des charges. Structure claire, questions guidées et exemples concrets pour ne rien oublier.
+                    </p>
+                    <ul class="space-y-2 text-sm text-tus-white/70 mb-8">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Structure professionnelle
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Questions guidées
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Modifiable à volonté
+                        </li>
+                    </ul>
+                    <a href="{% url 'resources:download' 'cahier-des-charges' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-tus-blue rounded-xl text-tus-white font-medium hover:shadow-lg hover:shadow-tus-blue/30 hover:-translate-y-0.5 transition-all duration-300">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Télécharger gratuitement
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter CTA -->
+    <section class="py-20 px-6 relative z-10">
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 border border-tus-blue/20 rounded-2xl p-8 md:p-12 text-center">
+                <h2 class="text-2xl md:text-3xl font-display font-bold mb-4">
+                    Besoin d'aide pour votre projet ?
+                </h2>
+                <p class="text-tus-white/70 mb-8 max-w-xl mx-auto">
+                    Nos experts sont là pour vous accompagner. Discutons de votre projet lors d'un appel découverte gratuit.
+                </p>
+                <a href="{% url 'leads:contact' %}" class="group relative inline-flex items-center gap-2">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-tus-blue to-[#2D5BFF] rounded-xl blur opacity-60 group-hover:opacity-100 transition duration-500"></div>
+                    <span class="relative px-8 py-4 bg-tus-blue rounded-xl text-tus-white font-display font-semibold group-hover:-translate-y-0.5 transition-transform duration-300">
+                        Prendre rendez-vous
+                        <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

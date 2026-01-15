@@ -1,0 +1,13 @@
+# robots.txt for Trait d'Union Studio
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://traitdunion.studio/sitemap.xml
+
+# Disallow admin
+User-agent: *
+Disallow: /admin/
+
+# Disallow media uploads
+Disallow: /media/leads/

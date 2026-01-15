@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% block title %}Contact – Trait d'Union Studio{% endblock %}
+{% block content %}
+<div class="min-h-screen py-16 px-6 relative overflow-hidden">
+    <!-- Arrière-plan avec effets lumineux -->
+    <div class="absolute inset-0 pointer-events-none">
+        <!-- Blob bleu en haut à gauche -->
+        <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-tus-blue/20 rounded-full blur-[150px]"></div>
+        <!-- Blob bleu en bas à droite -->
+        <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-tus-blue/15 rounded-full blur-[120px]"></div>
+        <!-- Blob subtil au centre -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-tus-blue/5 via-tus-blue/10 to-tus-blue/5 rounded-full blur-[100px]"></div>
+    </div>
+
+    <div class="max-w-4xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-12 animate-fade-in">
+            <h1 class="text-4xl md:text-5xl font-display font-bold mb-4">Parlons de votre <span class="text-tus-blue">projet</span></h1>
+            <p class="text-tus-white/70 max-w-xl mx-auto">Décrivez-nous votre vision. Nous transformons vos idées en expériences digitales d'exception.</p>
+        </div>
+
+        <!-- Bande fixe avec dégradé animé et texte défilant - 25px -->
+        <div class="h-[25px] overflow-hidden relative rounded-t-2xl">
+            <!-- Dégradé mobile en arrière-plan -->
+            <div class="absolute inset-0 bg-gradient-to-r from-tus-blue via-[#2D5BFF] to-tus-blue bg-[length:200%_100%] animate-gradient-shift"></div>
+            <!-- Texte défilant (commence à droite, sort à gauche, puis recommence) -->
+            <div class="absolute inset-0 flex items-center justify-center">
+                <div class="animate-text-scroll whitespace-nowrap text-xs font-display font-semibold text-tus-white tracking-wider uppercase">
+                    ✦ Quand l'élégance se conçoit, la performance se déploie ✦
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire Glassmorphism -->
+        <div class="relative rounded-b-2xl p-8 md:p-12 animate-slide-up overflow-hidden">
+            <!-- Fond glass -->
+            <div class="absolute inset-0 bg-tus-white/[0.03] backdrop-blur-xl"></div>
+            <!-- Bordure dégradée subtile -->
+            <div class="absolute inset-0 rounded-b-2xl border border-tus-white/10"></div>
+            <!-- Reflet en haut -->
+            <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-tus-white/20 to-transparent"></div>
+            <!-- Lueur interne subtile -->
+            <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/[0.02] to-transparent"></div>
+            
+            <form method="post" enctype="multipart/form-data" class="space-y-6 relative z-10">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Nom -->
+                <div class="space-y-2">
+                    <label for="id_name" class="block text-sm font-medium text-tus-white/80">{{ form.name.label }}</label>
+                    <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}"
+                           class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/30 focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300"
+                           placeholder="Votre nom complet">
+                    {% if form.name.errors %}<p class="text-red-400 text-sm mt-1">{{ form.name.errors.0 }}</p>{% endif %}
+                </div>
+                
+                <!-- Email -->
+                <div class="space-y-2">
+                    <label for="id_email" class="block text-sm font-medium text-tus-white/80">{{ form.email.label }}</label>
+                    <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}"
+                           class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/30 focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300"
+                           placeholder="votre@email.com">
+                    {% if form.email.errors %}<p class="text-red-400 text-sm mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+
+            <!-- Type de projet -->
+            <div class="space-y-2">
+                <label for="id_project_type" class="block text-sm font-medium text-tus-white/80">{{ form.project_type.label }}</label>
+                <select name="project_type" id="id_project_type"
+                        class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300 cursor-pointer"
+                        hx-get="{% url 'leads:dynamic_fields' %}" 
+                        hx-trigger="change" 
+                        hx-target="#dynamic-fields" 
+                        hx-swap="innerHTML"
+                        hx-include="this">
+                    {% for value, label in form.project_type.field.choices %}
+                    <option value="{{ value }}" {% if form.project_type.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Champs dynamiques HTMX -->
+            <div id="dynamic-fields" class="transition-all duration-300"></div>
+
+            <!-- Message -->
+            <div class="space-y-2">
+                <label for="id_message" class="block text-sm font-medium text-tus-white/80">{{ form.message.label }}</label>
+                <textarea name="message" id="id_message" rows="5"
+                          class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/30 focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300 resize-none"
+                          placeholder="Décrivez votre projet, vos objectifs, votre vision...">{{ form.message.value|default:'' }}</textarea>
+                {% if form.message.errors %}<p class="text-red-400 text-sm mt-1">{{ form.message.errors.0 }}</p>{% endif %}
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Budget -->
+                <div class="space-y-2">
+                    <label for="id_budget" class="block text-sm font-medium text-tus-white/80">{{ form.budget.label }}</label>
+                    <select name="budget" id="id_budget"
+                            class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300 cursor-pointer">
+                        {% for value, label in form.budget.field.choices %}
+                        <option value="{{ value }}" {% if form.budget.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- URL existante -->
+                <div class="space-y-2">
+                    <label for="id_existing_url" class="block text-sm font-medium text-tus-white/80">{{ form.existing_url.label }}</label>
+                    <input type="url" name="existing_url" id="id_existing_url" value="{{ form.existing_url.value|default:'' }}"
+                           class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/30 focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300"
+                           placeholder="https://votre-site-actuel.com">
+                </div>
+            </div>
+
+            <!-- Pièce jointe -->
+            <div class="space-y-2">
+                <label for="id_attachment" class="block text-sm font-medium text-tus-white/80">{{ form.attachment.label }}</label>
+                <div class="relative">
+                    <input type="file" name="attachment" id="id_attachment"
+                           class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 border-dashed rounded-xl px-4 py-6 text-tus-white/60 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-tus-blue/80 file:text-tus-white file:font-medium file:cursor-pointer file:hover:bg-tus-blue hover:bg-tus-white/10 hover:border-tus-blue/30 transition-all duration-300">
+                </div>
+                {% if form.attachment.errors %}<p class="text-red-400 text-sm mt-1">{{ form.attachment.errors.0 }}</p>{% endif %}
+            </div>
+
+            {{ form.honeypot }}
+            
+            <!-- reCAPTCHA v3 token (invisible) -->
+            <input type="hidden" name="g-recaptcha-response" id="recaptcha-token">
+
+            <!-- Submit -->
+            <div class="relative group">
+                <!-- Glow externe -->
+                <div class="absolute -inset-1 bg-gradient-to-r from-tus-blue via-[#2D5BFF] to-tus-blue rounded-2xl opacity-50 blur-lg group-hover:opacity-80 transition-all duration-500"></div>
+                <button type="submit" id="submit-btn"
+                        class="relative w-full bg-gradient-to-r from-tus-blue to-[#2D5BFF] text-tus-white font-display font-semibold py-4 px-8 rounded-xl border border-tus-white/20 hover:border-tus-white/40 hover:shadow-[0_0_40px_rgba(11,45,255,0.4)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                    <span class="relative z-10">Envoyer ma demande</span>
+                    <!-- Shine effect -->
+                    <div class="absolute inset-0 rounded-xl overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    </div>
+                </button>
+            </div>
+            
+            <!-- Note de confidentialité reCAPTCHA -->
+            <p class="text-xs text-tus-white/40 text-center mt-4">
+                Ce site est protégé par reCAPTCHA. La <a href="https://policies.google.com/privacy" target="_blank" class="underline hover:text-tus-blue transition-colors">Politique de confidentialité</a> et les <a href="https://policies.google.com/terms" target="_blank" class="underline hover:text-tus-blue transition-colors">Conditions d'utilisation</a> de Google s'appliquent.
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if recaptcha_site_key %}
+<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
+<script>
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        submitBtn.querySelector('span').textContent = 'Vérification...';
+        
+        grecaptcha.ready(function() {
+            grecaptcha.execute('{{ recaptcha_site_key }}', {action: 'contact'}).then(function(token) {
+                document.getElementById('recaptcha-token').value = token;
+                form.submit();
+            });
+        });
+    });
+</script>
+{% endif %}
+{% endblock %}

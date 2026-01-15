@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Trait d'Union Studio{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Agence web en Guyane et Outre-mer. Création de sites vitrines, e-commerce et plateformes sur-mesure. Design premium et performance maximale.{% endblock %}">
+    <!-- OpenGraph tags -->
+    <meta property="og:title" content="{% block og_title %}Trait d'Union Studio{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Studio de design et développement web de luxe technologique.{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{% static 'images/og-default.png' %}{% endblock %}">
+    <!-- Google Fonts - Space Grotesk & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tus-black': '#07080A',
+                        'tus-white': '#F6F7FB',
+                        'tus-blue': '#0B2DFF',
+                        'surface-dark': '#0D1016',
+                        'stroke-dark': 'rgba(246,247,251,0.10)',
+                    },
+                    fontFamily: {
+                        'display': ['Space Grotesk', 'system-ui', 'sans-serif'],
+                        'body': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                        'slide-up': 'slideUp 0.8s ease-out forwards',
+                        'slide-in-right': 'slideInRight 0.6s ease-out forwards',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+                        'marquee': 'marquee 20s linear infinite',
+                        'gradient-shift': 'gradientShift 3s ease-in-out infinite',
+                        'text-scroll': 'textScroll 18s linear infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideInRight: {
+                            '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(11,45,255,0.3)' },
+                            '50%': { boxShadow: '0 0 40px rgba(11,45,255,0.6)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-50%)' },
+                        },
+                        gradientShift: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' },
+                        },
+                        textScroll: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        /* Fix pour les options de select sur fond sombre */
+        select option {
+            background-color: #07080A;
+            color: #F6F7FB;
+            padding: 12px;
+        }
+        select option:hover,
+        select option:focus,
+        select option:checked {
+            background-color: #0B2DFF;
+            color: #F6F7FB;
+        }
+        /* Fix pour les navigateurs WebKit */
+        select::-webkit-scrollbar {
+            width: 8px;
+        }
+        select::-webkit-scrollbar-track {
+            background: #0D1016;
+        }
+        select::-webkit-scrollbar-thumb {
+            background: rgba(11,45,255,0.5);
+            border-radius: 4px;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-tus-black text-tus-white font-body antialiased">
+    {% include 'partials/navbar.html' %}
+    <main class="min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+    {% include 'partials/footer.html' %}
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script>
+        // HTMX premium animations
+        document.body.addEventListener('htmx:beforeRequest', function(evt) {
+            const target = evt.detail.elt;
+            target.style.transition = 'opacity 0.3s ease';
+            target.style.opacity = '0.6';
+        });
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            const target = evt.detail.elt;
+            target.style.opacity = '0';
+            target.style.transform = 'translateY(10px)';
+            requestAnimationFrame(() => {
+                target.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                target.style.opacity = '1';
+                target.style.transform = 'translateY(0)';
+            });
+        });
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            evt.detail.elt.style.opacity = '1';
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

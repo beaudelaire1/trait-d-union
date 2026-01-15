@@ -1,0 +1,53 @@
+<nav class="px-6 py-4 border-b border-stroke-dark backdrop-blur-md bg-tus-black/80 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <!-- Logo SVG -->
+        <a href="/" class="group">
+            <svg height="36" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d'Union Studio">
+                <defs>
+                    <linearGradient id="tusGradNav" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#0B2DFF"/>
+                        <stop offset="0.62" stop-color="#2D5BFF"/>
+                        <stop offset="1" stop-color="#F6F7FB"/>
+                    </linearGradient>
+                </defs>
+                <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB" class="group-hover:fill-tus-blue transition-colors">TRAIT D'UNION</text>
+                <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradNav)" class="origin-left group-hover:scale-x-110 transition-transform"/>
+                <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+            </svg>
+        </a>
+        
+        <!-- Navigation -->
+        <ul class="hidden md:flex items-center gap-8 text-sm font-medium">
+            <li>
+                <a href="/services/" class="relative py-2 text-tus-white/80 hover:text-tus-white transition-colors group">
+                    Services
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-tus-blue group-hover:w-full transition-all duration-300"></span>
+                </a>
+            </li>
+            <li>
+                <a href="/portfolio/" class="relative py-2 text-tus-white/80 hover:text-tus-white transition-colors group">
+                    Portfolio
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-tus-blue group-hover:w-full transition-all duration-300"></span>
+                </a>
+            </li>
+            <li>
+                <a href="/method/" class="relative py-2 text-tus-white/80 hover:text-tus-white transition-colors group">
+                    Méthode
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-tus-blue group-hover:w-full transition-all duration-300"></span>
+                </a>
+            </li>
+            <li>
+                <a href="/contact/" class="bg-tus-blue px-5 py-2.5 rounded-full font-semibold hover:shadow-lg hover:shadow-tus-blue/30 hover:-translate-y-0.5 transition-all duration-300">
+                    Contact
+                </a>
+            </li>
+        </ul>
+        
+        <!-- Mobile menu button -->
+        <button class="md:hidden text-tus-white p-2" aria-label="Menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+    </div>
+</nav>

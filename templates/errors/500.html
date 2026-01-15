@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Oops ! Erreur interne du serveur{% endblock %}
+
+{% block content %}
+<section class="py-16 text-center">
+  <div class="container mx-auto px-4">
+    <h1 class="text-4xl font-bold mb-4">Une erreur est survenue</h1>
+    <p class="text-lg mb-8">
+      Nous sommes désolés, une erreur inattendue s’est produite. Notre équipe a été informée.
+    </p>
+    <a href="/" class="inline-block px-6 py-3 bg-black text-white rounded hover:bg-gray-800">
+      Retour à l’accueil
+    </a>
+  </div>
+</section>
+{% endblock %}

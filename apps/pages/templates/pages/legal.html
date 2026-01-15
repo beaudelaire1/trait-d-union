@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Mentions légales – Trait d'Union Studio{% endblock %}
+{% block meta_description %}Mentions légales et politique de confidentialité de Trait d'Union Studio.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-20 px-6 relative overflow-hidden">
+    <!-- Arrière-plan -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-[400px] h-[400px] bg-tus-blue/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="max-w-4xl mx-auto relative z-10">
+        <div class="animate-fade-in">
+            <h1 class="text-4xl md:text-5xl font-display font-bold mb-4">
+                Mentions <span class="text-tus-blue">légales</span>
+            </h1>
+            <p class="text-tus-white/60 mb-12">Dernière mise à jour : Janvier 2026</p>
+        </div>
+
+        <div class="space-y-12 animate-slide-up">
+            <!-- Éditeur -->
+            <section class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8">
+                <h2 class="text-2xl font-display font-bold mb-4 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-tus-blue/20 flex items-center justify-center text-tus-blue text-sm">1</span>
+                    Éditeur du site
+                </h2>
+                <div class="text-tus-white/70 space-y-2">
+                    <p><strong class="text-tus-white">Trait d'Union Studio</strong></p>
+                    <p>Agence web basée en Guyane française</p>
+                    <p>Zone d'intervention : Guyane, Martinique, Guadeloupe, Réunion et Outre-mer</p>
+                    <p>Siège social : [Adresse à compléter], Guyane française</p>
+                    <p>SIRET : [Numéro à compléter]</p>
+                    <p>RCS : Cayenne</p>
+                </div>
+            </section>
+
+            <!-- Directeur publication -->
+            <section class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8">
+                <h2 class="text-2xl font-display font-bold mb-4 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-tus-blue/20 flex items-center justify-center text-tus-blue text-sm">2</span>
+                    Directeur de la publication
+                </h2>
+                <p class="text-tus-white/70">[Nom du directeur de publication]</p>
+            </section>
+
+            <!-- Hébergeur -->
+            <section class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8">
+                <h2 class="text-2xl font-display font-bold mb-4 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-tus-blue/20 flex items-center justify-center text-tus-blue text-sm">3</span>
+                    Hébergement
+                </h2>
+                <div class="text-tus-white/70 space-y-2">
+                    <p><strong class="text-tus-white">Hostinger International Ltd.</strong></p>
+                    <p>61 Lordou Vironos Street, 6023 Larnaca, Chypre</p>
+                    <p>Site web : <a href="https://www.hostinger.fr" class="text-tus-blue hover:underline">www.hostinger.fr</a></p>
+                </div>
+            </section>
+
+            <!-- Propriété intellectuelle -->
+            <section class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8">
+                <h2 class="text-2xl font-display font-bold mb-4 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-tus-blue/20 flex items-center justify-center text-tus-blue text-sm">4</span>
+                    Propriété intellectuelle
+                </h2>
+                <p class="text-tus-white/70">
+                    L'ensemble du contenu de ce site (textes, images, vidéos, logos, icônes, etc.) est la propriété exclusive de Trait d'Union Studio ou de ses partenaires. Toute reproduction, représentation, modification, publication, adaptation de tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé, est interdite, sauf autorisation écrite préalable.
+                </p>
+            </section>
+
+            <!-- Protection des données -->
+            <section class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8">
+                <h2 class="text-2xl font-display font-bold mb-4 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-tus-blue/20 flex items-center justify-center text-tus-blue text-sm">5</span>
+                    Protection des données personnelles
+                </h2>
+                <div class="text-tus-white/70 space-y-4">
+                    <p>
+                        Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition aux données personnelles vous concernant.
+                    </p>
+                    <p>
+                        Les informations collectées via le formulaire de contact sont destinées uniquement à Trait d'Union Studio et ne sont jamais transmises à des tiers sans votre consentement explicite.
+                    </p>
+                    <p>
+                        Pour exercer vos droits, contactez-nous à : <a href="mailto:contact@traitdunion.it" class="text-tus-blue hover:underline">contact@traitdunion.it</a>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Cookies -->
+            <section class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8">
+                <h2 class="text-2xl font-display font-bold mb-4 flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-tus-blue/20 flex items-center justify-center text-tus-blue text-sm">6</span>
+                    Cookies
+                </h2>
+                <p class="text-tus-white/70">
+                    Ce site utilise des cookies techniques nécessaires à son bon fonctionnement. Aucun cookie publicitaire ou de tracking n'est utilisé. En naviguant sur ce site, vous acceptez l'utilisation de ces cookies essentiels.
+                </p>
+            </section>
+        </div>
+
+        <!-- Contact -->
+        <div class="mt-16 text-center">
+            <p class="text-tus-white/60 mb-4">Une question concernant ces mentions légales ?</p>
+            <a href="{% url 'leads:contact' %}" class="inline-flex items-center gap-2 text-tus-blue hover:underline">
+                Contactez-nous
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

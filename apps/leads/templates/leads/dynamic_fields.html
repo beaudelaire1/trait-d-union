@@ -1,0 +1,9 @@
+{% for field in form.visible_fields %}
+    {% if not field.name == 'project_type' %}
+    <div class="mb-4">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.errors %}<p class="text-red-500 text-sm">{{ field.errors.0 }}</p>{% endif %}
+    </div>
+    {% endif %}
+{% endfor %}

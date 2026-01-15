@@ -1,0 +1,206 @@
+/* ============================================
+   TRAIT D'UNION STUDIO - Premium CSS
+   « Quand l'élégance se conçoit, la performance se déploie. »
+   ============================================ */
+
+:root {
+    /* Couleurs officielles */
+    --tus-black: #07080A;
+    --tus-white: #F6F7FB;
+    --tus-blue: #0B2DFF;
+    --surface-dark: #0D1016;
+    --stroke-dark: rgba(246,247,251,0.10);
+}
+
+/* ============================================
+   Base
+   ============================================ */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: var(--tus-black);
+    color: var(--tus-white);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* ============================================
+   Links & Buttons
+   ============================================ */
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--tus-blue);
+    color: var(--tus-white);
+    padding: 0.875rem 2rem;
+    border-radius: 9999px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 40px rgba(11, 45, 255, 0.4);
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: var(--tus-white);
+    padding: 0.875rem 2rem;
+    border: 1px solid var(--stroke-dark);
+    border-radius: 9999px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:hover {
+    border-color: var(--tus-blue);
+    background-color: rgba(11, 45, 255, 0.1);
+}
+
+/* ============================================
+   Cards Premium
+   ============================================ */
+.card-premium {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    border: 1px solid var(--stroke-dark);
+    border-radius: 18px;
+    padding: 2rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-premium:hover {
+    border-color: rgba(11, 45, 255, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   Gradient Text
+   ============================================ */
+.gradient-text {
+    background: linear-gradient(90deg, var(--tus-blue), #2D5BFF, var(--tus-white));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ============================================
+   Glass Effect
+   ============================================ */
+.glass {
+    background: rgba(13, 16, 22, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* ============================================
+   Form Inputs Premium
+   ============================================ */
+input, select, textarea {
+    font-family: 'Inter', sans-serif;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+}
+
+/* Custom select arrow */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23F6F7FB'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
+    padding-right: 3rem;
+}
+
+/* ============================================
+   Loading States
+   ============================================ */
+.htmx-request {
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.htmx-request::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top-color: var(--tus-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Scrollbar Premium
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--tus-black);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--stroke-dark);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(246,247,251,0.2);
+}
+
+/* ============================================
+   Selection
+   ============================================ */
+::selection {
+    background-color: var(--tus-blue);
+    color: var(--tus-white);
+}
+
+/* ============================================
+   Glow Effects
+   ============================================ */
+.glow-blue {
+    box-shadow: 0 0 60px rgba(11, 45, 255, 0.3);
+}
+
+.glow-blue-hover:hover {
+    box-shadow: 0 0 80px rgba(11, 45, 255, 0.5);
+}

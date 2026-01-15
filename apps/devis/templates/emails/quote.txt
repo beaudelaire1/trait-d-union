@@ -1,0 +1,4 @@
+
+Bonjour,
+
+Veuillez trouver votre devis {{ quote.number }} en pièce jointe.

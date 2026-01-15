@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Portfolio – Trait d’Union Studio{% endblock %}
+{% block content %}
+<div class="min-h-screen py-20 px-6 relative overflow-hidden">
+    <!-- Arrière-plan avec effets lumineux -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-tus-blue/15 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-tus-blue/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto relative z-10">
+        <!-- Header -->
+        <div class="text-center mb-16 animate-fade-in">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
+                Nos <span class="text-tus-blue">réalisations</span>
+            </h1>
+            <p class="text-tus-white/70 max-w-2xl mx-auto text-lg">
+                Découvrez nos projets les plus récents. Chaque création est unique, pensée et développée sur mesure.
+            </p>
+        </div>
+
+        <!-- Filtres -->
+        <div class="flex flex-wrap justify-center gap-3 mb-12 animate-slide-up">
+            <button hx-get="?" hx-target="#project-list" hx-push-url="true"
+                    class="px-6 py-3 rounded-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 text-tus-white font-medium hover:bg-tus-blue hover:border-tus-blue transition-all duration-300">
+                Tous
+            </button>
+            <button hx-get="?type=vitrine" hx-target="#project-list" hx-push-url="true"
+                    class="px-6 py-3 rounded-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 text-tus-white font-medium hover:bg-tus-blue hover:border-tus-blue transition-all duration-300">
+                Sites vitrine
+            </button>
+            <button hx-get="?type=commerce" hx-target="#project-list" hx-push-url="true"
+                    class="px-6 py-3 rounded-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 text-tus-white font-medium hover:bg-tus-blue hover:border-tus-blue transition-all duration-300">
+                E-commerce
+            </button>
+            <button hx-get="?type=systeme" hx-target="#project-list" hx-push-url="true"
+                    class="px-6 py-3 rounded-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 text-tus-white font-medium hover:bg-tus-blue hover:border-tus-blue transition-all duration-300">
+                Plateformes/ERP
+            </button>
+        </div>
+
+        <!-- Liste des projets -->
+        <div id="project-list">
+            {% include 'portfolio/_project_list_partial.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

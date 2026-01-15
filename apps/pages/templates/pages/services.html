@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block title %}Services – Trait d’Union Studio{% endblock %}
+{% block meta_description %}Découvrez nos services de création web premium : sites vitrine, e-commerce et plateformes sur mesure.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen relative overflow-hidden">
+    <!-- Arrière-plan -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-tus-blue/15 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-tus-blue/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="py-20 px-6 relative z-10">
+        <div class="max-w-6xl mx-auto text-center animate-fade-in">
+            <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue text-sm font-medium mb-6">Nos expertises</span>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
+                Des solutions <span class="text-tus-blue">sur mesure</span>
+            </h1>
+            <p class="text-tus-white/70 text-lg max-w-2xl mx-auto">
+                Chaque projet est unique. Nous adaptons notre expertise à vos besoins pour créer des expériences digitales qui convertissent.
+            </p>
+        </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section class="py-16 px-6 relative z-10">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+            
+            <!-- Site Vitrine -->
+            <div class="group relative animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-tus-blue/50 to-tus-blue/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                <div class="relative bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 h-full hover:border-tus-blue/30 transition-all duration-500">
+                    <div class="w-14 h-14 rounded-xl bg-tus-blue/10 flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold mb-4">Site Vitrine</h3>
+                    <p class="text-tus-white/60 mb-6">Une présence en ligne élégante et performante qui reflète l'excellence de votre marque.</p>
+                    <ul class="space-y-3 text-sm text-tus-white/70">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Design sur mesure
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Optimisation SEO
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Responsive & performant
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Animations premium
+                        </li>
+                    </ul>
+                    <div class="mt-8 pt-6 border-t border-tus-white/10">
+                        <span class="text-tus-white/40 text-sm">À partir de</span>
+                        <p class="text-2xl font-display font-bold text-tus-blue">3 000 €</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- E-commerce -->
+            <div class="group relative animate-slide-up" style="animation-delay: 0.2s;">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-tus-blue/50 to-tus-blue/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                <div class="relative bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 h-full hover:border-tus-blue/30 transition-all duration-500">
+                    <!-- Badge populaire -->
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+                        <span class="px-4 py-1 bg-tus-blue text-tus-white text-xs font-semibold rounded-full">Populaire</span>
+                    </div>
+                    <div class="w-14 h-14 rounded-xl bg-tus-blue/10 flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold mb-4">E-commerce</h3>
+                    <p class="text-tus-white/60 mb-6">Une boutique en ligne optimisée pour maximiser vos conversions et fidéliser vos clients.</p>
+                    <ul class="space-y-3 text-sm text-tus-white/70">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Tunnel de vente optimisé
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Paiement sécurisé
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Gestion des stocks
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Analytics & reporting
+                        </li>
+                    </ul>
+                    <div class="mt-8 pt-6 border-t border-tus-white/10">
+                        <span class="text-tus-white/40 text-sm">À partir de</span>
+                        <p class="text-2xl font-display font-bold text-tus-blue">8 000 €</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plateforme -->
+            <div class="group relative animate-slide-up" style="animation-delay: 0.3s;">
+                <div class="absolute -inset-0.5 bg-gradient-to-r from-tus-blue/50 to-tus-blue/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+                <div class="relative bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 h-full hover:border-tus-blue/30 transition-all duration-500">
+                    <div class="w-14 h-14 rounded-xl bg-tus-blue/10 flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-display font-bold mb-4">Plateforme</h3>
+                    <p class="text-tus-white/60 mb-6">Des outils métier sur mesure pour automatiser et optimiser vos processus internes.</p>
+                    <ul class="space-y-3 text-sm text-tus-white/70">
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Architecture scalable
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            API & intégrations
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Dashboard personnalisé
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-tus-blue flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                            Support dédié
+                        </li>
+                    </ul>
+                    <div class="mt-8 pt-6 border-t border-tus-white/10">
+                        <span class="text-tus-white/40 text-sm">À partir de</span>
+                        <p class="text-2xl font-display font-bold text-tus-blue">15 000 €</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-6 relative z-10">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-display font-bold mb-6">
+                Prêt à donner vie à votre projet ?
+            </h2>
+            <p class="text-tus-white/70 mb-8 max-w-xl mx-auto">
+                Discutons de vos besoins et trouvons ensemble la solution idéale pour votre entreprise.
+            </p>
+            <a href="{% url 'leads:contact' %}" class="group relative inline-flex items-center gap-2">
+                <div class="absolute -inset-1 bg-gradient-to-r from-tus-blue to-[#2D5BFF] rounded-xl blur opacity-60 group-hover:opacity-100 transition duration-500"></div>
+                <span class="relative px-8 py-4 bg-tus-blue rounded-xl text-tus-white font-display font-semibold group-hover:-translate-y-0.5 transition-transform duration-300">
+                    Démarrer un projet
+                    <svg class="w-5 h-5 inline ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </span>
+            </a>
+        </div>
+    </section>
+</div>
+{% endblock %}
