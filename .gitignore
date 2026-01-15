@@ -30,3 +30,7 @@ staticfiles/
 # OS
 .DS_Store
 Thumbs.db
+
+# Test scripts (local only)
+send_test_*.py
+*_test_*.py
