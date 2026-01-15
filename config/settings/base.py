@@ -148,6 +148,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Email backend
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# Email configuration
+# In production, override via environment variables
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'contact@traitdunion.it')
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.it')
+
 # reCAPTCHA v3 settings
 # Obtenez vos clés sur https://www.google.com/recaptcha/admin
 RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
