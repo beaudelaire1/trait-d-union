@@ -7,3 +7,4 @@ mysqlclient>=2.2.0
 gunicorn>=21.0.0
 weasyprint>=67.0
 num2words>=0.5.13
+django-jazzmin
