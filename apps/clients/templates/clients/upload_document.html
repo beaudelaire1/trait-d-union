@@ -1,30 +1,107 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Uploader un document - Espace Client{% endblock %}
+{% block title %}Uploader un document - Espace Client | Trait d'Union Studio{% endblock %}
 
 {% block content %}
 <div class="client-portal">
-    <header class="client-header">
-        <div class="container">
-            <nav class="client-breadcrumb">
-                <a href="{% url 'clients:dashboard' %}">Espace client</a>
-                <span>/</span>
-                <a href="{% url 'clients:documents' %}">Documents</a>
-                <span>/</span>
-                <span>Uploader</span>
-            </nav>
-            <h1>Uploader un document</h1>
+    <!-- Sidebar -->
+    <aside class="client-sidebar">
+        <div class="sidebar-header">
+            <div class="user-avatar">
+                <span>{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}</span>
+            </div>
+            <div class="user-info">
+                <h3>{{ request.user.get_full_name|default:request.user.username }}</h3>
+                <p>{{ request.user.client_profile.company_name|default:"Client" }}</p>
+            </div>
         </div>
-    </header>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'clients:dashboard' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Tableau de bord</span>
+            </a>
+            <a href="{% url 'clients:projects' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Mes projets</span>
+            </a>
+            <a href="{% url 'clients:quotes' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <span>Devis</span>
+            </a>
+            <a href="{% url 'clients:invoices' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                <span>Factures</span>
+            </a>
+            <a href="{% url 'clients:documents' %}" class="nav-item active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                    <polyline points="13 2 13 9 20 9"></polyline>
+                </svg>
+                <span>Documents</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="{% url 'clients:profile' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Mon profil</span>
+            </a>
+            <a href="{% url 'account_logout' %}" class="nav-item logout">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Déconnexion</span>
+            </a>
+        </nav>
+    </aside>
 
-    <section class="client-main">
-        <div class="container">
+    <!-- Main Content -->
+    <main class="client-main">
+        <header class="client-header">
+            <div class="header-content">
+                <div>
+                    <nav class="breadcrumb">
+                        <a href="{% url 'clients:dashboard' %}">Tableau de bord</a>
+                        <span>/</span>
+                        <a href="{% url 'clients:documents' %}">Documents</a>
+                        <span>/</span>
+                        <span>Uploader</span>
+                    </nav>
+                    <h1>Uploader un document</h1>
+                </div>
+            </div>
+        </header>
+
+        <div class="client-content">
             <div class="upload-form-wrapper">
                 {% if project %}
-                    <div class="upload-context">
-                        <span class="context-label">Projet :</span>
-                        <span class="context-value">{{ project.name }}</span>
-                    </div>
+                <div class="upload-context">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span class="context-label">Projet :</span>
+                    <span class="context-value">{{ project.name }}</span>
+                </div>
                 {% endif %}
 
                 <form method="post" enctype="multipart/form-data" class="upload-form">
@@ -35,83 +112,264 @@
                         <input type="file" name="file" id="file-input" class="dropzone-input" 
                                accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.zip,.svg,.ai,.psd">
                         <div class="dropzone-content">
-                            <span class="dropzone-icon">📤</span>
+                            <div class="dropzone-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
                             <p class="dropzone-text">Glissez-déposez votre fichier ici</p>
                             <p class="dropzone-hint">ou cliquez pour sélectionner</p>
                             <p class="dropzone-formats">PDF, DOC, PNG, JPG, ZIP, SVG, AI, PSD</p>
                         </div>
                         <div class="dropzone-preview" id="dropzone-preview" style="display: none;">
-                            <span class="preview-icon">📄</span>
+                            <div class="preview-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                            </div>
                             <span class="preview-name" id="preview-name"></span>
-                            <button type="button" class="preview-remove" id="preview-remove">×</button>
+                            <button type="button" class="preview-remove" id="preview-remove">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="id_title">Nom du document *</label>
-                        {{ form.title }}
+                        <input type="text" name="title" id="id_title" placeholder="Nom du document" required>
                     </div>
 
                     <div class="form-group">
                         <label for="id_document_type">Type de document</label>
-                        {{ form.document_type }}
+                        <select name="document_type" id="id_document_type">
+                            <option value="other">Autre</option>
+                            <option value="brief">Brief / Cahier des charges</option>
+                            <option value="logo">Logo / Identité visuelle</option>
+                            <option value="content">Contenu (textes, images)</option>
+                            <option value="assets">Assets graphiques</option>
+                            <option value="contract">Contrat / Document légal</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
                         <label for="id_notes">Notes (optionnel)</label>
-                        {{ form.notes }}
+                        <textarea name="notes" id="id_notes" rows="3" placeholder="Notes additionnelles (optionnel)"></textarea>
                     </div>
 
                     <div class="form-actions">
-                        <a href="{% url 'clients:documents' %}" class="btn btn-outline">Annuler</a>
-                        <button type="submit" class="btn btn-primary">Uploader</button>
+                        <a href="{% url 'clients:documents' %}" class="btn-secondary">Annuler</a>
+                        <button type="submit" class="btn-primary">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            Uploader
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
-    </section>
+    </main>
 </div>
 
 <style>
+/* Portal Layout - Dark Theme */
+.client-portal {
+    display: flex;
+    min-height: 100vh;
+    background: #0a0a0f;
+    padding-top: 80px;
+}
+
+/* Sidebar */
+.client-sidebar {
+    width: 280px;
+    background: #12121a;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    position: fixed;
+    top: 80px;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #8B5CF6, #6366F1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    font-size: 1rem;
+}
+
+.user-info h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f6f7fb;
+    margin-bottom: 0.125rem;
+}
+
+.user-info p {
+    font-size: 0.8rem;
+    color: rgba(246,247,251,0.5);
+    margin: 0;
+}
+
+.sidebar-nav {
+    padding: 1rem 0.75rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    color: rgba(246,247,251,0.7);
+    text-decoration: none;
+    border-radius: 10px;
+    margin-bottom: 0.25rem;
+    transition: all 0.2s;
+}
+
+.nav-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: #f6f7fb;
+}
+
+.nav-item.active {
+    background: rgba(139,92,246,0.15);
+    color: #8B5CF6;
+}
+
+.nav-item.active svg {
+    stroke: #8B5CF6;
+}
+
+.nav-item.logout {
+    color: rgba(239,68,68,0.8);
+}
+
+.nav-item.logout:hover {
+    background: rgba(239,68,68,0.1);
+    color: #EF4444;
+}
+
+.nav-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 1rem 0;
+}
+
+/* Main Content */
+.client-main {
+    flex: 1;
+    margin-left: 280px;
+    padding: 2rem;
+}
+
+.client-header {
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb a {
+    color: #8B5CF6;
+    text-decoration: none;
+}
+
+.breadcrumb span {
+    color: rgba(246,247,251,0.4);
+}
+
+.client-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f6f7fb;
+}
+
+/* Upload Form */
 .upload-form-wrapper {
     max-width: 600px;
-    margin: 0 auto;
-    background: white;
+    background: #12121a;
     padding: 2rem;
-    border-radius: 1rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
 .upload-context {
-    background: var(--gray-50);
-    padding: 1rem;
-    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(139,92,246,0.1);
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
     margin-bottom: 1.5rem;
+    border: 1px solid rgba(139,92,246,0.2);
+}
+
+.upload-context svg {
+    stroke: #8B5CF6;
 }
 
 .context-label {
-    color: var(--gray-500);
-    margin-right: 0.5rem;
+    color: rgba(246,247,251,0.6);
 }
 
 .context-value {
     font-weight: 600;
+    color: #f6f7fb;
 }
 
+/* Dropzone */
 .dropzone {
-    border: 2px dashed var(--gray-300);
-    border-radius: 1rem;
-    padding: 2rem;
+    border: 2px dashed rgba(255,255,255,0.2);
+    border-radius: 16px;
+    padding: 3rem 2rem;
     text-align: center;
     cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
     position: relative;
+    background: rgba(255,255,255,0.02);
 }
 
 .dropzone:hover,
 .dropzone.dragover {
-    border-color: var(--primary);
-    background: rgba(var(--primary-rgb), 0.02);
+    border-color: #8B5CF6;
+    background: rgba(139,92,246,0.05);
 }
 
 .dropzone-input {
@@ -125,25 +383,37 @@
 }
 
 .dropzone-icon {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: rgba(139,92,246,0.1);
+    border-radius: 50%;
+    margin-bottom: 1.25rem;
+}
+
+.dropzone-icon svg {
+    stroke: #8B5CF6;
 }
 
 .dropzone-text {
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-}
-
-.dropzone-hint {
-    color: var(--gray-500);
-    font-size: 0.875rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #f6f7fb;
     margin-bottom: 0.5rem;
 }
 
+.dropzone-hint {
+    color: rgba(246,247,251,0.5);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
 .dropzone-formats {
-    color: var(--gray-400);
-    font-size: 0.75rem;
+    color: rgba(246,247,251,0.35);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
 }
 
 .dropzone-preview {
@@ -151,35 +421,54 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    padding: 1rem;
-    background: var(--gray-50);
-    border-radius: 0.5rem;
+    padding: 1.25rem;
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 10px;
 }
 
 .preview-icon {
-    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(34,197,94,0.2);
+    border-radius: 8px;
+}
+
+.preview-icon svg {
+    stroke: #4ADE80;
 }
 
 .preview-name {
     font-weight: 500;
+    color: #f6f7fb;
+    flex: 1;
 }
 
 .preview-remove {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     border: none;
-    background: var(--gray-300);
-    color: white;
+    background: rgba(239,68,68,0.2);
     cursor: pointer;
-    font-size: 1rem;
-    line-height: 1;
+    transition: all 0.2s;
+}
+
+.preview-remove svg {
+    stroke: #F87171;
 }
 
 .preview-remove:hover {
-    background: var(--gray-400);
+    background: rgba(239,68,68,0.3);
 }
 
+/* Form */
 .form-group {
     margin-bottom: 1.5rem;
 }
@@ -188,29 +477,127 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
+    color: rgba(246,247,251,0.8);
+    font-size: 0.9rem;
 }
 
-.form-input,
-.form-select {
+.form-group input,
+.form-group select,
+.form-group textarea {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--gray-300);
-    border-radius: 0.5rem;
-    font-size: 1rem;
+    padding: 0.875rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #f6f7fb;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
 }
 
-.form-input:focus,
-.form-select:focus {
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(246,247,251,0.4);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    border-color: #8B5CF6;
+    background: rgba(139,92,246,0.05);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
 }
 
+.form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(246,247,251,0.5)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+}
+
+.form-group select option {
+    background: #12121a;
+    color: #f6f7fb;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Form Actions */
 .form-actions {
     display: flex;
-    justify-content: flex-end;
     gap: 1rem;
+    justify-content: flex-end;
     margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.btn-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: rgba(246,247,251,0.8);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    color: #f6f7fb;
+}
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: #8B5CF6;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #7C3AED;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(139,92,246,0.4);
+}
+
+@media (max-width: 1024px) {
+    .client-sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .client-main {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .upload-form-wrapper {
+        padding: 1.5rem;
+    }
 }
 </style>
 

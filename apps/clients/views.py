@@ -49,11 +49,11 @@ class DashboardView(ClientRequiredMixin, TemplateView):
         from apps.factures.models import Invoice
         
         context['recent_quotes'] = Quote.objects.filter(
-            client_email=self.request.user.email
+            client__email=self.request.user.email
         ).order_by('-created_at')[:5]
         
         context['recent_invoices'] = Invoice.objects.filter(
-            client_email=self.request.user.email
+            quote__client__email=self.request.user.email
         ).order_by('-created_at')[:5]
         
         return context
@@ -164,7 +164,7 @@ class QuoteListView(ClientRequiredMixin, ListView):
     def get_queryset(self):
         from apps.devis.models import Quote
         return Quote.objects.filter(
-            client_email=self.request.user.email
+            client__email=self.request.user.email
         ).order_by('-created_at')
 
 
@@ -176,5 +176,5 @@ class InvoiceListView(ClientRequiredMixin, ListView):
     def get_queryset(self):
         from apps.factures.models import Invoice
         return Invoice.objects.filter(
-            client_email=self.request.user.email
+            quote__client__email=self.request.user.email
         ).order_by('-created_at')

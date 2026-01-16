@@ -5,276 +5,615 @@
 
 {% block content %}
 <div class="client-portal">
-    <!-- Header -->
-    <header class="client-header">
-        <div class="container">
-            <div class="client-header-content">
-                <div class="client-welcome">
-                    <h1>Bonjour, {{ request.user.client_profile.full_name }} 👋</h1>
-                    <p class="text-muted">Bienvenue dans votre espace client</p>
-                </div>
-                <a href="{% url 'clients:profile' %}" class="btn btn-outline">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    Mon profil
-                </a>
+    <!-- Sidebar -->
+    <aside class="client-sidebar">
+        <div class="sidebar-header">
+            <div class="user-avatar">
+                <span>{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}</span>
+            </div>
+            <div class="user-info">
+                <h3>{{ request.user.get_full_name|default:request.user.username }}</h3>
+                <p>{{ request.user.client_profile.company_name|default:"Client" }}</p>
             </div>
         </div>
-    </header>
-
-    <!-- Stats Cards -->
-    <section class="client-stats">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">📁</div>
-                    <div class="stat-content">
-                        <span class="stat-value">{{ stats.total_projects }}</span>
-                        <span class="stat-label">Projets</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🔄</div>
-                    <div class="stat-content">
-                        <span class="stat-value">{{ stats.active_projects }}</span>
-                        <span class="stat-label">En cours</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📄</div>
-                    <div class="stat-content">
-                        <span class="stat-value">{{ stats.documents }}</span>
-                        <span class="stat-label">Documents</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'clients:dashboard' %}" class="nav-item active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Tableau de bord</span>
+            </a>
+            <a href="{% url 'clients:projects' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Mes projets</span>
+            </a>
+            <a href="{% url 'clients:quotes' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                <span>Devis</span>
+            </a>
+            <a href="{% url 'clients:invoices' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                <span>Factures</span>
+            </a>
+            <a href="{% url 'clients:documents' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                    <polyline points="13 2 13 9 20 9"></polyline>
+                </svg>
+                <span>Documents</span>
+            </a>
+            
+            <div class="nav-divider"></div>
+            
+            <a href="{% url 'clients:profile' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Mon profil</span>
+            </a>
+            <a href="{% url 'account_logout' %}" class="nav-item logout">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Déconnexion</span>
+            </a>
+        </nav>
+    </aside>
 
     <!-- Main Content -->
-    <section class="client-main">
-        <div class="container">
-            <div class="client-grid">
-                <!-- Active Projects -->
-                <div class="client-card">
-                    <div class="card-header">
-                        <h2>Projets en cours</h2>
-                        <a href="{% url 'clients:projects' %}" class="link-arrow">Voir tout →</a>
-                    </div>
-                    <div class="card-content">
-                        {% if active_projects %}
-                            <div class="project-list">
-                                {% for project in active_projects %}
-                                <a href="{% url 'clients:project_detail' project.pk %}" class="project-item">
-                                    <div class="project-info">
-                                        <span class="project-name">{{ project.name }}</span>
-                                        <span class="project-status">{{ project.get_status_display }}</span>
-                                    </div>
-                                    <div class="project-progress">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" style="width: {{ project.progress }}%"></div>
-                                        </div>
-                                        <span class="progress-text">{{ project.progress }}%</span>
-                                    </div>
-                                </a>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <p>Aucun projet en cours</p>
-                            </div>
-                        {% endif %}
-                    </div>
+    <main class="client-main">
+        <!-- Header -->
+        <header class="client-header">
+            <div class="header-content">
+                <div>
+                    <h1>Bonjour, {{ request.user.first_name|default:request.user.username }} 👋</h1>
+                    <p class="header-subtitle">Bienvenue dans votre espace client premium</p>
                 </div>
-
-                <!-- Recent Quotes -->
-                <div class="client-card">
-                    <div class="card-header">
-                        <h2>Derniers devis</h2>
-                        <a href="{% url 'clients:quotes' %}" class="link-arrow">Voir tout →</a>
-                    </div>
-                    <div class="card-content">
-                        {% if recent_quotes %}
-                            <div class="document-list">
-                                {% for quote in recent_quotes %}
-                                <a href="{% url 'devis:quote_detail' quote.pk %}" class="document-item">
-                                    <span class="doc-icon">📋</span>
-                                    <div class="doc-info">
-                                        <span class="doc-title">Devis {{ quote.reference }}</span>
-                                        <span class="doc-meta">{{ quote.total_ttc|floatformat:2 }}€ • {{ quote.created_at|date:"d/m/Y" }}</span>
-                                    </div>
-                                    <span class="doc-status status-{{ quote.status }}">{{ quote.get_status_display }}</span>
-                                </a>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <p>Aucun devis</p>
-                            </div>
-                        {% endif %}
-                    </div>
+                <div class="header-actions">
+                    <a href="{% url 'leads:contact' %}" class="btn-client-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Nouveau projet
+                    </a>
                 </div>
+            </div>
+        </header>
 
-                <!-- Recent Invoices -->
-                <div class="client-card">
-                    <div class="card-header">
-                        <h2>Dernières factures</h2>
-                        <a href="{% url 'clients:invoices' %}" class="link-arrow">Voir tout →</a>
-                    </div>
-                    <div class="card-content">
-                        {% if recent_invoices %}
-                            <div class="document-list">
-                                {% for invoice in recent_invoices %}
-                                <a href="{% url 'factures:invoice_detail' invoice.pk %}" class="document-item">
-                                    <span class="doc-icon">🧾</span>
-                                    <div class="doc-info">
-                                        <span class="doc-title">Facture {{ invoice.reference }}</span>
-                                        <span class="doc-meta">{{ invoice.total_ttc|floatformat:2 }}€ • {{ invoice.created_at|date:"d/m/Y" }}</span>
-                                    </div>
-                                    <span class="doc-status status-{{ invoice.status }}">{{ invoice.get_status_display }}</span>
-                                </a>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <p>Aucune facture</p>
-                            </div>
-                        {% endif %}
-                    </div>
+        <!-- Stats -->
+        <section class="stats-section">
+            <div class="stat-card gradient-blue">
+                <div class="stat-icon-wrap">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
                 </div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ stats.total_projects }}</span>
+                    <span class="stat-label">Projets totaux</span>
+                </div>
+            </div>
+            <div class="stat-card gradient-purple">
+                <div class="stat-icon-wrap">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ stats.active_projects }}</span>
+                    <span class="stat-label">En cours</span>
+                </div>
+            </div>
+            <div class="stat-card gradient-green">
+                <div class="stat-icon-wrap">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ stats.documents }}</span>
+                    <span class="stat-label">Documents</span>
+                </div>
+            </div>
+            <div class="stat-card gradient-orange">
+                <div class="stat-icon-wrap">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-value">{{ recent_quotes|length }}</span>
+                    <span class="stat-label">Devis récents</span>
+                </div>
+            </div>
+        </section>
 
-                <!-- Recent Documents -->
-                <div class="client-card">
-                    <div class="card-header">
-                        <h2>Documents récents</h2>
-                        <a href="{% url 'clients:documents' %}" class="link-arrow">Voir tout →</a>
-                    </div>
-                    <div class="card-content">
-                        {% if recent_documents %}
-                            <div class="document-list">
-                                {% for doc in recent_documents %}
-                                <a href="{{ doc.file.url }}" target="_blank" class="document-item">
-                                    <span class="doc-icon">
-                                        {% if doc.is_image %}🖼️{% else %}📎{% endif %}
-                                    </span>
-                                    <div class="doc-info">
-                                        <span class="doc-title">{{ doc.title }}</span>
-                                        <span class="doc-meta">{{ doc.get_document_type_display }} • {{ doc.created_at|date:"d/m/Y" }}</span>
+        <!-- Content Grid -->
+        <section class="content-grid">
+            <!-- Active Projects -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Projets en cours
+                    </h2>
+                    <a href="{% url 'clients:projects' %}" class="card-link">Voir tout →</a>
+                </div>
+                <div class="card-body">
+                    {% if active_projects %}
+                        <div class="project-list">
+                            {% for project in active_projects %}
+                            <a href="{% url 'clients:project_detail' project.pk %}" class="project-item">
+                                <div class="project-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                        <polyline points="2 17 12 22 22 17"></polyline>
+                                        <polyline points="2 12 12 17 22 12"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="project-details">
+                                    <span class="project-name">{{ project.name }}</span>
+                                    <span class="project-status status-{{ project.status }}">{{ project.get_status_display }}</span>
+                                </div>
+                                <div class="project-progress-wrap">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: {{ project.progress }}%"></div>
                                     </div>
-                                </a>
-                                {% endfor %}
+                                    <span class="progress-label">{{ project.progress }}%</span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                                </svg>
                             </div>
-                        {% else %}
-                            <div class="empty-state">
-                                <p>Aucun document</p>
-                                <a href="{% url 'clients:upload_document' %}" class="btn btn-sm">Uploader un fichier</a>
+                            <p>Aucun projet en cours</p>
+                            <a href="{% url 'leads:contact' %}" class="btn-small">Démarrer un projet</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Quotes -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        Derniers devis
+                    </h2>
+                    <a href="{% url 'clients:quotes' %}" class="card-link">Voir tout →</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_quotes %}
+                        <div class="document-list">
+                            {% for quote in recent_quotes %}
+                            <div class="document-item">
+                                <div class="doc-icon quote">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    </svg>
+                                </div>
+                                <div class="doc-info">
+                                    <span class="doc-name">{{ quote.number }}</span>
+                                    <span class="doc-meta">{{ quote.created_at|date:"d/m/Y" }} • {{ quote.total_ttc|floatformat:2 }}€</span>
+                                </div>
+                                <span class="doc-status status-{{ quote.status }}">{{ quote.get_status_display }}</span>
                             </div>
-                        {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                </svg>
+                            </div>
+                            <p>Aucun devis pour le moment</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Invoices -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
+                        Dernières factures
+                    </h2>
+                    <a href="{% url 'clients:invoices' %}" class="card-link">Voir tout →</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_invoices %}
+                        <div class="document-list">
+                            {% for invoice in recent_invoices %}
+                            <div class="document-item">
+                                <div class="doc-icon invoice">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                    </svg>
+                                </div>
+                                <div class="doc-info">
+                                    <span class="doc-name">{{ invoice.number }}</span>
+                                    <span class="doc-meta">{{ invoice.issue_date|date:"d/m/Y" }} • {{ invoice.total_ttc|floatformat:2 }}€</span>
+                                </div>
+                                <span class="doc-status status-{{ invoice.status }}">{{ invoice.get_status_display }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                                </svg>
+                            </div>
+                            <p>Aucune facture pour le moment</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="content-card actions-card">
+                <div class="card-header">
+                    <h2>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                        Actions rapides
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="quick-actions">
+                        <a href="{% url 'clients:upload_document' %}" class="action-btn">
+                            <div class="action-icon upload">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <span>Uploader un fichier</span>
+                        </a>
+                        <a href="{% url 'leads:contact' %}" class="action-btn">
+                            <div class="action-icon message">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </div>
+                            <span>Nous contacter</span>
+                        </a>
+                        <a href="{% url 'leads:contact' %}" class="action-btn">
+                            <div class="action-icon quote">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                </svg>
+                            </div>
+                            <span>Demander un devis</span>
+                        </a>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Quick Actions -->
-    <section class="client-actions">
-        <div class="container">
-            <h2>Actions rapides</h2>
-            <div class="actions-grid">
-                <a href="{% url 'clients:upload_document' %}" class="action-card">
-                    <span class="action-icon">📤</span>
-                    <span class="action-label">Uploader un fichier</span>
-                </a>
-                <a href="{% url 'leads:contact' %}" class="action-card">
-                    <span class="action-icon">💬</span>
-                    <span class="action-label">Nous contacter</span>
-                </a>
-                <a href="{% url 'leads:quote_request' %}" class="action-card">
-                    <span class="action-icon">📝</span>
-                    <span class="action-label">Demander un devis</span>
-                </a>
-            </div>
-        </div>
-    </section>
+        </section>
+    </main>
 </div>
 
 <style>
+/* ========================================
+   ESPACE CLIENT PREMIUM - TRAIT D'UNION STUDIO
+   ======================================== */
+
+:root {
+    --client-bg: #0a0a0f;
+    --client-surface: #12121a;
+    --client-surface-hover: #1a1a25;
+    --client-border: rgba(255,255,255,0.08);
+    --client-text: #f6f7fb;
+    --client-text-muted: rgba(246,247,251,0.6);
+    --client-blue: #0B2DFF;
+    --client-blue-soft: rgba(11,45,255,0.15);
+    --client-purple: #8B5CF6;
+    --client-green: #10B981;
+    --client-orange: #F59E0B;
+    --client-red: #EF4444;
+    --sidebar-width: 280px;
+}
+
 .client-portal {
     min-height: 100vh;
-    background: var(--gray-50);
-}
-
-.client-header {
-    background: white;
-    border-bottom: 1px solid var(--gray-200);
-    padding: 2rem 0;
-}
-
-.client-header-content {
+    background: var(--client-bg);
     display: flex;
-    justify-content: space-between;
+    padding-top: 80px;
+}
+
+/* ========================================
+   SIDEBAR
+   ======================================== */
+.client-sidebar {
+    width: var(--sidebar-width);
+    background: var(--client-surface);
+    border-right: 1px solid var(--client-border);
+    padding: 2rem 1.5rem;
+    position: fixed;
+    top: 80px;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 40;
+}
+
+.sidebar-header {
+    display: flex;
     align-items: center;
     gap: 1rem;
-    flex-wrap: wrap;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--client-border);
+    margin-bottom: 1.5rem;
 }
 
-.client-welcome h1 {
-    font-size: 1.75rem;
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--client-blue), var(--client-purple));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.user-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--client-text);
     margin-bottom: 0.25rem;
 }
 
-.client-stats {
-    padding: 2rem 0;
+.user-info p {
+    font-size: 0.85rem;
+    color: var(--client-text-muted);
 }
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 10px;
+    color: var(--client-text-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+    background: var(--client-surface-hover);
+    color: var(--client-text);
+}
+
+.nav-item.active {
+    background: var(--client-blue-soft);
+    color: var(--client-blue);
+}
+
+.nav-item.active svg {
+    stroke: var(--client-blue);
+}
+
+.nav-item.logout {
+    color: var(--client-red);
+}
+
+.nav-item.logout:hover {
+    background: rgba(239,68,68,0.1);
+}
+
+.nav-divider {
+    height: 1px;
+    background: var(--client-border);
+    margin: 1rem 0;
+}
+
+/* ========================================
+   MAIN CONTENT
+   ======================================== */
+.client-main {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    max-width: calc(100vw - var(--sidebar-width));
+}
+
+.client-header {
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 1rem;
+}
+
+.client-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--client-text);
+    margin-bottom: 0.25rem;
+}
+
+.header-subtitle {
+    color: var(--client-text-muted);
+    font-size: 0.95rem;
+}
+
+.btn-client-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--client-blue);
+    color: white;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-client-primary:hover {
+    background: #0922cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(11,45,255,0.4);
+}
+
+/* ========================================
+   STATS
+   ======================================== */
+.stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: white;
-    border-radius: 1rem;
     padding: 1.5rem;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     gap: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
 }
 
-.stat-icon {
-    font-size: 2rem;
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.3;
+}
+
+.gradient-blue {
+    background: linear-gradient(135deg, rgba(11,45,255,0.2), rgba(11,45,255,0.05));
+    border: 1px solid rgba(11,45,255,0.2);
+}
+.gradient-blue::before { background: var(--client-blue); }
+
+.gradient-purple {
+    background: linear-gradient(135deg, rgba(139,92,246,0.2), rgba(139,92,246,0.05));
+    border: 1px solid rgba(139,92,246,0.2);
+}
+.gradient-purple::before { background: var(--client-purple); }
+
+.gradient-green {
+    background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.05));
+    border: 1px solid rgba(16,185,129,0.2);
+}
+.gradient-green::before { background: var(--client-green); }
+
+.gradient-orange {
+    background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.05));
+    border: 1px solid rgba(245,158,11,0.2);
+}
+.gradient-orange::before { background: var(--client-orange); }
+
+.stat-icon-wrap {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon-wrap svg {
+    stroke: var(--client-text);
 }
 
 .stat-value {
     display: block;
     font-size: 1.75rem;
     font-weight: 700;
+    color: var(--client-text);
 }
 
 .stat-label {
-    color: var(--gray-500);
-    font-size: 0.875rem;
+    display: block;
+    font-size: 0.85rem;
+    color: var(--client-text-muted);
+    margin-top: 0.25rem;
 }
 
-.client-main {
-    padding-bottom: 3rem;
-}
-
-.client-grid {
+/* ========================================
+   CONTENT CARDS
+   ======================================== */
+.content-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
 }
 
-.client-card {
-    background: white;
-    border-radius: 1rem;
+.content-card {
+    background: var(--client-surface);
+    border: 1px solid var(--client-border);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 .card-header {
@@ -282,162 +621,333 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--client-border);
 }
 
 .card-header h2 {
-    font-size: 1.125rem;
-    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--client-text);
 }
 
-.link-arrow {
-    color: var(--primary);
-    font-size: 0.875rem;
+.card-header h2 svg {
+    stroke: var(--client-blue);
+}
+
+.card-link {
+    font-size: 0.85rem;
+    color: var(--client-blue);
+    text-decoration: none;
     font-weight: 500;
+    transition: opacity 0.2s;
 }
 
-.card-content {
-    padding: 1rem;
+.card-link:hover {
+    opacity: 0.8;
 }
 
-.project-list, .document-list {
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Project List */
+.project-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
-.project-item, .document-item {
+.project-item {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 0.875rem;
-    border-radius: 0.75rem;
-    transition: background 0.2s;
+    padding: 1rem;
+    background: var(--client-surface-hover);
+    border-radius: 10px;
     text-decoration: none;
-    color: inherit;
+    transition: all 0.2s ease;
 }
 
-.project-item:hover, .document-item:hover {
-    background: var(--gray-50);
+.project-item:hover {
+    background: rgba(255,255,255,0.08);
+    transform: translateX(4px);
 }
 
-.project-info {
+.project-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--client-blue-soft);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.project-icon svg {
+    stroke: var(--client-blue);
+}
+
+.project-details {
     flex: 1;
 }
 
-.project-name, .doc-title {
+.project-name {
     display: block;
-    font-weight: 500;
-    margin-bottom: 0.125rem;
+    font-weight: 600;
+    color: var(--client-text);
+    margin-bottom: 0.25rem;
 }
 
 .project-status {
-    font-size: 0.75rem;
-    color: var(--gray-500);
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
 }
 
-.project-progress {
+.project-progress-wrap {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-end;
     gap: 0.5rem;
+    min-width: 80px;
 }
 
 .progress-bar {
-    width: 80px;
+    width: 100%;
     height: 6px;
-    background: var(--gray-200);
+    background: rgba(255,255,255,0.1);
     border-radius: 3px;
     overflow: hidden;
 }
 
 .progress-fill {
     height: 100%;
-    background: var(--primary);
+    background: linear-gradient(90deg, var(--client-blue), var(--client-purple));
     border-radius: 3px;
-    transition: width 0.3s;
+    transition: width 0.3s ease;
 }
 
-.progress-text {
+.progress-label {
     font-size: 0.75rem;
-    color: var(--gray-500);
-    min-width: 35px;
+    color: var(--client-text-muted);
+    font-weight: 600;
+}
+
+/* Document List */
+.document-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.document-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    background: var(--client-surface-hover);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.document-item:hover {
+    background: rgba(255,255,255,0.08);
 }
 
 .doc-icon {
-    font-size: 1.5rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.doc-icon.quote {
+    background: rgba(11,45,255,0.15);
+}
+.doc-icon.quote svg { stroke: var(--client-blue); }
+
+.doc-icon.invoice {
+    background: rgba(16,185,129,0.15);
+}
+.doc-icon.invoice svg { stroke: var(--client-green); }
 
 .doc-info {
     flex: 1;
 }
 
+.doc-name {
+    display: block;
+    font-weight: 600;
+    color: var(--client-text);
+    font-size: 0.9rem;
+}
+
 .doc-meta {
-    font-size: 0.75rem;
-    color: var(--gray-500);
+    display: block;
+    font-size: 0.8rem;
+    color: var(--client-text-muted);
+    margin-top: 0.15rem;
 }
 
 .doc-status {
     font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-weight: 500;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.status-draft { background: var(--gray-100); color: var(--gray-600); }
-.status-sent { background: #dbeafe; color: #1e40af; }
-.status-accepted, .status-paid { background: #dcfce7; color: #166534; }
-.status-rejected { background: #fee2e2; color: #991b1b; }
+/* Status Colors */
+.status-draft { background: rgba(107,114,128,0.2); color: #9CA3AF; }
+.status-sent { background: rgba(59,130,246,0.2); color: #60A5FA; }
+.status-accepted { background: rgba(16,185,129,0.2); color: #34D399; }
+.status-rejected { background: rgba(239,68,68,0.2); color: #F87171; }
+.status-paid { background: rgba(16,185,129,0.2); color: #34D399; }
+.status-overdue { background: rgba(239,68,68,0.2); color: #F87171; }
+.status-partial { background: rgba(245,158,11,0.2); color: #FBBF24; }
 
+.status-briefing { background: rgba(59,130,246,0.2); color: #60A5FA; }
+.status-design { background: rgba(139,92,246,0.2); color: #A78BFA; }
+.status-development { background: rgba(245,158,11,0.2); color: #FBBF24; }
+.status-review { background: rgba(236,72,153,0.2); color: #F472B6; }
+.status-delivered { background: rgba(16,185,129,0.2); color: #34D399; }
+
+/* Empty State */
 .empty-state {
     text-align: center;
-    padding: 2rem 1rem;
-    color: var(--gray-500);
+    padding: 2rem;
 }
 
-.client-actions {
-    padding: 2rem 0 4rem;
+.empty-icon {
+    margin-bottom: 1rem;
 }
 
-.client-actions h2 {
-    margin-bottom: 1.5rem;
+.empty-icon svg {
+    stroke: var(--client-text-muted);
+    opacity: 0.5;
 }
 
-.actions-grid {
+.empty-state p {
+    color: var(--client-text-muted);
+    margin-bottom: 1rem;
+}
+
+.btn-small {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: var(--client-blue);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-small:hover {
+    background: #0922cc;
+}
+
+/* Quick Actions */
+.actions-card {
+    grid-column: span 2;
+}
+
+.quick-actions {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
 }
 
-.action-card {
+.action-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
     padding: 1.5rem;
-    background: white;
-    border-radius: 1rem;
+    background: var(--client-surface-hover);
+    border-radius: 12px;
     text-decoration: none;
-    color: inherit;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: all 0.2s ease;
 }
 
-.action-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.action-btn:hover {
+    background: rgba(255,255,255,0.08);
+    transform: translateY(-4px);
 }
 
 .action-icon {
-    font-size: 2rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.action-label {
-    font-weight: 500;
+.action-icon.upload {
+    background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(139,92,246,0.1));
+}
+.action-icon.upload svg { stroke: var(--client-purple); }
+
+.action-icon.message {
+    background: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(16,185,129,0.1));
+}
+.action-icon.message svg { stroke: var(--client-green); }
+
+.action-icon.quote {
+    background: linear-gradient(135deg, rgba(11,45,255,0.3), rgba(11,45,255,0.1));
+}
+.action-icon.quote svg { stroke: var(--client-blue); }
+
+.action-btn span {
+    font-weight: 600;
+    color: var(--client-text);
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 1200px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+    .actions-card {
+        grid-column: span 1;
+    }
 }
 
 @media (max-width: 768px) {
-    .client-grid {
+    .client-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .client-main {
+        margin-left: 0;
+        max-width: 100%;
+        padding: 1rem;
+    }
+    
+    .stats-section {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .quick-actions {
         grid-template-columns: 1fr;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 </style>

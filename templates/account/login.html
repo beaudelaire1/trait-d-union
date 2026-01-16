@@ -1,0 +1,408 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Connexion - Espace Client | Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <!-- Left side - Branding -->
+        <div class="auth-branding">
+            <div class="branding-content">
+                <div class="brand-logo">
+                    <svg height="48" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="tusGradAuth" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#0B2DFF"/>
+                                <stop offset="0.62" stop-color="#2D5BFF"/>
+                                <stop offset="1" stop-color="#F6F7FB"/>
+                            </linearGradient>
+                        </defs>
+                        <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D'UNION</text>
+                        <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradAuth)"/>
+                        <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+                    </svg>
+                </div>
+                <h1>Espace Client</h1>
+                <p>Accédez à vos projets, devis et factures en toute sécurité.</p>
+                
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">📁</div>
+                        <span>Suivi de vos projets en temps réel</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">📄</div>
+                        <span>Accès à tous vos documents</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">💬</div>
+                        <span>Communication directe avec notre équipe</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right side - Form -->
+        <div class="auth-form-section">
+            <div class="auth-form-container">
+                <h2>Connexion</h2>
+                <p class="auth-subtitle">Bienvenue ! Connectez-vous à votre espace.</p>
+                
+                {% if form.errors %}
+                <div class="auth-error">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span>Email ou mot de passe incorrect</span>
+                </div>
+                {% endif %}
+                
+                <form method="post" action="{% url 'account_login' %}" class="auth-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="id_login">Email</label>
+                        <div class="input-wrapper">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            <input type="email" name="login" id="id_login" placeholder="votre@email.com" required autofocus>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_password">Mot de passe</label>
+                        <div class="input-wrapper">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <input type="password" name="password" id="id_password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="remember" id="id_remember">
+                            <span class="checkmark"></span>
+                            <span>Se souvenir de moi</span>
+                        </label>
+                        <a href="{% url 'account_reset_password' %}" class="forgot-link">Mot de passe oublié ?</a>
+                    </div>
+                    
+                    {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+                    {% endif %}
+                    
+                    <button type="submit" class="btn-auth-submit">
+                        Connexion
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </form>
+                
+                <p class="auth-footer">
+                    Pas encore de compte ? <a href="{% url 'account_signup' %}">Créer un compte</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ========================================
+   AUTH PAGES - PREMIUM DESIGN
+   ======================================== */
+.auth-page {
+    min-height: 100vh;
+    background: #0a0a0f;
+    padding-top: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 1100px;
+    width: 100%;
+    margin: 2rem;
+    background: #12121a;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Branding Side */
+.auth-branding {
+    background: linear-gradient(135deg, #0B2DFF 0%, #1a1a2e 100%);
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-branding::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+}
+
+.branding-content {
+    position: relative;
+    z-index: 1;
+}
+
+.brand-logo {
+    margin-bottom: 2rem;
+}
+
+.auth-branding h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.75rem;
+}
+
+.auth-branding > .branding-content > p {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.feature-icon {
+    font-size: 1.5rem;
+}
+
+.feature-item span {
+    color: white;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+/* Form Side */
+.auth-form-section {
+    padding: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-form-container {
+    width: 100%;
+    max-width: 380px;
+}
+
+.auth-form-container h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f6f7fb;
+    margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+    color: rgba(246,247,251,0.6);
+    margin-bottom: 2rem;
+}
+
+.auth-error {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    color: #F87171;
+    font-size: 0.9rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: rgba(246,247,251,0.8);
+    margin-bottom: 0.5rem;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper svg {
+    position: absolute;
+    left: 1rem;
+    stroke: rgba(246,247,251,0.4);
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #f6f7fb;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.input-wrapper input::placeholder {
+    color: rgba(246,247,251,0.4);
+}
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: #0B2DFF;
+    background: rgba(11,45,255,0.05);
+    box-shadow: 0 0 0 3px rgba(11,45,255,0.15);
+}
+
+.input-wrapper input:focus + svg,
+.input-wrapper:focus-within svg {
+    stroke: #0B2DFF;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: rgba(246,247,251,0.7);
+    font-size: 0.9rem;
+}
+
+.checkbox-label input {
+    width: 18px;
+    height: 18px;
+    accent-color: #0B2DFF;
+}
+
+.forgot-link {
+    color: #0B2DFF;
+    font-size: 0.9rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.forgot-link:hover {
+    opacity: 0.8;
+}
+
+.btn-auth-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem;
+    background: #0B2DFF;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+}
+
+.btn-auth-submit:hover {
+    background: #0922cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(11,45,255,0.4);
+}
+
+.btn-auth-submit svg {
+    transition: transform 0.2s;
+}
+
+.btn-auth-submit:hover svg {
+    transform: translateX(4px);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: rgba(246,247,251,0.6);
+    font-size: 0.95rem;
+}
+
+.auth-footer a {
+    color: #0B2DFF;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .auth-container {
+        grid-template-columns: 1fr;
+        margin: 1rem;
+    }
+    
+    .auth-branding {
+        padding: 2rem;
+    }
+    
+    .features-list {
+        display: none;
+    }
+    
+    .auth-form-section {
+        padding: 2rem;
+    }
+}
+</style>
+{% endblock %}
