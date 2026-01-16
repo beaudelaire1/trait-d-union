@@ -204,3 +204,471 @@ select {
 .glow-blue-hover:hover {
     box-shadow: 0 0 80px rgba(11, 45, 255, 0.5);
 }
+
+/* ============================================
+   Apple-like Animations (Phase 2)
+   ============================================ */
+
+/* Fade Slide Up - entrée élégante */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-slide-up {
+    animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scale apparition */
+@keyframes fadeScaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-scale-in {
+    animation: fadeScaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Pulse lent pour backgrounds */
+@keyframes pulseSlow {
+    0%, 100% {
+        opacity: 0.15;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.25;
+        transform: scale(1.05);
+    }
+}
+
+.animate-pulse-slow {
+    animation: pulseSlow 4s ease-in-out infinite;
+}
+
+/* Gradient shift horizontal */
+@keyframes gradientShiftX {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradientShiftX 3s ease infinite;
+}
+
+/* Float effet flottant */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    25% {
+        transform: translateY(-10px) rotate(1deg);
+    }
+    75% {
+        transform: translateY(10px) rotate(-1deg);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+/* Stagger delay utilities */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+.stagger-6 { animation-delay: 0.6s; }
+.stagger-7 { animation-delay: 0.7s; }
+.stagger-8 { animation-delay: 0.8s; }
+
+/* Magnetic button effect base */
+.btn-magnetic {
+    transition: transform 0.2s cubic-bezier(0.33, 1, 0.68, 1);
+    will-change: transform;
+}
+
+/* Card interactive premium */
+.card-interactive {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, box-shadow;
+}
+
+.card-interactive:hover {
+    transform: translateY(-8px);
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(11, 45, 255, 0.15);
+}
+
+/* Link underline animation */
+.link-animated {
+    position: relative;
+    display: inline-block;
+}
+
+.link-animated::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--tus-blue), #00D4FF);
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.link-animated:hover::after {
+    width: 100%;
+}
+
+/* Shine effect on hover */
+.shine-hover {
+    position: relative;
+    overflow: hidden;
+}
+
+.shine-hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transition: left 0.5s ease;
+}
+
+.shine-hover:hover::before {
+    left: 100%;
+}
+
+/* ============================================
+   APPLE-LIKE SCROLL REVEAL
+   ============================================ */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-scale {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-scale.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-left.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.reveal-right {
+    opacity: 0;
+    transform: translateX(60px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-right.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ============================================
+   NAVBAR SCROLL EFFECTS
+   ============================================ */
+.navbar-scrolled {
+    background-color: rgba(7, 8, 10, 0.95) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    border-color: rgba(246, 247, 251, 0.08) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   CUSTOM CURSOR (Apple-like)
+   ============================================ */
+.cursor-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--tus-blue);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: difference;
+}
+
+.cursor-ring {
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--tus-blue);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.15s ease-out;
+    opacity: 0.5;
+}
+
+.cursor-ring.hover {
+    transform: scale(1.5);
+    background: rgba(11, 45, 255, 0.1);
+    border-color: var(--tus-white);
+}
+
+/* Hide on touch devices */
+@media (hover: none) {
+    .cursor-dot, .cursor-ring {
+        display: none !important;
+    }
+}
+
+/* ============================================
+   BENTO GRID (Apple Style)
+   ============================================ */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(200px, auto);
+    gap: 1rem;
+}
+
+.bento-item {
+    background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid rgba(246, 247, 251, 0.08);
+    border-radius: 24px;
+    padding: 2rem;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-item::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(11, 45, 255, 0.15) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.bento-item:hover::before {
+    opacity: 1;
+}
+
+.bento-item:hover {
+    border-color: rgba(11, 45, 255, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                0 0 60px rgba(11, 45, 255, 0.1);
+}
+
+.bento-large {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.bento-wide {
+    grid-column: span 2;
+}
+
+.bento-tall {
+    grid-row: span 2;
+}
+
+@media (max-width: 1024px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .bento-large {
+        grid-column: span 2;
+        grid-row: span 1;
+    }
+}
+
+@media (max-width: 640px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+    .bento-large, .bento-wide, .bento-tall {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+}
+
+/* ============================================
+   TEXT GRADIENT ANIMATION
+   ============================================ */
+.text-gradient-animated {
+    background: linear-gradient(
+        90deg,
+        var(--tus-white) 0%,
+        var(--tus-blue) 25%,
+        #00D4FF 50%,
+        var(--tus-blue) 75%,
+        var(--tus-white) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textGradient 4s linear infinite;
+}
+
+@keyframes textGradient {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+/* ============================================
+   GLOW BUTTON PREMIUM
+   ============================================ */
+.btn-glow {
+    position: relative;
+    overflow: visible;
+}
+
+.btn-glow::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(90deg, var(--tus-blue), #00D4FF, var(--tus-blue));
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    filter: blur(15px);
+    transition: opacity 0.3s ease;
+}
+
+.btn-glow:hover::before {
+    opacity: 0.7;
+}
+
+/* ============================================
+   3D CARD TILT
+   ============================================ */
+.card-3d {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: transform 0.3s ease;
+}
+
+.card-3d-inner {
+    transition: transform 0.3s ease;
+}
+
+/* ============================================
+   MARQUEE SCROLL
+   ============================================ */
+.marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.marquee-content {
+    display: inline-block;
+    animation: marqueeScroll 30s linear infinite;
+}
+
+@keyframes marqueeScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* ============================================
+   BLOB ANIMATED BACKGROUND
+   ============================================ */
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.4;
+    animation: blobMove 20s ease-in-out infinite;
+}
+
+@keyframes blobMove {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    25% {
+        transform: translate(30px, -50px) scale(1.1);
+    }
+    50% {
+        transform: translate(-20px, 20px) scale(0.9);
+    }
+    75% {
+        transform: translate(50px, 50px) scale(1.05);
+    }
+}
+
+/* ============================================
+   NUMBER COUNTER ANIMATION
+   ============================================ */
+.counter {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Respect user preferences */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .animate-pulse-slow,
+    .animate-float,
+    .animate-gradient-x,
+    .reveal,
+    .reveal-scale,
+    .reveal-left,
+    .reveal-right {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}

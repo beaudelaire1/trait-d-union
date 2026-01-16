@@ -7,6 +7,7 @@ Cette configuration expose les routes suivantes :
 * ``/devis/succes/`` pour afficher la confirmation après soumission.
 * ``/devis/admin/<pk>/`` pour l'éditeur avancé de devis (staff uniquement).
 * ``/devis/service/<pk>/`` pour récupérer les infos d'un service en JSON.
+* ``/devis/valider/<token>/signer/`` pour signer et payer un devis.
 """
 
 from django.urls import path
@@ -32,4 +33,12 @@ urlpatterns = [
     path("valider/<str:token>/", views.quote_validate_start, name="quote_validate_start"),
     path("valider/<str:token>/code/", views.quote_validate_code, name="quote_validate_code"),
     path("pdf/<str:token>/", views.quote_public_pdf, name="quote_public_pdf"),
+    
+    # ===========================================
+    # PHASE 3 : Signature électronique & Paiement
+    # ===========================================
+    path("valider/<str:token>/signer/", views.quote_sign_and_pay, name="quote_sign_and_pay"),
+    path("valider/<str:token>/signature/", views.quote_submit_signature, name="quote_submit_signature"),
+    path("paiement/succes/", views.quote_payment_success, name="payment_success"),
+    path("webhook/stripe/", views.stripe_webhook, name="stripe_webhook"),
 ]

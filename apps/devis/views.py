@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import logging
 
 from django.contrib.admin.views.decorators import staff_member_required
@@ -7,7 +8,9 @@ from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods, require_POST
+from django.utils import timezone
 
 from services.models import Service
 from .forms import QuoteRequestForm, QuoteAdminForm
@@ -212,3 +215,210 @@ def quote_public_pdf(request, token: str):
     except Exception as exc:
         logger.error(f"Erreur lors de la génération du PDF public pour le token {token}: {exc}", exc_info=True)
         raise Http404("Impossible de générer le PDF du devis")
+
+
+# ---------------------------------------------------------------------------
+# PHASE 3 : Paiement Stripe & Signature électronique
+# ---------------------------------------------------------------------------
+
+@require_http_methods(["GET", "POST"])
+def quote_sign_and_pay(request, token: str):
+    """
+    Page de signature et paiement d'acompte pour un devis.
+    
+    Flux:
+    1. Le client voit le récapitulatif du devis
+    2. Il signe électroniquement (signature_pad.js)
+    3. Il paie l'acompte via Stripe Checkout
+    """
+    quote = get_object_or_404(Quote, public_token=token)
+    
+    # Vérifier que le devis peut être signé (statut SENT)
+    if quote.status not in [Quote.QuoteStatus.SENT, Quote.QuoteStatus.DRAFT]:
+        if quote.status == Quote.QuoteStatus.ACCEPTED:
+            messages.info(request, "Ce devis a déjà été accepté.")
+            return render(request, "devis/already_signed.html", {"quote": quote})
+        messages.error(request, "Ce devis ne peut pas être signé dans son état actuel.")
+        return redirect("pages:home")
+    
+    # Vérifier la validité
+    if quote.valid_until and quote.valid_until < timezone.now().date():
+        messages.error(request, "Ce devis a expiré.")
+        return render(request, "devis/quote_expired.html", {"quote": quote})
+    
+    # Import des services
+    from core.services.stripe_service import is_stripe_configured, get_stripe_keys
+    
+    context = {
+        "quote": quote,
+        "stripe_configured": is_stripe_configured(),
+        "stripe_publishable_key": get_stripe_keys().get('publishable_key', ''),
+        "deposit_rate": 30,  # 30% d'acompte
+        "deposit_amount": quote.total_ttc * 30 / 100,
+    }
+    
+    return render(request, "devis/sign_and_pay.html", context)
+
+
+@require_POST
+def quote_submit_signature(request, token: str):
+    """
+    Endpoint AJAX pour soumettre la signature électronique.
+    
+    Reçoit: signature_data (base64 PNG)
+    Retourne: JSON avec success et éventuellement checkout_url
+    """
+    quote = get_object_or_404(Quote, public_token=token)
+    
+    # Vérifier le statut
+    if quote.status not in [Quote.QuoteStatus.SENT, Quote.QuoteStatus.DRAFT]:
+        return JsonResponse({
+            "success": False,
+            "error": "Ce devis ne peut pas être signé."
+        }, status=400)
+    
+    # Récupérer les données
+    try:
+        data = json.loads(request.body)
+        signature_data = data.get("signature_data", "")
+    except json.JSONDecodeError:
+        signature_data = request.POST.get("signature_data", "")
+    
+    if not signature_data:
+        return JsonResponse({
+            "success": False,
+            "error": "Aucune signature fournie."
+        }, status=400)
+    
+    # Valider la signature
+    from core.services.signature_service import SignatureService
+    
+    is_valid, message = SignatureService.validate_signature_data(signature_data)
+    if not is_valid:
+        return JsonResponse({
+            "success": False,
+            "error": message
+        }, status=400)
+    
+    # Sauvegarder la signature
+    signature_hash = SignatureService.compute_signature_hash(signature_data)
+    signature_path = SignatureService.save_signature_image(
+        signature_data,
+        filename=f"signature_{quote.number}_{timezone.now().strftime('%Y%m%d_%H%M%S')}",
+        subdir="devis/signatures"
+    )
+    
+    # Générer l'audit trail
+    audit_trail = SignatureService.generate_audit_trail(
+        client_ip=SignatureService.get_client_ip(request),
+        user_agent=request.META.get('HTTP_USER_AGENT', 'Unknown'),
+        document_type='quote',
+        document_id=str(quote.pk),
+        document_number=quote.number,
+        signer_name=quote.client.full_name if quote.client else 'Client',
+        signer_email=quote.client.email if quote.client else '',
+        signature_hash=signature_hash,
+    )
+    
+    # Mettre à jour le devis
+    if signature_path:
+        quote.signature_image = signature_path
+    quote.signed_at = timezone.now()
+    quote.signature_audit_trail = audit_trail
+    quote.save(update_fields=['signature_image', 'signed_at', 'signature_audit_trail'])
+    
+    # Créer la session Stripe si configuré
+    from core.services.stripe_service import is_stripe_configured, StripePaymentService
+    
+    response_data = {
+        "success": True,
+        "message": "Signature enregistrée avec succès.",
+    }
+    
+    if is_stripe_configured():
+        try:
+            from django.conf import settings
+            session_data = StripePaymentService.create_checkout_session_for_quote(
+                quote,
+                success_url=f"{settings.SITE_URL}/devis/paiement/succes/?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url=f"{settings.SITE_URL}/devis/valider/{quote.public_token}/signer/",
+            )
+            quote.stripe_checkout_session_id = session_data['session_id']
+            quote.save(update_fields=['stripe_checkout_session_id'])
+            
+            response_data["checkout_url"] = session_data['checkout_url']
+            response_data["requires_payment"] = True
+        except Exception as e:
+            logger.error(f"Erreur création session Stripe: {e}")
+            # La signature est quand même valide
+            response_data["requires_payment"] = False
+            response_data["message"] = "Signature enregistrée. Paiement non disponible pour le moment."
+    else:
+        response_data["requires_payment"] = False
+        # Marquer comme accepté directement si pas de paiement
+        quote.status = Quote.QuoteStatus.ACCEPTED
+        quote.save(update_fields=['status'])
+    
+    return JsonResponse(response_data)
+
+
+@require_http_methods(["GET"])
+def quote_payment_success(request):
+    """
+    Page de confirmation après paiement réussi.
+    """
+    session_id = request.GET.get('session_id', '')
+    
+    if not session_id:
+        return redirect("pages:home")
+    
+    # Récupérer la session Stripe
+    from core.services.stripe_service import StripePaymentService, is_stripe_configured
+    
+    quote = None
+    if is_stripe_configured():
+        try:
+            session = StripePaymentService.retrieve_session(session_id)
+            if session:
+                quote_id = session.get('metadata', {}).get('quote_id')
+                if quote_id:
+                    quote = Quote.objects.filter(pk=int(quote_id)).first()
+        except Exception as e:
+            logger.error(f"Erreur récupération session: {e}")
+    
+    if not quote:
+        # Essayer de trouver par session_id
+        quote = Quote.objects.filter(stripe_checkout_session_id=session_id).first()
+    
+    return render(request, "devis/payment_success.html", {
+        "quote": quote,
+        "session_id": session_id,
+    })
+
+
+@csrf_exempt
+@require_POST
+def stripe_webhook(request):
+    """
+    Webhook Stripe pour gérer les événements de paiement.
+    """
+    from core.services.stripe_service import StripePaymentService, is_stripe_configured
+    
+    if not is_stripe_configured():
+        return HttpResponse(status=400)
+    
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
+    
+    try:
+        event = StripePaymentService.verify_webhook_signature(payload, sig_header)
+    except ValueError as e:
+        logger.error(f"Webhook signature invalide: {e}")
+        return HttpResponse(status=400)
+    
+    # Traiter les événements
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        StripePaymentService.handle_checkout_completed(session)
+    
+    return HttpResponse(status=200)

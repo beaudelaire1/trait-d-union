@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes documents - Espace Client{% endblock %}
+
+{% block content %}
+<div class="client-portal">
+    <header class="client-header">
+        <div class="container">
+            <nav class="client-breadcrumb">
+                <a href="{% url 'clients:dashboard' %}">Espace client</a>
+                <span>/</span>
+                <span>Mes documents</span>
+            </nav>
+            <div class="header-actions">
+                <h1>Mes documents</h1>
+                <a href="{% url 'clients:upload_document' %}" class="btn btn-primary">
+                    + Uploader un fichier
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section class="client-main">
+        <div class="container">
+            {% if documents %}
+                <div class="documents-table-wrapper">
+                    <table class="documents-table">
+                        <thead>
+                            <tr>
+                                <th>Document</th>
+                                <th>Type</th>
+                                <th>Projet</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doc in documents %}
+                            <tr>
+                                <td>
+                                    <div class="doc-cell">
+                                        <span class="doc-icon">
+                                            {% if doc.is_image %}🖼️
+                                            {% elif doc.file_extension == 'pdf' %}📄
+                                            {% elif doc.file_extension in 'doc,docx' %}📝
+                                            {% elif doc.file_extension in 'zip,rar' %}📦
+                                            {% else %}📎{% endif %}
+                                        </span>
+                                        <span class="doc-name">{{ doc.title }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ doc.get_document_type_display }}</td>
+                                <td>
+                                    {% if doc.project %}
+                                        <a href="{% url 'clients:project_detail' doc.project.pk %}">
+                                            {{ doc.project.name }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ doc.created_at|date:"d/m/Y" }}</td>
+                                <td>
+                                    <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-outline">
+                                        Télécharger
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state-large">
+                    <span class="empty-icon">📁</span>
+                    <h2>Aucun document</h2>
+                    <p>Uploadez vos fichiers (logos, cahiers des charges, assets...) pour les partager avec nous.</p>
+                    <a href="{% url 'clients:upload_document' %}" class="btn btn-primary">
+                        Uploader un fichier
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<style>
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.documents-table-wrapper {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.documents-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.documents-table th,
+.documents-table td {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.documents-table th {
+    background: var(--gray-50);
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.documents-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.doc-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.doc-icon {
+    font-size: 1.25rem;
+}
+
+.doc-name {
+    font-weight: 500;
+}
+
+.empty-state-large {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: white;
+    border-radius: 1rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .documents-table-wrapper {
+        overflow-x: auto;
+    }
+    
+    .documents-table {
+        min-width: 600px;
+    }
+}
+</style>
+{% endblock %}

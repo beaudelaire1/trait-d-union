@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mon Espace Client - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="client-portal">
+    <!-- Header -->
+    <header class="client-header">
+        <div class="container">
+            <div class="client-header-content">
+                <div class="client-welcome">
+                    <h1>Bonjour, {{ request.user.client_profile.full_name }} 👋</h1>
+                    <p class="text-muted">Bienvenue dans votre espace client</p>
+                </div>
+                <a href="{% url 'clients:profile' %}" class="btn btn-outline">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Mon profil
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <section class="client-stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📁</div>
+                    <div class="stat-content">
+                        <span class="stat-value">{{ stats.total_projects }}</span>
+                        <span class="stat-label">Projets</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔄</div>
+                    <div class="stat-content">
+                        <span class="stat-value">{{ stats.active_projects }}</span>
+                        <span class="stat-label">En cours</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📄</div>
+                    <div class="stat-content">
+                        <span class="stat-value">{{ stats.documents }}</span>
+                        <span class="stat-label">Documents</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="client-main">
+        <div class="container">
+            <div class="client-grid">
+                <!-- Active Projects -->
+                <div class="client-card">
+                    <div class="card-header">
+                        <h2>Projets en cours</h2>
+                        <a href="{% url 'clients:projects' %}" class="link-arrow">Voir tout →</a>
+                    </div>
+                    <div class="card-content">
+                        {% if active_projects %}
+                            <div class="project-list">
+                                {% for project in active_projects %}
+                                <a href="{% url 'clients:project_detail' project.pk %}" class="project-item">
+                                    <div class="project-info">
+                                        <span class="project-name">{{ project.name }}</span>
+                                        <span class="project-status">{{ project.get_status_display }}</span>
+                                    </div>
+                                    <div class="project-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{ project.progress }}%"></div>
+                                        </div>
+                                        <span class="progress-text">{{ project.progress }}%</span>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <p>Aucun projet en cours</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Quotes -->
+                <div class="client-card">
+                    <div class="card-header">
+                        <h2>Derniers devis</h2>
+                        <a href="{% url 'clients:quotes' %}" class="link-arrow">Voir tout →</a>
+                    </div>
+                    <div class="card-content">
+                        {% if recent_quotes %}
+                            <div class="document-list">
+                                {% for quote in recent_quotes %}
+                                <a href="{% url 'devis:quote_detail' quote.pk %}" class="document-item">
+                                    <span class="doc-icon">📋</span>
+                                    <div class="doc-info">
+                                        <span class="doc-title">Devis {{ quote.reference }}</span>
+                                        <span class="doc-meta">{{ quote.total_ttc|floatformat:2 }}€ • {{ quote.created_at|date:"d/m/Y" }}</span>
+                                    </div>
+                                    <span class="doc-status status-{{ quote.status }}">{{ quote.get_status_display }}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <p>Aucun devis</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Invoices -->
+                <div class="client-card">
+                    <div class="card-header">
+                        <h2>Dernières factures</h2>
+                        <a href="{% url 'clients:invoices' %}" class="link-arrow">Voir tout →</a>
+                    </div>
+                    <div class="card-content">
+                        {% if recent_invoices %}
+                            <div class="document-list">
+                                {% for invoice in recent_invoices %}
+                                <a href="{% url 'factures:invoice_detail' invoice.pk %}" class="document-item">
+                                    <span class="doc-icon">🧾</span>
+                                    <div class="doc-info">
+                                        <span class="doc-title">Facture {{ invoice.reference }}</span>
+                                        <span class="doc-meta">{{ invoice.total_ttc|floatformat:2 }}€ • {{ invoice.created_at|date:"d/m/Y" }}</span>
+                                    </div>
+                                    <span class="doc-status status-{{ invoice.status }}">{{ invoice.get_status_display }}</span>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <p>Aucune facture</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Recent Documents -->
+                <div class="client-card">
+                    <div class="card-header">
+                        <h2>Documents récents</h2>
+                        <a href="{% url 'clients:documents' %}" class="link-arrow">Voir tout →</a>
+                    </div>
+                    <div class="card-content">
+                        {% if recent_documents %}
+                            <div class="document-list">
+                                {% for doc in recent_documents %}
+                                <a href="{{ doc.file.url }}" target="_blank" class="document-item">
+                                    <span class="doc-icon">
+                                        {% if doc.is_image %}🖼️{% else %}📎{% endif %}
+                                    </span>
+                                    <div class="doc-info">
+                                        <span class="doc-title">{{ doc.title }}</span>
+                                        <span class="doc-meta">{{ doc.get_document_type_display }} • {{ doc.created_at|date:"d/m/Y" }}</span>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state">
+                                <p>Aucun document</p>
+                                <a href="{% url 'clients:upload_document' %}" class="btn btn-sm">Uploader un fichier</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="client-actions">
+        <div class="container">
+            <h2>Actions rapides</h2>
+            <div class="actions-grid">
+                <a href="{% url 'clients:upload_document' %}" class="action-card">
+                    <span class="action-icon">📤</span>
+                    <span class="action-label">Uploader un fichier</span>
+                </a>
+                <a href="{% url 'leads:contact' %}" class="action-card">
+                    <span class="action-icon">💬</span>
+                    <span class="action-label">Nous contacter</span>
+                </a>
+                <a href="{% url 'leads:quote_request' %}" class="action-card">
+                    <span class="action-icon">📝</span>
+                    <span class="action-label">Demander un devis</span>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.client-portal {
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+.client-header {
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 2rem 0;
+}
+
+.client-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.client-welcome h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.client-stats {
+    padding: 2rem 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.stat-icon {
+    font-size: 2rem;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.stat-label {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+}
+
+.client-main {
+    padding-bottom: 3rem;
+}
+
+.client-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.client-card {
+    background: white;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.card-header h2 {
+    font-size: 1.125rem;
+    margin: 0;
+}
+
+.link-arrow {
+    color: var(--primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.card-content {
+    padding: 1rem;
+}
+
+.project-list, .document-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.project-item, .document-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem;
+    border-radius: 0.75rem;
+    transition: background 0.2s;
+    text-decoration: none;
+    color: inherit;
+}
+
+.project-item:hover, .document-item:hover {
+    background: var(--gray-50);
+}
+
+.project-info {
+    flex: 1;
+}
+
+.project-name, .doc-title {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.125rem;
+}
+
+.project-status {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.project-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.progress-bar {
+    width: 80px;
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+.progress-text {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    min-width: 35px;
+}
+
+.doc-icon {
+    font-size: 1.5rem;
+}
+
+.doc-info {
+    flex: 1;
+}
+
+.doc-meta {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.doc-status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+}
+
+.status-draft { background: var(--gray-100); color: var(--gray-600); }
+.status-sent { background: #dbeafe; color: #1e40af; }
+.status-accepted, .status-paid { background: #dcfce7; color: #166534; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+
+.empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--gray-500);
+}
+
+.client-actions {
+    padding: 2rem 0 4rem;
+}
+
+.client-actions h2 {
+    margin-bottom: 1.5rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.action-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 1rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.action-icon {
+    font-size: 2rem;
+}
+
+.action-label {
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .client-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

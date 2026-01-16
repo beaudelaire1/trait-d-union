@@ -4,13 +4,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- View Transitions API -->
+    <meta name="view-transition" content="same-origin">
     <title>{% block title %}Trait d'Union Studio{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Agence web en Guyane et Outre-mer. Création de sites vitrines, e-commerce et plateformes sur-mesure. Design premium et performance maximale.{% endblock %}">
     <!-- OpenGraph tags -->
     <meta property="og:title" content="{% block og_title %}Trait d'Union Studio{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Studio de design et développement web de luxe technologique.{% endblock %}">
     <meta property="og:image" content="{% block og_image %}{% static 'images/og-default.png' %}{% endblock %}">
-    <!-- Google Fonts - Space Grotesk & Inter -->
+    <!-- Preload fonts for better LCP -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -99,36 +101,294 @@
             background: rgba(11,45,255,0.5);
             border-radius: 4px;
         }
+        
+        /* ============================================
+           VIEW TRANSITIONS - Apple-like smoothness
+           ============================================ */
+        @view-transition {
+            navigation: auto;
+        }
+        
+        /* Transition de la page entière */
+        ::view-transition-old(root) {
+            animation: fade-out 0.25s ease-out forwards;
+        }
+        ::view-transition-new(root) {
+            animation: fade-in 0.35s ease-out forwards;
+        }
+        
+        /* Transitions personnalisées pour le contenu principal */
+        ::view-transition-old(main-content) {
+            animation: slide-out-left 0.3s ease-in-out forwards;
+        }
+        ::view-transition-new(main-content) {
+            animation: slide-in-right 0.3s ease-in-out forwards;
+        }
+        
+        /* Navbar reste fixe pendant les transitions */
+        ::view-transition-group(navbar) {
+            animation: none;
+        }
+        
+        @keyframes fade-out {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slide-out-left {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(-20px); }
+        }
+        @keyframes slide-in-right {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        /* ============================================
+           MICRO-INTERACTIONS
+           ============================================ */
+        /* Boutons avec feedback tactile */
+        .btn-primary {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(11, 45, 255, 0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        /* Links avec underline animé */
+        .link-animated {
+            position: relative;
+        }
+        .link-animated::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #0B2DFF, #00D4FF);
+            transition: width 0.3s ease;
+        }
+        .link-animated:hover::after {
+            width: 100%;
+        }
+        
+        /* Cards avec effet de profondeur */
+        .card-interactive {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-interactive:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Focus states accessibles et élégants */
+        :focus-visible {
+            outline: 2px solid #0B2DFF;
+            outline-offset: 3px;
+            border-radius: 4px;
+        }
+        
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Reduced motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, ::before, ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            html {
+                scroll-behavior: auto;
+            }
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-tus-black text-tus-white font-body antialiased">
     {% include 'partials/navbar.html' %}
-    <main class="min-h-screen">
+    <main class="min-h-screen" style="view-transition-name: main-content;">
         {% block content %}{% endblock %}
     </main>
     {% include 'partials/footer.html' %}
-    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <!-- HTMX with View Transitions support -->
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
     <script>
-        // HTMX premium animations
+        // ============================================
+        // HTMX Configuration - Simplified
+        // ============================================
+        
+        // Only enable boost for specific elements, not globally
+        // This prevents issues with full page navigation
+        
+        // Loading indicator for HTMX requests
         document.body.addEventListener('htmx:beforeRequest', function(evt) {
+            document.body.classList.add('htmx-request');
             const target = evt.detail.elt;
-            target.style.transition = 'opacity 0.3s ease';
-            target.style.opacity = '0.6';
+            if (target.tagName === 'A' || target.tagName === 'BUTTON') {
+                target.style.opacity = '0.7';
+                target.style.pointerEvents = 'none';
+            }
         });
-        document.body.addEventListener('htmx:afterSwap', function(evt) {
-            const target = evt.detail.elt;
-            target.style.opacity = '0';
-            target.style.transform = 'translateY(10px)';
-            requestAnimationFrame(() => {
-                target.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
-                target.style.opacity = '1';
-                target.style.transform = 'translateY(0)';
+        
+        document.body.addEventListener('htmx:afterRequest', function(evt) {
+            document.body.classList.remove('htmx-request');
+            evt.detail.elt.style.opacity = '';
+            evt.detail.elt.style.pointerEvents = '';
+        });
+        
+        // ============================================
+        // MICRO-INTERACTIONS
+        // ============================================
+        
+        // Magnetic buttons effect (Apple-like)
+        document.querySelectorAll('.btn-magnetic').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                btn.style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'translate(0, 0)';
             });
         });
-        document.body.addEventListener('htmx:afterRequest', function(evt) {
-            evt.detail.elt.style.opacity = '1';
+        
+        // Smooth scroll to anchors
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
         });
+
+        // ============================================
+        // APPLE-LIKE SCROLL REVEAL
+        // ============================================
+        const revealElements = document.querySelectorAll('.reveal, .reveal-scale, .reveal-left, .reveal-right');
+        
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        revealElements.forEach(el => revealObserver.observe(el));
+
+        // ============================================
+        // NAVBAR SCROLL EFFECT
+        // ============================================
+        const navbar = document.getElementById('navbar');
+        let lastScroll = 0;
+
+        window.addEventListener('scroll', () => {
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 50) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+            
+            lastScroll = currentScroll;
+        }, { passive: true });
+
+        // ============================================
+        // CUSTOM CURSOR (Desktop only)
+        // ============================================
+        if (window.matchMedia('(hover: hover)').matches) {
+            const cursorDot = document.createElement('div');
+            const cursorRing = document.createElement('div');
+            cursorDot.className = 'cursor-dot';
+            cursorRing.className = 'cursor-ring';
+            document.body.appendChild(cursorDot);
+            document.body.appendChild(cursorRing);
+
+            let mouseX = 0, mouseY = 0;
+            let ringX = 0, ringY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursorDot.style.left = mouseX + 'px';
+                cursorDot.style.top = mouseY + 'px';
+            });
+
+            // Smooth ring follow
+            function animateRing() {
+                ringX += (mouseX - ringX) * 0.15;
+                ringY += (mouseY - ringY) * 0.15;
+                cursorRing.style.left = ringX + 'px';
+                cursorRing.style.top = ringY + 'px';
+                requestAnimationFrame(animateRing);
+            }
+            animateRing();
+
+            // Hover effect on interactive elements
+            const hoverTargets = document.querySelectorAll('a, button, .card-premium, .bento-item, input, textarea, select');
+            hoverTargets.forEach(el => {
+                el.addEventListener('mouseenter', () => cursorRing.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursorRing.classList.remove('hover'));
+            });
+        }
+
+        // ============================================
+        // BENTO CARD MOUSE GLOW EFFECT
+        // ============================================
+        document.querySelectorAll('.bento-item').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                card.style.setProperty('--mouse-x', x + '%');
+                card.style.setProperty('--mouse-y', y + '%');
+            });
+        });
+
+        // ============================================
+        // NUMBER COUNTER ANIMATION
+        // ============================================
+        const counters = document.querySelectorAll('.counter');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.dataset.counted) {
+                    entry.target.dataset.counted = 'true';
+                    const target = parseInt(entry.target.dataset.target);
+                    const suffix = entry.target.dataset.suffix || '';
+                    let current = 0;
+                    const increment = target / 50;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            entry.target.textContent = target + suffix;
+                            clearInterval(timer);
+                        } else {
+                            entry.target.textContent = Math.floor(current) + suffix;
+                        }
+                    }, 30);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(c => counterObserver.observe(c));
     </script>
     {% block extra_js %}{% endblock %}
 </body>

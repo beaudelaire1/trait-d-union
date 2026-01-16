@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }} - Suivi projet{% endblock %}
+
+{% block content %}
+<div class="client-portal">
+    <header class="client-header">
+        <div class="container">
+            <nav class="client-breadcrumb">
+                <a href="{% url 'clients:dashboard' %}">Espace client</a>
+                <span>/</span>
+                <a href="{% url 'clients:projects' %}">Projets</a>
+                <span>/</span>
+                <span>{{ project.name }}</span>
+            </nav>
+        </div>
+    </header>
+
+    <section class="project-hero">
+        <div class="container">
+            <div class="project-hero-content">
+                <div class="project-info">
+                    <h1>{{ project.name }}</h1>
+                    <p class="project-description">{{ project.description|default:"" }}</p>
+                    {% if project.estimated_delivery %}
+                        <p class="project-eta">
+                            <span class="icon">📅</span>
+                            Livraison estimée : {{ project.estimated_delivery|date:"d F Y" }}
+                        </p>
+                    {% endif %}
+                </div>
+                <div class="project-progress-card">
+                    <div class="progress-circle" data-progress="{{ project.progress }}">
+                        <svg viewBox="0 0 100 100">
+                            <circle class="progress-bg" cx="50" cy="50" r="45"/>
+                            <circle class="progress-fill" cx="50" cy="50" r="45" 
+                                stroke-dasharray="{{ project.progress|default:0 }}% 283"/>
+                        </svg>
+                        <span class="progress-value">{{ project.progress }}%</span>
+                    </div>
+                    <span class="progress-label">Progression</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="project-timeline-section">
+        <div class="container">
+            <h2>Avancement du projet</h2>
+            <div class="timeline">
+                {% for stage in stages %}
+                <div class="timeline-step {% if project.status == stage.id %}active{% elif forloop.counter0 < stages|length and project.status in 'development,review,delivered,maintenance' and stage.id == 'briefing' %}completed{% elif project.status in 'review,delivered,maintenance' and stage.id == 'design' %}completed{% elif project.status in 'delivered,maintenance' and stage.id == 'development' %}completed{% elif project.status == 'maintenance' and stage.id == 'review' %}completed{% elif project.status == 'maintenance' and stage.id == 'delivered' %}completed{% endif %}">
+                    <div class="step-marker">
+                        <span class="step-icon">{{ stage.icon }}</span>
+                    </div>
+                    <div class="step-content">
+                        <span class="step-label">{{ stage.label }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Milestones -->
+    {% if milestones %}
+    <section class="project-milestones">
+        <div class="container">
+            <h2>Jalons du projet</h2>
+            <div class="milestones-list">
+                {% for milestone in milestones %}
+                <div class="milestone-item status-{{ milestone.status }}">
+                    <div class="milestone-status">
+                        {% if milestone.status == 'completed' %}✅
+                        {% elif milestone.status == 'in_progress' %}🔄
+                        {% else %}⏳{% endif %}
+                    </div>
+                    <div class="milestone-content">
+                        <h3>{{ milestone.title }}</h3>
+                        {% if milestone.description %}
+                            <p>{{ milestone.description }}</p>
+                        {% endif %}
+                        {% if milestone.due_date %}
+                            <span class="milestone-date">
+                                {% if milestone.completed_at %}
+                                    Terminé le {{ milestone.completed_at|date:"d/m/Y" }}
+                                {% else %}
+                                    Échéance : {{ milestone.due_date|date:"d/m/Y" }}
+                                {% endif %}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Documents -->
+    <section class="project-documents">
+        <div class="container">
+            <div class="section-header">
+                <h2>Documents du projet</h2>
+                <a href="{% url 'clients:upload_document_project' project.pk %}" class="btn btn-sm">
+                    + Ajouter un fichier
+                </a>
+            </div>
+            
+            {% if documents %}
+                <div class="documents-grid">
+                    {% for doc in documents %}
+                    <a href="{{ doc.file.url }}" target="_blank" class="document-card">
+                        <div class="doc-preview">
+                            {% if doc.is_image %}
+                                <img src="{{ doc.file.url }}" alt="{{ doc.title }}">
+                            {% else %}
+                                <span class="doc-ext">.{{ doc.file_extension }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="doc-info">
+                            <span class="doc-title">{{ doc.title }}</span>
+                            <span class="doc-meta">{{ doc.created_at|date:"d/m/Y" }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <p>Aucun document pour ce projet</p>
+                    <a href="{% url 'clients:upload_document_project' project.pk %}" class="btn btn-outline">
+                        Uploader un fichier
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Linked Quote -->
+    {% if project.quote %}
+    <section class="project-quote">
+        <div class="container">
+            <h2>Devis associé</h2>
+            <a href="{% url 'devis:quote_detail' project.quote.pk %}" class="quote-card">
+                <span class="quote-ref">{{ project.quote.reference }}</span>
+                <span class="quote-amount">{{ project.quote.total_ttc|floatformat:2 }}€ TTC</span>
+                <span class="quote-status">{{ project.quote.get_status_display }}</span>
+            </a>
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+<style>
+.client-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.client-breadcrumb a {
+    color: var(--primary);
+}
+
+.client-breadcrumb span {
+    color: var(--gray-400);
+}
+
+.project-hero {
+    padding: 2rem 0 3rem;
+}
+
+.project-hero-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.project-info {
+    flex: 1;
+}
+
+.project-info h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.project-description {
+    color: var(--gray-600);
+    max-width: 500px;
+}
+
+.project-eta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    color: var(--gray-600);
+}
+
+.project-progress-card {
+    text-align: center;
+}
+
+.progress-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.progress-circle svg {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+}
+
+.progress-circle circle {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+}
+
+.progress-bg {
+    stroke: var(--gray-200);
+}
+
+.progress-fill {
+    stroke: var(--primary);
+    transition: stroke-dasharray 0.5s ease;
+}
+
+.progress-value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.progress-label {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--gray-500);
+}
+
+.project-timeline-section {
+    padding: 3rem 0;
+    background: white;
+}
+
+.project-timeline-section h2 {
+    margin-bottom: 2rem;
+}
+
+.timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 50px;
+    right: 50px;
+    height: 3px;
+    background: var(--gray-200);
+}
+
+.timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.step-marker {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: all 0.3s;
+}
+
+.timeline-step.completed .step-marker {
+    border-color: var(--primary);
+    background: var(--primary);
+}
+
+.timeline-step.active .step-marker {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.2);
+    transform: scale(1.1);
+}
+
+.step-label {
+    margin-top: 0.75rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.timeline-step.active .step-label {
+    color: var(--primary);
+}
+
+.project-milestones,
+.project-documents,
+.project-quote {
+    padding: 3rem 0;
+}
+
+.project-milestones h2,
+.project-documents h2,
+.project-quote h2 {
+    margin-bottom: 1.5rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.milestones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 600px;
+}
+
+.milestone-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.75rem;
+    border-left: 4px solid var(--gray-300);
+}
+
+.milestone-item.status-completed {
+    border-left-color: #22c55e;
+}
+
+.milestone-item.status-in_progress {
+    border-left-color: var(--primary);
+}
+
+.milestone-status {
+    font-size: 1.25rem;
+}
+
+.milestone-content h3 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.milestone-content p {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin-bottom: 0.5rem;
+}
+
+.milestone-date {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.documents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.document-card {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.document-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.doc-preview {
+    height: 120px;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doc-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.doc-ext {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-400);
+    text-transform: uppercase;
+}
+
+.document-card .doc-info {
+    padding: 1rem;
+}
+
+.document-card .doc-title {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.document-card .doc-meta {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.quote-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+    max-width: 500px;
+}
+
+.quote-ref {
+    font-weight: 600;
+}
+
+.quote-amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.quote-status {
+    padding: 0.25rem 0.75rem;
+    background: var(--gray-100);
+    border-radius: 1rem;
+    font-size: 0.875rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .timeline {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .timeline::before {
+        display: none;
+    }
+    
+    .timeline-step {
+        flex-direction: row;
+        gap: 1rem;
+    }
+    
+    .step-marker {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+}
+</style>
+{% endblock %}

@@ -3,150 +3,188 @@
 {% block content %}
 
 <!-- Hero Section -->
-<section class="min-h-screen flex items-center justify-center relative overflow-hidden">
+<section class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
     <!-- Background gradient -->
     <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/5 via-transparent to-transparent"></div>
     <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-tus-blue/10 rounded-full blur-[150px] pointer-events-none"></div>
     
     <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
         <!-- Accent décoratif -->
-        <div class="mb-8 animate-fade-in flex justify-center">
-            <div class="w-16 h-1 bg-gradient-to-r from-tus-blue via-[#2D5BFF] to-tus-white/50 rounded-full"></div>
+        <div class="mb-8 reveal flex justify-center">
+            <div class="w-20 h-1.5 bg-gradient-to-r from-tus-blue via-cyan-400 to-tus-white/50 rounded-full"></div>
         </div>
         
-        <h1 class="text-5xl md:text-7xl font-display font-bold mb-6 animate-slide-up">
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6 reveal" style="animation-delay: 0.1s;">
             Créons votre<br>
-            <span class="text-tus-blue">présence digitale</span>
+            <span class="text-gradient-animated">présence digitale</span>
         </h1>
         
-        <p class="text-xl md:text-2xl text-tus-white/70 max-w-2xl mx-auto mb-4 animate-slide-up" style="animation-delay: 0.1s">
+        <p class="text-xl md:text-2xl text-tus-white/70 max-w-2xl mx-auto mb-4 reveal" style="animation-delay: 0.2s;">
             « Quand l'élégance se conçoit, la performance se déploie. »
         </p>
         
-        <p class="text-lg text-tus-white/50 max-w-xl mx-auto mb-10 animate-slide-up" style="animation-delay: 0.2s">
+        <p class="text-lg text-tus-white/50 max-w-xl mx-auto mb-12 reveal" style="animation-delay: 0.3s;">
             Agence web en Guyane, au service des entreprises des Outre-mer.
         </p>
         
-        <div class="flex flex-col sm:flex-row gap-8 justify-center animate-slide-up" style="animation-delay: 0.3s">
+        <div class="flex flex-col sm:flex-row gap-6 justify-center reveal" style="animation-delay: 0.4s;">
             <!-- Bouton principal ULTRA premium -->
-            <a href="/contact/" class="group relative inline-flex items-center justify-center px-14 py-6 overflow-hidden rounded-2xl transition-all duration-700 hover:scale-[1.02]">
-                <!-- Contour blanc animé dégradé -->
-                <span class="absolute -inset-[1px] bg-gradient-to-r from-white/80 via-tus-blue via-50% to-white/80 bg-[length:200%_100%] rounded-2xl animate-gradient-shift"></span>
+            <a href="/contact/" class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-700 hover:scale-[1.02] btn-glow">
                 <!-- Outer glow permanent -->
-                <span class="absolute -inset-2 bg-gradient-to-r from-tus-blue via-[#2D5BFF] to-tus-blue rounded-2xl blur-xl opacity-60 group-hover:opacity-100 group-hover:blur-2xl transition-all duration-500"></span>
+                <span class="absolute -inset-1 bg-gradient-to-r from-tus-blue via-cyan-400 to-tus-blue rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity duration-500"></span>
                 <!-- Fond principal -->
-                <span class="absolute inset-[1px] bg-gradient-to-r from-tus-blue via-[#1a4aff] to-tus-blue bg-[length:200%_100%] rounded-[15px] animate-gradient-shift"></span>
-                <!-- Reflet brillant qui passe -->
-                <span class="absolute inset-[1px] rounded-[15px] overflow-hidden">
-                    <span class="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 ease-out"></span>
+                <span class="absolute inset-0 bg-gradient-to-r from-tus-blue to-[#1a4aff] rounded-2xl"></span>
+                <!-- Reflet brillant -->
+                <span class="absolute inset-0 rounded-2xl overflow-hidden">
+                    <span class="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 ease-out"></span>
                 </span>
-                <!-- Bordure interne lumineuse -->
-                <span class="absolute inset-[3px] rounded-[13px] bg-gradient-to-b from-white/20 to-transparent opacity-60"></span>
-                <!-- Inner shadow pour profondeur -->
-                <span class="absolute inset-[1px] rounded-[15px] shadow-[inset_0_4px_20px_rgba(255,255,255,0.15)]"></span>
                 <!-- Text + icon -->
-                <span class="relative z-10 flex items-center gap-4">
-                    <span class="font-display font-bold text-xl tracking-wide text-tus-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]">Démarrer un projet</span>
-                    <svg class="w-6 h-6 text-tus-white group-hover:translate-x-2 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span class="relative z-10 flex items-center gap-3">
+                    <span class="font-display font-bold text-lg text-tus-white">Démarrer un projet</span>
+                    <svg class="w-5 h-5 text-tus-white group-hover:translate-x-2 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                     </svg>
                 </span>
-                <!-- Glow au hover -->
-                <span class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_100px_rgba(11,45,255,0.9),0_0_150px_rgba(11,45,255,0.5)]"></span>
             </a>
-            <!-- Bouton secondaire élégant -->
-            <a href="/portfolio/" class="group relative inline-flex items-center justify-center px-14 py-6 overflow-hidden rounded-2xl transition-all duration-500 hover:scale-[1.02]">
-                <!-- Bordure animée -->
-                <span class="absolute inset-0 bg-gradient-to-r from-tus-white/30 via-tus-blue/50 to-tus-white/30 bg-[length:200%_100%] rounded-2xl animate-gradient-shift"></span>
-                <!-- Inner -->
-                <span class="absolute inset-[2px] bg-tus-black rounded-[14px] group-hover:bg-gradient-to-b group-hover:from-tus-blue/10 group-hover:to-transparent transition-all duration-500"></span>
-                <!-- Text -->
-                <span class="relative z-10 font-display font-bold text-xl tracking-wide text-tus-white/90 group-hover:text-tus-white transition-colors">Voir nos réalisations</span>
+            <!-- Bouton secondaire -->
+            <a href="/portfolio/" class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-500 hover:scale-[1.02] border border-tus-white/20 hover:border-tus-blue/50 hover:bg-tus-blue/10">
+                <span class="relative z-10 font-display font-bold text-lg text-tus-white/90 group-hover:text-tus-white transition-colors">Voir nos réalisations</span>
             </a>
         </div>
     </div>
     
     <!-- Scroll indicator -->
     <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <svg class="w-6 h-6 text-tus-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-        </svg>
+        <div class="w-6 h-10 border-2 border-tus-white/30 rounded-full flex justify-center">
+            <div class="w-1 h-3 bg-tus-white/50 rounded-full mt-2 animate-pulse"></div>
+        </div>
     </div>
 </section>
 
-<!-- Services Section -->
-<section class="py-24 relative">
+<!-- Services Section - Clean Apple Style -->
+<section class="py-32 relative">
     <div class="max-w-6xl mx-auto px-6">
-        <div class="text-center mb-16">
-            <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block">Nos expertises</span>
-            <h2 class="text-4xl md:text-5xl font-display font-bold">
+        <div class="text-center mb-20">
+            <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Nos expertises</span>
+            <h2 class="text-4xl md:text-6xl font-display font-bold reveal">
                 Des services <span class="text-tus-blue">premium</span>
             </h2>
+            <p class="text-tus-white/60 mt-6 max-w-2xl mx-auto text-lg reveal">
+                Une approche sur-mesure pour chaque projet, avec l'excellence comme standard.
+            </p>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {% for service in services %}
-            <div class="card-premium group">
-                <div class="text-4xl mb-6 group-hover:scale-110 transition-transform duration-300">{{ service.icon }}</div>
-                <h3 class="text-xl font-display font-semibold mb-3 group-hover:text-tus-blue transition-colors">{{ service.title }}</h3>
-                <p class="text-tus-white/60 text-sm leading-relaxed">{{ service.description }}</p>
+        <!-- Services Grid - Simple & Elegant -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Card 1 - Design -->
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.1s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <span class="text-3xl">🎨</span>
+                </div>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">Design UI/UX</h3>
+                <p class="text-tus-white/60 leading-relaxed">Interfaces élégantes et expériences utilisateur mémorables, conçues pour convertir.</p>
             </div>
-            {% empty %}
-            <!-- Fallback services -->
-            <div class="card-premium group">
-                <div class="text-4xl mb-6 group-hover:scale-110 transition-transform duration-300">🎨</div>
-                <h3 class="text-xl font-display font-semibold mb-3 group-hover:text-tus-blue transition-colors">Design UI/UX</h3>
-                <p class="text-tus-white/60 text-sm leading-relaxed">Interfaces élégantes et expériences utilisateur mémorables, conçues pour convertir.</p>
+            
+            <!-- Card 2 - Développement -->
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.2s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <span class="text-3xl">⚡</span>
+                </div>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">Développement Web</h3>
+                <p class="text-tus-white/60 leading-relaxed">Sites et applications performants, construits avec les technologies les plus modernes.</p>
             </div>
-            <div class="card-premium group">
-                <div class="text-4xl mb-6 group-hover:scale-110 transition-transform duration-300">⚡</div>
-                <h3 class="text-xl font-display font-semibold mb-3 group-hover:text-tus-blue transition-colors">Développement Web</h3>
-                <p class="text-tus-white/60 text-sm leading-relaxed">Sites et applications performants, construits avec les technologies les plus modernes.</p>
+            
+            <!-- Card 3 - Stratégie -->
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.3s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <span class="text-3xl">🚀</span>
+                </div>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">Stratégie Digitale</h3>
+                <p class="text-tus-white/60 leading-relaxed">Accompagnement complet pour maximiser votre impact en ligne.</p>
             </div>
-            <div class="card-premium group">
-                <div class="text-4xl mb-6 group-hover:scale-110 transition-transform duration-300">🚀</div>
-                <h3 class="text-xl font-display font-semibold mb-3 group-hover:text-tus-blue transition-colors">Stratégie Digitale</h3>
-                <p class="text-tus-white/60 text-sm leading-relaxed">Accompagnement complet pour maximiser votre impact et votre visibilité en ligne.</p>
+            
+            <!-- Card 4 - E-commerce -->
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.4s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <span class="text-3xl">🛒</span>
+                </div>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">E-commerce</h3>
+                <p class="text-tus-white/60 leading-relaxed">Boutiques en ligne qui convertissent et fidélisent vos clients.</p>
             </div>
-            {% endfor %}
+            
+            <!-- Card 5 - SEO -->
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.5s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <span class="text-3xl">📈</span>
+                </div>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">SEO & Visibilité</h3>
+                <p class="text-tus-white/60 leading-relaxed">Optimisation pour les moteurs de recherche et visibilité maximale.</p>
+            </div>
+            
+            <!-- Card 6 - Maintenance -->
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.6s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                    <span class="text-3xl">🛠️</span>
+                </div>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">Maintenance</h3>
+                <p class="text-tus-white/60 leading-relaxed">Support réactif, mises à jour et évolutions continues.</p>
+            </div>
         </div>
     </div>
 </section>
 
 <!-- Stats Section -->
-<section class="py-16 relative">
-    <div class="max-w-6xl mx-auto px-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="text-center group">
-                <div class="text-5xl md:text-6xl font-display font-bold text-tus-blue mb-3 group-hover:scale-110 transition-transform duration-300">100%</div>
+<section class="py-24 relative overflow-hidden">
+    <!-- Background effect -->
+    <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/5 via-transparent to-tus-blue/5"></div>
+    
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="text-center group reveal" style="animation-delay: 0.1s;">
+                <div class="text-6xl md:text-7xl font-display font-bold text-tus-blue mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <span class="counter" data-target="100" data-suffix="%">0%</span>
+                </div>
                 <p class="text-tus-white/70 text-sm uppercase tracking-wider">Clients satisfaits</p>
             </div>
-            <div class="text-center group">
-                <div class="text-5xl md:text-6xl font-display font-bold text-tus-blue mb-3 group-hover:scale-110 transition-transform duration-300">2+</div>
+            <div class="text-center group reveal" style="animation-delay: 0.2s;">
+                <div class="text-6xl md:text-7xl font-display font-bold text-tus-blue mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <span class="counter" data-target="2" data-suffix="">0</span>
+                </div>
                 <p class="text-tus-white/70 text-sm uppercase tracking-wider">Projets réalisés</p>
             </div>
-            <div class="text-center group">
-                <div class="text-5xl md:text-6xl font-display font-bold text-tus-blue mb-3 group-hover:scale-110 transition-transform duration-300">🇬🇫</div>
+            <div class="text-center group reveal" style="animation-delay: 0.3s;">
+                <div class="text-6xl md:text-7xl font-display font-bold mb-3 group-hover:scale-110 transition-transform duration-300">🇬🇫</div>
                 <p class="text-tus-white/70 text-sm uppercase tracking-wider">Basé en Guyane</p>
             </div>
         </div>
     </div>
 </section>
 
+
+
 <!-- CTA Section -->
-<section class="py-24 relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-r from-tus-blue/10 via-tus-blue/5 to-transparent"></div>
+<section class="py-32 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-tus-blue/20 via-tus-blue/10 to-transparent"></div>
+    <div class="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-tus-blue/20 rounded-full blur-[100px]"></div>
+    
     <div class="max-w-4xl mx-auto px-6 text-center relative z-10">
-        <h2 class="text-3xl md:text-4xl font-display font-bold mb-6">
-            Prêt à transformer votre vision en réalité ?
+        <h2 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-8 reveal">
+            Prêt à transformer<br>
+            <span class="text-tus-blue">votre vision</span> en réalité ?
         </h2>
-        <p class="text-tus-white/60 mb-8 max-w-xl mx-auto">
+        <p class="text-xl text-tus-white/60 mb-12 max-w-xl mx-auto reveal" style="animation-delay: 0.1s;">
             Discutons de votre projet et créons ensemble une expérience digitale exceptionnelle.
         </p>
-        <a href="/contact/" class="btn-primary animate-pulse-glow">
-            Contactez-nous
-            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        <div class="reveal" style="animation-delay: 0.2s;">
+            <a href="/contact/" class="group inline-flex items-center gap-3 bg-tus-white text-tus-black px-10 py-5 rounded-2xl font-display font-bold text-lg hover:bg-tus-blue hover:text-tus-white transition-all duration-300 hover:scale-105">
+                Contactez-nous
+                <svg class="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>
             </svg>
         </a>
     </div>

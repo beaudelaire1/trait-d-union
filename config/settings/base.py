@@ -42,7 +42,7 @@ ALLOWED_HOSTS: list[str] = []
 
 # Application definition
 INSTALLED_APPS = [
-    'jazzmin',
+    'jazzmin',  # Admin premium personnalisé
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,7 +50,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
+    'django.contrib.sites',
     'django_htmx',
+    # allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
     # local apps
     'apps.pages',
     'apps.portfolio',
@@ -58,8 +63,12 @@ INSTALLED_APPS = [
     'apps.resources',
     'apps.devis',
     'apps.factures',
+    'apps.clients',
     'services',
 ]
+
+# Django Sites framework
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -71,6 +80,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # HTMX must come before CommonMiddleware to set the proper flags
     'django_htmx.middleware.HtmxMiddleware',
+    # allauth
+    'allauth.account.middleware.AccountMiddleware',
     # custom middlewares
     'config.middleware.RateLimitMiddleware',
     'config.middleware.SecurityHeadersMiddleware',
@@ -145,12 +156,21 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Email backend
+# ==============================================================================
+# EMAIL CONFIGURATION
+# ==============================================================================
+# Backend par défaut (console en dev)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
-# Email configuration
-# In production, override via environment variables
+# Brevo (ex-Sendinblue) API pour les emails transactionnels
+# En production, utiliser l'API Brevo plutôt que SMTP (plus fiable sur Render)
+BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
+
+# Configuration expéditeur
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'contact@traitdunion.it')
+DEFAULT_FROM_NAME = os.environ.get('DEFAULT_FROM_NAME', "Trait d'Union Studio")
+
+# Email admin pour les notifications internes
 ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.it')
 
 # reCAPTCHA v3 settings
@@ -158,6 +178,26 @@ ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.it')
 RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
 RECAPTCHA_SCORE_THRESHOLD = 0.5  # Score minimum (0.0 à 1.0)
+
+# ==============================================================================
+# PHASE 3 : STRIPE PAYMENT CONFIGURATION
+# ==============================================================================
+# Configuration Stripe pour les paiements en ligne
+# Obtenez vos clés sur https://dashboard.stripe.com/apikeys
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY', '')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
+
+# Taux d'acompte par défaut (30%)
+QUOTE_DEPOSIT_RATE = 0.30
+
+# ==============================================================================
+# CRM INTEGRATION (Airtable / HubSpot)
+# ==============================================================================
+AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY', '')
+AIRTABLE_BASE_ID = os.environ.get('AIRTABLE_BASE_ID', '')
+AIRTABLE_TABLE_NAME = os.environ.get('AIRTABLE_TABLE_NAME', 'Leads')
+HUBSPOT_API_KEY = os.environ.get('HUBSPOT_API_KEY', '')
 
 LOGGING = {
     'version': 1,
@@ -318,3 +358,24 @@ JAZZMIN_UI_TWEAKS = {
     },
     "actions_sticky_top": True,
 }
+
+# ============================================================================
+# Django Allauth Configuration (Client Portal)
+# ============================================================================
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Allauth settings
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_LOGOUT_ON_GET = True
+
+# Redirections
+LOGIN_REDIRECT_URL = '/espace-client/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'

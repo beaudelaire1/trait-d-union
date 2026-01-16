@@ -16,6 +16,8 @@ sitemaps = {
 }
 
 urlpatterns = [
+    # Dashboard BI (Phase 5)
+    path('tus-gestion-secure/dashboard/', include('apps.pages.dashboard_urls')),
     path('tus-gestion-secure/', admin.site.urls),  # URL admin sécurisée
     path('', include('apps.pages.urls')),
     path('portfolio/', include('apps.portfolio.urls')),
@@ -24,6 +26,9 @@ urlpatterns = [
     # Business apps
     path('devis/', include('apps.devis.urls')),
     path('factures/', include('apps.factures.urls')),
+    # Client portal (Phase 4)
+    path('espace-client/', include('apps.clients.urls')),
+    path('accounts/', include('allauth.urls')),
     # SEO
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),

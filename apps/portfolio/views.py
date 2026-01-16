@@ -25,8 +25,9 @@ class ProjectListView(ListView):
         return queryset
 
     def get_template_names(self) -> list[str]:
-        # If the request comes from HTMX, return partial template for list only
-        if self.request.headers.get('HX-Request'):
+        # Only return partial for HTMX filter requests (when there's a target)
+        # Full page navigation should return the complete template
+        if self.request.headers.get('HX-Request') and self.request.headers.get('HX-Target') == 'project-list':
             return ['portfolio/_project_list_partial.html']
         return [self.template_name]
 

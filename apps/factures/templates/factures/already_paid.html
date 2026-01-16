@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Facture déjà payée - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-[#F6F7FB] flex items-center justify-center py-20">
+    <div class="max-w-xl mx-auto px-6 text-center">
+        <!-- Info Icon -->
+        <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8">
+            <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </div>
+
+        <h1 class="font-display text-4xl font-bold text-[#07080A] mb-4">
+            Facture déjà réglée
+        </h1>
+        
+        <p class="text-gray-600 text-lg mb-8">
+            La facture <strong>{{ invoice.number }}</strong> a déjà été payée.
+        </p>
+
+        <div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+            <div class="space-y-4">
+                <div class="flex justify-between items-center pb-4 border-b">
+                    <span class="text-gray-600">Facture n°</span>
+                    <span class="font-semibold text-[#07080A]">{{ invoice.number }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-4 border-b">
+                    <span class="text-gray-600">Montant</span>
+                    <span class="font-display text-xl font-bold text-[#07080A]">{{ invoice.total_ttc|floatformat:2 }} €</span>
+                </div>
+                {% if invoice.paid_at %}
+                <div class="flex justify-between items-center pb-4 border-b">
+                    <span class="text-gray-600">Payée le</span>
+                    <span class="font-semibold text-[#07080A]">{{ invoice.paid_at|date:"d/m/Y" }}</span>
+                </div>
+                {% endif %}
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-600">Statut</span>
+                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Payée
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'factures:public_pdf' token=invoice.public_token %}" 
+               target="_blank"
+               class="inline-flex items-center justify-center gap-2 bg-[#07080A] text-white py-3 px-6 rounded-xl font-semibold hover:bg-gray-800 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Télécharger le PDF
+            </a>
+            <a href="{% url 'pages:home' %}" 
+               class="inline-flex items-center justify-center gap-2 border-2 border-[#07080A] text-[#07080A] py-3 px-6 rounded-xl font-semibold hover:bg-[#07080A] hover:text-white transition-colors">
+                Retour à l'accueil
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

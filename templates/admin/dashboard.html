@@ -1,0 +1,1302 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- Sidebar Premium -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <span class="brand-icon">◆</span>
+                <span class="brand-text">TUS<span class="brand-accent">.</span></span>
+            </div>
+            <span class="sidebar-badge">PRO</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <span class="nav-section-title">Principal</span>
+                <a href="/tus-gestion-secure/dashboard/" class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-section-title">Commercial</span>
+                <a href="/tus-gestion-secure/leads/lead/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    <span>Leads</span>
+                    {% if monthly_leads > 0 %}
+                    <span class="nav-badge">{{ monthly_leads }}</span>
+                    {% endif %}
+                </a>
+                <a href="/tus-gestion-secure/devis/quote/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14,2 14,8 20,8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    <span>Devis</span>
+                    {% if pipeline_count > 0 %}
+                    <span class="nav-badge accent">{{ pipeline_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="/tus-gestion-secure/factures/invoice/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                    <span>Factures</span>
+                    {% if overdue_count > 0 %}
+                    <span class="nav-badge danger">{{ overdue_count }}</span>
+                    {% endif %}
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-section-title">Projets</span>
+                <a href="/tus-gestion-secure/portfolio/project/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>Portfolio</span>
+                </a>
+                <a href="/tus-gestion-secure/services/service/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12,2 2,7 12,12 22,7 12,2"></polygon>
+                        <polyline points="2,17 12,22 22,17"></polyline>
+                        <polyline points="2,12 12,17 22,12"></polyline>
+                    </svg>
+                    <span>Services</span>
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <span class="nav-section-title">Gestion</span>
+                <a href="/tus-gestion-secure/clients/clientprofile/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Clients</span>
+                </a>
+                <a href="/tus-gestion-secure/" class="nav-item">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Admin Django</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="/" class="sidebar-link" target="_blank">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15,3 21,3 21,9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                <span>Voir le site</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Top Bar -->
+        <header class="dashboard-topbar">
+            <div class="topbar-left">
+                <h1 class="topbar-title">Dashboard</h1>
+                <span class="topbar-date">{{ today|date:"l d F Y" }}</span>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-search">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" placeholder="Rechercher..." class="search-input">
+                </div>
+                <div class="topbar-user">
+                    <span class="user-avatar">{{ request.user.username|slice:":2"|upper }}</span>
+                    <span class="user-name">{{ request.user.username }}</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <a href="/tus-gestion-secure/devis/quote/add/" class="action-btn primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Nouveau devis
+                </a>
+                <a href="/tus-gestion-secure/factures/invoice/add/" class="action-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Nouvelle facture
+                </a>
+                <a href="/tus-gestion-secure/leads/lead/add/" class="action-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                    Ajouter un lead
+                </a>
+            </section>
+
+            <!-- Alert Banner -->
+            {% if overdue_count > 0 %}
+            <div class="alert-banner danger">
+                <div class="alert-icon-wrap">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <div class="alert-text">
+                    <strong>{{ overdue_count }} facture{{ overdue_count|pluralize }} en retard</strong>
+                    <span>{{ overdue_amount|floatformat:2 }}€ à recouvrer</span>
+                </div>
+                <a href="/tus-gestion-secure/factures/invoice/?status__exact=overdue" class="alert-action">
+                    Gérer →
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- KPI Cards -->
+            <section class="kpi-section">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon-wrap blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                                </svg>
+                            </div>
+                            <div class="kpi-trend up">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"></polyline>
+                                    <polyline points="17,6 23,6 23,12"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value">{{ pipeline_value|floatformat:0 }}<span class="kpi-currency">€</span></div>
+                        <div class="kpi-label">Pipeline en cours</div>
+                        <div class="kpi-sub">{{ pipeline_count }} devis en attente</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon-wrap green">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                            </div>
+                            <div class="kpi-trend {% if revenue_variation >= 0 %}up{% else %}down{% endif %}">
+                                {% if revenue_variation >= 0 %}+{% endif %}{{ revenue_variation|floatformat:0 }}%
+                            </div>
+                        </div>
+                        <div class="kpi-value">{{ monthly_revenue|floatformat:0 }}<span class="kpi-currency">€</span></div>
+                        <div class="kpi-label">CA ce mois</div>
+                        <div class="kpi-sub">vs mois précédent</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon-wrap purple">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value">{{ yearly_revenue|floatformat:0 }}<span class="kpi-currency">€</span></div>
+                        <div class="kpi-label">CA annuel</div>
+                        <div class="kpi-sub">Total {{ today|date:"Y" }}</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-top">
+                            <div class="kpi-icon-wrap orange">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12,6 12,12 16,14"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="kpi-value">{{ conversion_rate|floatformat:0 }}<span class="kpi-unit">%</span></div>
+                        <div class="kpi-label">Taux de conversion</div>
+                        <div class="kpi-sub">{{ monthly_quotes_accepted }}/{{ monthly_quotes_sent }} devis signés</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-section">
+                <div class="charts-grid">
+                    <!-- Revenue Chart -->
+                    <div class="chart-card large">
+                        <div class="chart-header">
+                            <h3>Évolution du chiffre d'affaires</h3>
+                            <div class="chart-legend">
+                                <span class="legend-item"><span class="dot green"></span>Encaissé</span>
+                            </div>
+                        </div>
+                        <div class="chart-body">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Pipeline Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Pipeline par statut</h3>
+                        </div>
+                        <div class="chart-body centered">
+                            <canvas id="pipelineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conversion Funnel -->
+            <section class="funnel-section">
+                <div class="funnel-card">
+                    <div class="funnel-header">
+                        <h3>Entonnoir de conversion</h3>
+                        <span class="funnel-period">Ce mois</span>
+                    </div>
+                    <div class="funnel-body">
+                        <div class="funnel-steps">
+                            <div class="funnel-step">
+                                <div class="step-bar" style="width: 100%;">
+                                    <span class="step-value">{{ monthly_leads }}</span>
+                                </div>
+                                <span class="step-label">Leads</span>
+                            </div>
+                            <div class="funnel-step">
+                                <div class="step-bar" style="width: {% widthratio monthly_quotes_sent monthly_leads 100 %}%;">
+                                    <span class="step-value">{{ monthly_quotes_sent }}</span>
+                                </div>
+                                <span class="step-label">Devis envoyés</span>
+                            </div>
+                            <div class="funnel-step">
+                                <div class="step-bar success" style="width: {% widthratio monthly_quotes_accepted monthly_leads 100 %}%;">
+                                    <span class="step-value">{{ monthly_quotes_accepted }}</span>
+                                </div>
+                                <span class="step-label">Devis signés</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity Grid -->
+            <section class="activity-section">
+                <div class="activity-grid">
+                    <!-- Recent Leads -->
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <h3>Derniers leads</h3>
+                            <a href="/tus-gestion-secure/leads/lead/" class="activity-link">Voir tout</a>
+                        </div>
+                        <div class="activity-list">
+                            {% for lead in recent_leads %}
+                            <div class="activity-item">
+                                <div class="activity-avatar">{{ lead.name|slice:":2"|upper }}</div>
+                                <div class="activity-info">
+                                    <span class="activity-name">{{ lead.name }}</span>
+                                    <span class="activity-meta">{{ lead.email }}</span>
+                                </div>
+                                <span class="activity-date">{{ lead.created_at|date:"d/m" }}</span>
+                            </div>
+                            {% empty %}
+                            <div class="empty-state">
+                                <p>Aucun lead récent</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Recent Quotes -->
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <h3>Derniers devis</h3>
+                            <a href="/tus-gestion-secure/devis/quote/" class="activity-link">Voir tout</a>
+                        </div>
+                        <div class="activity-list">
+                            {% for quote in recent_quotes %}
+                            <div class="activity-item">
+                                <div class="activity-status status-{{ quote.status }}"></div>
+                                <div class="activity-info">
+                                    <span class="activity-name">{{ quote.reference }}</span>
+                                    <span class="activity-meta">{{ quote.client_name }}</span>
+                                </div>
+                                <span class="activity-amount">{{ quote.total_ttc|floatformat:0 }}€</span>
+                            </div>
+                            {% empty %}
+                            <div class="empty-state">
+                                <p>Aucun devis récent</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Recent Invoices -->
+                    <div class="activity-card">
+                        <div class="activity-header">
+                            <h3>Dernières factures</h3>
+                            <a href="/tus-gestion-secure/factures/invoice/" class="activity-link">Voir tout</a>
+                        </div>
+                        <div class="activity-list">
+                            {% for invoice in recent_invoices %}
+                            <div class="activity-item">
+                                <div class="activity-status status-{{ invoice.status }}"></div>
+                                <div class="activity-info">
+                                    <span class="activity-name">{{ invoice.number }}</span>
+                                    <span class="activity-meta">{{ invoice.get_status_display }}</span>
+                                </div>
+                                <span class="activity-amount">{{ invoice.total_ttc|floatformat:0 }}€</span>
+                            </div>
+                            {% empty %}
+                            <div class="empty-state">
+                                <p>Aucune facture récente</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<style>
+/* ============================================
+   DASHBOARD PREMIUM - TRAIT D'UNION STUDIO
+   ============================================ */
+
+:root {
+    --sidebar-width: 260px;
+    --topbar-height: 70px;
+    --dash-bg: #0f0f12;
+    --dash-surface: #18181c;
+    --dash-surface-hover: #1f1f24;
+    --dash-border: #2a2a30;
+    --dash-text: #f5f5f7;
+    --dash-text-muted: #8e8e93;
+    --dash-accent: #0a84ff;
+    --dash-accent-hover: #409cff;
+    --dash-success: #30d158;
+    --dash-warning: #ff9f0a;
+    --dash-danger: #ff453a;
+    --dash-purple: #bf5af2;
+}
+
+/* Layout */
+.dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--dash-bg);
+    color: var(--dash-text);
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+    width: var(--sidebar-width);
+    background: var(--dash-surface);
+    border-right: 1px solid var(--dash-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--dash-border);
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.brand-icon {
+    color: var(--dash-accent);
+    font-size: 1.25rem;
+}
+
+.brand-accent {
+    color: var(--dash-accent);
+}
+
+.sidebar-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    background: linear-gradient(135deg, var(--dash-accent), var(--dash-purple));
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
+
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem 0;
+}
+
+.nav-section {
+    margin-bottom: 1.5rem;
+}
+
+.nav-section-title {
+    display: block;
+    padding: 0 1.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--dash-text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    color: var(--dash-text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.nav-item:hover {
+    color: var(--dash-text);
+    background: var(--dash-surface-hover);
+}
+
+.nav-item.active {
+    color: var(--dash-accent);
+    background: rgba(10, 132, 255, 0.1);
+}
+
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 24px;
+    background: var(--dash-accent);
+    border-radius: 0 3px 3px 0;
+}
+
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.nav-badge {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    background: var(--dash-surface-hover);
+    border-radius: 10px;
+    color: var(--dash-text);
+}
+
+.nav-badge.accent {
+    background: var(--dash-accent);
+}
+
+.nav-badge.danger {
+    background: var(--dash-danger);
+}
+
+.sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--dash-border);
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--dash-text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+}
+
+.sidebar-link:hover {
+    color: var(--dash-text);
+}
+
+/* Main Content */
+.dashboard-main {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+}
+
+/* Topbar */
+.dashboard-topbar {
+    height: var(--topbar-height);
+    background: var(--dash-surface);
+    border-bottom: 1px solid var(--dash-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.topbar-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.topbar-date {
+    font-size: 0.85rem;
+    color: var(--dash-text-muted);
+    text-transform: capitalize;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.topbar-search {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: var(--dash-text-muted);
+}
+
+.search-input {
+    background: var(--dash-bg);
+    border: 1px solid var(--dash-border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    color: var(--dash-text);
+    font-size: 0.85rem;
+    width: 220px;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--dash-accent);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+}
+
+.search-input::placeholder {
+    color: var(--dash-text-muted);
+}
+
+.topbar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--dash-accent), var(--dash-purple));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Dashboard Content */
+.dashboard-content {
+    padding: 2rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    border-radius: 10px;
+    color: var(--dash-text);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.action-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.action-btn:hover {
+    background: var(--dash-surface-hover);
+    border-color: var(--dash-text-muted);
+}
+
+.action-btn.primary {
+    background: var(--dash-accent);
+    border-color: var(--dash-accent);
+}
+
+.action-btn.primary:hover {
+    background: var(--dash-accent-hover);
+    border-color: var(--dash-accent-hover);
+}
+
+/* Alert Banner */
+.alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.alert-banner.danger {
+    background: rgba(255, 69, 58, 0.1);
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+.alert-icon-wrap {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 69, 58, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alert-icon-wrap svg {
+    width: 20px;
+    height: 20px;
+    color: var(--dash-danger);
+}
+
+.alert-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.alert-text strong {
+    font-size: 0.95rem;
+}
+
+.alert-text span {
+    font-size: 0.85rem;
+    color: var(--dash-text-muted);
+}
+
+.alert-action {
+    color: var(--dash-danger);
+    font-weight: 500;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+
+.alert-action:hover {
+    text-decoration: underline;
+}
+
+/* KPI Section */
+.kpi-section {
+    margin-bottom: 2rem;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.kpi-card {
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.kpi-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.kpi-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kpi-icon-wrap svg {
+    width: 22px;
+    height: 22px;
+}
+
+.kpi-icon-wrap.blue {
+    background: rgba(10, 132, 255, 0.15);
+    color: var(--dash-accent);
+}
+
+.kpi-icon-wrap.green {
+    background: rgba(48, 209, 88, 0.15);
+    color: var(--dash-success);
+}
+
+.kpi-icon-wrap.purple {
+    background: rgba(191, 90, 242, 0.15);
+    color: var(--dash-purple);
+}
+
+.kpi-icon-wrap.orange {
+    background: rgba(255, 159, 10, 0.15);
+    color: var(--dash-warning);
+}
+
+.kpi-trend {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}
+
+.kpi-trend.up {
+    background: rgba(48, 209, 88, 0.15);
+    color: var(--dash-success);
+}
+
+.kpi-trend.down {
+    background: rgba(255, 69, 58, 0.15);
+    color: var(--dash-danger);
+}
+
+.kpi-trend svg {
+    width: 16px;
+    height: 16px;
+}
+
+.kpi-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.kpi-currency, .kpi-unit {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--dash-text-muted);
+    margin-left: 0.15rem;
+}
+
+.kpi-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.kpi-sub {
+    font-size: 0.8rem;
+    color: var(--dash-text-muted);
+}
+
+/* Charts Section */
+.charts-section {
+    margin-bottom: 2rem;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+.chart-card {
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.chart-card.large {
+    grid-column: 1;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.chart-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.chart-legend {
+    display: flex;
+    gap: 1rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--dash-text-muted);
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.dot.green {
+    background: var(--dash-success);
+}
+
+.chart-body {
+    height: 250px;
+    position: relative;
+}
+
+.chart-body.centered {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Funnel Section */
+.funnel-section {
+    margin-bottom: 2rem;
+}
+
+.funnel-card {
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.funnel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.funnel-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.funnel-period {
+    font-size: 0.8rem;
+    color: var(--dash-text-muted);
+    padding: 0.25rem 0.75rem;
+    background: var(--dash-bg);
+    border-radius: 6px;
+}
+
+.funnel-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.funnel-step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.step-bar {
+    height: 40px;
+    background: linear-gradient(90deg, var(--dash-accent), rgba(10, 132, 255, 0.3));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 1rem;
+    min-width: 60px;
+    transition: width 0.5s ease;
+}
+
+.step-bar.success {
+    background: linear-gradient(90deg, var(--dash-success), rgba(48, 209, 88, 0.3));
+}
+
+.step-value {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.step-label {
+    font-size: 0.85rem;
+    color: var(--dash-text-muted);
+    min-width: 120px;
+}
+
+/* Activity Section */
+.activity-section {
+    margin-bottom: 2rem;
+}
+
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.activity-card {
+    background: var(--dash-surface);
+    border: 1px solid var(--dash-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.activity-header h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.activity-link {
+    font-size: 0.8rem;
+    color: var(--dash-accent);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.activity-link:hover {
+    text-decoration: underline;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--dash-bg);
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+
+.activity-item:hover {
+    background: var(--dash-surface-hover);
+}
+
+.activity-avatar {
+    width: 36px;
+    height: 36px;
+    background: var(--dash-surface-hover);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--dash-text-muted);
+}
+
+.activity-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.activity-status.status-draft { background: var(--dash-text-muted); }
+.activity-status.status-sent { background: var(--dash-accent); }
+.activity-status.status-accepted, .activity-status.status-paid { background: var(--dash-success); }
+.activity-status.status-rejected, .activity-status.status-overdue { background: var(--dash-danger); }
+
+.activity-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-name {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.activity-meta {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--dash-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.activity-date, .activity-amount {
+    font-size: 0.85rem;
+    color: var(--dash-text-muted);
+    font-weight: 500;
+}
+
+.activity-amount {
+    color: var(--dash-text);
+}
+
+.empty-state {
+    padding: 2rem;
+    text-align: center;
+    color: var(--dash-text-muted);
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 1400px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .activity-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .dashboard-sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .dashboard-main {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .topbar-search {
+        display: none;
+    }
+    
+    .quick-actions {
+        flex-wrap: wrap;
+    }
+    
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart.js global config
+    Chart.defaults.color = '#8e8e93';
+    Chart.defaults.borderColor = '#2a2a30';
+    Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        new Chart(revenueCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: {{ revenue_labels|safe }},
+                datasets: [{
+                    label: 'CA encaissé',
+                    data: {{ revenue_data|safe }},
+                    backgroundColor: 'rgba(48, 209, 88, 0.8)',
+                    borderColor: '#30d158',
+                    borderWidth: 0,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#2a2a30',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('fr-FR') + '€';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    }
+
+    // Pipeline Chart
+    const pipelineCtx = document.getElementById('pipelineChart');
+    if (pipelineCtx) {
+        new Chart(pipelineCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: {{ pipeline_labels|safe }},
+                datasets: [{
+                    data: {{ pipeline_data|safe }},
+                    backgroundColor: [
+                        '#0a84ff',
+                        '#30d158',
+                        '#ff453a',
+                        '#8e8e93'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

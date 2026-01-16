@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Signer le devis {{ quote.number }} - Trait d'Union Studio{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+{% if stripe_configured and stripe_publishable_key %}
+<script src="https://js.stripe.com/v3/"></script>
+{% endif %}
+<style>
+    .signature-container {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        background: #fafafa;
+        position: relative;
+        touch-action: none;
+    }
+    .signature-container.signing {
+        border-color: #3b82f6;
+        background: white;
+    }
+    .signature-container canvas {
+        width: 100%;
+        height: 200px;
+        cursor: crosshair;
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .summary-row:last-child {
+        border-bottom: none;
+    }
+    .loading-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+    }
+    .loading-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-[#F6F7FB] py-12 px-4">
+    <div class="max-w-3xl mx-auto">
+        
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="font-display text-3xl md:text-4xl font-bold text-[#07080A] mb-2">
+                Accepter le devis
+            </h1>
+            <p class="text-gray-600">
+                Devis n° <strong>{{ quote.number }}</strong>
+                {% if quote.valid_until %}
+                · Valide jusqu'au {{ quote.valid_until|date:"d/m/Y" }}
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Récapitulatif du devis -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-8">
+            <h2 class="font-display text-xl font-semibold text-[#07080A] mb-6 flex items-center gap-2">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                Récapitulatif
+            </h2>
+
+            {% if quote.items %}
+            <div class="mb-6">
+                {% for item in quote.items %}
+                <div class="summary-row">
+                    <div>
+                        <span class="font-medium">{{ item.description }}</span>
+                        <span class="text-gray-500 text-sm ml-2">× {{ item.quantity }}</span>
+                    </div>
+                    <span class="font-medium">{{ item.total_ht|floatformat:2 }} €</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="bg-gray-50 rounded-xl p-4 space-y-2">
+                <div class="flex justify-between text-gray-600">
+                    <span>Sous-total HT</span>
+                    <span>{{ quote.total_ht|floatformat:2 }} €</span>
+                </div>
+                <div class="flex justify-between text-gray-600">
+                    <span>TVA</span>
+                    <span>{{ quote.tva|floatformat:2 }} €</span>
+                </div>
+                <div class="flex justify-between font-display text-xl font-bold text-[#07080A] pt-2 border-t">
+                    <span>Total TTC</span>
+                    <span>{{ quote.total_ttc|floatformat:2 }} €</span>
+                </div>
+            </div>
+
+            {% if stripe_configured %}
+            <div class="mt-4 p-4 bg-blue-50 rounded-xl">
+                <div class="flex justify-between items-center">
+                    <span class="text-blue-800 font-medium">
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        Acompte ({{ deposit_rate }}%)
+                    </span>
+                    <span class="text-blue-900 font-bold text-lg">{{ deposit_amount|floatformat:2 }} €</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Zone de signature -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-8">
+            <h2 class="font-display text-xl font-semibold text-[#07080A] mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                </svg>
+                Votre signature
+            </h2>
+
+            <p class="text-gray-600 mb-4 text-sm">
+                En signant ci-dessous, vous acceptez les termes et conditions du devis n° {{ quote.number }}.
+            </p>
+
+            <div class="signature-container mb-4" id="signature-container">
+                <canvas id="signature-pad"></canvas>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="button" id="clear-signature"
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg transition-colors">
+                    Effacer
+                </button>
+                <a href="{% url 'devis:quote_public_pdf' token=quote.public_token %}" target="_blank"
+                    class="px-4 py-2 text-blue-600 hover:text-blue-800 border border-blue-300 rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    Voir le PDF
+                </a>
+            </div>
+
+            <!-- Message d'erreur -->
+            <div id="error-message" class="hidden mt-4 p-4 bg-red-50 text-red-700 rounded-xl">
+                <span id="error-text"></span>
+            </div>
+        </div>
+
+        <!-- Conditions -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-8">
+            <label class="flex items-start gap-3 cursor-pointer">
+                <input type="checkbox" id="accept-terms" 
+                    class="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <span class="text-gray-700 text-sm">
+                    J'ai lu et j'accepte les <a href="#" class="text-blue-600 hover:underline">conditions générales de vente</a>
+                    et je reconnais que ma signature électronique a la même valeur juridique qu'une signature manuscrite.
+                </span>
+            </label>
+        </div>
+
+        <!-- Bouton d'action -->
+        <button type="button" id="submit-signature" disabled
+            class="w-full py-4 bg-[#07080A] text-white font-semibold text-lg rounded-2xl 
+                   hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                   flex items-center justify-center gap-3">
+            {% if stripe_configured %}
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            Signer et payer l'acompte ({{ deposit_amount|floatformat:2 }} €)
+            {% else %}
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Signer et accepter le devis
+            {% endif %}
+        </button>
+
+        <!-- Note de sécurité -->
+        <p class="text-center text-gray-500 text-xs mt-6">
+            🔒 Vos données sont sécurisées et chiffrées.
+            {% if stripe_configured %}Le paiement est géré par Stripe.{% endif %}
+        </p>
+    </div>
+</section>
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loading-overlay">
+    <div class="bg-white p-8 rounded-2xl shadow-2xl text-center">
+        <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="font-medium text-gray-800">Traitement en cours...</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser le pad de signature
+    const canvas = document.getElementById('signature-pad');
+    const container = document.getElementById('signature-container');
+    const signaturePad = new SignaturePad(canvas, {
+        backgroundColor: 'rgb(255, 255, 255)',
+        penColor: 'rgb(0, 0, 0)',
+    });
+
+    // Ajuster la taille du canvas
+    function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext('2d').scale(ratio, ratio);
+        signaturePad.clear();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Indicateur visuel pendant la signature
+    canvas.addEventListener('pointerdown', () => {
+        container.classList.add('signing');
+    });
+
+    // Bouton effacer
+    document.getElementById('clear-signature').addEventListener('click', () => {
+        signaturePad.clear();
+        container.classList.remove('signing');
+    });
+
+    // Checkbox et validation
+    const acceptTerms = document.getElementById('accept-terms');
+    const submitBtn = document.getElementById('submit-signature');
+    
+    function updateSubmitState() {
+        submitBtn.disabled = signaturePad.isEmpty() || !acceptTerms.checked;
+    }
+    
+    acceptTerms.addEventListener('change', updateSubmitState);
+    canvas.addEventListener('pointerup', () => {
+        setTimeout(updateSubmitState, 100);
+    });
+
+    // Soumission
+    submitBtn.addEventListener('click', async () => {
+        if (signaturePad.isEmpty()) {
+            showError("Veuillez signer le devis avant de continuer.");
+            return;
+        }
+        if (!acceptTerms.checked) {
+            showError("Veuillez accepter les conditions générales.");
+            return;
+        }
+
+        // Afficher le loader
+        document.getElementById('loading-overlay').classList.add('active');
+        hideError();
+
+        try {
+            const signatureData = signaturePad.toDataURL('image/png');
+            
+            const response = await fetch("{% url 'devis:quote_submit_signature' token=quote.public_token %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    signature_data: signatureData,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                if (data.requires_payment && data.checkout_url) {
+                    // Rediriger vers Stripe Checkout
+                    window.location.href = data.checkout_url;
+                } else {
+                    // Pas de paiement requis, rediriger vers la page de succès
+                    window.location.href = "{% url 'devis:payment_success' %}?signed=true";
+                }
+            } else {
+                showError(data.error || "Une erreur est survenue.");
+                document.getElementById('loading-overlay').classList.remove('active');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            showError("Erreur de connexion. Veuillez réessayer.");
+            document.getElementById('loading-overlay').classList.remove('active');
+        }
+    });
+
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        errorText.textContent = message;
+        errorDiv.classList.remove('hidden');
+    }
+
+    function hideError() {
+        document.getElementById('error-message').classList.add('hidden');
+    }
+});
+</script>
+{% endblock %}

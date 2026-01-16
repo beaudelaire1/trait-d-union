@@ -1,0 +1,134 @@
+# ==============================================================================
+# Docker Compose - Environnement de développement local
+# ==============================================================================
+# Miroir de la production Render pour tester localement
+#
+# Usage:
+#   docker-compose up -d              # Démarrer tous les services
+#   docker-compose up -d web          # Démarrer seulement Django
+#   docker-compose logs -f web        # Voir les logs Django
+#   docker-compose exec web bash      # Shell dans le conteneur
+#   docker-compose down -v            # Arrêter et supprimer les volumes
+
+services:
+  # ============================================================================
+  # APPLICATION DJANGO
+  # ============================================================================
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tus-web
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.production
+      - DJANGO_SECRET_KEY=dev-secret-key-change-in-production
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+      - DATABASE_URL=postgresql://tus_user:tus_password@db:5432/tus_db
+      - REDIS_URL=redis://redis:6379/0
+      - SITE_URL=http://localhost:8000
+      - DEBUG=False
+      # Brevo (optionnel en local)
+      - BREVO_API_KEY=${BREVO_API_KEY:-}
+      - DEFAULT_FROM_EMAIL=contact@traitdunion.it
+    volumes:
+      # Monter le code source pour le développement
+      - .:/app:cached
+      # Volumes persistants
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tus-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ============================================================================
+  # BASE DE DONNÉES POSTGRESQL
+  # ============================================================================
+  db:
+    image: postgres:15-alpine
+    container_name: tus-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=tus_db
+      - POSTGRES_USER=tus_user
+      - POSTGRES_PASSWORD=tus_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - tus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tus_user -d tus_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # CACHE REDIS
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: tus-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - tus-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # ADMINER (Interface BDD - optionnel)
+  # ============================================================================
+  adminer:
+    image: adminer:latest
+    container_name: tus-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - tus-network
+    profiles:
+      - tools  # Ne démarre que avec: docker-compose --profile tools up
+
+# ==============================================================================
+# VOLUMES PERSISTANTS
+# ==============================================================================
+volumes:
+  postgres_data:
+    name: tus-postgres-data
+  redis_data:
+    name: tus-redis-data
+  static_volume:
+    name: tus-static
+  media_volume:
+    name: tus-media
+
+# ==============================================================================
+# RÉSEAU
+# ==============================================================================
+networks:
+  tus-network:
+    name: tus-network
+    driver: bridge

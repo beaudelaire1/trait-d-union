@@ -182,6 +182,40 @@ class Quote(models.Model):
     # repository of generated documents.
     pdf = models.FileField(upload_to="devis", blank=True, null=True)
 
+    # ===========================================
+    # PHASE 3 : Signature électronique & Paiement
+    # ===========================================
+    # Image de la signature client (base64 PNG stockée en fichier)
+    signature_image = models.FileField(
+        upload_to="devis/signatures",
+        blank=True,
+        null=True,
+        help_text="Signature électronique du client"
+    )
+    # Date de signature
+    signed_at = models.DateTimeField(null=True, blank=True)
+    # Audit trail JSON (IP, UserAgent, etc.)
+    signature_audit_trail = models.JSONField(
+        blank=True,
+        null=True,
+        help_text="Informations d'audit de la signature"
+    )
+    # Stripe Checkout Session ID (acompte)
+    stripe_checkout_session_id = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="ID de session Stripe pour le paiement d'acompte"
+    )
+    # Montant de l'acompte payé
+    deposit_paid = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Montant de l'acompte encaissé"
+    )
+    # Date de paiement de l'acompte
+    deposit_paid_at = models.DateTimeField(null=True, blank=True)
+
     def amount_letter(self):
         """Montant TTC en toutes lettres (affiché sur le PDF devis)."""
         return f"{_num2words_fr(self.total_ttc).title()} euros"

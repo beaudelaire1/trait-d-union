@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes projets - Espace Client{% endblock %}
+
+{% block content %}
+<div class="client-portal">
+    <header class="client-header">
+        <div class="container">
+            <nav class="client-breadcrumb">
+                <a href="{% url 'clients:dashboard' %}">Espace client</a>
+                <span>/</span>
+                <span>Mes projets</span>
+            </nav>
+            <h1>Mes projets</h1>
+        </div>
+    </header>
+
+    <section class="client-main">
+        <div class="container">
+            {% if projects %}
+                <div class="projects-grid">
+                    {% for project in projects %}
+                    <a href="{% url 'clients:project_detail' project.pk %}" class="project-card">
+                        <div class="project-card-header">
+                            <span class="project-status-badge">{{ project.get_status_display }}</span>
+                            <span class="project-progress">{{ project.progress }}%</span>
+                        </div>
+                        <h3>{{ project.name }}</h3>
+                        {% if project.description %}
+                            <p class="project-desc">{{ project.description|truncatewords:20 }}</p>
+                        {% endif %}
+                        <div class="project-card-footer">
+                            {% if project.estimated_delivery %}
+                                <span class="project-date">📅 {{ project.estimated_delivery|date:"d/m/Y" }}</span>
+                            {% endif %}
+                            <span class="project-arrow">→</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ project.progress }}%"></div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state-large">
+                    <span class="empty-icon">📁</span>
+                    <h2>Aucun projet pour le moment</h2>
+                    <p>Vos projets apparaîtront ici une fois qu'un devis sera accepté.</p>
+                    <a href="{% url 'leads:quote_request' %}" class="btn btn-primary">Demander un devis</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+
+<style>
+.client-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.client-breadcrumb a {
+    color: var(--primary);
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.project-card {
+    background: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.project-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.project-status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    background: var(--gray-100);
+    border-radius: 1rem;
+}
+
+.project-progress {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.project-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.project-desc {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.project-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.project-date {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+}
+
+.project-arrow {
+    font-size: 1.25rem;
+    color: var(--primary);
+    transition: transform 0.2s;
+}
+
+.project-card:hover .project-arrow {
+    transform: translateX(4px);
+}
+
+.project-card .progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gray-100);
+}
+
+.project-card .progress-fill {
+    height: 100%;
+    background: var(--primary);
+    transition: width 0.3s;
+}
+
+.empty-state-large {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: white;
+    border-radius: 1rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.empty-state-large h2 {
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-large p {
+    color: var(--gray-600);
+    margin-bottom: 1.5rem;
+}
+</style>
+{% endblock %}

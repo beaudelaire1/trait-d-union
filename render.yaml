@@ -1,0 +1,88 @@
+# ==============================================================================
+# Render.com - Infrastructure as Code
+# ==============================================================================
+# Ce fichier définit l'infrastructure complète sur Render
+# Documentation: https://render.com/docs/infrastructure-as-code
+
+services:
+  # ==============================================================================
+  # SERVICE WEB DJANGO (Docker)
+  # ==============================================================================
+  - type: web
+    name: traitdunion-web
+    runtime: docker
+    region: frankfurt  # Plus proche de la Guyane via l'Europe
+    plan: starter  # Passer à "standard" pour plus de RAM (PDF generation)
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    
+    # Health check
+    healthCheckPath: /
+    
+    # Variables d'environnement
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: traitdunion.it,www.traitdunion.it,.onrender.com
+      - key: SITE_URL
+        value: https://traitdunion.it
+      
+      # Base de données (lien automatique)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: traitdunion-db
+          property: connectionString
+      
+      # Brevo API (à configurer manuellement dans le dashboard Render)
+      - key: BREVO_API_KEY
+        sync: false  # Secret à définir manuellement
+      
+      # Email
+      - key: DEFAULT_FROM_EMAIL
+        value: contact@traitdunion.it
+      - key: DEFAULT_FROM_NAME
+        value: "Trait d'Union Studio"
+      - key: ADMIN_EMAIL
+        value: contact@traitdunion.it
+
+  # ==============================================================================
+  # BASE DE DONNÉES POSTGRESQL
+  # ==============================================================================
+databases:
+  - name: traitdunion-db
+    region: frankfurt
+    plan: starter  # 1 GB, backups quotidiens
+    databaseName: traitdunion
+    user: tus_admin
+    ipAllowList: []  # Connexion interne uniquement
+
+# ==============================================================================
+# NOTES DE DÉPLOIEMENT
+# ==============================================================================
+# 
+# 1. PREMIÈRE INSTALLATION :
+#    - Forkez/clonez ce repo
+#    - Connectez-le à Render via "New Blueprint"
+#    - Configurez BREVO_API_KEY manuellement dans Environment
+#
+# 2. DNS (Hostinger) :
+#    - CNAME www -> [votre-service].onrender.com
+#    - A @ -> IP de Render (voir dashboard)
+#    - Ou utiliser les custom domains de Render
+#
+# 3. POUR LE STOCKAGE S3/R2 (médias) :
+#    Ajoutez ces variables manuellement :
+#    - AWS_ACCESS_KEY_ID
+#    - AWS_SECRET_ACCESS_KEY
+#    - AWS_STORAGE_BUCKET_NAME
+#    - AWS_S3_ENDPOINT_URL (pour Cloudflare R2)
+#
+# 4. REDIS (optionnel, pour cache/sessions) :
+#    Ajoutez un service Redis dans le dashboard et liez REDIS_URL
+#
+# 5. WEASYPRINT (génération PDF) :
+#    Sur Render, les dépendances système (pango, cairo) sont déjà disponibles
+#    Si problèmes, utilisez un Dockerfile custom

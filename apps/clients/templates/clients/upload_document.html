@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block title %}Uploader un document - Espace Client{% endblock %}
+
+{% block content %}
+<div class="client-portal">
+    <header class="client-header">
+        <div class="container">
+            <nav class="client-breadcrumb">
+                <a href="{% url 'clients:dashboard' %}">Espace client</a>
+                <span>/</span>
+                <a href="{% url 'clients:documents' %}">Documents</a>
+                <span>/</span>
+                <span>Uploader</span>
+            </nav>
+            <h1>Uploader un document</h1>
+        </div>
+    </header>
+
+    <section class="client-main">
+        <div class="container">
+            <div class="upload-form-wrapper">
+                {% if project %}
+                    <div class="upload-context">
+                        <span class="context-label">Projet :</span>
+                        <span class="context-value">{{ project.name }}</span>
+                    </div>
+                {% endif %}
+
+                <form method="post" enctype="multipart/form-data" class="upload-form">
+                    {% csrf_token %}
+                    
+                    <!-- Drag & Drop Zone -->
+                    <div class="dropzone" id="dropzone">
+                        <input type="file" name="file" id="file-input" class="dropzone-input" 
+                               accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.zip,.svg,.ai,.psd">
+                        <div class="dropzone-content">
+                            <span class="dropzone-icon">📤</span>
+                            <p class="dropzone-text">Glissez-déposez votre fichier ici</p>
+                            <p class="dropzone-hint">ou cliquez pour sélectionner</p>
+                            <p class="dropzone-formats">PDF, DOC, PNG, JPG, ZIP, SVG, AI, PSD</p>
+                        </div>
+                        <div class="dropzone-preview" id="dropzone-preview" style="display: none;">
+                            <span class="preview-icon">📄</span>
+                            <span class="preview-name" id="preview-name"></span>
+                            <button type="button" class="preview-remove" id="preview-remove">×</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_title">Nom du document *</label>
+                        {{ form.title }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_document_type">Type de document</label>
+                        {{ form.document_type }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_notes">Notes (optionnel)</label>
+                        {{ form.notes }}
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="{% url 'clients:documents' %}" class="btn btn-outline">Annuler</a>
+                        <button type="submit" class="btn btn-primary">Uploader</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.upload-form-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+}
+
+.upload-context {
+    background: var(--gray-50);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.context-label {
+    color: var(--gray-500);
+    margin-right: 0.5rem;
+}
+
+.context-value {
+    font-weight: 600;
+}
+
+.dropzone {
+    border: 2px dashed var(--gray-300);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.02);
+}
+
+.dropzone-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.dropzone-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.dropzone-text {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.dropzone-hint {
+    color: var(--gray-500);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+}
+
+.dropzone-formats {
+    color: var(--gray-400);
+    font-size: 0.75rem;
+}
+
+.dropzone-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: 0.5rem;
+}
+
+.preview-icon {
+    font-size: 1.5rem;
+}
+
+.preview-name {
+    font-weight: 500;
+}
+
+.preview-remove {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: var(--gray-300);
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.preview-remove:hover {
+    background: var(--gray-400);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const preview = document.getElementById('dropzone-preview');
+    const previewName = document.getElementById('preview-name');
+    const previewRemove = document.getElementById('preview-remove');
+    const content = dropzone.querySelector('.dropzone-content');
+    
+    // Drag events
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+        });
+    });
+    
+    // File selection
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            showPreview(this.files[0]);
+        }
+    });
+    
+    // Remove file
+    previewRemove.addEventListener('click', function(e) {
+        e.stopPropagation();
+        fileInput.value = '';
+        hidePreview();
+    });
+    
+    function showPreview(file) {
+        previewName.textContent = file.name;
+        content.style.display = 'none';
+        preview.style.display = 'flex';
+    }
+    
+    function hidePreview() {
+        content.style.display = 'block';
+        preview.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

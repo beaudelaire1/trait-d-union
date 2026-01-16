@@ -75,6 +75,54 @@ class Invoice(models.Model):
     payment_terms = models.TextField(blank=True, default="")
     pdf = models.FileField(upload_to="factures", blank=True, null=True)
 
+    # ===========================================
+    # PHASE 3 : Paiement en ligne
+    # ===========================================
+    # Jeton public pour accès client (paiement)
+    public_token = models.CharField(
+        max_length=64,
+        unique=True,
+        blank=True,
+        null=True,
+        help_text="Jeton public pour accès client"
+    )
+    # Stripe Checkout Session ID
+    stripe_checkout_session_id = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="ID de session Stripe pour le paiement"
+    )
+    # Montant payé
+    amount_paid = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Montant total encaissé"
+    )
+    # Date du dernier paiement
+    paid_at = models.DateTimeField(null=True, blank=True)
+
+    # ===========================================
+    # PHASE 4.3 : Relances automatiques (Dunning)
+    # ===========================================
+    last_reminder_level = models.IntegerField(
+        default=0,
+        help_text="Niveau de relance (0=aucune, 1=soft, 2=firm, 3=urgent, 4=final)"
+    )
+    last_reminder_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Date de la dernière relance envoyée"
+    )
+    reminder_count = models.IntegerField(
+        default=0,
+        help_text="Nombre total de relances envoyées"
+    )
+    dunning_completed = models.BooleanField(
+        default=False,
+        help_text="Processus de relance terminé (4 relances envoyées)"
+    )
+
     class Meta:
         ordering = ["-issue_date", "-number"]
         indexes = [models.Index(fields=["number", "issue_date"])]
@@ -93,8 +141,18 @@ class Invoice(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         """
-        Assignation automatique du numéro de facture.
+        Assignation automatique du numéro de facture et du jeton public.
         """
+        import secrets
+        
+        # Générer un jeton public unique
+        if not self.public_token:
+            while True:
+                token = secrets.token_urlsafe(32)
+                if not Invoice.objects.filter(public_token=token).exists():
+                    self.public_token = token
+                    break
+        
         if not self.pk and not self.number:
             year = self.issue_date.year if getattr(self, "issue_date", None) else date.today().year
             prefix = f"FAC-{year}-"

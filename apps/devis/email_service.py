@@ -1,11 +1,38 @@
+"""
+Service d'envoi d'emails pour les devis.
+
+Ce module gère l'envoi des emails transactionnels liés aux devis :
+- Envoi du devis au client (avec PDF en pièce jointe)
+- Envoi du code OTP pour la validation
+
+Utilise Brevo (ex-Sendinblue) si configuré, sinon fallback Django EmailMessage.
+"""
 from __future__ import annotations
 
+import logging
 from typing import Optional
 
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.urls import reverse
+
+logger = logging.getLogger(__name__)
+
+
+def _get_email_backend() -> str:
+    """
+    Retourne le backend d'email approprié.
+    
+    Utilise Brevo si configuré, sinon fallback sur Django EmailMessage.
+    """
+    try:
+        from core.services.email_backends import brevo_service
+        if brevo_service.is_configured():
+            return 'brevo'
+    except ImportError:
+        pass
+    return 'django'
 
 
 def _base_url(request=None) -> str:
@@ -18,10 +45,72 @@ def _base_url(request=None) -> str:
     return str(getattr(settings, 'SITE_URL', 'http://localhost:8000')).rstrip('/')
 
 
+def _send_via_brevo(
+    recipient: str,
+    subject: str,
+    html_body: str,
+    *,
+    recipient_name: Optional[str] = None,
+    from_email: Optional[str] = None,
+    from_name: Optional[str] = None,
+    attachments: Optional[list[dict]] = None,
+    tags: Optional[list[str]] = None,
+) -> None:
+    """Envoie un email via Brevo."""
+    from core.services.email_backends import send_transactional_email
+    
+    result = send_transactional_email(
+        to_email=recipient,
+        subject=subject,
+        html_content=html_body,
+        to_name=recipient_name,
+        from_email=from_email,
+        from_name=from_name,
+        attachments=attachments,
+        tags=tags
+    )
+    
+    if not result.get('success'):
+        raise Exception(f"Échec envoi Brevo: {result.get('error')}")
+    
+    logger.info(f"Email envoyé via Brevo à {recipient} (ID: {result.get('message_id')})")
+
+
+def _send_via_django(
+    recipient: str,
+    subject: str,
+    html_body: str,
+    *,
+    from_email: Optional[str] = None,
+    attachments: Optional[list[dict]] = None,
+) -> None:
+    """Envoie un email via Django EmailMessage (fallback)."""
+    email = EmailMessage(
+        subject=subject,
+        body=html_body,
+        from_email=from_email or getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it'),
+        to=[recipient]
+    )
+    email.content_subtype = 'html'
+    
+    if attachments:
+        for att in attachments:
+            email.attach(att['name'], att['content'], att.get('mime_type', 'application/pdf'))
+    
+    email.send(fail_silently=False)
+    logger.info(f"Email envoyé via Django à {recipient}")
+
+
 def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> None:
-    """Send the premium quote email with PDF attached.
+    """
+    Envoie le devis au client avec le PDF en pièce jointe.
 
     Uses templates/emails/modele_quote.html (provided by the user).
+    
+    Args:
+        quote: Instance du modèle Quote
+        request: HttpRequest pour construire les URLs absolues
+        to_email: Email destinataire (optionnel, utilise quote.client.email sinon)
     """
     # Ensure totals are up-to-date
     try:
@@ -51,10 +140,12 @@ def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> 
     client_name = getattr(client, 'full_name', '') if client is not None else ''
     recipient = to_email or (getattr(client, 'email', None) if client is not None else None)
     if not recipient:
+        logger.warning(f"Aucun destinataire pour le devis {quote.number}")
         return
 
-    subject = f"Votre devis {quote.number} — {getattr(settings, 'INVOICE_BRANDING', {}).get('name', 'Nettoyage Express')}"
-    company_name = getattr(settings, 'INVOICE_BRANDING', {}).get('name', 'Nettoyage Express')
+    branding = getattr(settings, 'INVOICE_BRANDING', {})
+    company_name = branding.get('name', "Trait d'Union Studio")
+    subject = f"Votre devis {quote.number} — {company_name}"
 
     # HTML ONLY: aucune notification en texte (exigence projet)
     html_body = render_to_string(
@@ -68,50 +159,85 @@ def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> 
         },
     )
 
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or 'no-reply@example.com'
-    email = EmailMessage(subject=subject, body=html_body, from_email=from_email, to=[recipient])
-    email.content_subtype = 'html'
-
-    # Attach PDF - generate fresh for ephemeral filesystem
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or 'contact@traitdunion.it'
+    from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
+    
+    # Générer le PDF pour la pièce jointe
+    attachments = []
     try:
-        # Always generate fresh PDF (don't rely on saved file in ephemeral filesystem)
         pdf_bytes = quote.generate_pdf(attach=False)
-        email.attach(f"{quote.number}.pdf", pdf_bytes, 'application/pdf')
+        if pdf_bytes:
+            attachments.append({
+                'name': f"{quote.number}.pdf",
+                'content': pdf_bytes,
+                'mime_type': 'application/pdf'
+            })
     except Exception as e:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Erreur lors de l'attachement du PDF pour le devis {quote.number}: {e}")
-        # Ne pas bloquer l'envoi, mais logger l'erreur
+        logger.error(f"Erreur lors de la génération du PDF pour le devis {quote.number}: {e}")
+        # Continue without PDF attachment
 
+    # Utiliser Brevo si configuré, sinon fallback Django
+    backend = _get_email_backend()
+    
     try:
-        email.send(fail_silently=False)
+        if backend == 'brevo':
+            _send_via_brevo(
+                recipient=recipient,
+                subject=subject,
+                html_body=html_body,
+                recipient_name=client_name or None,
+                from_email=from_email,
+                from_name=from_name,
+                attachments=attachments if attachments else None,
+                tags=['devis', 'quote', f'quote-{quote.number}']
+            )
+        else:
+            _send_via_django(
+                recipient=recipient,
+                subject=subject,
+                html_body=html_body,
+                from_email=from_email,
+                attachments=attachments if attachments else None,
+            )
+        
+        logger.info(f"Devis {quote.number} envoyé à {recipient} via {backend}")
+        
     except Exception as e:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Erreur lors de l'envoi de l'email pour le devis {quote.number}: {e}")
-        raise  # Re-raise pour que l'appelant puisse gérer
+        logger.error(f"Erreur lors de l'envoi du devis {quote.number}: {e}")
+        raise
 
 
 def send_quote_validation_code(quote, validation, request=None, *, to_email: Optional[str] = None) -> None:
-    """Send the OTP code email (step 1 of 2FA)."""
+    """
+    Envoie le code OTP pour la validation du devis (étape 1 du 2FA).
+    
+    Args:
+        quote: Instance du modèle Quote
+        validation: Instance QuoteValidation avec le code OTP
+        request: HttpRequest pour construire les URLs absolues
+        to_email: Email destinataire (optionnel)
+    """
     client = getattr(quote, 'client', None)
     recipient = to_email or (getattr(client, 'email', None) if client is not None else None)
     if not recipient:
+        logger.warning(f"Aucun destinataire pour le code OTP du devis {quote.number}")
         return
 
     base = _base_url(request)
     code_url = f"{base}{reverse('devis:quote_validate_code', kwargs={'token': validation.token})}"
 
     subject = f"Code de confirmation pour valider le devis {quote.number}"
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or 'no-reply@example.com'
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or 'contact@traitdunion.it'
+    from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
+    client_name = getattr(client, 'full_name', '') if client else ''
 
     # Le template générique attend : headline/intro + action_url/action_label
-    html = render_to_string(
+    html_body = render_to_string(
         'emails/notification_generic.html',
         {
             'headline': 'Validation du devis — Code de confirmation',
             'intro': (
-                f"Bonjour {getattr(client, 'full_name', '') or ''},\n\n"
+                f"Bonjour {client_name or ''},\n\n"
                 f"Votre code de confirmation pour valider le devis {quote.number} est : {validation.code}\n\n"
                 f"Ce code expire dans 15 minutes."
             ),
@@ -124,7 +250,30 @@ def send_quote_validation_code(quote, validation, request=None, *, to_email: Opt
         },
     )
 
-    # HTML ONLY
-    email = EmailMessage(subject=subject, body=html, from_email=from_email, to=[recipient])
-    email.content_subtype = 'html'
-    email.send(fail_silently=False)
+    # Utiliser Brevo si configuré, sinon fallback Django
+    backend = _get_email_backend()
+    
+    try:
+        if backend == 'brevo':
+            _send_via_brevo(
+                recipient=recipient,
+                subject=subject,
+                html_body=html_body,
+                recipient_name=client_name or None,
+                from_email=from_email,
+                from_name=from_name,
+                tags=['otp', 'validation', f'quote-{quote.number}']
+            )
+        else:
+            _send_via_django(
+                recipient=recipient,
+                subject=subject,
+                html_body=html_body,
+                from_email=from_email,
+            )
+        
+        logger.info(f"Code OTP envoyé pour le devis {quote.number} à {recipient} via {backend}")
+        
+    except Exception as e:
+        logger.error(f"Erreur lors de l'envoi du code OTP pour le devis {quote.number}: {e}")
+        raise

@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon profil - Espace Client{% endblock %}
+
+{% block content %}
+<div class="client-portal">
+    <header class="client-header">
+        <div class="container">
+            <nav class="client-breadcrumb">
+                <a href="{% url 'clients:dashboard' %}">Espace client</a>
+                <span>/</span>
+                <span>Mon profil</span>
+            </nav>
+            <h1>Mon profil</h1>
+        </div>
+    </header>
+
+    <section class="client-main">
+        <div class="container">
+            <div class="profile-layout">
+                <!-- Avatar Section -->
+                <div class="profile-avatar-section">
+                    <div class="avatar-preview">
+                        {% if object.avatar %}
+                            <img src="{{ object.avatar.url }}" alt="Avatar">
+                        {% else %}
+                            <div class="avatar-placeholder">
+                                {{ request.user.email|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="avatar-info">
+                        <h2>{{ object.full_name }}</h2>
+                        <p>{{ request.user.email }}</p>
+                        <p class="text-muted">Client depuis {{ object.created_at|date:"F Y" }}</p>
+                    </div>
+                </div>
+
+                <!-- Form Section -->
+                <form method="post" enctype="multipart/form-data" class="profile-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-card">
+                        <h3>Informations personnelles</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="id_first_name">Prénom</label>
+                                {{ form.first_name }}
+                            </div>
+                            <div class="form-group">
+                                <label for="id_last_name">Nom</label>
+                                {{ form.last_name }}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_phone">Téléphone</label>
+                            {{ form.phone }}
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h3>Entreprise</h3>
+                        <div class="form-group">
+                            <label for="id_company_name">Nom de l'entreprise</label>
+                            {{ form.company_name }}
+                        </div>
+                        <div class="form-group">
+                            <label for="id_address">Adresse</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="id_siret">SIRET</label>
+                                {{ form.siret }}
+                            </div>
+                            <div class="form-group">
+                                <label for="id_tva_number">N° TVA</label>
+                                {{ form.tva_number }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h3>Préférences</h3>
+                        <div class="form-group checkbox-group">
+                            {{ form.email_notifications }}
+                            <label for="id_email_notifications">
+                                Recevoir les notifications par email
+                                <span class="text-muted">(mises à jour projets, factures...)</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="id_avatar">Photo de profil</label>
+                            {{ form.avatar }}
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="{% url 'clients:dashboard' %}" class="btn btn-outline">Annuler</a>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+.client-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.client-breadcrumb a {
+    color: var(--primary);
+}
+
+.client-breadcrumb span {
+    color: var(--gray-400);
+}
+
+.profile-layout {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.profile-avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.avatar-preview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.avatar-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+.avatar-info h2 {
+    margin-bottom: 0.25rem;
+}
+
+.avatar-info p {
+    margin: 0;
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+}
+
+.form-card h3 {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.checkbox-group label {
+    margin: 0;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+@media (max-width: 640px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-avatar-section {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}

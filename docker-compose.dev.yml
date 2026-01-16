@@ -1,0 +1,28 @@
+# ==============================================================================
+# Docker Compose - Développement avec rechargement automatique
+# ==============================================================================
+# Utilise le serveur de dev Django au lieu de Gunicorn pour le hot-reload
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  web:
+    build:
+      context: .
+      target: runtime  # Utiliser le stage runtime
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+      - DEBUG=True
+    volumes:
+      # Monter le code source pour hot-reload
+      - .:/app:cached
+      # Exclure les fichiers non nécessaires
+      - /app/__pycache__
+      - /app/.git
+      - /app/venv
+    # Utiliser le serveur de dev Django au lieu de Gunicorn
+    command: python manage.py runserver 0.0.0.0:8000
+    # Pas de healthcheck en dev (le serveur redémarre souvent)
+    healthcheck:
+      disable: true

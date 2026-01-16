@@ -13,6 +13,20 @@ INSTALLED_APPS += [
     'django_extensions',
 ]
 
+# ==============================================================================
+# DATABASE - PostgreSQL local (via venv Python 3.11)
+# ==============================================================================
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'tus_db',
+        'USER': 'postgres',
+        'PASSWORD': 'Vilme1479*',
+        'HOST': 'localhost',
+        'PORT': '5433',
+    }
+}
+
 # Email configuration (auto)
 if os.environ.get('EMAIL_HOST'):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

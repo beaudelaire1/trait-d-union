@@ -1,0 +1,126 @@
+# PLAN DE BATAILLE : OPÉRATION TRAIT D'UNION 
+# CIBLE DÉPLOIEMENT : RENDER.COM
+# REGISTRAR : HOSTINGER
+# OBJECTIF : DOMINATION TOTALE
+
+---
+
+## PHASE 1 : INFRASTRUCTURE & PUISSANCE (FONDATIONS) ✅ TERMINÉE
+(Objectif : Fiabilité 99.99% et temps de réponse < 100ms)
+
+1. CONTAINERISATION (DOCKER) ✅
+   - [x] `Dockerfile` optimisé (Multi-stage build)
+   - [x] Dépendances système Linux pour `WeasyPrint` (pango, cairo)
+   - [x] `docker-compose.yml` pour mirrorer la prod en local
+   - [x] `docker-compose.dev.yml` pour le hot-reload
+
+2. CONFIGURATION RENDER.COM ✅
+   - [x] `render.yaml` avec Docker runtime
+   - [x] Service Web Django + PostgreSQL managé
+   - [x] Variables d'environnement configurées
+   - [ ] Redis (optionnel, à ajouter si besoin)
+
+3. GESTION ASSETS & MÉDIAS ✅
+   - [x] WhiteNoise + Compression dans `production.py`
+   - [x] Configuration S3/Cloudflare R2 prête (django-storages)
+
+4. EMAILING TRANSACTIONNEL ✅
+   - [x] Intégration Brevo API (core/services/email_backends.py)
+   - [x] Fallback Django EmailMessage si Brevo non configuré
+   - [x] Services devis/factures/leads adaptés
+
+5. BASCULE DNS (À FAIRE MANUELLEMENT)
+   - [ ] Hostinger DNS : Pointer vers Render (CNAME/A)
+   - [ ] SSL automatique (Let's Encrypt via Render)
+
+---
+
+## PHASE 2 : EXPÉRIENCE UTILISATEUR "APPLE-LIKE" ✅ TERMINÉE
+(Objectif : Séduire par le détail et la fluidité)
+
+1. FLUIDITÉ VISUELLE (HTMX + VIEW TRANSITIONS) ✅
+   - [x] API View Transitions (meta tag + CSS keyframes)
+   - [x] HTMX 2.0 avec hx-boost pour navigation SPA-like
+   - [x] Navbar fixe pendant les transitions
+   - [x] Animations fade-in/slide pour le contenu
+
+2. MICRO-INTERACTIONS & ASSETS ✅
+   - [x] Boutons magnétiques (effet Apple)
+   - [x] Links avec underline animé
+   - [x] Cards avec effet de profondeur au hover
+   - [x] Focus states accessibles
+   - [x] Respect prefers-reduced-motion
+
+3. IMAGES OPTIMISÉES ✅
+   - [x] Service ImageProcessor (WebP/AVIF)
+   - [x] Lazy loading natif + Intersection Observer
+   - [x] Fade-in au chargement des images
+   - [x] Génération thumbnails automatique
+
+---
+
+## PHASE 3 : CASH-FLOW & CONVERSION (PRIORITÉ P1) ✅ TERMINÉE
+(Objectif : Sécuriser le chiffre d'affaires et les contrats)
+
+1. PAIEMENT IMMÉDIAT (STRIPE) ✅
+   - [x] Intégration Stripe Checkout (core/services/stripe_service.py)
+   - [x] Bouton "Payer l'acompte" sur le devis (30% par défaut)
+   - [x] Bouton "Payer le solde" sur la facture
+   - [x] Webhooks pour mise à jour automatique des statuts
+   - [x] Templates: sign_and_pay.html, pay.html, payment_success.html
+
+2. SIGNATURE ÉLECTRONIQUE (E-SIGNING) ✅
+   - [x] Pad de signature JS (signature_pad.js) sur la vue devis
+   - [x] Service SignatureService (core/services/signature_service.py)
+   - [x] Validation côté serveur (format, dimensions, non-vide)
+   - [x] Génération Audit Trail complet (IP, Date, UserAgent, Hash)
+   - [x] Stockage signature + audit trail dans le modèle Quote
+
+3. FORMULAIRE INTELLIGENT & CRM ✅
+   - [x] Service CRMService (core/services/crm_service.py)
+   - [x] Intégration Airtable (création de leads)
+   - [x] Intégration HubSpot (contacts + deals)
+   - [x] Synchronisation automatique des devis
+
+   Configuration requise (.env) :
+   - STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
+   - AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_NAME
+   - HUBSPOT_API_KEY
+
+---
+
+## PHASE 4 : SERVICE CLIENT "VIP" (FIDÉLISATION) ✅ TERMINÉE
+(Objectif : Transparence radicale et autonomie client)
+
+1. ESPACE CLIENT SÉCURISÉ (PORTAIL) ✅
+   - [x] Implémentation `django-allauth` pour l'accès client
+   - [x] App `apps.clients` avec modèles (ClientProfile, Project, etc.)
+   - [x] Vue centralisée : Historique Devis / Factures / Documents
+   - [x] Module d'upload de fichiers (Documents projet)
+   - [x] Templates: dashboard.html, profile.html, projects.html, etc.
+
+2. PROJECT TRACKER (TIMELINE) ✅
+   - [x] Modèles Project et ProjectMilestone
+   - [x] Vue "Suivi de projet" avec statuts (Cadrage > Design > Dev > Recette)
+   - [x] Timeline des jalons avec pourcentage de progression
+   - [x] Templates: project_list.html, project_detail.html
+
+3. MARKETING AUTOMATION & RELANCES (DUNNING) ✅
+   - [x] Service DunningService (apps/factures/services/dunning_service.py)
+   - [x] Workflow 4 niveaux : J+3 doux, J+10 ferme, J+21 urgent, J+30 final
+   - [x] Templates email: dunning_soft.html, dunning_firm.html, etc.
+   - [x] Champs de tracking: last_reminder_level, last_reminder_date, etc.
+   - [x] Commande management: python manage.py process_dunning
+
+---
+
+## PHASE 5 : PILOTAGE INTERNE (LE COCKPIT) ✅ TERMINÉE
+(Objectif : Pilotage par la donnée)
+
+1. DASHBOARD DE COMMANDEMENT (BI) ✅
+   - [x] Vue Admin Custom (dashboard_views.py)
+   - [x] KPIs : Pipeline Value, Taux de conversion, CA mensuel/annuel
+   - [x] Visualisation Chart.js (graphique barres + doughnut)
+   - [x] Alertes factures en retard
+   - [x] Activité récente (leads, devis, factures)
+   - [x] URL sécurisée : /tus-gestion-secure/dashboard/
