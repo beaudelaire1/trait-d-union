@@ -89,7 +89,7 @@
                     </nav>
                     <h1>Mes devis</h1>
                 </div>
-                <a href="{% url 'leads:contact' %}" class="btn-client-primary">
+                <a href="{% url 'clients:new_request' %}" class="btn-client-primary">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -160,7 +160,7 @@
                 </div>
                 <h2>Aucun devis</h2>
                 <p>Vous n'avez pas encore de devis. Contactez-nous pour démarrer votre projet !</p>
-                <a href="{% url 'leads:contact' %}" class="btn-primary">Demander un devis</a>
+                <a href="{% url 'clients:new_request' %}" class="btn-primary">Demander un devis</a>
             </div>
             {% endif %}
         </div>

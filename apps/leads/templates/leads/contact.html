@@ -19,17 +19,75 @@
             <p class="text-tus-white/70 max-w-xl mx-auto">Décrivez-nous votre vision. Nous transformons vos idées en expériences digitales d'exception.</p>
         </div>
 
-        <!-- Bande fixe avec dégradé animé et texte défilant - 25px -->
-        <div class="h-[25px] overflow-hidden relative rounded-t-2xl">
+        <!-- Bande fixe avec dégradé animé et texte défilant premium -->
+        <div class="h-[36px] overflow-hidden relative rounded-t-2xl">
             <!-- Dégradé mobile en arrière-plan -->
             <div class="absolute inset-0 bg-gradient-to-r from-tus-blue via-[#2D5BFF] to-tus-blue bg-[length:200%_100%] animate-gradient-shift"></div>
-            <!-- Texte défilant (commence à droite, sort à gauche, puis recommence) -->
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div class="animate-text-scroll whitespace-nowrap text-xs font-display font-semibold text-tus-white tracking-wider uppercase">
-                    ✦ Quand l'élégance se conçoit, la performance se déploie ✦
+            <!-- Masques de fondu aux extrémités pour effet premium -->
+            <div class="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-tus-blue to-transparent z-10"></div>
+            <div class="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#2D5BFF] to-transparent z-10"></div>
+            <!-- Texte défilant premium avec animation sur les mots -->
+            <div class="absolute inset-0 flex items-center overflow-hidden">
+                <div class="ticker-premium whitespace-nowrap text-sm font-display font-semibold tracking-wide uppercase">
+                    <span class="ticker-word">✦</span>
+                    <span class="ticker-word">Quand</span>
+                    <span class="ticker-word">l'élégance</span>
+                    <span class="ticker-word">se</span>
+                    <span class="ticker-word">conçoit,</span>
+                    <span class="ticker-word">la</span>
+                    <span class="ticker-word">performance</span>
+                    <span class="ticker-word">se</span>
+                    <span class="ticker-word">déploie</span>
+                    <span class="ticker-word">✦</span>
                 </div>
             </div>
         </div>
+        
+        <style>
+            .ticker-premium {
+                animation: tickerPremium 28s linear infinite;
+                padding-left: 100%;
+            }
+            @keyframes tickerPremium {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-100%); }
+            }
+            
+            .ticker-word {
+                display: inline-block;
+                margin: 0 0.3em;
+                color: rgba(246, 247, 251, 0.7);
+                animation: wordShimmer 3s ease-in-out infinite;
+                background: linear-gradient(90deg, 
+                    rgba(246, 247, 251, 0.7) 0%, 
+                    rgba(255, 255, 255, 1) 50%, 
+                    rgba(246, 247, 251, 0.7) 100%);
+                background-size: 200% 100%;
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            
+            .ticker-word:nth-child(1) { animation-delay: 0s; }
+            .ticker-word:nth-child(2) { animation-delay: 0.15s; }
+            .ticker-word:nth-child(3) { animation-delay: 0.3s; }
+            .ticker-word:nth-child(4) { animation-delay: 0.45s; }
+            .ticker-word:nth-child(5) { animation-delay: 0.6s; }
+            .ticker-word:nth-child(6) { animation-delay: 0.75s; }
+            .ticker-word:nth-child(7) { animation-delay: 0.9s; }
+            .ticker-word:nth-child(8) { animation-delay: 1.05s; }
+            .ticker-word:nth-child(9) { animation-delay: 1.2s; }
+            .ticker-word:nth-child(10) { animation-delay: 1.35s; }
+            
+            @keyframes wordShimmer {
+                0%, 100% { 
+                    background-position: 200% center;
+                }
+                50% { 
+                    background-position: -200% center;
+                }
+            }
+        </style>
 
         <!-- Formulaire Glassmorphism -->
         <div class="relative rounded-b-2xl p-8 md:p-12 animate-slide-up overflow-hidden">

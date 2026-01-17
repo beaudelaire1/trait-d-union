@@ -4,95 +4,186 @@
 {% block title %}Mon Espace Client - Trait d'Union Studio{% endblock %}
 
 {% block content %}
-<div class="client-portal">
+<div class="client-portal" x-data="{ sidebarOpen: true, showNotifications: false }">
+    <!-- Sidebar Toggle (Mobile) -->
+    <button @click="sidebarOpen = !sidebarOpen" 
+            class="sidebar-toggle"
+            :class="{ 'active': sidebarOpen }">
+        <svg x-show="!sidebarOpen" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg x-show="sidebarOpen" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+
     <!-- Sidebar -->
-    <aside class="client-sidebar">
+    <aside class="client-sidebar" :class="{ 'collapsed': !sidebarOpen }">
         <div class="sidebar-header">
             <div class="user-avatar">
                 <span>{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}</span>
             </div>
-            <div class="user-info">
+            <div class="user-info" x-show="sidebarOpen" x-transition>
                 <h3>{{ request.user.get_full_name|default:request.user.username }}</h3>
-                <p>{{ request.user.client_profile.company_name|default:"Client" }}</p>
+                <p>{{ request.user.client_profile.company_name|default:"Client VIP" }}</p>
             </div>
+            <!-- Collapse Button (Desktop) -->
+            <button @click="sidebarOpen = !sidebarOpen" class="collapse-btn" title="Réduire le menu">
+                <svg :class="{ 'rotated': !sidebarOpen }" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
         </div>
         
         <nav class="sidebar-nav">
-            <a href="{% url 'clients:dashboard' %}" class="nav-item active">
+            <a href="{% url 'clients:dashboard' %}" class="nav-item active" title="Tableau de bord">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"></rect>
                     <rect x="14" y="3" width="7" height="7"></rect>
                     <rect x="14" y="14" width="7" height="7"></rect>
                     <rect x="3" y="14" width="7" height="7"></rect>
                 </svg>
-                <span>Tableau de bord</span>
+                <span x-show="sidebarOpen" x-transition>Tableau de bord</span>
             </a>
-            <a href="{% url 'clients:projects' %}" class="nav-item">
+            <a href="{% url 'clients:projects' %}" class="nav-item" title="Mes projets">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                 </svg>
-                <span>Mes projets</span>
+                <span x-show="sidebarOpen" x-transition>Mes projets</span>
+                {% if stats.active_projects > 0 %}
+                <span class="nav-badge" x-show="sidebarOpen">{{ stats.active_projects }}</span>
+                {% endif %}
             </a>
-            <a href="{% url 'clients:quotes' %}" class="nav-item">
+            <a href="{% url 'clients:quotes' %}" class="nav-item" title="Devis">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
                     <line x1="16" y1="13" x2="8" y2="13"></line>
                     <line x1="16" y1="17" x2="8" y2="17"></line>
                 </svg>
-                <span>Devis</span>
+                <span x-show="sidebarOpen" x-transition>Devis</span>
+                {% if pending_quotes_count > 0 %}
+                <span class="nav-badge new" x-show="sidebarOpen">{{ pending_quotes_count }}</span>
+                {% endif %}
             </a>
-            <a href="{% url 'clients:invoices' %}" class="nav-item">
+            <a href="{% url 'clients:invoices' %}" class="nav-item" title="Factures">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                     <line x1="1" y1="10" x2="23" y2="10"></line>
                 </svg>
-                <span>Factures</span>
+                <span x-show="sidebarOpen" x-transition>Factures</span>
+                {% if pending_invoices_count > 0 %}
+                <span class="nav-badge warning" x-show="sidebarOpen">{{ pending_invoices_count }}</span>
+                {% endif %}
             </a>
-            <a href="{% url 'clients:documents' %}" class="nav-item">
+            <a href="{% url 'clients:documents' %}" class="nav-item" title="Documents">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
                     <polyline points="13 2 13 9 20 9"></polyline>
                 </svg>
-                <span>Documents</span>
+                <span x-show="sidebarOpen" x-transition>Documents</span>
             </a>
             
             <div class="nav-divider"></div>
             
-            <a href="{% url 'clients:profile' %}" class="nav-item">
+            <a href="{% url 'clients:profile' %}" class="nav-item" title="Mon profil">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                <span>Mon profil</span>
+                <span x-show="sidebarOpen" x-transition>Mon profil</span>
             </a>
-            <a href="{% url 'account_logout' %}" class="nav-item logout">
+            <a href="{% url 'account_logout' %}" class="nav-item logout" title="Déconnexion">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                     <polyline points="16 17 21 12 16 7"></polyline>
                     <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
-                <span>Déconnexion</span>
+                <span x-show="sidebarOpen" x-transition>Déconnexion</span>
             </a>
         </nav>
     </aside>
 
     <!-- Main Content -->
-    <main class="client-main">
+    <main class="client-main" :class="{ 'expanded': !sidebarOpen }">
         <!-- Header -->
         <header class="client-header">
             <div class="header-content">
                 <div>
                     <h1>Bonjour, {{ request.user.first_name|default:request.user.username }} 👋</h1>
-                    <p class="header-subtitle">Bienvenue dans votre espace client premium</p>
+                    <p class="header-subtitle">Votre Portail de Pilotage TUS</p>
+                </div>
+                <!-- Standard TUS Badge -->
+                <div class="tus-standard-badge">
+                    <div class="badge-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <div class="badge-content">
+                        <span class="badge-label">Standard TUS</span>
+                        <span class="badge-status">Sécurisé • RGPD</span>
+                    </div>
                 </div>
                 <div class="header-actions">
-                    <a href="{% url 'leads:contact' %}" class="btn-client-primary">
+                    <!-- Notifications Bell -->
+                    <div class="notification-wrapper" x-data="{ count: {{ notifications_count|default:0 }} }">
+                        <button @click="showNotifications = !showNotifications" class="notification-btn" :class="{ 'has-notifications': count > 0 }">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <span x-show="count > 0" class="notification-badge" x-text="count"></span>
+                        </button>
+                        
+                        <!-- Notifications Dropdown -->
+                        <div x-show="showNotifications" 
+                             @click.away="showNotifications = false"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 transform scale-95"
+                             x-transition:enter-end="opacity-100 transform scale-100"
+                             class="notifications-dropdown">
+                            <div class="notifications-header">
+                                <h4>Notifications</h4>
+                                <a href="#" class="mark-all-read">Tout marquer comme lu</a>
+                            </div>
+                            <div class="notifications-list">
+                                {% if notifications %}
+                                    {% for notif in notifications %}
+                                    <div class="notification-item {% if not notif.read %}unread{% endif %}">
+                                        <div class="notif-icon {{ notif.type }}">
+                                            {% if notif.type == 'quote' %}
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+                                            {% elif notif.type == 'invoice' %}
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"></rect></svg>
+                                            {% else %}
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle></svg>
+                                            {% endif %}
+                                        </div>
+                                        <div class="notif-content">
+                                            <p>{{ notif.message }}</p>
+                                            <span class="notif-time">{{ notif.created_at|timesince }}</span>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="no-notifications">
+                                        <p>Aucune notification</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'clients:new_request' %}" class="btn-client-primary">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
-                        Nouveau projet
+                        Nouvelle demande
                     </a>
                 </div>
             </div>
@@ -149,6 +240,85 @@
             </div>
         </section>
 
+        <!-- Transparence Section - Activité Récente -->
+        <section class="transparency-section">
+            <div class="transparency-header">
+                <div class="transparency-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <h2>Transparence radicale</h2>
+                </div>
+                <p class="transparency-subtitle">Historique complet de vos interactions</p>
+            </div>
+            
+            <div class="activity-timeline" x-data="{ showAll: false }">
+                {% if recent_quotes or recent_invoices or active_projects %}
+                <div class="timeline-items">
+                    {% for quote in recent_quotes|slice:":3" %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker quote"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="timeline-type">Devis {{ quote.number }}</span>
+                                <span class="timeline-status status-{{ quote.status }}">{{ quote.get_status_display }}</span>
+                            </div>
+                            <p class="timeline-desc">{{ quote.title|default:"Nouveau devis" }}</p>
+                            <span class="timeline-date">{{ quote.created_at|date:"d/m/Y à H:i" }}</span>
+                        </div>
+                        <div class="timeline-amount">{{ quote.total_ttc|floatformat:0 }} €</div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% for invoice in recent_invoices|slice:":2" %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker invoice"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="timeline-type">Facture {{ invoice.number }}</span>
+                                <span class="timeline-status status-{{ invoice.status }}">{{ invoice.get_status_display }}</span>
+                            </div>
+                            <p class="timeline-desc">{% if invoice.status == 'paid' %}Règlement reçu{% else %}En attente de règlement{% endif %}</p>
+                            <span class="timeline-date">{{ invoice.issue_date|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="timeline-amount">{{ invoice.total_ttc|floatformat:0 }} €</div>
+                    </div>
+                    {% endfor %}
+                    
+                    {% for project in active_projects|slice:":2" %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker project"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <span class="timeline-type">Projet</span>
+                                <span class="timeline-status status-{{ project.status }}">{{ project.get_status_display }}</span>
+                            </div>
+                            <p class="timeline-desc">{{ project.name }}</p>
+                            <span class="timeline-date">Progression : {{ project.progress }}%</span>
+                        </div>
+                        <div class="timeline-progress">
+                            <div class="mini-progress-bar">
+                                <div class="mini-progress-fill" style="width: {{ project.progress }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="timeline-empty">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p>Aucune activité récente</p>
+                    <span>Vos prochaines interactions apparaîtront ici</span>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+
         <!-- Content Grid -->
         <section class="content-grid">
             <!-- Active Projects -->
@@ -195,7 +365,7 @@
                                 </svg>
                             </div>
                             <p>Aucun projet en cours</p>
-                            <a href="{% url 'leads:contact' %}" class="btn-small">Démarrer un projet</a>
+                            <a href="{% url 'clients:new_request' %}" class="btn-small">Démarrer un projet</a>
                         </div>
                     {% endif %}
                 </div>
@@ -290,7 +460,7 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="content-card actions-card">
+            <div class="content-card actions-card" x-data="{ showModal: false, modalType: '' }">
                 <div class="card-header">
                     <h2>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -301,25 +471,7 @@
                 </div>
                 <div class="card-body">
                     <div class="quick-actions">
-                        <a href="{% url 'clients:upload_document' %}" class="action-btn">
-                            <div class="action-icon upload">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                </svg>
-                            </div>
-                            <span>Uploader un fichier</span>
-                        </a>
-                        <a href="{% url 'leads:contact' %}" class="action-btn">
-                            <div class="action-icon message">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                                </svg>
-                            </div>
-                            <span>Nous contacter</span>
-                        </a>
-                        <a href="{% url 'leads:contact' %}" class="action-btn">
+                        <button @click="showModal = true; modalType = 'quote'" class="action-btn">
                             <div class="action-icon quote">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -329,7 +481,139 @@
                                 </svg>
                             </div>
                             <span>Demander un devis</span>
+                        </button>
+                        <button @click="showModal = true; modalType = 'invoice'" class="action-btn">
+                            <div class="action-icon invoice">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                                </svg>
+                            </div>
+                            <span>Demander une facture</span>
+                        </button>
+                        <button @click="showModal = true; modalType = 'support'" class="action-btn">
+                            <div class="action-icon support">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <span>Support technique</span>
+                        </button>
+                        <a href="{% url 'clients:upload_document' %}" class="action-btn">
+                            <div class="action-icon upload">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </div>
+                            <span>Envoyer un fichier</span>
                         </a>
+                        <button @click="showModal = true; modalType = 'duplicate'" class="action-btn">
+                            <div class="action-icon duplicate">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </div>
+                            <span>Duplicata document</span>
+                        </button>
+                        <button @click="showModal = true; modalType = 'other'" class="action-btn">
+                            <div class="action-icon other">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                            </div>
+                            <span>Autre demande</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Request Modal -->
+                <div x-show="showModal" 
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0"
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100"
+                     x-transition:leave-end="opacity-0"
+                     class="quick-modal-overlay"
+                     @click.self="showModal = false">
+                    <div class="quick-modal" @click.stop>
+                        <div class="modal-header">
+                            <h3>
+                                <span x-show="modalType === 'quote'">📄 Demande de devis</span>
+                                <span x-show="modalType === 'invoice'">🧾 Demande de facture</span>
+                                <span x-show="modalType === 'support'">🔧 Support technique</span>
+                                <span x-show="modalType === 'duplicate'">📋 Duplicata de document</span>
+                                <span x-show="modalType === 'other'">💬 Autre demande</span>
+                            </h3>
+                            <button @click="showModal = false" class="modal-close">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <form hx-post="{% url 'clients:quick_request' %}" 
+                              hx-target="#quick-request-result"
+                              hx-swap="innerHTML"
+                              class="modal-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="request_type" :value="modalType">
+                            
+                            <div class="modal-info">
+                                <p><strong>{{ request.user.get_full_name }}</strong></p>
+                                <p class="text-muted">{{ request.user.email }}</p>
+                            </div>
+
+                            <!-- Project selector for support/invoice -->
+                            <div x-show="modalType === 'support' || modalType === 'invoice'" class="form-group">
+                                <label>Projet concerné</label>
+                                <select name="project_id" class="form-select">
+                                    <option value="">Aucun projet spécifique</option>
+                                    {% for project in active_projects %}
+                                    <option value="{{ project.id }}">{{ project.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <!-- Document reference for duplicates -->
+                            <div x-show="modalType === 'duplicate'" class="form-group">
+                                <label>Référence du document</label>
+                                <input type="text" name="document_ref" placeholder="Ex: DEVIS-2026-001, FAC-2026-042..." class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <span x-show="modalType === 'quote'">Décrivez votre nouveau besoin</span>
+                                    <span x-show="modalType === 'invoice'">Précisez votre demande</span>
+                                    <span x-show="modalType === 'support'">Décrivez votre problème</span>
+                                    <span x-show="modalType === 'duplicate'">Motif de la demande (optionnel)</span>
+                                    <span x-show="modalType === 'other'">Votre message</span>
+                                </label>
+                                <textarea name="message" 
+                                          rows="4" 
+                                          class="form-textarea"
+                                          :required="modalType !== 'duplicate'"
+                                          placeholder="Soyez le plus précis possible..."></textarea>
+                            </div>
+
+                            <div id="quick-request-result"></div>
+
+                            <div class="modal-actions">
+                                <button type="button" @click="showModal = false" class="btn-secondary">Annuler</button>
+                                <button type="submit" class="btn-primary">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                    </svg>
+                                    Envoyer
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -340,6 +624,7 @@
 <style>
 /* ========================================
    ESPACE CLIENT PREMIUM - TRAIT D'UNION STUDIO
+   Version 2.0 - Sidebar Collapsible + Notifications
    ======================================== */
 
 :root {
@@ -356,6 +641,7 @@
     --client-orange: #F59E0B;
     --client-red: #EF4444;
     --sidebar-width: 280px;
+    --sidebar-collapsed: 80px;
 }
 
 .client-portal {
@@ -366,19 +652,48 @@
 }
 
 /* ========================================
-   SIDEBAR
+   SIDEBAR - COLLAPSIBLE
    ======================================== */
 .client-sidebar {
     width: var(--sidebar-width);
     background: var(--client-surface);
     border-right: 1px solid var(--client-border);
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 1rem;
     position: fixed;
     top: 80px;
     left: 0;
     bottom: 0;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 40;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.client-sidebar.collapsed {
+    width: var(--sidebar-collapsed);
+}
+
+.sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 90px;
+    left: 10px;
+    z-index: 50;
+    width: 44px;
+    height: 44px;
+    background: var(--client-surface);
+    border: 1px solid var(--client-border);
+    border-radius: 10px;
+    color: var(--client-text);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background: var(--client-surface-hover);
+    border-color: var(--client-blue);
 }
 
 .sidebar-header {
@@ -388,11 +703,50 @@
     padding-bottom: 1.5rem;
     border-bottom: 1px solid var(--client-border);
     margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.collapse-btn {
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background: var(--client-surface);
+    border: 1px solid var(--client-border);
+    border-radius: 50%;
+    color: var(--client-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+}
+
+.sidebar-header:hover .collapse-btn {
+    opacity: 1;
+}
+
+.collapse-btn:hover {
+    background: var(--client-blue);
+    border-color: var(--client-blue);
+    color: white;
+}
+
+.collapse-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.collapse-btn svg.rotated {
+    transform: rotate(180deg);
 }
 
 .user-avatar {
     width: 48px;
     height: 48px;
+    min-width: 48px;
     background: linear-gradient(135deg, var(--client-blue), var(--client-purple));
     border-radius: 12px;
     display: flex;
@@ -403,16 +757,26 @@
     color: white;
 }
 
+.user-info {
+    overflow: hidden;
+}
+
 .user-info h3 {
     font-size: 1rem;
     font-weight: 600;
     color: var(--client-text);
     margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .user-info p {
     font-size: 0.85rem;
     color: var(--client-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-nav {
@@ -432,6 +796,12 @@
     font-size: 0.95rem;
     font-weight: 500;
     transition: all 0.2s ease;
+    white-space: nowrap;
+    position: relative;
+}
+
+.nav-item svg {
+    min-width: 20px;
 }
 
 .nav-item:hover {
@@ -456,10 +826,176 @@
     background: rgba(239,68,68,0.1);
 }
 
+.nav-badge {
+    margin-left: auto;
+    padding: 0.15rem 0.5rem;
+    background: var(--client-blue);
+    color: white;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.nav-badge.new {
+    background: var(--client-green);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.nav-badge.warning {
+    background: var(--client-orange);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
 .nav-divider {
     height: 1px;
     background: var(--client-border);
     margin: 1rem 0;
+}
+
+/* ========================================
+   NOTIFICATIONS
+   ======================================== */
+.notification-wrapper {
+    position: relative;
+}
+
+.notification-btn {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    background: var(--client-surface);
+    border: 1px solid var(--client-border);
+    border-radius: 10px;
+    color: var(--client-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.notification-btn:hover {
+    background: var(--client-surface-hover);
+    color: var(--client-text);
+    border-color: var(--client-blue);
+}
+
+.notification-btn.has-notifications {
+    color: var(--client-text);
+}
+
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    background: var(--client-red);
+    color: white;
+    border-radius: 9px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.notifications-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 360px;
+    max-height: 480px;
+    background: var(--client-surface);
+    border: 1px solid var(--client-border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    z-index: 100;
+}
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--client-border);
+}
+
+.notifications-header h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--client-text);
+}
+
+.mark-all-read {
+    font-size: 0.8rem;
+    color: var(--client-blue);
+    text-decoration: none;
+}
+
+.notifications-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--client-border);
+    transition: background 0.2s ease;
+}
+
+.notification-item:hover {
+    background: var(--client-surface-hover);
+}
+
+.notification-item.unread {
+    background: rgba(11,45,255,0.05);
+}
+
+.notif-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notif-icon.quote {
+    background: var(--client-blue-soft);
+    color: var(--client-blue);
+}
+
+.notif-icon.invoice {
+    background: rgba(16,185,129,0.15);
+    color: var(--client-green);
+}
+
+.notif-content p {
+    font-size: 0.9rem;
+    color: var(--client-text);
+    margin-bottom: 0.25rem;
+    line-height: 1.4;
+}
+
+.notif-time {
+    font-size: 0.75rem;
+    color: var(--client-text-muted);
+}
+
+.no-notifications {
+    padding: 2rem;
+    text-align: center;
+    color: var(--client-text-muted);
 }
 
 /* ========================================
@@ -470,6 +1006,12 @@
     margin-left: var(--sidebar-width);
     padding: 2rem;
     max-width: calc(100vw - var(--sidebar-width));
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.client-main.expanded {
+    margin-left: var(--sidebar-collapsed);
+    max-width: calc(100vw - var(--sidebar-collapsed));
 }
 
 .client-header {
@@ -481,6 +1023,12 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
     gap: 1rem;
 }
 
@@ -907,10 +1455,458 @@
 }
 .action-icon.quote svg { stroke: var(--client-blue); }
 
+.action-icon.invoice {
+    background: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(16,185,129,0.1));
+}
+.action-icon.invoice svg { stroke: var(--client-green); }
+
+.action-icon.support {
+    background: linear-gradient(135deg, rgba(245,158,11,0.3), rgba(245,158,11,0.1));
+}
+.action-icon.support svg { stroke: var(--client-orange); }
+
+.action-icon.duplicate {
+    background: linear-gradient(135deg, rgba(139,92,246,0.3), rgba(139,92,246,0.1));
+}
+.action-icon.duplicate svg { stroke: var(--client-purple); }
+
+.action-icon.other {
+    background: linear-gradient(135deg, rgba(96,165,250,0.3), rgba(96,165,250,0.1));
+}
+.action-icon.other svg { stroke: #60a5fa; }
+
+.action-btn {
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+}
+
 .action-btn span {
     font-weight: 600;
     color: var(--client-text);
     font-size: 0.9rem;
+}
+
+/* ========================================
+   QUICK REQUEST MODAL
+   ======================================== */
+.quick-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.quick-modal {
+    background: var(--client-surface);
+    border: 1px solid var(--client-border);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--client-border);
+}
+
+.modal-header h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--client-text);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--client-text-muted);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: var(--client-surface-hover);
+    color: var(--client-text);
+}
+
+.modal-form {
+    padding: 1.5rem;
+}
+
+.modal-info {
+    background: var(--client-surface-hover);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+}
+
+.modal-info p {
+    margin: 0;
+    color: var(--client-text);
+}
+
+.modal-info .text-muted {
+    font-size: 0.85rem;
+    color: var(--client-text-muted);
+    margin-top: 0.25rem;
+}
+
+.modal-form .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.modal-form label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--client-text);
+    margin-bottom: 0.5rem;
+}
+
+.modal-form .form-select,
+.modal-form .form-input,
+.modal-form .form-textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--client-bg);
+    border: 1px solid var(--client-border);
+    border-radius: 8px;
+    color: var(--client-text);
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+
+.modal-form .form-textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.modal-form .form-select:focus,
+.modal-form .form-input:focus,
+.modal-form .form-textarea:focus {
+    outline: none;
+    border-color: var(--client-blue);
+    box-shadow: 0 0 0 3px rgba(11,45,255,0.15);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--client-border);
+}
+
+.modal-actions .btn-secondary {
+    padding: 0.75rem 1.25rem;
+    background: var(--client-surface-hover);
+    border: 1px solid var(--client-border);
+    border-radius: 8px;
+    color: var(--client-text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-actions .btn-secondary:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.modal-actions .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--client-blue);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-actions .btn-primary:hover {
+    background: #0922cc;
+}
+
+/* Success message in modal */
+#quick-request-result .success-message {
+    background: rgba(16,185,129,0.15);
+    border: 1px solid rgba(16,185,129,0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    color: var(--client-green);
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+/* ========================================
+   TUS STANDARD BADGE
+   ======================================== */
+.tus-standard-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(11, 45, 255, 0.1));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+}
+
+.badge-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--client-green), var(--client-blue));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.badge-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.badge-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--client-text);
+}
+
+.badge-status {
+    font-size: 0.7rem;
+    color: var(--client-green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================
+   TRANSPARENCY SECTION
+   ======================================== */
+.transparency-section {
+    margin-bottom: 2rem;
+    background: var(--client-surface);
+    border: 1px solid var(--client-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.transparency-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.transparency-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.transparency-title svg {
+    color: var(--client-blue);
+}
+
+.transparency-title h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--client-text);
+    margin: 0;
+}
+
+.transparency-subtitle {
+    font-size: 0.85rem;
+    color: var(--client-text-muted);
+    margin: 0;
+}
+
+.activity-timeline {
+    position: relative;
+}
+
+.timeline-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--client-surface-hover);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.timeline-item:hover {
+    background: rgba(11, 45, 255, 0.05);
+    border-color: rgba(11, 45, 255, 0.2);
+}
+
+.timeline-marker {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: 4px;
+    flex-shrink: 0;
+}
+
+.timeline-marker.quote {
+    background: var(--client-blue);
+    box-shadow: 0 0 0 4px rgba(11, 45, 255, 0.2);
+}
+
+.timeline-marker.invoice {
+    background: var(--client-green);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.timeline-marker.project {
+    background: var(--client-purple);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+}
+
+.timeline-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.timeline-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.timeline-type {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--client-text);
+}
+
+.timeline-status {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.timeline-status.status-sent,
+.timeline-status.status-pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--client-orange);
+}
+
+.timeline-status.status-accepted,
+.timeline-status.status-paid {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--client-green);
+}
+
+.timeline-status.status-draft {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--client-text-muted);
+}
+
+.timeline-status.status-design,
+.timeline-status.status-development {
+    background: rgba(11, 45, 255, 0.15);
+    color: var(--client-blue);
+}
+
+.timeline-status.status-review {
+    background: rgba(139, 92, 246, 0.15);
+    color: var(--client-purple);
+}
+
+.timeline-desc {
+    font-size: 0.85rem;
+    color: var(--client-text-muted);
+    margin: 0 0 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.timeline-date {
+    font-size: 0.75rem;
+    color: var(--client-text-muted);
+    opacity: 0.7;
+}
+
+.timeline-amount {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--client-text);
+    white-space: nowrap;
+}
+
+.timeline-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mini-progress-bar {
+    width: 80px;
+    height: 6px;
+    background: var(--client-border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.mini-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--client-blue), var(--client-purple));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.timeline-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--client-text-muted);
+}
+
+.timeline-empty svg {
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.timeline-empty p {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.timeline-empty span {
+    font-size: 0.85rem;
+    opacity: 0.7;
 }
 
 /* ========================================
@@ -948,6 +1944,22 @@
     .header-content {
         flex-direction: column;
         align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .tus-standard-badge {
+        order: -1;
+        width: 100%;
+    }
+    
+    .timeline-item {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .timeline-amount,
+    .timeline-progress {
+        align-self: flex-start;
     }
 }
 </style>

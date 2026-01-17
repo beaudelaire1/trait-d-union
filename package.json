@@ -1,0 +1,16 @@
+{
+  "name": "trait-d-union-studio",
+  "version": "1.0.0",
+  "description": "Build tools pour Trait d'Union Studio",
+  "scripts": {
+    "css:dev": "npx tailwindcss -i ./static/css/input.css -o ./static/css/tailwind.css --watch",
+    "css:build": "npx tailwindcss -i ./static/css/input.css -o ./static/css/tailwind.css --minify",
+    "postbuild": "npm run css:build"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.32",
+    "autoprefixer": "^10.4.16",
+    "cssnano": "^6.0.2"
+  }
+}

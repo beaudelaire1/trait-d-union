@@ -1,0 +1,14 @@
+<div class="success-message">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 0.5rem;">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+    </svg>
+    <p style="margin: 0; font-weight: 600;">Demande envoyée avec succès !</p>
+    <p style="margin: 0.25rem 0 0; font-size: 0.85rem; opacity: 0.8;">Notre équipe vous répondra sous 24h.</p>
+</div>
+<script>
+    // Auto-close modal after 2 seconds
+    setTimeout(() => {
+        document.querySelector('.quick-modal-overlay')?.remove();
+    }, 2000);
+</script>

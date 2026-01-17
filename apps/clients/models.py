@@ -72,6 +72,61 @@ class ClientProfile(models.Model):
         return self.company_name or self.user.username
 
 
+class ClientNotification(models.Model):
+    """Notification for client portal."""
+    
+    NOTIFICATION_TYPES = [
+        ('quote', 'Nouveau devis'),
+        ('invoice', 'Nouvelle facture'),
+        ('project', 'Mise à jour projet'),
+        ('document', 'Nouveau document'),
+        ('message', 'Message'),
+    ]
+    
+    client = models.ForeignKey(
+        ClientProfile,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        verbose_name="Client"
+    )
+    notification_type = models.CharField(
+        "Type",
+        max_length=20,
+        choices=NOTIFICATION_TYPES,
+        default='message'
+    )
+    title = models.CharField(
+        "Titre",
+        max_length=200
+    )
+    message = models.TextField(
+        "Message"
+    )
+    link = models.CharField(
+        "Lien",
+        max_length=255,
+        blank=True
+    )
+    read = models.BooleanField(
+        "Lu",
+        default=False
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Notification"
+        verbose_name_plural = "Notifications"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} - {self.client}"
+    
+    @property
+    def type(self):
+        """Alias for notification_type for template compatibility."""
+        return self.notification_type
+
+
 class ProjectStatus(models.TextChoices):
     """Project status choices."""
     BRIEFING = 'briefing', '📋 Cadrage'
@@ -211,6 +266,146 @@ class ProjectMilestone(models.Model):
         self.status = 'completed'
         self.completed_at = timezone.now()
         self.save()
+
+
+class ProjectActivity(models.Model):
+    """Activity log for project transparency - tracks all changes."""
+    
+    ACTIVITY_TYPES = [
+        ('status_change', '🔄 Changement de statut'),
+        ('progress_update', '📊 Mise à jour progression'),
+        ('milestone_completed', '✅ Jalon terminé'),
+        ('document_added', '📄 Document ajouté'),
+        ('comment_added', '💬 Commentaire'),
+        ('delivery', '🚀 Livraison'),
+        ('feedback', '📝 Retour client'),
+        ('meeting', '📅 Réunion'),
+    ]
+    
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='activities',
+        verbose_name="Projet"
+    )
+    activity_type = models.CharField(
+        "Type d'activité",
+        max_length=30,
+        choices=ACTIVITY_TYPES
+    )
+    title = models.CharField(
+        "Titre",
+        max_length=200
+    )
+    description = models.TextField(
+        "Description",
+        blank=True
+    )
+    # Track who made the action
+    performed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='project_activities',
+        verbose_name="Effectué par"
+    )
+    is_client_visible = models.BooleanField(
+        "Visible par le client",
+        default=True
+    )
+    # Optional: link to related milestone
+    milestone = models.ForeignKey(
+        'ProjectMilestone',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='activities',
+        verbose_name="Jalon associé"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Activité projet"
+        verbose_name_plural = "Activités projet"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.project.name} - {self.title}"
+    
+    @property
+    def icon(self):
+        """Return emoji for activity type."""
+        icons = {
+            'status_change': '🔄',
+            'progress_update': '📊',
+            'milestone_completed': '✅',
+            'document_added': '📄',
+            'comment_added': '💬',
+            'delivery': '🚀',
+            'feedback': '📝',
+            'meeting': '📅',
+        }
+        return icons.get(self.activity_type, '📌')
+
+
+class ProjectComment(models.Model):
+    """Comments/messages on a project for client-team communication."""
+    
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name="Projet"
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='project_comments',
+        verbose_name="Auteur"
+    )
+    message = models.TextField(
+        "Message"
+    )
+    # Optional: attach to a specific milestone
+    milestone = models.ForeignKey(
+        'ProjectMilestone',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='comments',
+        verbose_name="Jalon associé"
+    )
+    # For file attachments
+    attachment = models.FileField(
+        "Pièce jointe",
+        upload_to='projects/comments/%Y/%m/',
+        blank=True,
+        null=True
+    )
+    is_internal = models.BooleanField(
+        "Note interne (invisible client)",
+        default=False
+    )
+    read_by_client = models.BooleanField(
+        "Lu par le client",
+        default=False
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Commentaire projet"
+        verbose_name_plural = "Commentaires projet"
+        ordering = ['created_at']
+    
+    def __str__(self):
+        return f"{self.project.name} - {self.author.get_full_name()}"
+    
+    @property
+    def is_from_client(self):
+        """Check if comment is from the client."""
+        return hasattr(self.author, 'client_profile')
 
 
 class ClientDocument(models.Model):

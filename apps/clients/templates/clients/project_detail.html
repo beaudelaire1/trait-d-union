@@ -150,6 +150,128 @@
         </div>
     </section>
     {% endif %}
+
+    <!-- Activity Log - Transparence radicale -->
+    <section class="project-activity">
+        <div class="container">
+            <div class="section-header">
+                <h2>
+                    <span class="section-icon">📊</span>
+                    Journal d'activité
+                </h2>
+                <span class="tus-badge">Transparence radicale</span>
+            </div>
+            
+            {% if activities %}
+            <div class="activity-feed">
+                {% for activity in activities %}
+                <div class="activity-item" data-type="{{ activity.activity_type }}">
+                    <div class="activity-icon">{{ activity.icon }}</div>
+                    <div class="activity-content">
+                        <div class="activity-header">
+                            <span class="activity-title">{{ activity.title }}</span>
+                            <span class="activity-date">{{ activity.created_at|date:"d/m/Y à H:i" }}</span>
+                        </div>
+                        {% if activity.description %}
+                        <p class="activity-desc">{{ activity.description }}</p>
+                        {% endif %}
+                        {% if activity.performed_by %}
+                        <span class="activity-author">
+                            Par {{ activity.performed_by.get_full_name|default:"Équipe TUS" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="activity-empty">
+                <p>Le journal d'activité apparaîtra ici dès le début du projet</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Comments Section - Communication -->
+    <section class="project-comments">
+        <div class="container">
+            <div class="section-header">
+                <h2>
+                    <span class="section-icon">💬</span>
+                    Échanges avec l'équipe
+                </h2>
+                <span class="comments-count">{{ comments.count }} message{{ comments.count|pluralize }}</span>
+            </div>
+            
+            <div class="comments-wrapper">
+                <!-- Comment Form -->
+                <form class="comment-form" 
+                      hx-post="{% url 'clients:add_project_comment' project.pk %}"
+                      hx-target="#comments-list"
+                      hx-swap="beforeend"
+                      hx-on::after-request="this.reset()">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <textarea name="message" 
+                                  placeholder="Posez une question ou partagez un retour..." 
+                                  rows="3"
+                                  required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <label class="file-upload">
+                            <input type="file" name="attachment" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip">
+                            <span class="file-btn">📎 Joindre un fichier</span>
+                        </label>
+                        <button type="submit" class="btn btn-primary">
+                            Envoyer
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Comments List -->
+                <div class="comments-list" id="comments-list">
+                    {% if comments %}
+                        {% for comment in comments %}
+                        <div class="comment-item {% if comment.is_from_client %}from-client{% else %}from-team{% endif %}">
+                            <div class="comment-avatar">
+                                {% if comment.is_from_client %}
+                                    <span>{{ comment.author.first_name|slice:":1"|upper }}{{ comment.author.last_name|slice:":1"|upper }}</span>
+                                {% else %}
+                                    <span class="team-avatar">TUS</span>
+                                {% endif %}
+                            </div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <span class="comment-author">
+                                        {% if comment.is_from_client %}
+                                            Vous
+                                        {% else %}
+                                            {{ comment.author.get_full_name|default:"Équipe TUS" }}
+                                        {% endif %}
+                                    </span>
+                                    <span class="comment-date">{{ comment.created_at|date:"d/m/Y à H:i" }}</span>
+                                </div>
+                                <div class="comment-body">
+                                    {{ comment.message|linebreaks }}
+                                </div>
+                                {% if comment.attachment %}
+                                <a href="{{ comment.attachment.url }}" target="_blank" class="comment-attachment">
+                                    📎 Pièce jointe
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="comments-empty">
+                            <p>Aucun message pour le moment</p>
+                            <span>Commencez la conversation avec notre équipe</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 <style>
@@ -493,6 +615,352 @@
         width: 40px;
         height: 40px;
         font-size: 1.25rem;
+    }
+}
+
+/* ========================================
+   TUS BADGE
+   ======================================== */
+.tus-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(11, 45, 255, 0.15));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #10b981;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.section-icon {
+    margin-right: 0.5rem;
+}
+
+/* ========================================
+   ACTIVITY FEED
+   ======================================== */
+.project-activity {
+    padding: 3rem 0;
+    background: #f8fafc;
+}
+
+.activity-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 700px;
+}
+
+.activity-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: white;
+    border-radius: 12px;
+    border-left: 3px solid var(--gray-200);
+    transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.activity-item[data-type="status_change"] { border-left-color: #3b82f6; }
+.activity-item[data-type="progress_update"] { border-left-color: #8b5cf6; }
+.activity-item[data-type="milestone_completed"] { border-left-color: #10b981; }
+.activity-item[data-type="document_added"] { border-left-color: #f59e0b; }
+.activity-item[data-type="comment_added"] { border-left-color: #06b6d4; }
+.activity-item[data-type="delivery"] { border-left-color: #22c55e; }
+.activity-item[data-type="meeting"] { border-left-color: #ec4899; }
+
+.activity-icon {
+    font-size: 1.25rem;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-100);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.activity-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.activity-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--gray-900);
+}
+
+.activity-date {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    white-space: nowrap;
+}
+
+.activity-desc {
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    margin: 0 0 0.25rem 0;
+}
+
+.activity-author {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.activity-empty {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    color: var(--gray-500);
+}
+
+/* ========================================
+   COMMENTS SECTION
+   ======================================== */
+.project-comments {
+    padding: 3rem 0;
+}
+
+.comments-count {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+}
+
+.comments-wrapper {
+    max-width: 700px;
+}
+
+.comment-form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 2px solid var(--gray-200);
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.file-upload input[type="file"] {
+    display: none;
+}
+
+.file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--gray-100);
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.file-btn:hover {
+    background: var(--gray-200);
+}
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: var(--primary-dark, #0026cc);
+    transform: translateY(-1px);
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.comment-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: 12px;
+}
+
+.comment-item.from-team {
+    background: linear-gradient(135deg, rgba(11, 45, 255, 0.03), rgba(139, 92, 246, 0.03));
+    border: 1px solid rgba(11, 45, 255, 0.1);
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.comment-item.from-team .comment-avatar {
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    color: white;
+}
+
+.team-avatar {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+}
+
+.comment-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.comment-author {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.comment-date {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.comment-body {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--gray-700);
+}
+
+.comment-body p {
+    margin: 0 0 0.5rem 0;
+}
+
+.comment-body p:last-child {
+    margin-bottom: 0;
+}
+
+.comment-attachment {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--gray-100);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: var(--gray-700);
+    text-decoration: none;
+}
+
+.comment-attachment:hover {
+    background: var(--gray-200);
+}
+
+.comments-empty {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    color: var(--gray-500);
+}
+
+.comments-empty p {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.comments-empty span {
+    font-size: 0.875rem;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .activity-header {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .file-upload {
+        width: 100%;
+    }
+    
+    .file-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-primary {
+        width: 100%;
     }
 }
 </style>

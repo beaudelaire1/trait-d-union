@@ -1,0 +1,84 @@
+<!-- Client Portal Sidebar -->
+<aside class="client-sidebar" :class="{ 'collapsed': !sidebarOpen }">
+    <div class="sidebar-header">
+        <div class="user-avatar">
+            <span>{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}</span>
+        </div>
+        <div class="user-info" x-show="sidebarOpen" x-transition>
+            <h3>{{ request.user.get_full_name|default:request.user.username }}</h3>
+            <p>{{ request.user.client_profile.company_name|default:"Client VIP" }}</p>
+        </div>
+        <!-- Collapse Button (Desktop) -->
+        <button @click="sidebarOpen = !sidebarOpen" class="collapse-btn" title="Réduire le menu">
+            <svg :class="{ 'rotated': !sidebarOpen }" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <a href="{% url 'clients:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" title="Tableau de bord">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span x-show="sidebarOpen" x-transition>Tableau de bord</span>
+        </a>
+        <a href="{% url 'clients:projects' %}" class="nav-item {% if request.resolver_match.url_name == 'projects' or request.resolver_match.url_name == 'project_detail' %}active{% endif %}" title="Mes projets">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span x-show="sidebarOpen" x-transition>Mes projets</span>
+        </a>
+        <a href="{% url 'clients:quotes' %}" class="nav-item {% if request.resolver_match.url_name == 'quotes' %}active{% endif %}" title="Devis">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span x-show="sidebarOpen" x-transition>Devis</span>
+        </a>
+        <a href="{% url 'clients:invoices' %}" class="nav-item {% if request.resolver_match.url_name == 'invoices' %}active{% endif %}" title="Factures">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+            <span x-show="sidebarOpen" x-transition>Factures</span>
+        </a>
+        <a href="{% url 'clients:documents' %}" class="nav-item {% if request.resolver_match.url_name == 'documents' %}active{% endif %}" title="Documents">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                <polyline points="13 2 13 9 20 9"></polyline>
+            </svg>
+            <span x-show="sidebarOpen" x-transition>Documents</span>
+        </a>
+        
+        <div class="nav-divider"></div>
+        
+        <a href="{% url 'clients:new_request' %}" class="nav-item {% if request.resolver_match.url_name == 'new_request' %}active{% endif %}" title="Nouvelle demande">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span x-show="sidebarOpen" x-transition>Nouvelle demande</span>
+        </a>
+        <a href="{% url 'clients:profile' %}" class="nav-item {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" title="Mon profil">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span x-show="sidebarOpen" x-transition>Mon profil</span>
+        </a>
+        <a href="{% url 'account_logout' %}" class="nav-item logout" title="Déconnexion">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span x-show="sidebarOpen" x-transition>Déconnexion</span>
+        </a>
+    </nav>
+</aside>

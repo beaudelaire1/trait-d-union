@@ -1,0 +1,29 @@
+<div class="comment-item {% if comment.is_from_client %}from-client{% else %}from-team{% endif %}">
+    <div class="comment-avatar">
+        {% if comment.is_from_client %}
+            <span>{{ comment.author.first_name|slice:":1"|upper }}{{ comment.author.last_name|slice:":1"|upper }}</span>
+        {% else %}
+            <span class="team-avatar">TUS</span>
+        {% endif %}
+    </div>
+    <div class="comment-content">
+        <div class="comment-header">
+            <span class="comment-author">
+                {% if comment.is_from_client %}
+                    Vous
+                {% else %}
+                    {{ comment.author.get_full_name|default:"Équipe TUS" }}
+                {% endif %}
+            </span>
+            <span class="comment-date">{{ comment.created_at|date:"d/m/Y à H:i" }}</span>
+        </div>
+        <div class="comment-body">
+            {{ comment.message|linebreaks }}
+        </div>
+        {% if comment.attachment %}
+        <a href="{{ comment.attachment.url }}" target="_blank" class="comment-attachment">
+            📎 Pièce jointe
+        </a>
+        {% endif %}
+    </div>
+</div>

@@ -2,13 +2,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import TemplateView, ListView, DetailView, UpdateView
+from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.http import JsonResponse
 
-from .models import ClientProfile, Project, ProjectMilestone, ClientDocument
-from .forms import ClientProfileForm, DocumentUploadForm
+from .models import ClientProfile, Project, ProjectMilestone, ClientDocument, ClientNotification
+from .forms import ClientProfileForm, DocumentUploadForm, ClientRequestForm
 
 
 class ClientRequiredMixin(LoginRequiredMixin):
@@ -19,6 +19,35 @@ class ClientRequiredMixin(LoginRequiredMixin):
             # Create profile if doesn't exist
             ClientProfile.objects.get_or_create(user=request.user)
         return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        """Add common client context (notifications, badges)."""
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            profile = self.request.user.client_profile
+            
+            # Notifications non lues
+            context['notifications'] = ClientNotification.objects.filter(
+                client=profile,
+                read=False
+            ).order_by('-created_at')[:10]
+            context['notifications_count'] = context['notifications'].count()
+            
+            # Badges pour le menu
+            from apps.devis.models import Quote
+            from apps.factures.models import Invoice
+            
+            context['pending_quotes_count'] = Quote.objects.filter(
+                client__email=self.request.user.email,
+                status='sent'
+            ).count()
+            
+            context['pending_invoices_count'] = Invoice.objects.filter(
+                quote__client__email=self.request.user.email,
+                status__in=['sent', 'overdue']
+            ).count()
+        
+        return context
 
 
 class DashboardView(ClientRequiredMixin, TemplateView):
@@ -98,6 +127,24 @@ class ProjectDetailView(ClientRequiredMixin, DetailView):
         context['milestones'] = self.object.milestones.all()
         context['documents'] = self.object.documents.all()
         
+        # Activity log (visible to client only)
+        context['activities'] = self.object.activities.filter(
+            is_client_visible=True
+        ).select_related('performed_by', 'milestone')[:20]
+        
+        # Comments (exclude internal notes)
+        context['comments'] = self.object.comments.filter(
+            is_internal=False
+        ).select_related('author', 'milestone')
+        
+        # Mark unread comments as read
+        self.object.comments.filter(
+            is_internal=False,
+            read_by_client=False
+        ).exclude(
+            author=self.request.user
+        ).update(read_by_client=True)
+        
         # Timeline stages
         context['stages'] = [
             {'id': 'briefing', 'label': 'Cadrage', 'icon': '📋'},
@@ -106,6 +153,11 @@ class ProjectDetailView(ClientRequiredMixin, DetailView):
             {'id': 'review', 'label': 'Recette', 'icon': '🔍'},
             {'id': 'delivered', 'label': 'Livré', 'icon': '✅'},
         ]
+        
+        # Calculate completed stages for progress bar
+        status_order = ['briefing', 'design', 'development', 'review', 'delivered']
+        current_index = status_order.index(self.object.status) if self.object.status in status_order else 0
+        context['completed_stages'] = status_order[:current_index]
         
         return context
 
@@ -178,3 +230,196 @@ class InvoiceListView(ClientRequiredMixin, ListView):
         return Invoice.objects.filter(
             quote__client__email=self.request.user.email
         ).order_by('-created_at')
+
+
+class NewClientRequestView(ClientRequiredMixin, TemplateView):
+    """Simplified request form for existing clients.
+    
+    Unlike the public contact form, this pre-fills client information
+    and provides a streamlined experience for repeat customers.
+    """
+    template_name = 'clients/new_request.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        profile = self.request.user.client_profile
+        
+        # Pre-fill form with client data
+        context['client_data'] = {
+            'name': self.request.user.get_full_name() or self.request.user.username,
+            'email': self.request.user.email,
+            'phone': profile.phone,
+            'company': profile.company_name,
+            'address': profile.address,
+        }
+        
+        # Get previous projects for context
+        context['previous_projects'] = profile.projects.all()[:5]
+        
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        """Handle new request submission."""
+        from apps.devis.models import QuoteRequest
+        
+        profile = request.user.client_profile
+        
+        # Create quote request with pre-filled client data
+        quote_request = QuoteRequest.objects.create(
+            client_name=request.user.get_full_name() or request.user.username,
+            email=request.user.email,
+            phone=profile.phone or request.POST.get('phone', ''),
+            address=profile.address or request.POST.get('address', ''),
+            message=request.POST.get('message', ''),
+            preferred_date=request.POST.get('preferred_date') or None,
+        )
+        
+        # Create notification for admin
+        messages.success(
+            request, 
+            'Votre demande a été envoyée avec succès ! Notre équipe vous recontactera sous 24h.'
+        )
+        
+        return redirect('clients:dashboard')
+
+
+@login_required
+def mark_notifications_read(request):
+    """Mark all notifications as read for the current user."""
+    if request.method == 'POST':
+        profile = request.user.client_profile
+        ClientNotification.objects.filter(client=profile, read=False).update(read=True)
+        return JsonResponse({'success': True})
+    return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+
+@login_required
+def add_project_comment(request, project_id):
+    """Add a comment to a project (HTMX endpoint)."""
+    from .models import ProjectComment, ProjectActivity
+    
+    profile = request.user.client_profile
+    project = get_object_or_404(Project, id=project_id, client=profile)
+    
+    if request.method == 'POST':
+        message = request.POST.get('message', '').strip()
+        attachment = request.FILES.get('attachment')
+        
+        if message or attachment:
+            comment = ProjectComment.objects.create(
+                project=project,
+                author=request.user,
+                message=message,
+                attachment=attachment,
+                is_internal=False  # Client comments are never internal
+            )
+            
+            # Log activity
+            ProjectActivity.objects.create(
+                project=project,
+                activity_type='comment_added',
+                title=f"Commentaire de {request.user.get_full_name() or request.user.username}",
+                description=message[:100] + '...' if len(message) > 100 else message,
+                performed_by=request.user,
+                is_client_visible=True
+            )
+            
+            # Return partial for HTMX
+            if request.headers.get('HX-Request'):
+                return render(request, 'clients/partials/comment_item.html', {
+                    'comment': comment,
+                    'user': request.user
+                })
+            
+            messages.success(request, 'Commentaire ajouté avec succès.')
+            return redirect('clients:project_detail', pk=project.pk)
+    
+    return redirect('clients:project_detail', pk=project.pk)
+
+
+@login_required
+def quick_request(request):
+    """Handle quick requests from client dashboard (HTMX endpoint).
+    
+    This replaces the need for clients to fill the full public contact form.
+    All client data is automatically attached from their profile.
+    """
+    from apps.leads.models import Lead
+    
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    profile = request.user.client_profile
+    request_type = request.POST.get('request_type', 'other')
+    message = request.POST.get('message', '').strip()
+    project_id = request.POST.get('project_id')
+    document_ref = request.POST.get('document_ref', '').strip()
+    
+    # Map request types to lead subjects
+    type_labels = {
+        'quote': '📄 Demande de devis',
+        'invoice': '🧾 Demande de facture',
+        'support': '🔧 Support technique',
+        'duplicate': '📋 Duplicata de document',
+        'other': '💬 Autre demande',
+    }
+    
+    request_label = type_labels.get(request_type, 'Demande client')
+    
+    # Build the full message with context
+    full_message = f"[CLIENT EXISTANT - {request_label}]\n"
+    full_message += f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+    full_message += f"Client : {request.user.get_full_name() or request.user.username}\n"
+    full_message += f"Email : {request.user.email}\n"
+    if profile.phone:
+        full_message += f"Téléphone : {profile.phone}\n"
+    if profile.company_name:
+        full_message += f"Entreprise : {profile.company_name}\n"
+    full_message += f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+    
+    if project_id:
+        try:
+            project = Project.objects.get(id=project_id, client=profile)
+            full_message += f"📁 Projet concerné : {project.name}\n\n"
+        except Project.DoesNotExist:
+            pass
+    
+    if document_ref:
+        full_message += f"📄 Référence document : {document_ref}\n\n"
+    
+    full_message += f"Message :\n{message}"
+    
+    # Map request type to project type for Lead model
+    project_type_map = {
+        'quote': 'vitrine',  # Default, admin will understand from message
+        'invoice': 'vitrine',
+        'support': 'plateforme',
+        'duplicate': 'vitrine',
+        'other': 'vitrine',
+    }
+    
+    # Create the lead (will trigger admin notification)
+    lead = Lead.objects.create(
+        name=f"[CLIENT] {request.user.get_full_name() or request.user.username}",
+        email=request.user.email,
+        project_type=project_type_map.get(request_type, 'vitrine'),
+        message=full_message,
+    )
+    
+    # Create notification for the client
+    ClientNotification.objects.create(
+        client=profile,
+        notification_type='message',
+        title=f"Demande envoyée : {request_label}",
+        message=f"Votre demande a été transmise à l'équipe. Réponse sous 24h.",
+        link='',
+    )
+    
+    # Return success HTML for HTMX
+    if request.headers.get('HX-Request'):
+        return render(request, 'clients/partials/quick_request_success.html', {
+            'request_type': request_type,
+        })
+    
+    messages.success(request, 'Votre demande a été envoyée avec succès !')
+    return redirect('clients:dashboard')

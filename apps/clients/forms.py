@@ -103,3 +103,69 @@ class DocumentUploadForm(forms.ModelForm):
                 'placeholder': 'Notes additionnelles (optionnel)'
             }),
         }
+
+
+class ClientRequestForm(forms.Form):
+    """Formulaire simplifié pour les demandes client (devis/facture)."""
+    
+    REQUEST_TYPES = [
+        ('quote', 'Demande de devis'),
+        ('invoice', 'Question sur une facture'),
+        ('project', 'Suivi de projet'),
+        ('other', 'Autre demande'),
+    ]
+    
+    request_type = forms.ChoiceField(
+        label="Type de demande",
+        choices=REQUEST_TYPES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-radio'
+        })
+    )
+    subject = forms.CharField(
+        label="Sujet",
+        max_length=200,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Décrivez brièvement votre demande'
+        })
+    )
+    description = forms.CharField(
+        label="Description",
+        widget=forms.Textarea(attrs={
+            'class': 'form-input',
+            'rows': 5,
+            'placeholder': 'Détaillez votre demande...'
+        })
+    )
+    budget_range = forms.ChoiceField(
+        label="Budget estimé (optionnel)",
+        required=False,
+        choices=[
+            ('', 'Non spécifié'),
+            ('500-1500', '500€ - 1 500€'),
+            ('1500-3000', '1 500€ - 3 000€'),
+            ('3000-5000', '3 000€ - 5 000€'),
+            ('5000-10000', '5 000€ - 10 000€'),
+            ('10000+', '10 000€+'),
+        ],
+        widget=forms.Select(attrs={
+            'class': 'form-select'
+        })
+    )
+    deadline = forms.DateField(
+        label="Échéance souhaitée (optionnel)",
+        required=False,
+        widget=forms.DateInput(attrs={
+            'class': 'form-input',
+            'type': 'date'
+        })
+    )
+    attachment = forms.FileField(
+        label="Pièce jointe (optionnel)",
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'form-input',
+            'accept': '.pdf,.doc,.docx,.png,.jpg,.jpeg,.zip'
+        })
+    )

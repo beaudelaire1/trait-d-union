@@ -1,0 +1,689 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Nouvelle Demande - Espace Client - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="client-portal" x-data="{ sidebarOpen: true }">
+    {% include 'clients/partials/sidebar.html' %}
+    
+    <main class="client-main" :class="{ 'expanded': !sidebarOpen }">
+        <header class="client-header">
+            <div class="header-content">
+                <div>
+                    <nav class="breadcrumb">
+                        <a href="{% url 'clients:dashboard' %}">Tableau de bord</a>
+                        <span>/</span>
+                        <span>Nouvelle demande</span>
+                    </nav>
+                    <h1>Nouvelle demande 📝</h1>
+                    <p class="header-subtitle">Formulaire simplifié pour nos clients fidèles</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="request-container">
+            <!-- Info Card -->
+            <div class="info-card">
+                <div class="info-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                </div>
+                <div class="info-content">
+                    <h4>Processus simplifié</h4>
+                    <p>En tant que client existant, vos informations sont déjà enregistrées. Décrivez simplement votre nouveau besoin et nous vous recontacterons sous 24h.</p>
+                </div>
+            </div>
+
+            <form method="post" class="request-form" x-data="{ requestType: 'quote' }">
+                {% csrf_token %}
+                
+                <!-- Client Info (Read-only) -->
+                <div class="form-section">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Vos informations
+                    </h3>
+                    <div class="client-info-grid">
+                        <div class="info-item">
+                            <span class="label">Nom</span>
+                            <span class="value">{{ client_data.name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Email</span>
+                            <span class="value">{{ client_data.email }}</span>
+                        </div>
+                        {% if client_data.company %}
+                        <div class="info-item">
+                            <span class="label">Entreprise</span>
+                            <span class="value">{{ client_data.company }}</span>
+                        </div>
+                        {% endif %}
+                        {% if client_data.phone %}
+                        <div class="info-item">
+                            <span class="label">Téléphone</span>
+                            <span class="value">{{ client_data.phone }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <p class="update-link">
+                        <a href="{% url 'clients:profile' %}">Mettre à jour mes informations →</a>
+                    </p>
+                </div>
+
+                <!-- Request Type -->
+                <div class="form-section">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                            <polyline points="2 17 12 22 22 17"></polyline>
+                            <polyline points="2 12 12 17 22 12"></polyline>
+                        </svg>
+                        Type de demande
+                    </h3>
+                    <div class="request-type-grid">
+                        <label class="type-option" :class="{ 'selected': requestType === 'quote' }">
+                            <input type="radio" name="request_type" value="quote" x-model="requestType">
+                            <div class="type-card">
+                                <div class="type-icon quote">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="12" y1="18" x2="12" y2="12"></line>
+                                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                                    </svg>
+                                </div>
+                                <span class="type-label">Nouveau devis</span>
+                                <span class="type-desc">Nouveau projet ou évolution</span>
+                            </div>
+                        </label>
+                        <label class="type-option" :class="{ 'selected': requestType === 'support' }">
+                            <input type="radio" name="request_type" value="support" x-model="requestType">
+                            <div class="type-card">
+                                <div class="type-icon support">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                    </svg>
+                                </div>
+                                <span class="type-label">Support</span>
+                                <span class="type-desc">Assistance technique</span>
+                            </div>
+                        </label>
+                        <label class="type-option" :class="{ 'selected': requestType === 'modification' }">
+                            <input type="radio" name="request_type" value="modification" x-model="requestType">
+                            <div class="type-card">
+                                <div class="type-icon modification">
+                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                    </svg>
+                                </div>
+                                <span class="type-label">Modification</span>
+                                <span class="type-desc">Ajustement existant</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Previous Projects (if any) -->
+                {% if previous_projects %}
+                <div class="form-section" x-show="requestType !== 'quote'">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Projet concerné
+                    </h3>
+                    <select name="related_project" class="form-select">
+                        <option value="">Sélectionnez un projet (optionnel)</option>
+                        {% for project in previous_projects %}
+                        <option value="{{ project.id }}">{{ project.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+
+                <!-- Message -->
+                <div class="form-section">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        Décrivez votre besoin
+                    </h3>
+                    <textarea name="message" 
+                              class="form-textarea" 
+                              rows="6" 
+                              placeholder="Décrivez votre demande en détail. Plus vous êtes précis, plus notre réponse sera adaptée..."
+                              required></textarea>
+                </div>
+
+                <!-- Preferred Date -->
+                <div class="form-section">
+                    <h3>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Date souhaitée (optionnel)
+                    </h3>
+                    <input type="date" name="preferred_date" class="form-input">
+                </div>
+
+                <!-- Submit -->
+                <div class="form-actions">
+                    <a href="{% url 'clients:dashboard' %}" class="btn-secondary">Annuler</a>
+                    <button type="submit" class="btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Envoyer ma demande
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<style>
+/* ========================================
+   ESPACE CLIENT - BASE STYLES
+   ======================================== */
+:root {
+    --client-bg: #0a0a0f;
+    --client-surface: #12121a;
+    --client-surface-hover: #1a1a25;
+    --client-border: rgba(255,255,255,0.08);
+    --client-text: #f6f7fb;
+    --client-text-muted: rgba(246,247,251,0.6);
+    --client-blue: #0B2DFF;
+    --client-blue-soft: rgba(11,45,255,0.15);
+    --client-purple: #8B5CF6;
+    --client-green: #10B981;
+    --client-orange: #F59E0B;
+    --client-red: #EF4444;
+    --sidebar-width: 280px;
+    --sidebar-collapsed: 80px;
+}
+
+.client-portal {
+    min-height: 100vh;
+    background: var(--client-bg);
+    display: flex;
+    padding-top: 80px;
+}
+
+/* Sidebar */
+.client-sidebar {
+    width: var(--sidebar-width);
+    background: var(--client-surface);
+    border-right: 1px solid var(--client-border);
+    padding: 1.5rem 1rem;
+    position: fixed;
+    top: 80px;
+    left: 0;
+    bottom: 0;
+    overflow-y: auto;
+    z-index: 40;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.client-sidebar.collapsed {
+    width: var(--sidebar-collapsed);
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--client-border);
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.collapse-btn {
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background: var(--client-surface);
+    border: 1px solid var(--client-border);
+    border-radius: 50%;
+    color: var(--client-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    opacity: 0;
+}
+
+.sidebar-header:hover .collapse-btn { opacity: 1; }
+.collapse-btn:hover { background: var(--client-blue); border-color: var(--client-blue); color: white; }
+.collapse-btn svg { transition: transform 0.3s ease; }
+.collapse-btn svg.rotated { transform: rotate(180deg); }
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background: linear-gradient(135deg, var(--client-blue), var(--client-purple));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.user-info { overflow: hidden; }
+.user-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--client-text);
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.user-info p {
+    font-size: 0.85rem;
+    color: var(--client-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border-radius: 10px;
+    color: var(--client-text-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.nav-item svg { min-width: 20px; }
+.nav-item:hover { background: var(--client-surface-hover); color: var(--client-text); }
+.nav-item.active { background: var(--client-blue-soft); color: var(--client-blue); }
+.nav-item.active svg { stroke: var(--client-blue); }
+.nav-item.logout { color: var(--client-red); }
+.nav-item.logout:hover { background: rgba(239,68,68,0.1); }
+.nav-divider { height: 1px; background: var(--client-border); margin: 1rem 0; }
+
+/* Main Content */
+.client-main {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    max-width: calc(100% - var(--sidebar-width));
+    padding: 2rem;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s;
+}
+
+.client-main.expanded {
+    margin-left: var(--sidebar-collapsed);
+    max-width: calc(100% - var(--sidebar-collapsed));
+}
+
+.client-header {
+    margin-bottom: 2rem;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb a { color: var(--client-blue); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb span { color: var(--client-text-muted); }
+
+.client-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--client-text);
+    margin-bottom: 0.25rem;
+}
+
+.header-subtitle {
+    color: var(--client-text-muted);
+    font-size: 0.95rem;
+}
+
+/* ========================================
+   NEW REQUEST PAGE SPECIFIC
+   ======================================== */
+.request-container {
+    max-width: 800px;
+}
+
+.info-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(11,45,255,0.1);
+    border: 1px solid rgba(11,45,255,0.2);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.info-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    background: rgba(11,45,255,0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0B2DFF;
+}
+
+.info-content h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #f6f7fb;
+    margin-bottom: 0.25rem;
+}
+
+.info-content p {
+    font-size: 0.9rem;
+    color: rgba(246,247,251,0.7);
+    line-height: 1.5;
+}
+
+.request-form {
+    background: #12121a;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.form-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f6f7fb;
+    margin-bottom: 1rem;
+}
+
+.form-section h3 svg {
+    stroke: #0B2DFF;
+}
+
+.client-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.info-item {
+    padding: 1rem;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+}
+
+.info-item .label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(246,247,251,0.5);
+    margin-bottom: 0.25rem;
+}
+
+.info-item .value {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #f6f7fb;
+}
+
+.update-link {
+    margin-top: 1rem;
+}
+
+.update-link a {
+    font-size: 0.85rem;
+    color: #0B2DFF;
+    text-decoration: none;
+}
+
+.update-link a:hover {
+    text-decoration: underline;
+}
+
+.request-type-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.type-option {
+    cursor: pointer;
+}
+
+.type-option input {
+    display: none;
+}
+
+.type-card {
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.type-option:hover .type-card {
+    border-color: rgba(11,45,255,0.3);
+}
+
+.type-option.selected .type-card {
+    border-color: #0B2DFF;
+    background: rgba(11,45,255,0.1);
+}
+
+.type-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 1rem;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.type-icon.quote {
+    background: rgba(11,45,255,0.2);
+    color: #0B2DFF;
+}
+
+.type-icon.support {
+    background: rgba(16,185,129,0.2);
+    color: #10B981;
+}
+
+.type-icon.modification {
+    background: rgba(245,158,11,0.2);
+    color: #F59E0B;
+}
+
+.type-label {
+    display: block;
+    font-weight: 600;
+    color: #f6f7fb;
+    margin-bottom: 0.25rem;
+}
+
+.type-desc {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(246,247,251,0.5);
+}
+
+.form-select,
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #f6f7fb;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.form-select:focus,
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #0B2DFF;
+    background: rgba(11,45,255,0.05);
+}
+
+.form-textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.btn-secondary {
+    padding: 0.875rem 1.5rem;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    color: rgba(246,247,251,0.7);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.3);
+    color: #f6f7fb;
+}
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: #0B2DFF;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #0922cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(11,45,255,0.4);
+}
+
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: rgba(246,247,251,0.5);
+    margin-bottom: 0.5rem;
+}
+
+.breadcrumb a {
+    color: rgba(246,247,251,0.5);
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    color: #0B2DFF;
+}
+
+@media (max-width: 768px) {
+    .client-sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .client-main {
+        margin-left: 0;
+        max-width: 100%;
+        padding: 1rem;
+    }
+    
+    .request-type-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .btn-secondary,
+    .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
