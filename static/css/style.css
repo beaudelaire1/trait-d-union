@@ -148,6 +148,32 @@ select {
     transition: opacity 0.3s ease;
 }
 
+/* ============================================
+   FAQ Accordion (HTMX)
+   ============================================ */
+.faq-item .faq-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-item.open .faq-content {
+    max-height: 500px;
+}
+
+.faq-item .faq-icon {
+    transition: transform 0.3s ease;
+}
+
+.faq-item.open .faq-icon {
+    transform: rotate(180deg);
+}
+
+.faq-item.open {
+    border-color: rgba(11, 45, 255, 0.3);
+    background: rgba(255, 255, 255, 0.03);
+}
+
 .htmx-request::after {
     content: '';
     position: absolute;

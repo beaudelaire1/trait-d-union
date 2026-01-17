@@ -12,6 +12,15 @@
     <meta property="og:title" content="{% block og_title %}Trait d'Union Studio{% endblock %}">
     <meta property="og:description" content="{% block og_description %}Studio de design et développement web de luxe technologique.{% endblock %}">
     <meta property="og:image" content="{% block og_image %}{% static 'images/og-default.png' %}{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:site_name" content="Trait d'Union Studio">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Trait d'Union Studio{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Studio de design et développement web de luxe technologique.{% endblock %}">
+    <!-- Schema.org JSON-LD Structured Data -->
+    {% include 'partials/schema_org.html' %}
     <!-- Preload fonts for better LCP -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -221,6 +230,8 @@
         {% block content %}{% endblock %}
     </main>
     {% include 'partials/footer.html' %}
+    <!-- Alpine.js for micro-interactions -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <!-- HTMX with View Transitions support -->
     <script src="https://unpkg.com/htmx.org@2.0.0"></script>
     <script>
@@ -391,5 +402,8 @@
         counters.forEach(c => counterObserver.observe(c));
     </script>
     {% block extra_js %}{% endblock %}
+    
+    <!-- RGPD Cookie Consent Banner -->
+    {% include 'partials/cookie_consent.html' %}
 </body>
 </html>
