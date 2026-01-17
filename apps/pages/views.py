@@ -20,6 +20,11 @@ class HomeView(TemplateView):
         # TODO: replace by dynamic content or database entries
         context['services'] = [
             {
+                'title': 'Design Graphique',
+                'description': 'Logos, identités visuelles et supports print qui marquent les esprits.',
+                'icon': '🎨',
+            },
+            {
                 'title': 'Site vitrine',
                 'description': 'Présentez votre marque avec élégance et efficacité.',
                 'icon': '🌐',
