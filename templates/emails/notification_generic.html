@@ -5,26 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ headline }}</title>
     <style>
+        /* Charte Graphique TUS */
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: #07080A;
-            background-color: #F6F7FB;
+            background-color: #07080A;
             margin: 0;
             padding: 20px;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background-color: #ffffff;
-            border-radius: 12px;
+            background-color: #0D1016;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(246, 247, 251, 0.1);
         }
         .header {
-            background-color: #07080A;
-            padding: 30px;
+            background: linear-gradient(135deg, #07080A 0%, #0D1016 100%);
+            padding: 40px 30px;
             text-align: center;
+            border-bottom: 1px solid rgba(246, 247, 251, 0.1);
         }
         .header h1 {
             color: #F6F7FB;
@@ -34,7 +36,7 @@
             font-family: 'Space Grotesk', sans-serif;
         }
         .logo {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         .logo span {
             color: #F6F7FB;
@@ -43,58 +45,68 @@
             font-family: 'Space Grotesk', sans-serif;
             letter-spacing: -0.02em;
         }
+        .logo .highlight {
+            color: #0B2DFF;
+        }
         .content {
             padding: 40px 30px;
+            background-color: #0D1016;
         }
         .message {
             font-size: 16px;
-            color: #4a5568;
+            color: rgba(246, 247, 251, 0.7);
             margin-bottom: 30px;
         }
         .details {
-            background-color: #F6F7FB;
-            border-radius: 8px;
+            background-color: rgba(246, 247, 251, 0.03);
+            border: 1px solid rgba(246, 247, 251, 0.1);
+            border-radius: 12px;
             padding: 20px;
             margin-bottom: 30px;
         }
         .detail-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(246, 247, 251, 0.05);
         }
         .detail-item:last-child {
             border-bottom: none;
         }
         .detail-label {
             font-weight: 500;
-            color: #718096;
+            color: rgba(246, 247, 251, 0.5);
         }
         .detail-value {
             font-weight: 600;
-            color: #07080A;
+            color: #F6F7FB;
         }
         .cta-button {
             display: inline-block;
-            background-color: #0B2DFF;
+            background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%);
             color: #ffffff !important;
             text-decoration: none;
-            padding: 14px 28px;
-            border-radius: 8px;
+            padding: 16px 32px;
+            border-radius: 12px;
             font-weight: 600;
             text-align: center;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
         .cta-button:hover {
-            background-color: #0825cc;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(11, 45, 255, 0.3);
+        }
+        .cta-success {
+            background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%);
         }
         .footer {
             background-color: #07080A;
-            padding: 25px 30px;
+            padding: 30px;
             text-align: center;
+            border-top: 1px solid rgba(246, 247, 251, 0.1);
         }
         .footer p {
-            color: #a0aec0;
+            color: rgba(246, 247, 251, 0.4);
             margin: 5px 0;
             font-size: 13px;
         }
@@ -102,13 +114,16 @@
             color: #0B2DFF;
             text-decoration: none;
         }
+        .footer a:hover {
+            color: #22C55E;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <div class="logo">
-                <span>TRAIT D'UNION</span>
+                <span>TRAIT D'<span class="highlight">UNION</span></span>
             </div>
             <h1>{{ headline }}</h1>
         </div>

@@ -4,22 +4,27 @@
 {% block title %}Valider le devis - Trait d'Union Studio{% endblock %}
 
 {% block content %}
-<section class="min-h-screen bg-[#F6F7FB] flex items-center justify-center py-20">
-    <div class="max-w-md mx-auto px-6">
-        <div class="bg-white rounded-2xl shadow-xl p-8 text-center">
+<section class="min-h-screen bg-tus-black flex items-center justify-center py-20 relative overflow-hidden">
+    <!-- Background effects -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-tus-blue/15 rounded-full blur-[150px]"></div>
+    </div>
+    
+    <div class="max-w-md mx-auto px-6 relative z-10">
+        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 text-center">
             <!-- Lock Icon -->
-            <div class="w-16 h-16 bg-[#0B2DFF]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg class="w-8 h-8 text-[#0B2DFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="w-16 h-16 bg-tus-blue/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
             </div>
 
-            <h1 class="font-display text-2xl font-bold text-[#07080A] mb-2">
+            <h1 class="font-display text-2xl font-bold text-tus-white mb-2">
                 Validation du devis
             </h1>
             
-            <p class="text-gray-600 mb-6">
-                Devis <strong>{{ quote.number }}</strong><br>
+            <p class="text-tus-white/60 mb-6">
+                Devis <strong class="text-tus-white">{{ quote.number }}</strong><br>
                 Un code de vérification vous a été envoyé par email.
             </p>
 
@@ -34,23 +39,23 @@
                            inputmode="numeric"
                            autocomplete="one-time-code"
                            required
-                           class="w-full text-center text-2xl tracking-[0.5em] font-mono px-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0B2DFF] focus:border-transparent"
+                           class="w-full text-center text-2xl tracking-[0.5em] font-mono px-4 py-4 bg-tus-white/5 border border-tus-white/20 rounded-xl text-tus-white focus:ring-2 focus:ring-tus-blue focus:border-transparent"
                            placeholder="000000">
                 </div>
 
                 {% if messages %}
                     {% for message in messages %}
-                        <p class="text-red-600 text-sm">{{ message }}</p>
+                        <p class="text-red-400 text-sm">{{ message }}</p>
                     {% endfor %}
                 {% endif %}
 
                 <button type="submit" 
-                        class="w-full bg-[#0B2DFF] text-white py-3 px-6 rounded-xl font-semibold hover:bg-[#0922cc] transition-colors">
+                        class="w-full bg-tus-blue text-tus-white py-3 px-6 rounded-xl font-semibold hover:bg-tus-blue/90 transition-colors">
                     Valider le devis
                 </button>
             </form>
 
-            <p class="text-sm text-gray-500 mt-6">
+            <p class="text-sm text-tus-white/50 mt-6">
                 Code valide pendant {{ validation.ttl_minutes|default:15 }} minutes.
             </p>
         </div>

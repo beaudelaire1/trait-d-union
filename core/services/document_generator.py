@@ -83,12 +83,29 @@ class DocumentGenerator:
             except Exception:
                 pass
         
+        # Préparer les informations de signature si le devis est signé
+        signature_info = None
+        if quote.signed_at and quote.signature_audit_trail:
+            audit = quote.signature_audit_trail
+            signature_info = {
+                'signed_at': quote.signed_at,
+                'signer_name': audit.get('signer', {}).get('name', 'N/A'),
+                'signer_email': audit.get('signer', {}).get('email', 'N/A'),
+                'ip_address': audit.get('technical', {}).get('ip_address', 'N/A'),
+                'user_agent': audit.get('technical', {}).get('user_agent', 'N/A'),
+                'signature_hash': audit.get('technical', {}).get('signature_hash', 'N/A')[:16] + '...' if audit.get('technical', {}).get('signature_hash') else 'N/A',
+                'integrity_hash': audit.get('integrity_hash', 'N/A')[:16] + '...' if audit.get('integrity_hash') else 'N/A',
+                'legal_statement': audit.get('legal', {}).get('statement', ''),
+                'has_signature_image': bool(quote.signature_image),
+            }
+        
         # Préparer le contexte
         context = {
             'quote': quote,
             'branding': branding,
             'items': list(quote.quote_items.all()) if hasattr(quote, 'quote_items') else [],
             'amount_in_letters': quote.amount_letter() if hasattr(quote, 'amount_letter') else None,
+            'signature_info': signature_info,
         }
         
         # Render le template

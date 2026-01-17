@@ -4,12 +4,16 @@
    ============================================ */
 
 :root {
-    /* Couleurs officielles */
+    /* Couleurs officielles - Charte Graphique TUS */
     --tus-black: #07080A;
     --tus-white: #F6F7FB;
     --tus-blue: #0B2DFF;
+    --tus-green: #22C55E;
+    --tus-green-light: #4ADE80;
     --surface-dark: #0D1016;
     --stroke-dark: rgba(246,247,251,0.10);
+    --tus-gray: #6B7280;
+    --tus-red: #DC2626;
 }
 
 /* ============================================

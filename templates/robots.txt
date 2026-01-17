@@ -5,10 +5,20 @@ User-agent: *
 Allow: /
 
 # Bloquer l'accès à l'administration
-Disallow: /admin/
+Disallow: /tus-gestion-secure/
 
 # Bloquer les fichiers médias privés
+Disallow: /media/devis/
+Disallow: /media/factures/
 Disallow: /media/leads/
+
+# Bloquer l'espace client (authentification requise)
+Disallow: /espace-client/
+Disallow: /accounts/
+
+# Crawl-delay pour éviter la surcharge
+Crawl-delay: 1
 
 # Sitemap
 Sitemap: https://traitdunion.it/sitemap.xml
+

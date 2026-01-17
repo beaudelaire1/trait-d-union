@@ -4,65 +4,72 @@
 {% block title %}Demande de devis - Trait d'Union Studio{% endblock %}
 
 {% block content %}
-<section class="min-h-screen bg-[#F6F7FB] py-20">
-    <div class="max-w-3xl mx-auto px-6">
+<section class="min-h-screen bg-tus-black py-20 relative overflow-hidden">
+    <!-- Background effects -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-tus-blue/15 to-tus-green/10 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-tus-green/10 to-tus-blue/10 rounded-full blur-[120px]"></div>
+    </div>
+    
+    <div class="max-w-3xl mx-auto px-6 relative z-10">
         <!-- Header -->
         <div class="text-center mb-12">
-            <h1 class="font-display text-4xl md:text-5xl font-bold text-[#07080A] mb-4">
-                Demander un devis
+            <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue text-sm font-medium mb-6">Devis gratuit</span>
+            <h1 class="font-display text-4xl md:text-5xl font-bold text-tus-white mb-4">
+                Demander un <span class="text-tus-blue">devis</span>
             </h1>
-            <p class="text-gray-600 text-lg max-w-xl mx-auto">
+            <p class="text-tus-white/70 text-lg max-w-xl mx-auto">
                 Décrivez votre projet et recevez une estimation personnalisée sous 24h.
             </p>
         </div>
 
         <!-- Form Card -->
-        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-12">
+        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 md:p-12">
             <form method="post" enctype="multipart/form-data" class="space-y-6">
                 {% csrf_token %}
                 
                 <!-- Contact Info -->
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <label for="id_client_name" class="block text-sm font-semibold text-[#07080A] mb-2">
+                        <label for="id_client_name" class="block text-sm font-semibold text-tus-white mb-2">
                             Nom complet *
                         </label>
                         <input type="text" name="client_name" id="id_client_name" required
-                               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0B2DFF] focus:border-transparent transition-all"
+                               class="w-full px-4 py-3 bg-tus-white/5 border border-tus-white/10 rounded-xl text-tus-white placeholder-tus-white/40 focus:ring-2 focus:ring-tus-blue focus:border-transparent transition-all"
                                placeholder="Jean Dupont">
                     </div>
                     <div>
-                        <label for="id_email" class="block text-sm font-semibold text-[#07080A] mb-2">
+                        <label for="id_email" class="block text-sm font-semibold text-tus-white mb-2">
                             Email *
                         </label>
                         <input type="email" name="email" id="id_email" required
-                               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0B2DFF] focus:border-transparent transition-all"
+                               class="w-full px-4 py-3 bg-tus-white/5 border border-tus-white/10 rounded-xl text-tus-white placeholder-tus-white/40 focus:ring-2 focus:ring-tus-blue focus:border-transparent transition-all"
                                placeholder="jean@exemple.com">
                     </div>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6">
                     <div>
-                        <label for="id_phone" class="block text-sm font-semibold text-[#07080A] mb-2">
+                        <label for="id_phone" class="block text-sm font-semibold text-tus-white mb-2">
                             Téléphone *
                         </label>
                         <input type="tel" name="phone" id="id_phone" required
-                               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0B2DFF] focus:border-transparent transition-all"
+                               class="w-full px-4 py-3 bg-tus-white/5 border border-tus-white/10 rounded-xl text-tus-white placeholder-tus-white/40 focus:ring-2 focus:ring-tus-blue focus:border-transparent transition-all"
                                placeholder="0694 12 34 56">
                     </div>
                     <div>
-                        <label for="id_address" class="block text-sm font-semibold text-[#07080A] mb-2">
+                        <label for="id_address" class="block text-sm font-semibold text-tus-white mb-2">
                             Adresse
                         </label>
                         <input type="text" name="address" id="id_address"
-                               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0B2DFF] focus:border-transparent transition-all"
+                               class="w-full px-4 py-3 bg-tus-white/5 border border-tus-white/10 rounded-xl text-tus-white placeholder-tus-white/40 focus:ring-2 focus:ring-tus-blue focus:border-transparent transition-all"
                                placeholder="Votre adresse">
                     </div>
                 </div>
 
                 <!-- Service Selection -->
                 <div>
-                    <label for="id_service" class="block text-sm font-semibold text-[#07080A] mb-2">
+                    <label for="id_service" class="block text-sm font-semibold text-tus-white mb-2">
                         Service souhaité
                     </label>
                     {{ form.service }}
@@ -70,49 +77,49 @@
 
                 <!-- Date -->
                 <div>
-                    <label for="id_preferred_date" class="block text-sm font-semibold text-[#07080A] mb-2">
+                    <label for="id_preferred_date" class="block text-sm font-semibold text-tus-white mb-2">
                         Date souhaitée (optionnel)
                     </label>
                     <input type="date" name="preferred_date" id="id_preferred_date"
-                           class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0B2DFF] focus:border-transparent transition-all">
+                           class="w-full px-4 py-3 bg-tus-white/5 border border-tus-white/10 rounded-xl text-tus-white focus:ring-2 focus:ring-tus-blue focus:border-transparent transition-all">
                 </div>
 
                 <!-- Message -->
                 <div>
-                    <label for="id_message" class="block text-sm font-semibold text-[#07080A] mb-2">
+                    <label for="id_message" class="block text-sm font-semibold text-tus-white mb-2">
                         Décrivez votre projet *
                     </label>
                     <textarea name="message" id="id_message" rows="5" required
-                              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#0B2DFF] focus:border-transparent transition-all resize-none"
+                              class="w-full px-4 py-3 bg-tus-white/5 border border-tus-white/10 rounded-xl text-tus-white placeholder-tus-white/40 focus:ring-2 focus:ring-tus-blue focus:border-transparent transition-all resize-none"
                               placeholder="Décrivez votre projet en détail : objectifs, délais, budget estimé..."></textarea>
                 </div>
 
                 <!-- Photos Upload -->
                 <div>
-                    <label class="block text-sm font-semibold text-[#07080A] mb-2">
+                    <label class="block text-sm font-semibold text-tus-white mb-2">
                         Documents / Photos (optionnel)
                     </label>
-                    <div class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-[#0B2DFF] transition-colors">
+                    <div class="border-2 border-dashed border-tus-white/20 rounded-xl p-6 text-center hover:border-tus-blue transition-colors">
                         <input type="file" name="photos" id="id_photos" multiple accept="image/*,.pdf"
                                class="hidden" onchange="updateFileLabel(this)">
                         <label for="id_photos" class="cursor-pointer">
-                            <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-12 h-12 mx-auto text-tus-white/40 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                             </svg>
-                            <span id="file-label" class="text-gray-600">Cliquez pour ajouter des fichiers</span>
+                            <span id="file-label" class="text-tus-white/60">Cliquez pour ajouter des fichiers</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Submit -->
                 <button type="submit" 
-                        class="w-full bg-[#0B2DFF] text-white py-4 px-8 rounded-xl font-semibold text-lg hover:bg-[#0922cc] transition-colors shadow-lg shadow-[#0B2DFF]/25">
+                        class="w-full bg-tus-blue text-tus-white py-4 px-8 rounded-xl font-semibold text-lg hover:bg-tus-blue/90 transition-colors shadow-lg shadow-tus-blue/25">
                     Envoyer ma demande
                 </button>
 
-                <p class="text-center text-sm text-gray-500">
+                <p class="text-center text-sm text-tus-white/50">
                     En soumettant ce formulaire, vous acceptez notre 
-                    <a href="{% url 'pages:legal' %}" class="text-[#0B2DFF] hover:underline">politique de confidentialité</a>.
+                    <a href="{% url 'pages:legal' %}" class="text-tus-blue hover:underline">politique de confidentialité</a>.
                 </p>
             </form>
         </div>

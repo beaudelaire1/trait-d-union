@@ -1,0 +1,101 @@
+{% comment %}
+Schema.org JSON-LD structured data for SEO
+Include in base.html within <head> tag
+{% endcomment %}
+
+{% load static %}
+
+{# Organization Schema - Site-wide #}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization",
+    "name": "Trait d'Union Studio",
+    "alternateName": "TUS",
+    "url": "{{ request.scheme }}://{{ request.get_host }}",
+    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo-tus.svg' %}",
+    "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.png' %}",
+    "description": "Agence web premium en Guyane et Outre-mer. Création de sites vitrines, e-commerce et plateformes sur-mesure avec design haut de gamme.",
+    "telephone": "+594 694 00 00 00",
+    "email": "contact@traitdunion.it",
+    "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Cayenne",
+        "addressLocality": "Cayenne",
+        "postalCode": "97300",
+        "addressRegion": "Guyane",
+        "addressCountry": "FR"
+    },
+    "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 4.9372,
+        "longitude": -52.3260
+    },
+    "areaServed": [
+        {
+            "@type": "AdministrativeArea",
+            "name": "Guyane française"
+        },
+        {
+            "@type": "AdministrativeArea", 
+            "name": "Martinique"
+        },
+        {
+            "@type": "AdministrativeArea",
+            "name": "Guadeloupe"
+        },
+        {
+            "@type": "Country",
+            "name": "France"
+        }
+    ],
+    "priceRange": "€€€",
+    "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "09:00",
+        "closes": "18:00"
+    },
+    "sameAs": [
+        "https://www.linkedin.com/company/traitdunion-studio",
+        "https://www.instagram.com/traitdunion.studio"
+    ],
+    "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Services Web Premium",
+        "itemListElement": [
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Site Vitrine",
+                    "description": "Création de sites vitrines élégants et performants"
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "E-commerce",
+                    "description": "Boutiques en ligne optimisées pour la conversion"
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Plateforme / Mini-ERP",
+                    "description": "Applications métier sur mesure"
+                }
+            }
+        ]
+    }
+}
+</script>
+
+{# BreadcrumbList Schema #}
+{% block schema_breadcrumb %}{% endblock %}
+
+{# Page-specific Schema #}
+{% block schema_page %}{% endblock %}

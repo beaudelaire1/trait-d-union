@@ -4,32 +4,37 @@
 {% block title %}Devis expiré - Trait d'Union Studio{% endblock %}
 
 {% block content %}
-<section class="min-h-screen bg-[#F6F7FB] flex items-center justify-center py-20">
-    <div class="max-w-xl mx-auto px-6 text-center">
+<section class="min-h-screen bg-tus-black flex items-center justify-center py-20 relative overflow-hidden">
+    <!-- Background effects -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amber-500/10 rounded-full blur-[150px]"></div>
+    </div>
+    
+    <div class="max-w-xl mx-auto px-6 text-center relative z-10">
         <!-- Warning Icon -->
-        <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-8">
-            <svg class="w-10 h-10 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-8">
+            <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
             </svg>
         </div>
 
-        <h1 class="font-display text-4xl font-bold text-[#07080A] mb-4">
-            Devis expiré
+        <h1 class="font-display text-4xl font-bold text-tus-white mb-4">
+            Devis <span class="text-amber-500">expiré</span>
         </h1>
         
-        <p class="text-gray-600 text-lg mb-8">
-            Le devis <strong>{{ quote.number }}</strong> n'est plus valide.
+        <p class="text-tus-white/70 text-lg mb-8">
+            Le devis <strong class="text-tus-white">{{ quote.number }}</strong> n'est plus valide.
             {% if quote.valid_until %}
             <br>Il a expiré le {{ quote.valid_until|date:"d/m/Y" }}.
             {% endif %}
         </p>
 
-        <div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
-            <p class="text-gray-700 mb-4">
+        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-6 mb-8">
+            <p class="text-tus-white/70 mb-4">
                 Vous souhaitez un nouveau devis ? Contactez-nous pour obtenir une proposition actualisée.
             </p>
             <div class="flex flex-col gap-3 text-sm">
-                <a href="mailto:contact@traitdunion.it" class="flex items-center justify-center gap-2 text-blue-600 hover:text-blue-800">
+                <a href="mailto:contact@traitdunion.it" class="flex items-center justify-center gap-2 text-tus-blue hover:text-tus-blue/80 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
@@ -40,14 +45,14 @@
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="{% url 'devis:request_quote' %}" 
-               class="inline-flex items-center justify-center gap-2 bg-[#07080A] text-white py-3 px-6 rounded-xl font-semibold hover:bg-gray-800 transition-colors">
+               class="inline-flex items-center justify-center gap-2 bg-tus-blue text-tus-white py-3 px-6 rounded-xl font-semibold hover:bg-tus-blue/90 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
                 Demander un nouveau devis
             </a>
             <a href="{% url 'pages:home' %}" 
-               class="inline-flex items-center justify-center gap-2 border-2 border-[#07080A] text-[#07080A] py-3 px-6 rounded-xl font-semibold hover:bg-[#07080A] hover:text-white transition-colors">
+               class="inline-flex items-center justify-center gap-2 border border-tus-white/20 text-tus-white py-3 px-6 rounded-xl font-semibold hover:bg-tus-white/5 transition-colors">
                 Retour à l'accueil
             </a>
         </div>

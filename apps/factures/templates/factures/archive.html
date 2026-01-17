@@ -4,18 +4,23 @@
 {% block title %}Archive des factures - Trait d'Union Studio{% endblock %}
 
 {% block content %}
-<section class="min-h-screen bg-[#F6F7FB] py-20">
-    <div class="max-w-6xl mx-auto px-6">
+<section class="min-h-screen bg-tus-black py-20 relative overflow-hidden">
+    <!-- Background effects -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-tus-blue/15 to-tus-green/10 rounded-full blur-[150px]"></div>
+    </div>
+    
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
         <!-- Header -->
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h1 class="font-display text-3xl font-bold text-[#07080A]">
-                    Archive des factures
+                <h1 class="font-display text-3xl font-bold text-tus-white">
+                    Archive des <span class="text-tus-blue">factures</span>
                 </h1>
-                <p class="text-gray-600 mt-1">{{ invoices.count }} facture{{ invoices.count|pluralize }}</p>
+                <p class="text-tus-white/60 mt-1">{{ invoices.count }} facture{{ invoices.count|pluralize }}</p>
             </div>
             <a href="/tus-gestion-secure/factures/invoice/" 
-               class="inline-flex items-center gap-2 bg-[#0B2DFF] text-white py-2 px-4 rounded-lg font-medium hover:bg-[#0922cc] transition-colors">
+               class="inline-flex items-center gap-2 bg-tus-blue text-tus-white py-2 px-4 rounded-lg font-medium hover:bg-tus-blue/90 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                 </svg>
@@ -24,54 +29,54 @@
         </div>
 
         <!-- Table -->
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl overflow-hidden">
             {% if invoices %}
             <div class="overflow-x-auto">
                 <table class="w-full">
-                    <thead class="bg-[#07080A] text-white">
+                    <thead class="bg-tus-black border-b border-tus-white/10">
                         <tr>
-                            <th class="px-6 py-4 text-left text-sm font-semibold">Numéro</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold">Date</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold">Client</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold">Montant TTC</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold">Statut</th>
-                            <th class="px-6 py-4 text-right text-sm font-semibold">Actions</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-tus-white">Numéro</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-tus-white">Date</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-tus-white">Client</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-tus-white">Montant TTC</th>
+                            <th class="px-6 py-4 text-left text-sm font-semibold text-tus-white">Statut</th>
+                            <th class="px-6 py-4 text-right text-sm font-semibold text-tus-white">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-tus-white/5">
                         {% for invoice in invoices %}
-                        <tr class="hover:bg-gray-50 transition-colors">
+                        <tr class="hover:bg-tus-white/5 transition-colors">
                             <td class="px-6 py-4">
-                                <span class="font-mono font-medium text-[#07080A]">{{ invoice.number }}</span>
+                                <span class="font-mono font-medium text-tus-white">{{ invoice.number }}</span>
                             </td>
-                            <td class="px-6 py-4 text-gray-600">
+                            <td class="px-6 py-4 text-tus-white/60">
                                 {{ invoice.issue_date|date:"d/m/Y" }}
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 text-tus-white/80">
                                 {% if invoice.quote and invoice.quote.client %}
                                     {{ invoice.quote.client.full_name }}
                                 {% else %}
-                                    <span class="text-gray-400">—</span>
+                                    <span class="text-tus-white/40">—</span>
                                 {% endif %}
                             </td>
-                            <td class="px-6 py-4 font-semibold text-[#07080A]">
+                            <td class="px-6 py-4 font-semibold text-tus-white">
                                 {{ invoice.total_ttc|floatformat:2 }} €
                             </td>
                             <td class="px-6 py-4">
                                 {% if invoice.status == 'paid' %}
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-tus-green/20 text-tus-green">
                                         Payée
                                     </span>
                                 {% elif invoice.status == 'sent' %}
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-tus-blue/20 text-tus-blue">
                                         Envoyée
                                     </span>
                                 {% elif invoice.status == 'overdue' %}
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400">
                                         En retard
                                     </span>
                                 {% else %}
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-tus-white/10 text-tus-white/60">
                                         {{ invoice.get_status_display }}
                                     </span>
                                 {% endif %}
@@ -79,14 +84,14 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{% url 'factures:download' pk=invoice.pk %}" 
-                                       class="p-2 text-gray-600 hover:text-[#0B2DFF] hover:bg-[#0B2DFF]/10 rounded-lg transition-colors"
+                                       class="p-2 text-tus-white/60 hover:text-tus-blue hover:bg-tus-blue/10 rounded-lg transition-colors"
                                        title="Télécharger PDF">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
                                     </a>
                                     <a href="/tus-gestion-secure/factures/invoice/{{ invoice.pk }}/change/" 
-                                       class="p-2 text-gray-600 hover:text-[#07080A] hover:bg-gray-100 rounded-lg transition-colors"
+                                       class="p-2 text-tus-white/60 hover:text-tus-white hover:bg-tus-white/10 rounded-lg transition-colors"
                                        title="Modifier">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -101,12 +106,12 @@
             </div>
             {% else %}
             <div class="py-16 text-center">
-                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-16 h-16 text-tus-white/30 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
-                <p class="text-gray-500 text-lg">Aucune facture pour l'instant</p>
+                <p class="text-tus-white/50 text-lg">Aucune facture pour l'instant</p>
                 <a href="/tus-gestion-secure/factures/invoice/add/" 
-                   class="inline-flex items-center gap-2 mt-4 text-[#0B2DFF] font-medium hover:underline">
+                   class="inline-flex items-center gap-2 mt-4 text-tus-blue font-medium hover:underline">
                     Créer votre première facture
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>

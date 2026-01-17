@@ -37,6 +37,20 @@ SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
+# Headers de sécurité supplémentaires
+SECURE_CONTENT_TYPE_NOSNIFF = True  # X-Content-Type-Options: nosniff
+SECURE_BROWSER_XSS_FILTER = True  # X-XSS-Protection (navigateurs anciens)
+X_FRAME_OPTIONS = 'DENY'  # Protection clickjacking
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# Permissions Policy (anciennement Feature-Policy)
+PERMISSIONS_POLICY = {
+    'geolocation': [],
+    'microphone': [],
+    'camera': [],
+    'payment': ['self'],
+}
+
 # ==============================================================================
 # DATABASE (PostgreSQL via Render)
 # ==============================================================================

@@ -1,0 +1,89 @@
+/* Fichier source Tailwind CSS pour la purge en production */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========================================
+   TRAIT D'UNION STUDIO - Styles Custom
+   Import depuis le fichier style.css existant
+   ======================================== */
+
+/* Variables CSS personnalisées */
+@layer base {
+  :root {
+    --tus-black: #07080A;
+    --tus-white: #F6F7FB;
+    --tus-blue: #0B2DFF;
+    --surface-dark: #0D1016;
+    --stroke-dark: rgba(246,247,251,0.10);
+  }
+}
+
+/* Classes utilitaires custom */
+@layer utilities {
+  .text-gradient-blue {
+    background: linear-gradient(135deg, var(--tus-blue) 0%, #4F6FFF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-surface-dark {
+    background-color: var(--surface-dark);
+  }
+
+  .border-stroke-dark {
+    border-color: var(--stroke-dark);
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(7, 8, 10, 0.85);
+    border: 1px solid var(--stroke-dark);
+  }
+
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(11, 45, 255, 0.3);
+  }
+
+  .glow-blue-strong {
+    box-shadow: 0 0 40px rgba(11, 45, 255, 0.6);
+  }
+}
+
+/* Components custom */
+@layer components {
+  .btn-premium {
+    @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase tracking-wider;
+    @apply bg-tus-blue text-tus-white rounded-full;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:shadow-[0_0_30px_rgba(11,45,255,0.5)] hover:-translate-y-0.5;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center px-8 py-4 text-sm font-semibold uppercase tracking-wider;
+    @apply bg-transparent text-tus-white rounded-full;
+    @apply border border-stroke-dark;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:border-tus-blue hover:text-tus-blue;
+  }
+
+  .card-premium {
+    @apply bg-surface-dark border border-stroke-dark rounded-2xl p-8;
+    @apply transition-all duration-500 ease-out;
+    @apply hover:border-tus-blue/30 hover:shadow-[0_0_30px_rgba(11,45,255,0.1)];
+  }
+
+  .section-title {
+    @apply text-4xl md:text-5xl lg:text-6xl font-display font-bold text-tus-white;
+    @apply leading-tight tracking-tight;
+  }
+
+  .input-premium {
+    @apply w-full px-6 py-4 bg-surface-dark border border-stroke-dark rounded-xl;
+    @apply text-tus-white placeholder:text-tus-white/40;
+    @apply focus:outline-none focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/20;
+    @apply transition-all duration-300;
+  }
+}

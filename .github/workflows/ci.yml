@@ -1,0 +1,247 @@
+# ==============================================================================
+# GitHub Actions - CI/CD Pipeline pour Trait d'Union Studio
+# ==============================================================================
+# Ce workflow exécute les tests automatiquement avant chaque déploiement
+# sur Render.com via la connexion GitHub native.
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # Permet le déclenchement manuel
+
+env:
+  PYTHON_VERSION: '3.12'
+  DJANGO_SETTINGS_MODULE: 'config.settings.test'
+
+jobs:
+  # ============================================================================
+  # LINT & FORMAT CHECK
+  # ============================================================================
+  lint:
+    name: 🔍 Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-lint-${{ hashFiles('requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-lint-
+
+      - name: Install linting tools
+        run: |
+          pip install --upgrade pip
+          pip install ruff black isort
+
+      - name: Run Ruff (linting)
+        run: ruff check . --output-format=github
+        continue-on-error: true
+
+      - name: Check code formatting with Black
+        run: black --check --diff .
+        continue-on-error: true
+
+      - name: Check import sorting with isort
+        run: isort --check-only --diff .
+        continue-on-error: true
+
+  # ============================================================================
+  # SECURITY AUDIT
+  # ============================================================================
+  security:
+    name: 🔒 Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install safety bandit
+
+      - name: Check for known vulnerabilities
+        run: safety check -r requirements.txt --full-report
+        continue-on-error: true
+
+      - name: Run Bandit security linter
+        run: bandit -r apps/ core/ config/ -ll
+        continue-on-error: true
+
+  # ============================================================================
+  # TESTS DJANGO
+  # ============================================================================
+  test:
+    name: 🧪 Django Tests
+    runs-on: ubuntu-latest
+    needs: [lint]  # Attendre le lint avant les tests
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install system dependencies (WeasyPrint)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libpango-1.0-0 \
+            libpangocairo-1.0-0 \
+            libcairo2 \
+            libgdk-pixbuf2.0-0 \
+            libffi-dev \
+            shared-mime-info \
+            fonts-liberation
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-django pytest-cov
+
+      - name: Run Django checks
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
+          DJANGO_SECRET_KEY: test-secret-key-for-ci
+          DJANGO_SETTINGS_MODULE: config.settings.test
+        run: python manage.py check
+
+      - name: Run migrations check
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
+          DJANGO_SECRET_KEY: test-secret-key-for-ci
+          DJANGO_SETTINGS_MODULE: config.settings.test
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Run tests with pytest
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
+          REDIS_URL: redis://localhost:6379/0
+          DJANGO_SECRET_KEY: test-secret-key-for-ci
+          DJANGO_SETTINGS_MODULE: config.settings.test
+        run: |
+          pytest --cov=apps --cov-report=xml --cov-report=term-missing -v
+
+      - name: Upload coverage report
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  # ============================================================================
+  # BUILD DOCKER (Validation)
+  # ============================================================================
+  build:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    needs: [test]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (validation)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: traitdunion-studio:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================================================
+  # LIGHTHOUSE AUDIT (sur PR uniquement)
+  # ============================================================================
+  lighthouse:
+    name: 🌟 Lighthouse Audit
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          configPath: './.lighthouserc.json'
+          uploadArtifacts: true
+        continue-on-error: true
+
+  # ============================================================================
+  # DEPLOY NOTIFICATION
+  # ============================================================================
+  deploy-ready:
+    name: ✅ Ready for Deploy
+    runs-on: ubuntu-latest
+    needs: [test, build, security]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Deployment status
+        run: |
+          echo "✅ All checks passed!"
+          echo "🚀 Render will automatically deploy from main branch"
+          echo "📊 Visit https://dashboard.render.com to monitor deployment"

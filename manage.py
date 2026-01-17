@@ -2,6 +2,16 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import warnings
+
+# Supprimer les warnings GLib/GTK (WeasyPrint sur Windows)
+os.environ['G_MESSAGES_DEBUG'] = ''
+os.environ['GIO_EXTRA_MODULES'] = ''
+os.environ['GDK_BACKEND'] = 'win32'
+
+# Filtrer les warnings Python
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings('ignore', message='.*GLib.*')
 
 
 def main() -> None:

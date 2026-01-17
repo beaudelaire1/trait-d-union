@@ -4,44 +4,49 @@
 {% block title %}Paiement confirmé - Trait d'Union Studio{% endblock %}
 
 {% block content %}
-<section class="min-h-screen bg-[#F6F7FB] flex items-center justify-center py-20">
-    <div class="max-w-xl mx-auto px-6 text-center">
+<section class="min-h-screen bg-tus-black flex items-center justify-center py-20 relative overflow-hidden">
+    <!-- Background effects -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-tus-green/15 rounded-full blur-[150px]"></div>
+    </div>
+
+    <div class="max-w-xl mx-auto px-6 text-center relative z-10">
         <!-- Success Icon with animation -->
         <div class="relative w-24 h-24 mx-auto mb-8">
-            <div class="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-25"></div>
-            <div class="relative w-24 h-24 bg-green-100 rounded-full flex items-center justify-center">
-                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="absolute inset-0 bg-tus-green/20 rounded-full animate-ping opacity-25"></div>
+            <div class="relative w-24 h-24 bg-tus-green/20 rounded-full flex items-center justify-center">
+                <svg class="w-12 h-12 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
         </div>
 
-        <h1 class="font-display text-4xl font-bold text-[#07080A] mb-4">
-            Paiement réussi !
+        <h1 class="font-display text-4xl font-bold text-tus-white mb-4">
+            Paiement <span class="text-tus-green">réussi !</span>
         </h1>
         
-        <p class="text-gray-600 text-lg mb-8">
+        <p class="text-tus-white/60 text-lg mb-8">
             {% if invoice %}
-            Votre paiement pour la facture <strong>{{ invoice.number }}</strong> a été reçu.
+            Votre paiement pour la facture <strong class="text-tus-white">{{ invoice.number }}</strong> a été reçu.
             {% else %}
             Votre paiement a bien été enregistré.
             {% endif %}
         </p>
 
         {% if invoice %}
-        <div class="bg-white rounded-2xl p-6 shadow-lg mb-8">
+        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-6 mb-8">
             <div class="space-y-4">
-                <div class="flex justify-between items-center pb-4 border-b">
-                    <span class="text-gray-600">Facture n°</span>
-                    <span class="font-semibold text-[#07080A]">{{ invoice.number }}</span>
+                <div class="flex justify-between items-center pb-4 border-b border-tus-white/10">
+                    <span class="text-tus-white/60">Facture n°</span>
+                    <span class="font-semibold text-tus-white">{{ invoice.number }}</span>
                 </div>
-                <div class="flex justify-between items-center pb-4 border-b">
-                    <span class="text-gray-600">Montant</span>
-                    <span class="font-display text-xl font-bold text-[#07080A]">{{ invoice.total_ttc|floatformat:2 }} €</span>
+                <div class="flex justify-between items-center pb-4 border-b border-tus-white/10">
+                    <span class="text-tus-white/60">Montant</span>
+                    <span class="font-display text-xl font-bold text-tus-white">{{ invoice.total_ttc|floatformat:2 }} €</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-gray-600">Statut</span>
-                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                    <span class="text-tus-white/60">Statut</span>
+                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-tus-green/20 text-tus-green rounded-full text-sm font-medium">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
@@ -53,14 +58,14 @@
         {% endif %}
 
         <!-- Confirmation -->
-        <div class="bg-blue-50 rounded-2xl p-6 mb-8 text-left">
-            <h3 class="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+        <div class="bg-tus-blue/10 border border-tus-blue/30 rounded-2xl p-6 mb-8 text-left">
+            <h3 class="font-semibold text-tus-blue mb-3 flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
                 Confirmation par email
             </h3>
-            <p class="text-blue-800 text-sm">
+            <p class="text-tus-white/70 text-sm">
                 Un email de confirmation vous a été envoyé avec le reçu de paiement.
             </p>
         </div>
@@ -69,7 +74,7 @@
             {% if invoice %}
             <a href="{% url 'factures:public_pdf' token=invoice.public_token %}" 
                target="_blank"
-               class="inline-flex items-center justify-center gap-2 bg-[#07080A] text-white py-3 px-6 rounded-xl font-semibold hover:bg-gray-800 transition-colors">
+               class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-tus-blue to-tus-blue/80 text-tus-white py-3 px-6 rounded-xl font-semibold hover:from-tus-blue/90 hover:to-tus-blue/70 transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
@@ -77,15 +82,15 @@
             </a>
             {% endif %}
             <a href="{% url 'pages:home' %}" 
-               class="inline-flex items-center justify-center gap-2 border-2 border-[#07080A] text-[#07080A] py-3 px-6 rounded-xl font-semibold hover:bg-[#07080A] hover:text-white transition-colors">
+               class="inline-flex items-center justify-center gap-2 border-2 border-tus-white/20 text-tus-white py-3 px-6 rounded-xl font-semibold hover:bg-tus-white/10 transition-colors">
                 Retour à l'accueil
             </a>
         </div>
 
         <!-- Contact -->
-        <p class="mt-8 text-gray-500 text-sm">
+        <p class="mt-8 text-tus-white/40 text-sm">
             Une question ? Contactez-nous à 
-            <a href="mailto:contact@traitdunion.it" class="text-blue-600 hover:underline">contact@traitdunion.it</a>
+            <a href="mailto:contact@traitdunion.it" class="text-tus-blue hover:underline">contact@traitdunion.it</a>
         </p>
     </div>
 </section>

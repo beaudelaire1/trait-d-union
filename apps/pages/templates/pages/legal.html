@@ -87,14 +87,52 @@
             </section>
 
             <!-- Cookies -->
-            <section class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8">
+            <section id="cookies" class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 scroll-mt-24">
                 <h2 class="text-2xl font-display font-bold mb-4 flex items-center gap-3">
                     <span class="w-8 h-8 rounded-lg bg-tus-blue/20 flex items-center justify-center text-tus-blue text-sm">6</span>
-                    Cookies
+                    Politique des Cookies
                 </h2>
-                <p class="text-tus-white/70">
-                    Ce site utilise des cookies techniques nécessaires à son bon fonctionnement. Aucun cookie publicitaire ou de tracking n'est utilisé. En naviguant sur ce site, vous acceptez l'utilisation de ces cookies essentiels.
-                </p>
+                
+                <div class="space-y-6 text-tus-white/70">
+                    <p>
+                        Conformément à la réglementation européenne (RGPD) et à la directive ePrivacy, nous vous informons de l'utilisation de cookies sur ce site.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-display font-semibold text-tus-white">🔒 Cookies essentiels (obligatoires)</h3>
+                        <p>
+                            Ces cookies sont indispensables au fonctionnement du site. Ils permettent d'assurer la sécurité, de gérer votre session et de mémoriser vos préférences de consentement.
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 ml-4">
+                            <li><code class="text-tus-blue">csrftoken</code> : Protection contre les attaques CSRF (sécurité)</li>
+                            <li><code class="text-tus-blue">sessionid</code> : Gestion de votre session utilisateur</li>
+                            <li><code class="text-tus-blue">tus_cookie_consent</code> : Mémorisation de vos préférences cookies</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-display font-semibold text-tus-white">📊 Cookies analytiques (optionnels)</h3>
+                        <p>
+                            Ces cookies nous permettent de mesurer l'audience du site et d'analyser son utilisation pour améliorer nos services. Vous pouvez les accepter ou les refuser.
+                        </p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-display font-semibold text-tus-white">📣 Cookies marketing</h3>
+                        <p>
+                            <strong class="text-tus-green">Nous n'utilisons aucun cookie publicitaire ou de tracking tiers.</strong> Votre vie privée est notre priorité.
+                        </p>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-tus-blue/10 rounded-xl border border-tus-blue/20">
+                        <p class="text-sm">
+                            Vous pouvez modifier vos préférences à tout moment en cliquant sur le bouton ci-dessous ou via le lien "Gérer les cookies" dans le pied de page.
+                        </p>
+                        <button onclick="openCookieSettings()" class="mt-3 px-4 py-2 bg-tus-blue hover:bg-tus-blue/90 text-white text-sm font-medium rounded-lg transition-colors">
+                            🍪 Gérer mes préférences cookies
+                        </button>
+                    </div>
+                </div>
             </section>
         </div>
 

@@ -1,0 +1,176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devis {{ quote.number }} - Trait d'Union Studio</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background-color: #07080A; -webkit-font-smoothing: antialiased;">
+    
+    <!-- Container principal -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #07080A;">
+        <tr>
+            <td style="padding: 40px 20px;">
+                
+                <!-- Card principale -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background: linear-gradient(135deg, #0f1114 0%, #1a1d24 100%); border-radius: 16px; border: 1px solid rgba(246, 247, 251, 0.1); overflow: hidden;">
+                    
+                    <!-- Header avec barre verte -->
+                    <tr>
+                        <td style="height: 4px; background: linear-gradient(90deg, #22C55E 0%, #4ADE80 50%, #22C55E 100%);"></td>
+                    </tr>
+                    
+                    <!-- Logo -->
+                    <tr>
+                        <td style="padding: 40px 40px 24px 40px; text-align: center;">
+                            <h1 style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 4px; color: #F6F7FB;">
+                                TRAIT D<span style="color: #22C55E;">'</span>UNION
+                            </h1>
+                            <p style="margin: 8px 0 0 0; font-size: 11px; letter-spacing: 3px; color: rgba(246, 247, 251, 0.5); text-transform: uppercase;">Studio</p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Titre -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px; text-align: center;">
+                            <h2 style="margin: 0; font-size: 22px; font-weight: 600; color: #22C55E;">
+                                📄 Nouveau Devis
+                            </h2>
+                            <p style="margin: 12px 0 0 0; font-size: 14px; color: rgba(246, 247, 251, 0.6);">
+                                Référence : <strong style="color: #F6F7FB;">{{ quote.number }}</strong>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Message -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px;">
+                            <p style="margin: 0 0 16px 0; line-height: 1.8; color: rgba(246, 247, 251, 0.85); font-size: 15px;">
+                                Bonjour{% if client_name %} <strong style="color: #F6F7FB;">{{ client_name }}</strong>{% endif %},
+                            </p>
+                            <p style="margin: 0 0 16px 0; line-height: 1.8; color: rgba(246, 247, 251, 0.85); font-size: 15px;">
+                                Nous avons le plaisir de vous transmettre votre devis pour les prestations convenues.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Résumé du devis -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(246, 247, 251, 0.03); border-radius: 12px; border: 1px solid rgba(246, 247, 251, 0.08);">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.6); font-size: 13px;">Date d'émission</td>
+                                                <td style="padding: 8px 0; color: #F6F7FB; font-size: 13px; text-align: right; font-weight: 500;">{{ quote.issue_date|date:"d/m/Y" }}</td>
+                                            </tr>
+                                            {% if quote.valid_until %}
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.6); font-size: 13px;">Valide jusqu'au</td>
+                                                <td style="padding: 8px 0; color: #F6F7FB; font-size: 13px; text-align: right; font-weight: 500;">{{ quote.valid_until|date:"d/m/Y" }}</td>
+                                            </tr>
+                                            {% endif %}
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.6); font-size: 13px;">Total HT</td>
+                                                <td style="padding: 8px 0; color: #F6F7FB; font-size: 13px; text-align: right; font-weight: 500;">{{ quote.total_ht|floatformat:2 }} €</td>
+                                            </tr>
+                                            {% if quote.tva %}
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.6); font-size: 13px;">TVA (20%)</td>
+                                                <td style="padding: 8px 0; color: #F6F7FB; font-size: 13px; text-align: right; font-weight: 500;">{{ quote.tva|floatformat:2 }} €</td>
+                                            </tr>
+                                            {% endif %}
+                                            <tr>
+                                                <td colspan="2" style="padding-top: 12px;">
+                                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                                        <tr>
+                                                            <td style="height: 1px; background: rgba(246, 247, 251, 0.1);"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 16px 0 8px 0; color: #F6F7FB; font-size: 15px; font-weight: 600;">Total TTC</td>
+                                                <td style="padding: 16px 0 8px 0; text-align: right;">
+                                                    <span style="background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%); color: #07080A; padding: 8px 16px; border-radius: 6px; font-weight: 700; font-size: 16px;">
+                                                        {{ quote.total_ttc|floatformat:2 }} €
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Bouton CTA -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px; text-align: center;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td style="border-radius: 8px; background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%);">
+                                        <a href="{{ quote_url }}" style="display: inline-block; padding: 16px 32px; color: #07080A; text-decoration: none; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">
+                                            📄 Voir le devis en ligne
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="margin: 16px 0 0 0; font-size: 12px; color: rgba(246, 247, 251, 0.5);">
+                                Ou téléchargez le PDF en pièce jointe
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Instructions -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(34, 197, 94, 0.08); border-radius: 8px; border-left: 3px solid #22C55E;">
+                                <tr>
+                                    <td style="padding: 16px 20px;">
+                                        <p style="margin: 0; font-size: 13px; color: rgba(246, 247, 251, 0.8); line-height: 1.6;">
+                                            <strong style="color: #22C55E;">💡 Pour accepter ce devis :</strong><br>
+                                            Cliquez sur le bouton ci-dessus et suivez les instructions pour valider votre devis en ligne.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Séparateur -->
+                    <tr>
+                        <td style="padding: 0 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td style="height: 1px; background: rgba(246, 247, 251, 0.1);"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 32px 40px;">
+                            <p style="margin: 0 0 8px 0; text-align: center; color: rgba(246, 247, 251, 0.5); font-size: 12px;">
+                                Des questions ? Répondez directement à cet email.
+                            </p>
+                            <p style="margin: 0 0 16px 0; text-align: center; color: rgba(246, 247, 251, 0.7); font-size: 13px;">
+                                <strong style="color: #F6F7FB;">Trait d'Union Studio</strong>
+                            </p>
+                            <p style="margin: 0; text-align: center; color: rgba(246, 247, 251, 0.4); font-size: 11px;">
+                                © 2025 Trait d'Union Studio - Tous droits réservés
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+                
+            </td>
+        </tr>
+    </table>
+    
+</body>
+</html>
