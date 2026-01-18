@@ -71,9 +71,9 @@
         </button>
     </div>
     
-    <!-- Mobile Menu Overlay - z-[60] pour être au-dessus de la navbar -->
-    <div id="mobile-menu" class="fixed inset-0 bg-tus-black backdrop-blur-none z-[60] md:hidden transform translate-x-full transition-transform duration-300 ease-out">
-        <div class="flex flex-col items-center justify-center h-full gap-5 text-center px-6">
+    <!-- Mobile Menu Overlay - commence sous la navbar (top-[72px]) -->
+    <div id="mobile-menu" class="fixed top-[72px] left-0 right-0 bottom-0 bg-tus-black z-[60] md:hidden transform translate-x-full transition-transform duration-300 ease-out">
+        <div class="flex flex-col items-center pt-12 gap-6 text-center px-6">
             <a href="/services/" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
                 Services
             </a>
@@ -97,7 +97,7 @@
                 Déconnexion
             </a>
             {% endif %}
-            <a href="/contact/" class="mt-4 bg-tus-blue px-8 py-4 rounded-full text-xl font-semibold text-white hover:bg-tus-blue/80 transition-colors">
+            <a href="/contact/" class="mt-6 bg-tus-blue px-8 py-4 rounded-full text-xl font-semibold text-white hover:bg-tus-blue/80 transition-colors">
                 Contact
             </a>
         </div>
