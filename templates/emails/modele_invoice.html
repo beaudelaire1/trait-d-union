@@ -16,34 +16,38 @@
                 <!-- Card principale -->
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background: linear-gradient(135deg, #0f1114 0%, #1a1d24 100%); border-radius: 16px; border: 1px solid rgba(246, 247, 251, 0.1); overflow: hidden;">
                     
-                    <!-- Header avec barre bleue -->
+                    <!-- Header avec barre bleue TUS -->
                     <tr>
                         <td style="height: 4px; background: linear-gradient(90deg, #0B2DFF 0%, #2D5BFF 50%, #0B2DFF 100%);"></td>
                     </tr>
                     
-                    <!-- Logo SVG TUS officiel -->
+                    <!-- Logo TUS -->
                     <tr>
                         <td style="padding: 40px 40px 24px 40px; text-align: center;">
-                            <!--[if mso]>
-                            <v:rect xmlns:v="urn:schemas-microsoft-com:vml" style="width:200px;height:50px;">
-                            <v:textbox inset="0,0,0,0"><center>
-                            <![endif]-->
-                            <svg height="48" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d'Union Studio" style="display: inline-block; vertical-align: middle;">
-                                <defs>
-                                    <linearGradient id="tusGradEmail" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
-                                        <stop offset="0" stop-color="#0B2DFF"/>
-                                        <stop offset="0.62" stop-color="#2D5BFF"/>
-                                        <stop offset="1" stop-color="#F6F7FB"/>
-                                    </linearGradient>
-                                </defs>
-                                <text x="0" y="54" font-family="'Space Grotesk', Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D'UNION</text>
-                                <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradEmail)"/>
-                                <text x="0" y="106" font-family="'Space Grotesk', Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
-                            </svg>
-                            <!--[if mso]>
-                            </center></v:textbox>
-                            </v:rect>
-                            <![endif]-->
+                            <!-- Logo texte stylisé (compatible tous clients email) -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <span style="font-family: 'Space Grotesk', Arial, sans-serif; font-size: 28px; font-weight: 700; color: #F6F7FB; letter-spacing: 1px;">TRAIT D'UNION</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top: 8px;">
+                                        <!-- Barre gradient -->
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="160" style="margin: 0 auto;">
+                                            <tr>
+                                                <td width="80" style="height: 4px; background: #0B2DFF; border-radius: 2px 0 0 2px;"></td>
+                                                <td width="80" style="height: 4px; background: linear-gradient(90deg, #2D5BFF, #F6F7FB); border-radius: 0 2px 2px 0;"></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top: 8px; text-align: center;">
+                                        <span style="font-family: 'Space Grotesk', Arial, sans-serif; font-size: 14px; font-weight: 600; color: rgba(246,247,251,0.8); letter-spacing: 4px;">STUDIO</span>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                     
@@ -165,10 +169,24 @@
                         </td>
                     </tr>
                     
-                    <!-- Bouton Paiement (si URL fournie) -->
-                    {% if payment_url %}
+                    <!-- Boutons -->
                     <tr>
                         <td style="padding: 0 40px 32px 40px; text-align: center;">
+                            <!-- Bouton Voir en ligne -->
+                            {% if view_url %}
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto 16px auto;">
+                                <tr>
+                                    <td style="border-radius: 8px; background: rgba(246, 247, 251, 0.1); border: 1px solid rgba(246, 247, 251, 0.2);">
+                                        <a href="{{ view_url }}" style="display: inline-block; padding: 14px 28px; color: #F6F7FB; text-decoration: none; font-weight: 500; font-size: 14px;">
+                                            📄 Voir la facture en ligne
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                            
+                            <!-- Bouton Paiement -->
+                            {% if payment_url %}
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
                                 <tr>
                                     <td style="border-radius: 8px; background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%);">
@@ -178,21 +196,22 @@
                                     </td>
                                 </tr>
                             </table>
+                            {% endif %}
+                            
                             <p style="margin: 16px 0 0 0; font-size: 12px; color: rgba(246, 247, 251, 0.5);">
-                                Ou téléchargez le PDF en pièce jointe
+                                Le PDF est également joint à cet email
                             </p>
                         </td>
                     </tr>
-                    {% endif %}
                     
                     <!-- Note TVA -->
                     <tr>
                         <td style="padding: 0 40px 24px 40px;">
-                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(34, 197, 94, 0.08); border-radius: 8px; border-left: 3px solid #22C55E;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(11, 45, 255, 0.08); border-radius: 8px; border-left: 3px solid #0B2DFF;">
                                 <tr>
                                     <td style="padding: 16px 20px;">
                                         <p style="margin: 0; font-size: 13px; color: rgba(246, 247, 251, 0.8); line-height: 1.6;">
-                                            <strong style="color: #22C55E;">💡 Information :</strong><br>
+                                            <strong style="color: #0B2DFF;">💡 Information :</strong><br>
                                             {% if invoice.tva == 0 %}
                                             TVA non applicable, article 293 B du CGI (auto-entrepreneur).
                                             {% else %}

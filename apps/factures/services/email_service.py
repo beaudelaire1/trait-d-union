@@ -6,6 +6,7 @@ from typing import Optional
 
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.urls import reverse
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +52,15 @@ class PremiumEmailService:
         
         subject = f"Facture {invoice.number} – {company_name}"
         
+        # Construire l'URL de vue en ligne
+        site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it')
+        view_url = None
+        if hasattr(invoice, 'public_token') and invoice.public_token:
+            try:
+                view_url = f"{site_url}{reverse('factures:invoice_public_view', kwargs={'token': invoice.public_token})}"
+            except Exception:
+                pass
+        
         # Générer le HTML via le template premium TUS
         html_body = render_to_string(
             'emails/modele_invoice.html',
@@ -59,6 +69,7 @@ class PremiumEmailService:
                 'client_name': client_name or 'Bonjour',
                 'company_name': company_name,
                 'payment_url': payment_url,
+                'view_url': view_url,
             },
         )
         
