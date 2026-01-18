@@ -104,7 +104,7 @@ class DocumentGenerator:
             'quote': quote,
             'branding': branding,
             'items': list(quote.quote_items.all()) if hasattr(quote, 'quote_items') else [],
-            'amount_in_letters': quote.amount_letter() if hasattr(quote, 'amount_letter') else None,
+            'total_lettres': quote.amount_letter() if hasattr(quote, 'amount_letter') else None,
             'signature_info': signature_info,
         }
         
@@ -148,7 +148,7 @@ class DocumentGenerator:
             'invoice': invoice,
             'branding': branding,
             'items': list(invoice.invoice_items.all()) if hasattr(invoice, 'invoice_items') else [],
-            'amount_in_letters': invoice.amount_letter() if hasattr(invoice, 'amount_letter') else None,
+            'total_lettres': invoice.amount_letter() if hasattr(invoice, 'amount_letter') else None,
         }
         
         # Render le template
