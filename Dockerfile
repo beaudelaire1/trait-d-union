@@ -42,5 +42,5 @@ RUN python manage.py collectstatic --noinput --clear
 # Port
 EXPOSE ${PORT}
 
-# Démarrage
-CMD ["sh", "-c", "gunicorn config.wsgi:application --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]
+# Démarrage - Force les settings de production
+CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.production gunicorn config.wsgi:application --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]
