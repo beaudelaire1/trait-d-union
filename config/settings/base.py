@@ -29,8 +29,8 @@ from dotenv import load_dotenv
 # from ``base.py`` → ``settings`` (0), ``config`` (1), ``tus_website`` (2).
 BASE_DIR = Path(__file__).resolve().parents[2]
 
-# Load environment variables from .env file
-load_dotenv(BASE_DIR / '.env')
+# Load environment variables from .env file (only in development, don't override existing)
+load_dotenv(BASE_DIR / '.env', override=False)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'changeme-in-production')
