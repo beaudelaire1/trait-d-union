@@ -1,0 +1,181 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demande de devis reçue - Trait d'Union Studio</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background-color: #07080A; -webkit-font-smoothing: antialiased;">
+    
+    <!-- Container principal -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #07080A;">
+        <tr>
+            <td style="padding: 40px 20px;">
+                
+                <!-- Card principale -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background: linear-gradient(135deg, #0f1114 0%, #1a1d24 100%); border-radius: 16px; border: 1px solid rgba(246, 247, 251, 0.1); overflow: hidden;">
+                    
+                    <!-- Header avec barre bleue TUS -->
+                    <tr>
+                        <td style="height: 4px; background: linear-gradient(90deg, #0B2DFF 0%, #2D5BFF 50%, #0B2DFF 100%);"></td>
+                    </tr>
+                    
+                    <!-- Logo TUS -->
+                    <tr>
+                        <td style="padding: 40px 40px 24px 40px; text-align: center;">
+                            <!-- Logo texte stylisé (compatible tous clients email) -->
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <span style="font-family: 'Space Grotesk', Arial, sans-serif; font-size: 28px; font-weight: 700; color: #F6F7FB; letter-spacing: 1px;">TRAIT D'UNION</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top: 8px;">
+                                        <!-- Barre gradient -->
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="160" style="margin: 0 auto;">
+                                            <tr>
+                                                <td width="80" style="height: 4px; background: #0B2DFF; border-radius: 2px 0 0 2px;"></td>
+                                                <td width="80" style="height: 4px; background: linear-gradient(90deg, #2D5BFF, #F6F7FB); border-radius: 0 2px 2px 0;"></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top: 8px; text-align: center;">
+                                        <span style="font-family: 'Space Grotesk', Arial, sans-serif; font-size: 14px; font-weight: 600; color: rgba(246,247,251,0.8); letter-spacing: 4px;">STUDIO</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Titre -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px; text-align: center;">
+                            <h2 style="margin: 0; font-size: 22px; font-weight: 600; color: #0B2DFF;">
+                                ✅ Demande de devis reçue
+                            </h2>
+                        </td>
+                    </tr>
+                    
+                    <!-- Message -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px;">
+                            <p style="margin: 0 0 16px 0; line-height: 1.8; color: rgba(246, 247, 251, 0.85); font-size: 15px;">
+                                Bonjour{% if quote_request.client_name %} <strong style="color: #F6F7FB;">{{ quote_request.client_name }}</strong>{% endif %},
+                            </p>
+                            <p style="margin: 0 0 16px 0; line-height: 1.8; color: rgba(246, 247, 251, 0.85); font-size: 15px;">
+                                Nous avons bien reçu votre demande de devis et nous vous remercions de votre confiance.
+                            </p>
+                            <p style="margin: 0; line-height: 1.8; color: rgba(246, 247, 251, 0.85); font-size: 15px;">
+                                Notre équipe analyse votre projet et reviendra vers vous dans les <strong style="color: #F6F7FB;">48 heures ouvrées</strong> avec une proposition personnalisée.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Récapitulatif -->
+                    {% if quote_request %}
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(246, 247, 251, 0.03); border-radius: 12px; border: 1px solid rgba(246, 247, 251, 0.08);">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <p style="margin: 0 0 16px 0; font-size: 14px; font-weight: 600; color: #F6F7FB; text-transform: uppercase; letter-spacing: 1px;">Récapitulatif de votre demande</p>
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            {% if quote_request.topic %}
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.6); font-size: 13px;">Type de service</td>
+                                                <td style="padding: 8px 0; color: #F6F7FB; font-size: 13px; text-align: right; font-weight: 500;">{{ quote_request.topic }}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% if quote_request.description %}
+                                            <tr>
+                                                <td colspan="2" style="padding: 12px 0;">
+                                                    <p style="margin: 0; color: rgba(246, 247, 251, 0.6); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Description</p>
+                                                    <p style="margin: 8px 0 0 0; color: rgba(246, 247, 251, 0.85); font-size: 14px; line-height: 1.6;">{{ quote_request.description|truncatewords:50 }}</p>
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
+                    <!-- CTA -->
+                    {% if cta_url %}
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px; text-align: center;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td style="border-radius: 8px; background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%);">
+                                        <a href="{{ cta_url }}" style="display: inline-block; padding: 16px 32px; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">
+                                            🌐 Découvrir nos services
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
+                    <!-- Info box -->
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(11, 45, 255, 0.08); border-radius: 8px; border-left: 3px solid #0B2DFF;">
+                                <tr>
+                                    <td style="padding: 16px 20px;">
+                                        <p style="margin: 0; font-size: 13px; color: rgba(246, 247, 251, 0.8); line-height: 1.6;">
+                                            <strong style="color: #0B2DFF;">💡 Prochaines étapes :</strong><br>
+                                            Nous étudions votre projet et préparons un devis détaillé. Vous recevrez prochainement un email avec votre devis à valider en ligne.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Séparateur -->
+                    <tr>
+                        <td style="padding: 0 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td style="height: 1px; background: rgba(246, 247, 251, 0.1);"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 32px 40px;">
+                            <p style="margin: 0 0 8px 0; text-align: center; color: rgba(246, 247, 251, 0.5); font-size: 12px;">
+                                Des questions ? Répondez directement à cet email.
+                            </p>
+                            <p style="margin: 0 0 16px 0; text-align: center; color: rgba(246, 247, 251, 0.7); font-size: 13px;">
+                                <strong style="color: #F6F7FB;">Trait d'Union Studio</strong><br>
+                                <span style="color: rgba(246, 247, 251, 0.5);">97300 Cayenne, Guyane</span>
+                            </p>
+                            <p style="margin: 0 0 8px 0; text-align: center;">
+                                <a href="https://traitdunion.it" style="color: #0B2DFF; text-decoration: none; font-size: 12px;">traitdunion.it</a>
+                                <span style="color: rgba(246, 247, 251, 0.3); margin: 0 8px;">|</span>
+                                <a href="mailto:contact@traitdunion.it" style="color: #0B2DFF; text-decoration: none; font-size: 12px;">contact@traitdunion.it</a>
+                            </p>
+                            <p style="margin: 16px 0 0 0; text-align: center; color: rgba(246, 247, 251, 0.3); font-size: 11px;">
+                                © 2026 Trait d'Union Studio - Tous droits réservés
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+                
+            </td>
+        </tr>
+    </table>
+    
+</body>
+</html>
