@@ -18,16 +18,22 @@ DEBUG = False
 # ==============================================================================
 # HOSTS & SECURITY
 # ==============================================================================
-ALLOWED_HOSTS = os.environ.get(
-    'DJANGO_ALLOWED_HOSTS', 
-    'traitdunion.it,www.traitdunion.it,.onrender.com'
-).split(',')
+# Hardcodé pour éviter les problèmes de variables d'environnement
+ALLOWED_HOSTS = [
+    'trait-d-union.onrender.com',
+    'traitdunion.it',
+    'www.traitdunion.it',
+    '.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
-# CSRF trusted origins pour Render
-CSRF_TRUSTED_ORIGINS = os.environ.get(
-    'CSRF_TRUSTED_ORIGINS',
-    'https://traitdunion.it,https://www.traitdunion.it,https://trait-d-union.onrender.com'
-).split(',')
+# CSRF trusted origins - DOIT inclure le scheme https://
+CSRF_TRUSTED_ORIGINS = [
+    'https://trait-d-union.onrender.com',
+    'https://traitdunion.it',
+    'https://www.traitdunion.it',
+]
 
 # Sécurité HTTPS
 SECURE_SSL_REDIRECT = True
