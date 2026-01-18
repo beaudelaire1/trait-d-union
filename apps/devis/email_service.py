@@ -255,22 +255,24 @@ def send_quote_validation_code(quote, validation, request=None, *, to_email: Opt
     from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
     client_name = getattr(client, 'full_name', '') if client else ''
 
-    # Le template générique attend : headline/intro + action_url/action_label
+    # Le template générique attend : headline, message, details, cta_url, cta_text
     html_body = render_to_string(
         'emails/notification_generic.html',
         {
-            'headline': 'Validation du devis — Code de confirmation',
-            'intro': (
-                f"Bonjour {client_name or ''},\n\n"
-                f"Votre code de confirmation pour valider le devis {quote.number} est : {validation.code}\n\n"
-                f"Ce code expire dans 15 minutes."
+            'headline': 'Code de confirmation',
+            'message': (
+                f"Bonjour {client_name or ''},<br><br>"
+                f"Votre code de confirmation pour valider le devis <strong>{quote.number}</strong> est :<br><br>"
+                f"<div style='text-align:center; font-size: 32px; font-weight: bold; letter-spacing: 8px; "
+                f"background: rgba(11, 45, 255, 0.1); padding: 20px; border-radius: 12px; margin: 20px 0;'>"
+                f"{validation.code}</div>"
+                f"<br>Ce code expire dans <strong>15 minutes</strong>."
             ),
-            'rows': [
+            'details': [
                 {'label': 'Devis', 'value': quote.number},
-                {'label': 'Code', 'value': validation.code},
             ],
-            'action_url': code_url,
-            'action_label': 'Saisir le code',
+            'cta_url': code_url,
+            'cta_text': 'Saisir le code',
         },
     )
 

@@ -138,11 +138,32 @@ def quote_validate_start(request, token: str):
     Le paramètre ``token`` est le ``Quote.public_token`` (stable).
     """
     quote = get_object_or_404(Quote, public_token=token)
+    
+    # Si le devis est déjà accepté, rediriger vers la page appropriée
+    if quote.status == Quote.QuoteStatus.ACCEPTED:
+        messages.info(request, "Ce devis a déjà été accepté.")
+        return render(request, "devis/already_signed.html", {"quote": quote})
+    
+    # Si le devis est facturé, afficher un message approprié
+    if quote.status == Quote.QuoteStatus.INVOICED:
+        messages.info(request, "Ce devis a déjà été facturé.")
+        return render(request, "devis/already_signed.html", {"quote": quote})
+    
+    # Si le devis est rejeté, afficher un message
+    if quote.status == Quote.QuoteStatus.REJECTED:
+        messages.error(request, "Ce devis a été refusé et ne peut plus être validé.")
+        return render(request, "devis/quote_unavailable.html", {"quote": quote})
+    
+    # Si le devis est en brouillon (pas encore envoyé)
+    if quote.status == Quote.QuoteStatus.DRAFT:
+        messages.error(request, "Ce devis n'a pas encore été finalisé. Veuillez nous contacter.")
+        return render(request, "devis/quote_unavailable.html", {"quote": quote})
+    
     try:
         res = start_quote_validation(quote, request=request)
     except QuoteNotValidatableError:
         messages.error(request, "Ce devis ne peut pas être validé dans son état actuel.")
-        return redirect("devis:quote_success")
+        return render(request, "devis/quote_unavailable.html", {"quote": quote})
     return redirect("devis:quote_validate_code", token=res.validation.token)
 
 
