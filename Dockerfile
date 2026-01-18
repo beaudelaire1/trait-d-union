@@ -55,23 +55,22 @@ WORKDIR /app
 # DÉPENDANCES SYSTÈME POUR WEASYPRINT
 # ==============================================================================
 # WeasyPrint nécessite Pango, Cairo et leurs dépendances pour générer des PDFs
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    # WeasyPrint dependencies
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libcairo2 \
-    libgdk-pixbuf2.0-0 \
-    libffi-dev \
-    shared-mime-info \
-    # Fonts pour les PDFs
-    fonts-liberation \
-    fonts-dejavu-core \
-    # PostgreSQL client (pour pg_dump si besoin)
-    libpq5 \
-    # Curl pour healthchecks
-    curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        # WeasyPrint dependencies
+        libpango-1.0-0 \
+        libpangocairo-1.0-0 \
+        libcairo2 \
+        libgdk-pixbuf2.0-0 \
+        libffi-dev \
+        shared-mime-info \
+        # Fonts pour les PDFs
+        fonts-liberation \
+        fonts-dejavu-core \
+        # PostgreSQL client
+        libpq5 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copier les wheels depuis le builder
 COPY --from=builder /app/wheels /wheels
@@ -92,10 +91,6 @@ USER appuser
 
 # Exposer le port
 EXPOSE ${PORT}
-
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT}/ || exit 1
 
 # ==============================================================================
 # COMMANDE DE DÉMARRAGE
