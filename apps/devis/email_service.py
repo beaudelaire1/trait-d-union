@@ -162,6 +162,13 @@ def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> 
     from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or 'contact@traitdunion.it'
     from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
     
+    # Email admin pour copie (TASK_NOTIFICATION_EMAIL ou ADMIN_EMAIL)
+    admin_email = (
+        getattr(settings, 'TASK_NOTIFICATION_EMAIL', None) or 
+        getattr(settings, 'ADMIN_EMAIL', None) or 
+        'contact@traitdunion.it'
+    )
+    
     # Générer le PDF pour la pièce jointe
     attachments = []
     try:
@@ -181,6 +188,7 @@ def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> 
     
     try:
         if backend == 'brevo':
+            # Envoi au client
             _send_via_brevo(
                 recipient=recipient,
                 subject=subject,
@@ -191,6 +199,22 @@ def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> 
                 attachments=attachments if attachments else None,
                 tags=['devis', 'quote', f'quote-{quote.number}']
             )
+            
+            # Copie à l'admin si différent du client
+            if admin_email and admin_email != recipient:
+                try:
+                    _send_via_brevo(
+                        recipient=admin_email,
+                        subject=f"[Copie] {subject}",
+                        html_body=html_body,
+                        from_email=from_email,
+                        from_name=from_name,
+                        attachments=attachments if attachments else None,
+                        tags=['devis', 'quote', 'admin-copy']
+                    )
+                    logger.info(f"Copie du devis {quote.number} envoyée à l'admin {admin_email}")
+                except Exception as copy_err:
+                    logger.warning(f"Échec envoi copie admin pour devis {quote.number}: {copy_err}")
         else:
             _send_via_django(
                 recipient=recipient,

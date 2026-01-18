@@ -5,6 +5,7 @@ import logging
 from typing import Optional
 
 from django.conf import settings
+from django.template.loader import render_to_string
 
 logger = logging.getLogger(__name__)
 
@@ -13,50 +14,61 @@ class PremiumEmailService:
     """Envoi d'email avec PDF de facture en pièce jointe.
 
     Cette implémentation utilise Brevo si configuré, sinon fallback Django.
+    Utilise le template premium TUS emails/modele_invoice.html.
     """
 
     def __init__(self, from_email: Optional[str] = None) -> None:
         self.from_email = from_email or getattr(settings, "DEFAULT_FROM_EMAIL", None)
         self.from_name = getattr(settings, "DEFAULT_FROM_NAME", "Trait d'Union Studio")
 
-    def send_invoice_notification(self, invoice) -> bool:
+    def send_invoice_notification(self, invoice, payment_url: Optional[str] = None) -> bool:
         """Envoie la facture au client (et en copie à l'admin).
 
+        Utilise le template premium TUS avec charte graphique.
+        
         - Sujet: « Facture {number} »
-        - Corps: bref message avec le total TTC
+        - Corps: template emails/modele_invoice.html
         - PJ: le PDF de la facture (généré au préalable)
         """
-        client_email = getattr(invoice.quote.client, "email", None)
+        # Récupérer les infos client
+        client = None
+        client_name = ""
+        client_email = None
+        
+        if hasattr(invoice, 'quote') and invoice.quote:
+            client = getattr(invoice.quote, 'client', None)
+            if client:
+                client_name = getattr(client, 'full_name', '') or getattr(client, 'nom', '')
+                client_email = getattr(client, 'email', None)
+        
         admin_email = getattr(settings, "ADMIN_EMAIL", None) or "contact@traitdunion.it"
         
         # Destinataire principal (client si disponible, sinon admin)
         recipient = client_email if client_email else admin_email
         
-        subject = f"Facture {invoice.number} – Trait d'Union Studio"
+        branding = getattr(settings, 'INVOICE_BRANDING', {})
+        company_name = branding.get('name', "Trait d'Union Studio")
         
-        # Corps HTML pour Brevo
-        html_body = f"""
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #333;">Votre facture {invoice.number}</h2>
-            <p>Bonjour,</p>
-            <p>Veuillez trouver ci-jointe votre facture <strong>{invoice.number}</strong>.</p>
-            <p style="font-size: 18px; background: #f5f5f5; padding: 15px; border-radius: 5px;">
-                Montant TTC: <strong>{invoice.total_ttc} €</strong>
-            </p>
-            <p>Merci pour votre confiance.</p>
-            <p style="color: #666; margin-top: 30px;">
-                Trait d'Union Studio<br>
-                <a href="https://traitdunion.it">traitdunion.it</a>
-            </p>
-        </div>
-        """
+        subject = f"Facture {invoice.number} – {company_name}"
         
+        # Générer le HTML via le template premium TUS
+        html_body = render_to_string(
+            'emails/modele_invoice.html',
+            {
+                'invoice': invoice,
+                'client_name': client_name or 'Bonjour',
+                'company_name': company_name,
+                'payment_url': payment_url,
+            },
+        )
+        
+        # Corps texte fallback
         text_body = (
-            f"Bonjour,\n\n"
+            f"Bonjour{' ' + client_name if client_name else ''},\n\n"
             f"Veuillez trouver ci-jointe votre facture {invoice.number}.\n"
             f"Montant TTC: {invoice.total_ttc} €.\n\n"
             f"Merci pour votre confiance,\n"
-            f"Trait d'Union Studio"
+            f"{company_name}"
         )
 
         # Générer le PDF
@@ -117,7 +129,7 @@ class PremiumEmailService:
                 
                 success = result.get('success', False)
                 if success:
-                    logger.info(f"Facture {invoice.number} envoyée via Brevo à {recipient}")
+                    logger.info(f"Facture {invoice.number} envoyée via Brevo à {recipient} (template premium TUS)")
                 return success
             else:
                 # Fallback Django

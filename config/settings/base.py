@@ -173,6 +173,10 @@ DEFAULT_FROM_NAME = os.environ.get('DEFAULT_FROM_NAME', "Trait d'Union Studio")
 # Email admin pour les notifications internes
 ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.it')
 
+# Email pour les notifications de tâches async (Celery) et alertes critiques
+# Si non défini, utilise ADMIN_EMAIL comme fallback
+TASK_NOTIFICATION_EMAIL = os.environ.get('TASK_NOTIFICATION_EMAIL', os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.it'))
+
 # reCAPTCHA v3 settings
 # Obtenez vos clés sur https://www.google.com/recaptcha/admin
 RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')

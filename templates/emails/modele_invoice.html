@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture {{ invoice.number }} - Trait d'Union Studio</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; background-color: #07080A; -webkit-font-smoothing: antialiased;">
+    
+    <!-- Container principal -->
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #07080A;">
+        <tr>
+            <td style="padding: 40px 20px;">
+                
+                <!-- Card principale -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="margin: 0 auto; background: linear-gradient(135deg, #0f1114 0%, #1a1d24 100%); border-radius: 16px; border: 1px solid rgba(246, 247, 251, 0.1); overflow: hidden;">
+                    
+                    <!-- Header avec barre bleue -->
+                    <tr>
+                        <td style="height: 4px; background: linear-gradient(90deg, #0B2DFF 0%, #2D5BFF 50%, #0B2DFF 100%);"></td>
+                    </tr>
+                    
+                    <!-- Logo SVG TUS officiel -->
+                    <tr>
+                        <td style="padding: 40px 40px 24px 40px; text-align: center;">
+                            <!--[if mso]>
+                            <v:rect xmlns:v="urn:schemas-microsoft-com:vml" style="width:200px;height:50px;">
+                            <v:textbox inset="0,0,0,0"><center>
+                            <![endif]-->
+                            <svg height="48" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d'Union Studio" style="display: inline-block; vertical-align: middle;">
+                                <defs>
+                                    <linearGradient id="tusGradEmail" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                                        <stop offset="0" stop-color="#0B2DFF"/>
+                                        <stop offset="0.62" stop-color="#2D5BFF"/>
+                                        <stop offset="1" stop-color="#F6F7FB"/>
+                                    </linearGradient>
+                                </defs>
+                                <text x="0" y="54" font-family="'Space Grotesk', Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D'UNION</text>
+                                <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradEmail)"/>
+                                <text x="0" y="106" font-family="'Space Grotesk', Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+                            </svg>
+                            <!--[if mso]>
+                            </center></v:textbox>
+                            </v:rect>
+                            <![endif]-->
+                        </td>
+                    </tr>
+                    
+                    <!-- Titre Facture -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px; text-align: center;">
+                            <h2 style="margin: 0; font-size: 22px; font-weight: 600; color: #0B2DFF;">
+                                📄 Facture
+                            </h2>
+                            <p style="margin: 12px 0 0 0; font-size: 14px; color: rgba(246, 247, 251, 0.6);">
+                                Référence : <strong style="color: #F6F7FB;">{{ invoice.number }}</strong>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Message de salutation -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px;">
+                            <p style="margin: 0 0 16px 0; line-height: 1.8; color: rgba(246, 247, 251, 0.85); font-size: 15px;">
+                                Bonjour{% if client_name %} <strong style="color: #F6F7FB;">{{ client_name }}</strong>{% endif %},
+                            </p>
+                            <p style="margin: 0; line-height: 1.8; color: rgba(246, 247, 251, 0.85); font-size: 15px;">
+                                Veuillez trouver ci-joint le détail de votre facture.
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Infos Facture -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(246, 247, 251, 0.03); border-radius: 12px; border: 1px solid rgba(246, 247, 251, 0.08);">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.6); font-size: 13px;">Date d'émission</td>
+                                                <td style="padding: 8px 0; color: #F6F7FB; font-size: 13px; text-align: right; font-weight: 500;">{{ invoice.issue_date|date:"d/m/Y" }}</td>
+                                            </tr>
+                                            {% if invoice.due_date %}
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.6); font-size: 13px;">Date d'échéance</td>
+                                                <td style="padding: 8px 0; color: #F6F7FB; font-size: 13px; text-align: right; font-weight: 500;">{{ invoice.due_date|date:"d/m/Y" }}</td>
+                                            </tr>
+                                            {% endif %}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Détail des prestations -->
+                    {% if invoice.items %}
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(246, 247, 251, 0.03); border-radius: 12px; border: 1px solid rgba(246, 247, 251, 0.08);">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <p style="margin: 0 0 16px 0; font-size: 14px; font-weight: 600; color: #F6F7FB; text-transform: uppercase; letter-spacing: 1px;">Détail des prestations</p>
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Description</td>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; width: 50px;">Qté</td>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: right; width: 80px;">P.U.</td>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.5); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: right; width: 80px;">Total</td>
+                                            </tr>
+                                            {% for item in invoice.items %}
+                                            <tr>
+                                                <td style="padding: 12px 0; color: rgba(246, 247, 251, 0.85); font-size: 14px; border-bottom: 1px solid rgba(246, 247, 251, 0.05);">{{ item.description }}</td>
+                                                <td style="padding: 12px 0; color: rgba(246, 247, 251, 0.6); font-size: 14px; text-align: center; border-bottom: 1px solid rgba(246, 247, 251, 0.05);">{{ item.quantity }}</td>
+                                                <td style="padding: 12px 0; color: #F6F7FB; font-size: 14px; text-align: right; border-bottom: 1px solid rgba(246, 247, 251, 0.05);">{{ item.unit_price|floatformat:2 }} €</td>
+                                                <td style="padding: 12px 0; color: #F6F7FB; font-size: 14px; text-align: right; font-weight: 500; border-bottom: 1px solid rgba(246, 247, 251, 0.05);">{{ item.total_ht|floatformat:2 }} €</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
+                    <!-- Totaux -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(11, 45, 255, 0.05); border-radius: 12px; border: 1px solid rgba(11, 45, 255, 0.2);">
+                                <tr>
+                                    <td style="padding: 24px;">
+                                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.6); font-size: 14px;">Total HT</td>
+                                                <td style="padding: 8px 0; color: #F6F7FB; font-size: 14px; text-align: right; font-weight: 500;">{{ invoice.total_ht|floatformat:2 }} €</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: rgba(246, 247, 251, 0.6); font-size: 14px;">TVA</td>
+                                                <td style="padding: 8px 0; color: #F6F7FB; font-size: 14px; text-align: right; font-weight: 500;">{{ invoice.tva|floatformat:2 }} €</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" style="padding-top: 12px;">
+                                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                                        <tr>
+                                                            <td style="height: 1px; background: rgba(246, 247, 251, 0.1);"></td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 16px 0 8px 0; color: #F6F7FB; font-size: 16px; font-weight: 600;">Total TTC</td>
+                                                <td style="padding: 16px 0 8px 0; text-align: right;">
+                                                    <span style="background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%); color: #ffffff; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 18px;">
+                                                        {{ invoice.total_ttc|floatformat:2 }} €
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Bouton Paiement (si URL fournie) -->
+                    {% if payment_url %}
+                    <tr>
+                        <td style="padding: 0 40px 32px 40px; text-align: center;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td style="border-radius: 8px; background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%);">
+                                        <a href="{{ payment_url }}" style="display: inline-block; padding: 16px 32px; color: #ffffff; text-decoration: none; font-weight: 600; font-size: 14px; letter-spacing: 0.5px;">
+                                            💳 Payer en ligne
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="margin: 16px 0 0 0; font-size: 12px; color: rgba(246, 247, 251, 0.5);">
+                                Ou téléchargez le PDF en pièce jointe
+                            </p>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    
+                    <!-- Note TVA -->
+                    <tr>
+                        <td style="padding: 0 40px 24px 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: rgba(34, 197, 94, 0.08); border-radius: 8px; border-left: 3px solid #22C55E;">
+                                <tr>
+                                    <td style="padding: 16px 20px;">
+                                        <p style="margin: 0; font-size: 13px; color: rgba(246, 247, 251, 0.8); line-height: 1.6;">
+                                            <strong style="color: #22C55E;">💡 Information :</strong><br>
+                                            {% if invoice.tva == 0 %}
+                                            TVA non applicable, article 293 B du CGI (auto-entrepreneur).
+                                            {% else %}
+                                            Facture à régler sous 30 jours à réception.
+                                            {% endif %}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Séparateur -->
+                    <tr>
+                        <td style="padding: 0 40px;">
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                                <tr>
+                                    <td style="height: 1px; background: rgba(246, 247, 251, 0.1);"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 32px 40px;">
+                            <p style="margin: 0 0 8px 0; text-align: center; color: rgba(246, 247, 251, 0.5); font-size: 12px;">
+                                Des questions ? Répondez directement à cet email.
+                            </p>
+                            <p style="margin: 0 0 16px 0; text-align: center; color: rgba(246, 247, 251, 0.7); font-size: 13px;">
+                                <strong style="color: #F6F7FB;">{{ company_name|default:"Trait d'Union Studio" }}</strong><br>
+                                <span style="color: rgba(246, 247, 251, 0.5);">97300 Cayenne, Guyane</span>
+                            </p>
+                            <p style="margin: 0 0 8px 0; text-align: center;">
+                                <a href="https://traitdunion.it" style="color: #0B2DFF; text-decoration: none; font-size: 12px;">traitdunion.it</a>
+                                <span style="color: rgba(246, 247, 251, 0.3); margin: 0 8px;">|</span>
+                                <a href="mailto:contact@traitdunion.it" style="color: #0B2DFF; text-decoration: none; font-size: 12px;">contact@traitdunion.it</a>
+                            </p>
+                            <p style="margin: 16px 0 0 0; text-align: center; color: rgba(246, 247, 251, 0.3); font-size: 11px;">
+                                © 2026 Trait d'Union Studio - Tous droits réservés
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+                
+            </td>
+        </tr>
+    </table>
+    
+</body>
+</html>
