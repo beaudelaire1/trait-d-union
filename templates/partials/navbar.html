@@ -1,7 +1,7 @@
 <nav id="navbar" class="px-6 py-4 border-b border-stroke-dark/50 backdrop-blur-xl bg-tus-black/70 fixed top-0 left-0 right-0 z-50 transition-all duration-500" style="view-transition-name: navbar;">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
         <!-- Logo SVG -->
-        <a href="/" class="group link-animated">
+        <a href="/" class="group link-animated" id="navbar-logo">
             <svg height="36" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d'Union Studio">
                 <defs>
                     <linearGradient id="tusGradNav" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
@@ -59,7 +59,7 @@
         </ul>
         
         <!-- Mobile menu button -->
-        <button class="md:hidden text-tus-white p-2 relative z-50" aria-label="Menu" id="mobile-menu-btn" aria-expanded="false">
+        <button class="md:hidden text-tus-white p-2 relative z-[70]" aria-label="Menu" id="mobile-menu-btn" aria-expanded="false">
             <!-- Icône hamburger -->
             <svg id="menu-icon-open" class="w-6 h-6 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -71,40 +71,35 @@
         </button>
     </div>
     
-    <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="fixed inset-0 bg-tus-black/98 backdrop-blur-xl z-40 md:hidden transform translate-x-full transition-transform duration-300 ease-out">
-        <div class="flex flex-col items-center justify-center h-full gap-4 text-center px-6">
-            <a href="/services/" class="text-xl font-display font-semibold text-tus-white/90 hover:text-tus-blue transition-colors">
+    <!-- Mobile Menu Overlay - z-[60] pour être au-dessus de la navbar -->
+    <div id="mobile-menu" class="fixed inset-0 bg-tus-black backdrop-blur-none z-[60] md:hidden transform translate-x-full transition-transform duration-300 ease-out">
+        <div class="flex flex-col items-center justify-center h-full gap-5 text-center px-6">
+            <a href="/services/" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
                 Services
             </a>
-            <a href="/portfolio/" class="text-xl font-display font-semibold text-tus-white/90 hover:text-tus-blue transition-colors">
+            <a href="/portfolio/" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
                 Portfolio
             </a>
-            <a href="/method/" class="text-xl font-display font-semibold text-tus-white/90 hover:text-tus-blue transition-colors">
+            <a href="/method/" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
                 Méthode
             </a>
-            <a href="{% url 'clients:dashboard' %}" class="text-xl font-display font-semibold text-tus-white/90 hover:text-tus-blue transition-colors flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{% url 'clients:dashboard' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
                 Espace Client
             </a>
             {% if user.is_authenticated %}
-            <a href="{% url 'account_logout' %}" class="text-lg font-display font-semibold text-red-400/90 hover:text-red-400 transition-colors flex items-center gap-2">
+            <a href="{% url 'account_logout' %}" class="text-xl font-display font-semibold text-red-400 hover:text-red-300 transition-colors flex items-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                 </svg>
                 Déconnexion
             </a>
             {% endif %}
-            <a href="/contact/" class="mt-2 bg-tus-blue px-6 py-3 rounded-full text-lg font-semibold text-white hover:bg-tus-blue/80 transition-colors">
+            <a href="/contact/" class="mt-4 bg-tus-blue px-8 py-4 rounded-full text-xl font-semibold text-white hover:bg-tus-blue/80 transition-colors">
                 Contact
             </a>
-            
-            <!-- Footer mobile menu -->
-            <div class="absolute bottom-6 left-0 right-0 text-center">
-                <p class="text-xs text-tus-white/40">© 2026 Trait d'Union Studio</p>
-            </div>
         </div>
     </div>
 </nav>
@@ -116,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mobileMenu = document.getElementById('mobile-menu');
     const iconOpen = document.getElementById('menu-icon-open');
     const iconClose = document.getElementById('menu-icon-close');
+    const navbarLogo = document.getElementById('navbar-logo');
     let isOpen = false;
     
     if (menuBtn && mobileMenu) {
@@ -130,6 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 iconClose.classList.remove('opacity-0', 'scale-0');
                 menuBtn.setAttribute('aria-expanded', 'true');
                 document.body.style.overflow = 'hidden';
+                // Cacher le logo
+                if (navbarLogo) navbarLogo.style.opacity = '0';
             } else {
                 // Fermer le menu
                 mobileMenu.classList.add('translate-x-full');
@@ -138,6 +136,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 iconClose.classList.add('opacity-0', 'scale-0');
                 menuBtn.setAttribute('aria-expanded', 'false');
                 document.body.style.overflow = '';
+                // Afficher le logo
+                if (navbarLogo) navbarLogo.style.opacity = '1';
             }
         });
         
@@ -151,6 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 iconClose.classList.add('opacity-0', 'scale-0');
                 menuBtn.setAttribute('aria-expanded', 'false');
                 document.body.style.overflow = '';
+                if (navbarLogo) navbarLogo.style.opacity = '1';
             });
         });
     }
