@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TUS — Variantes Logo (SVG)</title>
+
+  <!-- Fonts: TUS (Space Grotesk + Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --tus-black:#07080A;
+      --tus-white:#F6F7FB;
+      --tus-blue:#0B2DFF;
+
+      --surface-dark:#0D1016;
+      --stroke-dark:rgba(246,247,251,.10);
+      --stroke-light:rgba(7,8,10,.10);
+
+      --font-display:"Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      --font-body:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+      --radius:18px;
+    }
+
+    *{ box-sizing: border-box; }
+    body{
+      margin:0;
+      font-family: var(--font-body);
+      background: #0a0b10;
+      color: var(--tus-white);
+      line-height: 1.6;
+    }
+    header{
+      padding: 28px 20px 8px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    h1{
+      margin: 0 0 8px;
+      font-family: var(--font-display);
+      letter-spacing: .6px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .subtitle{
+      margin: 0 0 18px;
+      color: rgba(246,247,251,.78);
+      max-width: 80ch;
+    }
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 12px 20px 42px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .card{
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--stroke-dark);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    }
+    .card.light{
+      border: 1px solid var(--stroke-light);
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(246,247,251,1));
+      color: #07080A;
+    }
+    .card .head{
+      display:flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .card.light .head{ border-bottom: 1px solid rgba(7,8,10,.08); }
+    .badge{
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .3px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      color: rgba(246,247,251,.88);
+      background: rgba(255,255,255,.04);
+    }
+    .card.light .badge{
+      border: 1px solid rgba(7,8,10,.14);
+      color: rgba(7,8,10,.82);
+      background: rgba(7,8,10,.03);
+    }
+    .meta{
+      font-size: 13px;
+      color: rgba(246,247,251,.72);
+    }
+    .card.light .meta{ color: rgba(7,8,10,.62); }
+    .stage{
+      padding: 18px 14px 20px;
+      display:flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 120px;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .note{
+      padding: 12px 14px 14px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(246,247,251,.72);
+      font-size: 13px;
+    }
+    .card.light .note{
+      border-top: 1px solid rgba(7,8,10,.08);
+      color: rgba(7,8,10,.62);
+    }
+
+    .scaleRow{ display:flex; gap: 10px; align-items:center; flex-wrap: wrap; }
+    .scaleLabel{
+      font-size: 12px;
+      opacity: .85;
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+    .card.light .scaleLabel{
+      border: 1px solid rgba(7,8,10,.12);
+    }
+    .logoBox{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px dashed rgba(255,255,255,.14);
+      background: rgba(0,0,0,.14);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .card.light .logoBox{
+      border: 1px dashed rgba(7,8,10,.18);
+      background: rgba(255,255,255,.65);
+    }
+
+    /* Helpful: simulate navbar height */
+    .navbarMock{
+      width: 100%;
+      max-width: 980px;
+      height: 64px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(13,16,22,.85);
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      padding: 0 14px;
+      gap: 14px;
+    }
+    .navRight{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      opacity: .75;
+      font-size: 12px;
+    }
+    .pill{
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Trait d’Union Studio (TUS) — Variantes logo (SVG)</h1>
+    <p class="subtitle">
+      7 variantes prêtes à copier-coller, optimisées pour <b>navbar</b> et <b>documents (devis/factures)</b>.
+      Police: <b>Space Grotesk</b> (titres/logo) + <b>Inter</b> (UI). Palette: <b>#07080A / #F6F7FB / #0B2DFF</b>.
+    </p>
+  </header>
+
+  <main class="wrap">
+
+    <!-- 1) Navbar - gradient strong (dark) -->
+    <section class="card">
+      <div class="head">
+        <div>
+          <span class="badge">1) Navbar — Gradient “Strong” (fond sombre)</span>
+          <div class="meta">Hauteur recommandée: 28–36px • Trait: 6px (lisible)</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="navbarMock">
+          <!-- Logo -->
+          <div class="logoBox" style="border:none;background:transparent;padding:0;">
+            <svg height="32" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+              <defs>
+                <linearGradient id="tusGradNavStrong" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#0B2DFF"/>
+                  <stop offset="0.62" stop-color="#2D5BFF"/>
+                  <stop offset="1" stop-color="#F6F7FB"/>
+                </linearGradient>
+              </defs>
+
+              <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D’UNION</text>
+              <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradNavStrong)"/>
+              <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+            </svg>
+          </div>
+          <div class="navRight">
+            <span class="pill">Services</span>
+            <span class="pill">Réalisations</span>
+            <span class="pill">Contact</span>
+          </div>
+        </div>
+
+        <div class="scaleRow">
+          <span class="scaleLabel">Preview tailles</span>
+          <div class="logoBox"><svg height="28" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="tusGradNavStrong28" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#0B2DFF"/><stop offset="0.62" stop-color="#2D5BFF"/><stop offset="1" stop-color="#F6F7FB"/>
+            </linearGradient></defs>
+            <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D’UNION</text>
+            <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradNavStrong28)"/>
+            <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+          </svg></div>
+
+          <div class="logoBox"><svg height="36" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="tusGradNavStrong36" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#0B2DFF"/><stop offset="0.62" stop-color="#2D5BFF"/><stop offset="1" stop-color="#F6F7FB"/>
+            </linearGradient></defs>
+            <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D’UNION</text>
+            <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradNavStrong36)"/>
+            <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+          </svg></div>
+        </div>
+      </div>
+
+      <div class="note">Usage: navbar (fond <code>#07080A</code>), headers sombres, hero. Dégradé fort bleu → blanc pour un accent “i-tech” lisible.</div>
+    </section>
+
+    <!-- 2) Navbar - blue dominant (dark) -->
+    <section class="card">
+      <div class="head">
+        <div>
+          <span class="badge">2) Navbar — “Blue Dominant” (fond sombre)</span>
+          <div class="meta">Blanc = éclat final • le trait reste majoritairement bleu</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="logoBox" style="background:transparent;border-style:solid;border-color:rgba(255,255,255,.10)">
+          <svg height="32" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+            <defs>
+              <linearGradient id="tusGradBlueDominant" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#0B2DFF"/>
+                <stop offset="0.80" stop-color="#0B2DFF"/>
+                <stop offset="1" stop-color="#F6F7FB"/>
+              </linearGradient>
+            </defs>
+
+            <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D’UNION</text>
+            <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradBlueDominant)"/>
+            <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="note">Usage: navbar quand tu veux un trait plus “bleu plein” et un éclat final blanc minimal.</div>
+    </section>
+
+    <!-- 3) Documents - gradient strong (light) -->
+    <section class="card light">
+      <div class="head">
+        <div>
+          <span class="badge">3) Documents — Gradient “Strong” (fond clair devis/factures)</span>
+          <div class="meta">Texte noir premium • trait dégradé bleu → blanc</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="logoBox">
+          <svg width="520" height="120" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+            <defs>
+              <linearGradient id="tusGradDocStrong" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#0B2DFF"/>
+                <stop offset="0.70" stop-color="#2D5BFF"/>
+                <stop offset="1" stop-color="#F6F7FB"/>
+              </linearGradient>
+            </defs>
+
+            <text x="0" y="52" font-family="Space Grotesk, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="1.2" fill="#07080A">TRAIT D’UNION</text>
+            <rect x="0" y="66" width="260" height="4" rx="2" fill="url(#tusGradDocStrong)"/>
+            <text x="0" y="104" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(7,8,10,0.78)">STUDIO</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="note">Usage: en-tête de devis/factures (fond blanc). Dégradé visible mais discret; garde un rendu premium en PDF.</div>
+    </section>
+
+    <!-- 4) Documents - blue dominant (light) -->
+    <section class="card light">
+      <div class="head">
+        <div>
+          <span class="badge">4) Documents — “Blue Dominant” (fond clair)</span>
+          <div class="meta">Le dégradé reste quasi tout bleu, blanc uniquement en fin</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="logoBox">
+          <svg width="520" height="120" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+            <defs>
+              <linearGradient id="tusGradDocBlueDom" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#0B2DFF"/>
+                <stop offset="0.86" stop-color="#0B2DFF"/>
+                <stop offset="1" stop-color="#F6F7FB"/>
+              </linearGradient>
+            </defs>
+
+            <text x="0" y="52" font-family="Space Grotesk, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="1.2" fill="#07080A">TRAIT D’UNION</text>
+            <rect x="0" y="66" width="260" height="4" rx="2" fill="url(#tusGradDocBlueDom)"/>
+            <text x="0" y="104" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(7,8,10,0.78)">STUDIO</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="note">Usage: documents quand tu veux un trait très “signature bleu” (le blanc devient un éclat presque imperceptible).</div>
+    </section>
+
+    <!-- 5) Print safe - monochrome black -->
+    <section class="card light">
+      <div class="head">
+        <div>
+          <span class="badge">5) Print safe — Monochrome noir (photocopie / N&B)</span>
+          <div class="meta">Zéro dégradé • lisible même sur imprimantes basiques</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="logoBox">
+          <svg width="520" height="120" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+            <text x="0" y="52" font-family="Space Grotesk, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="1.2" fill="#07080A">TRAIT D’UNION</text>
+            <rect x="0" y="66" width="260" height="4" rx="2" fill="#07080A"/>
+            <text x="0" y="104" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(7,8,10,0.82)">STUDIO</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="note">Usage: PDF “low ink”, photocopies, scans, export N&B.</div>
+    </section>
+
+    <!-- 6) Print safe - monochrome white -->
+    <section class="card">
+      <div class="head">
+        <div>
+          <span class="badge">6) Print safe — Monochrome blanc (fond sombre)</span>
+          <div class="meta">Zéro dégradé • rendu “maison premium” minimal</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="logoBox" style="background:transparent;border-style:solid;border-color:rgba(255,255,255,.10)">
+          <svg width="520" height="120" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+            <text x="0" y="52" font-family="Space Grotesk, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="1.2" fill="#F6F7FB">TRAIT D’UNION</text>
+            <rect x="0" y="66" width="260" height="4" rx="2" fill="#F6F7FB"/>
+            <text x="0" y="104" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="note">Usage: hero, cover sombre, fonds noirs/graphite, visuels minimalistes.</div>
+    </section>
+
+    <!-- 7) Compact wordmark (single line) -->
+    <section class="card">
+      <div class="head">
+        <div>
+          <span class="badge">7) Compact — 1 ligne (navbar ultra serrée / en-tête étroit)</span>
+          <div class="meta">“TRAIT D’UNION STUDIO” + trait dégradé en suffixe</div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="logoBox" style="background:transparent;border-style:solid;border-color:rgba(255,255,255,.10)">
+          <svg height="32" viewBox="0 0 760 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+            <defs>
+              <linearGradient id="tusGradCompact" x1="500" y1="0" x2="740" y2="0" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#0B2DFF"/>
+                <stop offset="0.70" stop-color="#2D5BFF"/>
+                <stop offset="1" stop-color="#F6F7FB"/>
+              </linearGradient>
+            </defs>
+
+            <text x="0" y="74"
+                  font-family="Space Grotesk, Arial, sans-serif"
+                  font-size="54"
+                  font-weight="700"
+                  letter-spacing="1.0"
+                  fill="#F6F7FB">TRAIT D’UNION <tspan font-weight="600" letter-spacing="4" font-size="38">STUDIO</tspan></text>
+
+            <rect x="520" y="86" width="220" height="6" rx="3" fill="url(#tusGradCompact)"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="note">Usage: navbar quand la hauteur est faible et que tu veux éviter la seconde ligne “STUDIO”. Très pratique en responsive.</div>
+    </section>
+
+  </main>
+</body>
+</html>

@@ -1,0 +1,306 @@
+================================================================================
+                        CHARTE GRAPHIQUE
+                     TRAIT D'UNION STUDIO
+================================================================================
+
+Dernière mise à jour : Janvier 2025
+Version : 1.0
+
+================================================================================
+                              COULEURS
+================================================================================
+
+COULEURS PRINCIPALES
+--------------------
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Nom             │ Code HEX   │ RGB              │ Utilisation               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ TUS Black       │ #07080A    │ rgb(7, 8, 10)    │ Fond principal, textes    │
+│ TUS White       │ #F6F7FB    │ rgb(246,247,251) │ Texte principal, accents  │
+│ TUS Blue        │ #0B2DFF    │ rgb(11, 45, 255) │ CTA, liens, accent primaire│
+│ TUS Green       │ #22C55E    │ rgb(34,197,94)   │ Succès, validation, trust │
+│ TUS Green Light │ #4ADE80    │ rgb(74,222,128)  │ Variante claire du vert   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+COULEURS SECONDAIRES
+--------------------
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Nom             │ Code HEX   │ Usage                                        │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Surface Dark    │ #0D1016    │ Cartes, surfaces élevées                     │
+│ Stroke Dark     │ rgba(246,247,251,0.10)  │ Bordures subtiles             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+OPACITÉS STANDARD
+-----------------
+
+• tus-white/70 → Texte secondaire
+• tus-white/60 → Texte tertiaire, descriptions
+• tus-white/40 → Texte désactivé, labels
+• tus-white/10 → Bordures subtiles
+• tus-white/5  → Fonds de cartes glassmorphism
+• tus-blue/10  → Badges, backgrounds d'icônes
+• tus-blue/20  → Blobs lumineux
+• tus-green/10 → Badges succès, backgrounds verts
+
+SÉMANTIQUE DES COULEURS
+-----------------------
+
+• BLEU (tus-blue) :
+  - Actions principales (CTA, boutons)
+  - Liens et éléments interactifs
+  - Accent de marque principal
+  - Highlights et focus
+
+• VERT (tus-green) :
+  - États de succès et validation
+  - Indicateurs de confiance
+  - Badges "Standard TUS"
+  - Confirmations et accomplissements
+  - Couplé au bleu pour dynamisme
+
+• BLANC (tus-white) :
+  - Texte principal et secondaire
+  - Contraste sur fond sombre
+
+• NOIR (tus-black) :
+  - Fond principal du site
+  - Crée l'atmosphère premium/dark mode
+
+
+================================================================================
+                              TYPOGRAPHIE
+================================================================================
+
+POLICES
+-------
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Famille          │ Poids           │ Usage                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Space Grotesk    │ 500, 600, 700   │ Titres, display, navigation            │
+│ Inter            │ 400, 500, 600, 700 │ Corps de texte, paragraphes         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+CLASSES TAILWIND
+----------------
+
+• font-display → Space Grotesk (titres, éléments d'interface)
+• font-body → Inter (texte courant) - défaut via body
+
+HIÉRARCHIE TYPOGRAPHIQUE
+------------------------
+
+• H1 : text-4xl md:text-5xl lg:text-6xl font-display font-bold
+• H2 : text-3xl md:text-4xl font-display font-bold
+• H3 : text-2xl font-display font-bold
+• H4 : text-lg font-display font-bold
+• Body : text-base (16px)
+• Small : text-sm (14px)
+• Extra small : text-xs (12px)
+
+
+================================================================================
+                              ANIMATIONS
+================================================================================
+
+ANIMATIONS DISPONIBLES
+----------------------
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ Classe               │ Effet                     │ Durée    │ Usage         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ animate-fade-in      │ Apparition en fondu       │ 0.6s     │ Héros, titres │
+│ animate-slide-up     │ Montée + fondu            │ 0.8s     │ Cartes, listes│
+│ animate-slide-in-right│ Glissement droite        │ 0.6s     │ Menus, modals │
+│ animate-pulse-glow   │ Pulsation lumineuse       │ 2s loop  │ CTA importants│
+│ animate-marquee      │ Défilement horizontal     │ 20s loop │ Texte défilant│
+│ animate-gradient-shift│ Mouvement gradient       │ 3s loop  │ Bandes, fonds │
+│ animate-text-scroll  │ Scroll texte              │ 18s loop │ Tickers       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+DÉLAIS D'ANIMATION (Stagger Effect)
+-----------------------------------
+
+Pour créer un effet de cascade sur les listes/grilles :
+• style="animation-delay: 0.1s"
+• style="animation-delay: 0.2s"
+• style="animation-delay: 0.3s"
+• etc.
+
+
+================================================================================
+                              COMPOSANTS
+================================================================================
+
+CARTES GLASSMORPHISM
+--------------------
+
+```html
+<div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-6">
+    <!-- Contenu -->
+</div>
+```
+
+BADGES
+------
+
+• Badge marque :
+  bg-tus-blue/10 text-tus-blue rounded-full px-4 py-2
+
+• Badge succès :
+  bg-tus-green/10 text-tus-green rounded-full px-3 py-1
+
+• Badge neutre :
+  bg-tus-white/5 text-tus-white/60 rounded-full px-3 py-1
+
+BOUTONS
+-------
+
+• CTA Principal :
+  bg-tus-blue text-tus-white font-display font-semibold px-8 py-4 rounded-xl
+  hover:bg-tus-blue/90 hover:scale-[1.02] active:scale-[0.98]
+  transition-all duration-300
+
+• CTA Secondaire :
+  bg-tus-white/5 border border-tus-white/10 text-tus-white
+  hover:bg-tus-white/10 hover:border-tus-white/20
+
+• Bouton Succès :
+  bg-tus-green text-white font-semibold
+  hover:bg-tus-green-light
+
+EFFETS DE SURVOL SUR CARTES
+---------------------------
+
+```html
+<div class="group relative">
+    <!-- Glow au hover -->
+    <div class="absolute -inset-0.5 bg-gradient-to-r from-tus-blue/50 to-tus-green/30 
+                rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500">
+    </div>
+    <div class="relative bg-tus-white/5 ...">
+        <!-- Contenu -->
+    </div>
+</div>
+```
+
+BLOBS LUMINEUX (Arrière-plan)
+-----------------------------
+
+```html
+<div class="absolute -top-40 -left-40 w-[600px] h-[600px] 
+            bg-tus-blue/15 rounded-full blur-[150px]"></div>
+```
+
+Variante bleu + vert :
+```html
+<div class="absolute -top-40 -left-40 w-[600px] h-[600px] 
+            bg-gradient-to-br from-tus-blue/15 to-tus-green/10 rounded-full blur-[150px]"></div>
+```
+
+
+================================================================================
+                         EFFETS SPÉCIAUX
+================================================================================
+
+GRADIENTS
+---------
+
+• Bleu vers vert (dynamique) :
+  bg-gradient-to-r from-tus-blue to-tus-green
+
+• Bleu avec transparence :
+  bg-gradient-to-r from-tus-blue/50 to-tus-blue/30
+
+• Bleu vers vert subtil :
+  bg-gradient-to-br from-tus-blue/20 via-transparent to-tus-green/10
+
+REFLETS & BORDURES
+------------------
+
+• Ligne de reflet :
+  <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r 
+              from-transparent via-tus-white/20 to-transparent"></div>
+
+• Bordure interactive :
+  border border-tus-white/10 hover:border-tus-blue/30
+
+
+================================================================================
+                         VIEW TRANSITIONS API
+================================================================================
+
+Le site utilise la View Transitions API pour des transitions fluides entre pages.
+
+Activation :
+```html
+<meta name="view-transition" content="same-origin">
+```
+
+Styles CSS associés :
+```css
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 0.4s;
+}
+```
+
+
+================================================================================
+                         BREAKPOINTS RESPONSIVE
+================================================================================
+
+Tailwind CSS breakpoints par défaut :
+
+• sm : 640px   → Petits écrans (mobiles paysage)
+• md : 768px   → Tablettes
+• lg : 1024px  → Laptops
+• xl : 1280px  → Desktops
+• 2xl: 1536px  → Grands écrans
+
+
+================================================================================
+                         BONNES PRATIQUES
+================================================================================
+
+1. COHÉRENCE DES COULEURS
+   - Toujours utiliser les variables tus-* (jamais blue-500, green-400, etc.)
+   - Bleu = interaction, Vert = succès/confiance
+
+2. ANIMATIONS
+   - Utiliser les animations avec parcimonie
+   - Préférer les délais (stagger) pour les listes
+   - Respecter prefers-reduced-motion
+
+3. ACCESSIBILITÉ
+   - Contraste minimum 4.5:1 pour le texte
+   - Focus visible sur tous les éléments interactifs
+   - Texte alternatif pour les images
+
+4. GLASSMORPHISM
+   - Toujours avec backdrop-blur-sm ou backdrop-blur-xl
+   - Opacité faible (tus-white/5 ou /3)
+   - Bordure subtile pour définir les contours
+
+5. SPACING
+   - Utiliser les multiples de 4 (px-4, py-6, gap-8...)
+   - Section padding : py-16 à py-24
+   - Container max-width : max-w-6xl ou max-w-7xl mx-auto
+
+
+================================================================================
+                         FICHIERS DE RÉFÉRENCE
+================================================================================
+
+• Configuration Tailwind : templates/base.html (script inline)
+• Styles custom : static/css/style.css
+• Templates de base : templates/
+• Composants réutilisables : templates/partials/
+
+
+================================================================================
+              © 2025 Trait d'Union Studio - Tous droits réservés
+================================================================================

@@ -41,8 +41,6 @@ debug_*.py
 send_premium_*.py
 
 # Local development files
-charte.txt
-tus_logo_variantes.html
 plandaction.txt
 gen_pdf*.py
 generate_pdf*.py
