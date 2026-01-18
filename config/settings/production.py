@@ -12,6 +12,7 @@ from .base import *  # noqa: F401,F403
 
 import dj_database_url
 
+# TOUJOURS False en production - ne jamais utiliser de variable d'env pour DEBUG
 DEBUG = False
 
 # ==============================================================================
