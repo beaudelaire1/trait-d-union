@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://traitdunion.studio/sitemap.xml
+Sitemap: https://traitdunion.it/sitemap.xml
 
 # Disallow admin
 User-agent: *

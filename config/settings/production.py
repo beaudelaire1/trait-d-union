@@ -95,33 +95,24 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ==============================================================================
-# MEDIA FILES (S3 Compatible - Cloudflare R2 recommandé pour Render)
+# MEDIA FILES (Cloudinary - recommandé pour simplicité)
 # ==============================================================================
-# Activer S3 uniquement si configuré
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL')  # Pour Cloudflare R2
-AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'auto')
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
 
-if AWS_ACCESS_KEY_ID and AWS_STORAGE_BUCKET_NAME:
-    # Configuration S3/R2
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
+    # Configuration Cloudinary
+    INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
     
-    AWS_S3_OBJECT_PARAMETERS = {
-        'CacheControl': 'max-age=86400',
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+        'API_KEY': CLOUDINARY_API_KEY,
+        'API_SECRET': CLOUDINARY_API_SECRET,
     }
-    AWS_DEFAULT_ACL = None
-    AWS_QUERYSTRING_AUTH = True
-    AWS_S3_FILE_OVERWRITE = False
     
-    # URL personnalisée pour accès public (optionnel)
-    AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN')
-    
-    if AWS_S3_CUSTOM_DOMAIN:
-        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
-    else:
-        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/'
 
 # ==============================================================================
 # EMAIL (Brevo API - recommandé pour Render)
@@ -219,3 +210,38 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 ]
 # Supprimer APP_DIRS car on utilise un loader explicite
 TEMPLATES[0]['APP_DIRS'] = False
+
+# ==============================================================================
+# SENTRY (Monitoring erreurs)
+# ==============================================================================
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
+
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.logging import LoggingIntegration
+    
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[
+            DjangoIntegration(
+                transaction_style='url',
+                middleware_spans=True,
+            ),
+            LoggingIntegration(
+                level=None,  # Capture tous les logs
+                event_level='ERROR',  # Envoyer les ERROR+ comme events
+            ),
+        ],
+        # Performance monitoring
+        traces_sample_rate=0.1,  # 10% des transactions
+        profiles_sample_rate=0.1,  # 10% des profils
+        
+        # Environnement
+        environment='production',
+        release=os.environ.get('RENDER_GIT_COMMIT', 'unknown'),
+        
+        # Options
+        send_default_pii=False,  # RGPD: pas de données personnelles
+        attach_stacktrace=True,
+    )

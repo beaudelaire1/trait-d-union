@@ -21,13 +21,13 @@ class BudgetRange(models.TextChoices):
 class Lead(models.Model):
     """Represents a contact request from the website."""
 
-    name = models.CharField(max_length=100)
-    email = models.EmailField(max_length=254)
-    project_type = models.CharField(max_length=20, choices=ProjectTypeChoice.choices)
-    message = models.TextField()
-    budget = models.CharField(max_length=20, choices=BudgetRange.choices, blank=True)
-    existing_url = models.URLField(max_length=500, blank=True)
-    attachment = models.FileField(upload_to='leads/attachments/', blank=True)
+    name = models.CharField("Nom complet", max_length=100)
+    email = models.EmailField("Email", max_length=254)
+    project_type = models.CharField("Type de projet", max_length=20, choices=ProjectTypeChoice.choices)
+    message = models.TextField("Message")
+    budget = models.CharField("Budget estimé", max_length=20, choices=BudgetRange.choices, blank=True)
+    existing_url = models.URLField("Site existant", max_length=500, blank=True)
+    attachment = models.FileField("Pièce jointe", upload_to='leads/attachments/', blank=True)
     honeypot = models.CharField(max_length=255, blank=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

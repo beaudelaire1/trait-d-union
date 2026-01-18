@@ -20,9 +20,12 @@ dj-database-url>=2.1.0
 # WhiteNoise pour les fichiers statiques (Render)
 whitenoise>=6.6.0
 
-# Stockage S3 pour les médias (optionnel)
-django-storages>=1.14.0
-boto3>=1.34.0
+# Stockage Cloudinary pour les médias
+cloudinary>=1.36.0
+django-cloudinary-storage>=0.3.0
+
+# Monitoring Sentry
+sentry-sdk[django]>=1.39.0
 
 # Paiements Stripe
 stripe>=8.0.0
