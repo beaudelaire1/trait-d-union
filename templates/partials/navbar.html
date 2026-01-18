@@ -16,7 +16,7 @@
             </svg>
         </a>
         
-        <!-- Navigation -->
+        <!-- Navigation Desktop -->
         <ul class="hidden md:flex items-center gap-8 text-sm font-medium">
             <li>
                 <a href="/services/" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
@@ -49,10 +49,92 @@
         </ul>
         
         <!-- Mobile menu button -->
-        <button class="md:hidden text-tus-white p-2" aria-label="Menu" id="mobile-menu-btn">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button class="md:hidden text-tus-white p-2 relative z-50" aria-label="Menu" id="mobile-menu-btn" aria-expanded="false">
+            <!-- Icône hamburger -->
+            <svg id="menu-icon-open" class="w-6 h-6 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+            <!-- Icône fermer (cachée par défaut) -->
+            <svg id="menu-icon-close" class="w-6 h-6 absolute inset-0 m-auto opacity-0 scale-0 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
         </button>
     </div>
+    
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu" class="fixed inset-0 bg-tus-black/98 backdrop-blur-xl z-40 md:hidden transform translate-x-full transition-transform duration-300 ease-out">
+        <div class="flex flex-col items-center justify-center h-full gap-8 text-center">
+            <a href="/services/" class="text-2xl font-display font-semibold text-tus-white/90 hover:text-tus-blue transition-colors">
+                Services
+            </a>
+            <a href="/portfolio/" class="text-2xl font-display font-semibold text-tus-white/90 hover:text-tus-blue transition-colors">
+                Portfolio
+            </a>
+            <a href="/method/" class="text-2xl font-display font-semibold text-tus-white/90 hover:text-tus-blue transition-colors">
+                Méthode
+            </a>
+            <a href="{% url 'clients:dashboard' %}" class="text-2xl font-display font-semibold text-tus-white/90 hover:text-tus-blue transition-colors flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                Espace Client
+            </a>
+            <a href="/contact/" class="mt-4 bg-tus-blue px-8 py-4 rounded-full text-xl font-semibold text-white hover:bg-tus-blue/80 transition-colors">
+                Contact
+            </a>
+            
+            <!-- Footer mobile menu -->
+            <div class="absolute bottom-8 left-0 right-0 text-center">
+                <p class="text-sm text-tus-white/40">© 2026 Trait d'Union Studio</p>
+            </div>
+        </div>
+    </div>
 </nav>
+
+<!-- Mobile Menu Toggle Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconOpen = document.getElementById('menu-icon-open');
+    const iconClose = document.getElementById('menu-icon-close');
+    let isOpen = false;
+    
+    if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener('click', function() {
+            isOpen = !isOpen;
+            
+            if (isOpen) {
+                // Ouvrir le menu
+                mobileMenu.classList.remove('translate-x-full');
+                mobileMenu.classList.add('translate-x-0');
+                iconOpen.classList.add('opacity-0', 'scale-0');
+                iconClose.classList.remove('opacity-0', 'scale-0');
+                menuBtn.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Fermer le menu
+                mobileMenu.classList.add('translate-x-full');
+                mobileMenu.classList.remove('translate-x-0');
+                iconOpen.classList.remove('opacity-0', 'scale-0');
+                iconClose.classList.add('opacity-0', 'scale-0');
+                menuBtn.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Fermer le menu quand on clique sur un lien
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                isOpen = false;
+                mobileMenu.classList.add('translate-x-full');
+                mobileMenu.classList.remove('translate-x-0');
+                iconOpen.classList.remove('opacity-0', 'scale-0');
+                iconClose.classList.add('opacity-0', 'scale-0');
+                menuBtn.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            });
+        });
+    }
+});
+</script>
