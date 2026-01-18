@@ -25,7 +25,7 @@ ALLOWED_HOSTS = os.environ.get(
 # CSRF trusted origins pour Render
 CSRF_TRUSTED_ORIGINS = os.environ.get(
     'CSRF_TRUSTED_ORIGINS',
-    'https://traitdunion.it,https://www.traitdunion.it,https://*.onrender.com'
+    'https://traitdunion.it,https://www.traitdunion.it,https://trait-d-union.onrender.com'
 ).split(',')
 
 # Sécurité HTTPS
