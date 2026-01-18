@@ -1,0 +1,15 @@
+Bonjour,
+
+Vous recevez cet email car vous avez créé un compte sur Trait d'Union Studio.
+
+Pour activer votre compte, veuillez confirmer votre adresse email en visitant ce lien :
+
+{{ activate_url }}
+
+Si vous n'avez pas créé de compte sur notre site, vous pouvez ignorer cet email.
+
+---
+Trait d'Union Studio
+Design & Développement Web Premium
+https://traitdunion.it
+contact@traitdunion.it

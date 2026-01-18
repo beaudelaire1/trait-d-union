@@ -1,0 +1,27 @@
+{% extends "account/email/base_message.html" %}
+{% load i18n %}
+
+{% block subject %}Confirmez votre adresse email - Trait d'Union Studio{% endblock %}
+
+{% block headline %}Confirmez votre email{% endblock %}
+
+{% block content %}
+<p>Bonjour,</p>
+
+<p>Vous recevez cet email car vous avez créé un compte sur <strong>Trait d'Union Studio</strong>.</p>
+
+<p>Pour activer votre compte et accéder à votre espace client, veuillez confirmer votre adresse email en cliquant sur le bouton ci-dessous :</p>
+
+<p style="text-align: center;">
+    <a href="{{ activate_url }}" class="cta-button" style="color: #ffffff !important;">Confirmer mon email</a>
+</p>
+
+<p class="note">
+    Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :<br>
+    <span class="link-text">{{ activate_url }}</span>
+</p>
+
+<p class="note">
+    Si vous n'avez pas créé de compte sur notre site, vous pouvez ignorer cet email.
+</p>
+{% endblock %}
