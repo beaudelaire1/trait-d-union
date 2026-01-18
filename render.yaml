@@ -16,6 +16,9 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     
+    # Build command (migrations, collectstatic)
+    buildCommand: chmod +x build.sh && ./build.sh
+    
     # Health check
     healthCheckPath: /
     
@@ -29,6 +32,8 @@ services:
         value: traitdunion.it,www.traitdunion.it,.onrender.com
       - key: SITE_URL
         value: https://traitdunion.it
+      - key: CSRF_TRUSTED_ORIGINS
+        value: https://traitdunion.it,https://www.traitdunion.it,https://*.onrender.com
       
       # Base de données (lien automatique)
       - key: DATABASE_URL
@@ -46,7 +51,31 @@ services:
       - key: DEFAULT_FROM_NAME
         value: "Trait d'Union Studio"
       - key: ADMIN_EMAIL
-        value: contact@traitdunion.it
+        value: admin@traitdunion.it
+      - key: TASK_NOTIFICATION_EMAIL
+        value: info@traitdunion.it
+      
+      # Stripe (à configurer manuellement - SECRETS)
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      
+      # reCAPTCHA (à configurer manuellement)
+      - key: RECAPTCHA_SITE_KEY
+        sync: false
+      - key: RECAPTCHA_SECRET_KEY
+        sync: false
+      
+      # Superuser initial (optionnel)
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@traitdunion.it
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
 
   # ==============================================================================
   # BASE DE DONNÉES POSTGRESQL

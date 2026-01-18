@@ -198,6 +198,40 @@ def invoice_payment_success(request):
 
 
 @require_http_methods(["GET"])
+def invoice_payment_cancel(request):
+    """
+    Page affichée quand le client annule le paiement sur Stripe.
+    """
+    token = request.GET.get('token', '')
+    invoice = None
+    
+    if token:
+        invoice = Invoice.objects.filter(public_token=token).first()
+    
+    return render(request, "factures/payment_cancel.html", {
+        "invoice": invoice,
+    })
+
+
+@require_http_methods(["GET"])
+def invoice_payment_error(request):
+    """
+    Page affichée en cas d'erreur de paiement.
+    """
+    token = request.GET.get('token', '')
+    error_message = request.GET.get('error', '')
+    invoice = None
+    
+    if token:
+        invoice = Invoice.objects.filter(public_token=token).first()
+    
+    return render(request, "factures/payment_error.html", {
+        "invoice": invoice,
+        "error_message": error_message,
+    })
+
+
+@require_http_methods(["GET"])
 def invoice_public_pdf(request, token: str):
     """
     Téléchargement public du PDF de facture via jeton.

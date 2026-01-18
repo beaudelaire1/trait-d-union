@@ -33,8 +33,12 @@ Thumbs.db
 
 # Test scripts (local only)
 send_test_*.py
-*_test_*.pytest_*.py
+*_test_*.py
+test_*.py
 send_*_email.py
+check_*.py
+debug_*.py
+send_premium_*.py
 
 # Local development files
 charte.txt

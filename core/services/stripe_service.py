@@ -183,7 +183,7 @@ class StripePaymentService:
             }],
             metadata=metadata,
             success_url=success_url or f"{settings.SITE_URL}/factures/paiement/succes/?session_id={{CHECKOUT_SESSION_ID}}",
-            cancel_url=cancel_url or f"{settings.SITE_URL}/factures/",
+            cancel_url=cancel_url or f"{settings.SITE_URL}/factures/paiement/annule/?token={invoice.public_token}",
         )
 
         logger.info(f"Session Stripe créée pour facture {invoice.number}: {session.id}")

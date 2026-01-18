@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Erreur de paiement - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<section class="min-h-screen bg-tus-black flex items-center justify-center py-20 relative overflow-hidden">
+    <!-- Background effects -->
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-500/10 rounded-full blur-[150px]"></div>
+    </div>
+
+    <div class="max-w-xl mx-auto px-6 text-center relative z-10">
+        <!-- Error Icon -->
+        <div class="relative w-24 h-24 mx-auto mb-8">
+            <div class="relative w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center">
+                <svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </div>
+        </div>
+
+        <h1 class="font-display text-4xl font-bold text-tus-white mb-4">
+            Erreur de <span class="text-red-400">paiement</span>
+        </h1>
+        
+        <p class="text-tus-white/60 text-lg mb-8">
+            Une erreur est survenue lors du traitement de votre paiement.
+            <br>
+            <span class="text-tus-white/50">Aucun montant n'a été débité de votre compte.</span>
+        </p>
+
+        {% if error_message %}
+        <div class="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-8">
+            <p class="text-red-400 text-sm">{{ error_message }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Possible reasons -->
+        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-6 mb-8 text-left">
+            <h3 class="font-semibold text-tus-white mb-4">Causes possibles :</h3>
+            <ul class="space-y-3 text-tus-white/70 text-sm">
+                <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-tus-blue shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                    <span>Carte bancaire refusée (fonds insuffisants, carte expirée, plafond atteint)</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-tus-blue shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    <span>Authentification 3D Secure non validée</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-tus-blue shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.14 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"/>
+                    </svg>
+                    <span>Problème de connexion temporaire</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Help box -->
+        <div class="bg-tus-blue/10 border border-tus-blue/30 rounded-2xl p-6 mb-8 text-left">
+            <h3 class="font-semibold text-tus-blue mb-3 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                Besoin d'assistance ?
+            </h3>
+            <p class="text-tus-white/70 text-sm">
+                Si le problème persiste, contactez-nous avec la référence de votre facture. 
+                Nous pouvons également vous proposer un paiement par virement bancaire.
+            </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% if invoice %}
+            <a href="{% url 'factures:pay' token=invoice.public_token %}" 
+               class="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-tus-blue to-tus-blue/80 text-tus-white py-3 px-6 rounded-xl font-semibold hover:from-tus-blue/90 hover:to-tus-blue/70 transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Réessayer le paiement
+            </a>
+            {% endif %}
+            <a href="mailto:contact@traitdunion.it?subject=Problème de paiement{% if invoice %} - Facture {{ invoice.number }}{% endif %}" 
+               class="inline-flex items-center justify-center gap-2 border-2 border-tus-white/20 text-tus-white py-3 px-6 rounded-xl font-semibold hover:bg-tus-white/10 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Nous contacter
+            </a>
+        </div>
+
+        <!-- Back home -->
+        <p class="mt-8 text-tus-white/40 text-sm">
+            <a href="{% url 'pages:home' %}" class="hover:text-tus-white transition-colors">← Retour à l'accueil</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

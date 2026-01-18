@@ -28,6 +28,8 @@ urlpatterns = [
     path("payer/<str:token>/", views.invoice_pay, name="pay"),
     path("payer/<str:token>/checkout/", views.invoice_create_checkout, name="create_checkout"),
     path("paiement/succes/", views.invoice_payment_success, name="payment_success"),
+    path("paiement/annule/", views.invoice_payment_cancel, name="payment_cancel"),
+    path("paiement/erreur/", views.invoice_payment_error, name="payment_error"),
     path("pdf/<str:token>/", views.invoice_public_pdf, name="public_pdf"),
     path("webhook/stripe/", views.stripe_invoice_webhook, name="stripe_webhook"),
 ]
