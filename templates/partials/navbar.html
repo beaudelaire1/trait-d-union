@@ -71,9 +71,14 @@
         </button>
     </div>
     
-    <!-- Mobile Menu Overlay - commence sous la navbar (top-[72px]) -->
-    <div id="mobile-menu" class="fixed top-[72px] left-0 right-0 bottom-0 z-[60] md:hidden transform translate-x-full transition-transform duration-300 ease-out" style="backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); background: linear-gradient(180deg, rgba(7, 8, 10, 0.75) 0%, rgba(7, 8, 10, 0.70) 40%, rgba(11, 45, 100, 0.65) 100%);">
-        <div class="flex flex-col items-center pt-12 gap-6 text-center px-6">
+    <!-- Mobile Menu Overlay - avec effet de flou -->
+    <div id="mobile-menu" class="fixed top-[72px] left-0 right-0 bottom-0 z-[60] md:hidden transform translate-x-full transition-transform duration-300 ease-out overflow-hidden">
+        <!-- Couche de flou -->
+        <div class="absolute inset-0 bg-tus-black/80" style="backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);"></div>
+        <!-- Overlay de couleur -->
+        <div class="absolute inset-0 bg-gradient-to-b from-tus-black/60 via-tus-black/50 to-tus-blue/30"></div>
+        <!-- Contenu du menu -->
+        <div class="relative z-10 flex flex-col items-center pt-12 gap-6 text-center px-6">
             <a href="/services/" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
                 Services
             </a>
