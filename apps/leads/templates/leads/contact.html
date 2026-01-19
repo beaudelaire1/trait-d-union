@@ -185,8 +185,12 @@
 
             {{ form.honeypot }}
             
-            <!-- reCAPTCHA v3 token (invisible) -->
-            <input type="hidden" name="g-recaptcha-response" id="recaptcha-token">
+            <!-- reCAPTCHA v2 checkbox -->
+            {% if recaptcha_site_key %}
+            <div class="flex justify-center">
+                <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}" data-theme="dark"></div>
+            </div>
+            {% endif %}
 
             <!-- Submit -->
             <div class="relative group">
@@ -213,23 +217,6 @@
 
 {% block extra_js %}
 {% if recaptcha_site_key %}
-<script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key }}"></script>
-<script>
-    const form = document.querySelector('form');
-    const submitBtn = document.getElementById('submit-btn');
-    
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        submitBtn.disabled = true;
-        submitBtn.querySelector('span').textContent = 'Vérification...';
-        
-        grecaptcha.ready(function() {
-            grecaptcha.execute('{{ recaptcha_site_key }}', {action: 'contact'}).then(function(token) {
-                document.getElementById('recaptcha-token').value = token;
-                form.submit();
-            });
-        });
-    });
-</script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 {% endif %}
 {% endblock %}

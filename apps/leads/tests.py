@@ -15,54 +15,53 @@ from apps.leads.views import verify_recaptcha
 class VerifyRecaptchaTest(TestCase):
     """Test the verify_recaptcha function."""
 
-    @override_settings(RECAPTCHA_SECRET_KEY='')
-    def test_no_secret_key_passes(self):
-        """Test that verification passes when no secret key is configured."""
-        is_valid, score = verify_recaptcha('some-token', '127.0.0.1')
+    @override_settings(RECAPTCHA_SECRET_KEY='', RECAPTCHA_SITE_KEY='')
+    def test_no_keys_configured_passes(self):
+        """Test that verification passes when no keys are configured."""
+        is_valid = verify_recaptcha('some-token', '127.0.0.1')
         self.assertTrue(is_valid)
-        self.assertEqual(score, 1.0)
 
-    @override_settings(RECAPTCHA_SECRET_KEY='test-secret')
-    def test_no_token_passes(self):
-        """Test that verification passes when token is empty (JS didn't load)."""
-        is_valid, score = verify_recaptcha('', '127.0.0.1')
+    @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='')
+    def test_no_site_key_passes(self):
+        """Test that verification passes when only secret key is configured."""
+        is_valid = verify_recaptcha('some-token', '127.0.0.1')
         self.assertTrue(is_valid)
-        self.assertEqual(score, 1.0)
 
-    @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SCORE_THRESHOLD=0.5)
+    @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
+    def test_no_token_fails(self):
+        """Test that verification fails when token is empty (user didn't check the box)."""
+        is_valid = verify_recaptcha('', '127.0.0.1')
+        self.assertFalse(is_valid)
+
+    @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
     @patch('apps.leads.views.requests.post')
-    def test_successful_verification_high_score(self, mock_post):
-        """Test successful verification with high score."""
+    def test_successful_verification(self, mock_post):
+        """Test successful verification."""
         mock_response = MagicMock()
         mock_response.json.return_value = {
             'success': True,
-            'score': 0.9,
-            'action': 'contact',
             'hostname': 'example.com'
         }
         mock_post.return_value = mock_response
 
-        is_valid, score = verify_recaptcha('valid-token', '127.0.0.1')
+        is_valid = verify_recaptcha('valid-token', '127.0.0.1')
         self.assertTrue(is_valid)
-        self.assertEqual(score, 0.9)
 
-    @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SCORE_THRESHOLD=0.5)
+    @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
     @patch('apps.leads.views.requests.post')
-    def test_low_score_fails(self, mock_post):
-        """Test that low score fails verification."""
+    def test_failed_verification(self, mock_post):
+        """Test that failed verification returns False."""
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            'success': True,
-            'score': 0.3,
-            'action': 'contact'
+            'success': False,
+            'error-codes': ['invalid-input-response']
         }
         mock_post.return_value = mock_response
 
-        is_valid, score = verify_recaptcha('valid-token', '127.0.0.1')
+        is_valid = verify_recaptcha('invalid-token', '127.0.0.1')
         self.assertFalse(is_valid)
-        self.assertEqual(score, 0.3)
 
-    @override_settings(RECAPTCHA_SECRET_KEY='test-secret')
+    @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
     @patch('apps.leads.views.requests.post')
     def test_invalid_secret_passes(self, mock_post):
         """Test that invalid secret key error allows submission (graceful degradation)."""
@@ -73,45 +72,26 @@ class VerifyRecaptchaTest(TestCase):
         }
         mock_post.return_value = mock_response
 
-        is_valid, score = verify_recaptcha('some-token', '127.0.0.1')
+        is_valid = verify_recaptcha('some-token', '127.0.0.1')
         self.assertTrue(is_valid)
-        self.assertEqual(score, 1.0)
 
-    @override_settings(RECAPTCHA_SECRET_KEY='test-secret')
-    @patch('apps.leads.views.requests.post')
-    def test_wrong_action_fails(self, mock_post):
-        """Test that wrong action name fails verification."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {
-            'success': True,
-            'score': 0.9,
-            'action': 'login'  # Wrong action
-        }
-        mock_post.return_value = mock_response
-
-        is_valid, score = verify_recaptcha('valid-token', '127.0.0.1', expected_action='contact')
-        self.assertFalse(is_valid)
-        self.assertEqual(score, 0.0)
-
-    @override_settings(RECAPTCHA_SECRET_KEY='test-secret')
+    @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
     @patch('apps.leads.views.requests.post')
     def test_network_error_passes(self, mock_post):
         """Test that network errors allow submission (graceful degradation)."""
         mock_post.side_effect = requests.RequestException("Connection timeout")
 
-        is_valid, score = verify_recaptcha('some-token', '127.0.0.1')
+        is_valid = verify_recaptcha('some-token', '127.0.0.1')
         self.assertTrue(is_valid)
-        self.assertEqual(score, 1.0)
 
-    @override_settings(RECAPTCHA_SECRET_KEY='test-secret')
+    @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
     @patch('apps.leads.views.requests.post')
     def test_timeout_handled(self, mock_post):
         """Test that API timeout is handled gracefully."""
         mock_post.side_effect = requests.Timeout("Request timed out")
 
-        is_valid, score = verify_recaptcha('some-token', '127.0.0.1')
+        is_valid = verify_recaptcha('some-token', '127.0.0.1')
         self.assertTrue(is_valid)
-        self.assertEqual(score, 1.0)
 
 
 class LeadModelTest(TestCase):
