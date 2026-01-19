@@ -101,8 +101,14 @@ CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
 CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
 
+# Vérifier si on est en train de builder (collectstatic)
+import sys
+IS_BUILDING = 'collectstatic' in sys.argv
+
 if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
-    print(f"✅ Cloudinary configuration found for cloud: {CLOUDINARY_CLOUD_NAME}")
+    if not IS_BUILDING:
+        print(f"✅ Cloudinary configuration found for cloud: {CLOUDINARY_CLOUD_NAME}")
+    
     # Configuration Cloudinary
     INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
     
@@ -126,8 +132,13 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/'
 else:
-    print("❌ CLOUDINARY ENV VARS MISSING! External media storage will NOT work.")
-    # Fallback si pas de Cloudinary (les images seront cassées en prod)
+    # Mode Build ou Config manquante
+    if IS_BUILDING:
+        print("ℹ️  Build mode detected: Skipping detailed Cloudinary checks (expected).")
+    else:
+        print("❌ CLOUDINARY ENV VARS MISSING! External media storage will NOT work.")
+    
+    # Configuration minimale pour le build
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
