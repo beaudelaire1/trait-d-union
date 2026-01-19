@@ -6,12 +6,12 @@
         
         {% if project.thumbnail %}
         <!-- Projet avec image -->
-        <div class="relative h-56 overflow-hidden">
+        <div class="relative h-56 overflow-hidden bg-tus-black/20">
             <img src="{{ project.thumbnail.url }}" 
                  alt="Projet {{ project.title }} - {{ project.get_category_display }}" 
-                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" 
+                 class="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-700 ease-out" 
                  loading="lazy">
-            <div class="absolute inset-0 bg-gradient-to-t from-tus-black/90 via-tus-black/20 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-tus-black/90 via-tus-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             
             <!-- Tech badges sur l'image -->
             {% if project.technologies %}
