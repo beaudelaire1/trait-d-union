@@ -130,7 +130,11 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
     
     # Fallback pour compatibilité
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/'
+    
+    # IMPORTANT : Ne pas surcharger MEDIA_URL avec l'URL Cloudinary brute.
+    # La librairie cloudinary_storage génère elle-même les URLs complètes (incluant /image/upload/...).
+    # En laissant /media/, on évite de casser les liens.
+    MEDIA_URL = '/media/'
 else:
     # Mode Build ou Config manquante
     if IS_BUILDING:
