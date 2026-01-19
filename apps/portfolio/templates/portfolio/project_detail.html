@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-{% block title %}{{ project.title }} – Portfolio – Trait d'Union Studio{% endblock %}
-{% block meta_description %}{{ project.objective|truncatewords:30 }}{% endblock %}
+{% block title %}Projet Web {{ project.title }} - {{ project.get_category_display }} - Trait d'Union Studio{% endblock %}
+{% block meta_description %}{{ project.objective|truncatewords:30 }} - Réalisation de site web et application en Guyane et Antilles par Trait d'Union Studio.{% endblock %}
 
 {% block content %}
 <div class="min-h-screen relative overflow-hidden">
@@ -64,9 +64,9 @@
         <div class="max-w-6xl mx-auto">
             <div class="relative rounded-2xl overflow-hidden shadow-2xl shadow-tus-blue/10 bg-tus-white/5 group">
                 <img src="{{ project.thumbnail.url }}" 
-                     alt="{{ project.title }}" 
+                     alt="{{ project.title }} - Création site internet Guyane" 
                      class="w-full h-auto max-h-[500px] object-contain transition-transform duration-700 group-hover:scale-105"
-                     loading="lazy">
+                     fetchpriority="high">
                 <div class="absolute inset-0 bg-gradient-to-t from-tus-black/50 via-transparent to-transparent pointer-events-none"></div>
                 
                 <!-- Overlay effet sur hover -->

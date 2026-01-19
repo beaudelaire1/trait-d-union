@@ -102,6 +102,7 @@ CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
 CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
 
 if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
+    print(f"✅ Cloudinary configuration found for cloud: {CLOUDINARY_CLOUD_NAME}")
     # Configuration Cloudinary
     INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
     
@@ -111,8 +112,30 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
         'API_SECRET': CLOUDINARY_API_SECRET,
     }
     
+    # Configuration moderne Django 5+
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+    
+    # Fallback pour compatibilité
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/'
+else:
+    print("❌ CLOUDINARY ENV VARS MISSING! External media storage will NOT work.")
+    # Fallback si pas de Cloudinary (les images seront cassées en prod)
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
 
 # ==============================================================================
 # EMAIL (Brevo API - recommandé pour Render)
