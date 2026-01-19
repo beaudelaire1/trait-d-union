@@ -19,29 +19,28 @@ from .services import EmailService
 logger = logging.getLogger(__name__)
 
 
-def verify_recaptcha(token: str, remote_ip: str = '', expected_action: str = 'contact') -> tuple[bool, float]:
-    """Vérifie le token reCAPTCHA v3 auprès de Google.
+def verify_recaptcha(token: str, remote_ip: str = '') -> bool:
+    """Vérifie le token reCAPTCHA v2 auprès de Google.
     
     Args:
-        token: Le token reCAPTCHA généré côté client
+        token: Le token reCAPTCHA généré côté client (g-recaptcha-response)
         remote_ip: L'adresse IP du client (optionnel)
-        expected_action: L'action attendue pour la vérification (défaut: 'contact')
     
     Returns:
-        tuple: (is_valid, score) - Le score va de 0.0 (bot) à 1.0 (humain)
+        bool: True si la vérification a réussi, False sinon
     """
     secret_key = getattr(settings, 'RECAPTCHA_SECRET_KEY', '')
+    site_key = getattr(settings, 'RECAPTCHA_SITE_KEY', '')
     
-    # Si pas de clé secrète configurée, on passe (mode développement)
-    if not secret_key:
-        logger.debug("reCAPTCHA: Pas de clé secrète configurée, vérification ignorée")
-        return True, 1.0
+    # Si pas de clé configurée, on passe (mode développement)
+    if not secret_key or not site_key:
+        logger.debug("reCAPTCHA: Pas de clés configurées, vérification ignorée")
+        return True
     
-    # Si pas de token mais clé configurée, c'est un problème
+    # Si pas de token mais clés configurées, le JS n'a peut-être pas chargé
     if not token:
-        logger.warning("reCAPTCHA: Token manquant alors que la clé secrète est configurée")
-        # On laisse passer pour ne pas bloquer si le JS n'a pas chargé
-        return True, 1.0
+        logger.warning("reCAPTCHA: Token manquant - le widget n'a pas été validé")
+        return False
     
     try:
         response = requests.post(
@@ -56,7 +55,6 @@ def verify_recaptcha(token: str, remote_ip: str = '', expected_action: str = 'co
         result = response.json()
         
         logger.debug(f"reCAPTCHA response: success={result.get('success')}, "
-                    f"score={result.get('score')}, action={result.get('action')}, "
                     f"hostname={result.get('hostname')}")
         
         if not result.get('success'):
@@ -66,28 +64,15 @@ def verify_recaptcha(token: str, remote_ip: str = '', expected_action: str = 'co
             # pour ne pas bloquer les utilisateurs légitimes
             if 'invalid-input-secret' in error_codes or 'bad-request' in error_codes:
                 logger.error("reCAPTCHA: Clé secrète invalide ou requête malformée - vérifiez la configuration")
-                return True, 1.0
-            return False, 0.0
+                return True
+            return False
         
-        # Vérifier l'action pour plus de sécurité
-        action = result.get('action', '')
-        if action and action != expected_action:
-            logger.warning(f"reCAPTCHA: Action inattendue '{action}', attendue '{expected_action}'")
-            return False, 0.0
-        
-        score = result.get('score', 0.0)
-        threshold = getattr(settings, 'RECAPTCHA_SCORE_THRESHOLD', 0.5)
-        is_valid = score >= threshold
-        
-        if not is_valid:
-            logger.info(f"reCAPTCHA: Score {score} inférieur au seuil {threshold}")
-        
-        return is_valid, score
+        return True
         
     except requests.RequestException as e:
         logger.error(f"reCAPTCHA API error: {e}")
         # En cas d'erreur réseau, on laisse passer pour ne pas bloquer les utilisateurs
-        return True, 1.0
+        return True
 
 
 class ContactView(FormView):
@@ -105,15 +90,14 @@ class ContactView(FormView):
     def form_valid(self, form: ContactForm) -> HttpResponse:
         # Vérifier reCAPTCHA
         recaptcha_token = self.request.POST.get('g-recaptcha-response', '')
-        is_valid, score = verify_recaptcha(
+        is_valid = verify_recaptcha(
             token=recaptcha_token,
             remote_ip=self.get_client_ip(),
-            expected_action='contact'
         )
         
         if not is_valid:
-            logger.warning(f"reCAPTCHA rejected submission with score: {score}")
-            form.add_error(None, "La vérification de sécurité a échoué. Veuillez réessayer.")
+            logger.warning("reCAPTCHA verification failed")
+            form.add_error(None, "La vérification de sécurité a échoué. Veuillez cocher la case « Je ne suis pas un robot » et réessayer.")
             return self.form_invalid(form)
         
         # Save lead
