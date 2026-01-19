@@ -19,15 +19,28 @@ from .services import EmailService
 logger = logging.getLogger(__name__)
 
 
-def verify_recaptcha(token: str, remote_ip: str = '') -> tuple[bool, float]:
+def verify_recaptcha(token: str, remote_ip: str = '', expected_action: str = 'contact') -> tuple[bool, float]:
     """Vérifie le token reCAPTCHA v3 auprès de Google.
+    
+    Args:
+        token: Le token reCAPTCHA généré côté client
+        remote_ip: L'adresse IP du client (optionnel)
+        expected_action: L'action attendue pour la vérification (défaut: 'contact')
     
     Returns:
         tuple: (is_valid, score) - Le score va de 0.0 (bot) à 1.0 (humain)
     """
     secret_key = getattr(settings, 'RECAPTCHA_SECRET_KEY', '')
-    if not secret_key or not token:
-        # Si pas de clé configurée, on passe (mode développement)
+    
+    # Si pas de clé secrète configurée, on passe (mode développement)
+    if not secret_key:
+        logger.debug("reCAPTCHA: Pas de clé secrète configurée, vérification ignorée")
+        return True, 1.0
+    
+    # Si pas de token mais clé configurée, c'est un problème
+    if not token:
+        logger.warning("reCAPTCHA: Token manquant alors que la clé secrète est configurée")
+        # On laisse passer pour ne pas bloquer si le JS n'a pas chargé
         return True, 1.0
     
     try:
@@ -42,13 +55,34 @@ def verify_recaptcha(token: str, remote_ip: str = '') -> tuple[bool, float]:
         )
         result = response.json()
         
-        if result.get('success'):
-            score = result.get('score', 0.0)
-            threshold = getattr(settings, 'RECAPTCHA_SCORE_THRESHOLD', 0.5)
-            return score >= threshold, score
+        logger.debug(f"reCAPTCHA response: success={result.get('success')}, "
+                    f"score={result.get('score')}, action={result.get('action')}, "
+                    f"hostname={result.get('hostname')}")
         
-        logger.warning(f"reCAPTCHA verification failed: {result.get('error-codes', [])}")
-        return False, 0.0
+        if not result.get('success'):
+            error_codes = result.get('error-codes', [])
+            logger.warning(f"reCAPTCHA verification failed: {error_codes}")
+            # En cas d'erreur de configuration (clés invalides), on laisse passer
+            # pour ne pas bloquer les utilisateurs légitimes
+            if 'invalid-input-secret' in error_codes or 'bad-request' in error_codes:
+                logger.error("reCAPTCHA: Clé secrète invalide ou requête malformée - vérifiez la configuration")
+                return True, 1.0
+            return False, 0.0
+        
+        # Vérifier l'action pour plus de sécurité
+        action = result.get('action', '')
+        if action and action != expected_action:
+            logger.warning(f"reCAPTCHA: Action inattendue '{action}', attendue '{expected_action}'")
+            return False, 0.0
+        
+        score = result.get('score', 0.0)
+        threshold = float(getattr(settings, 'RECAPTCHA_SCORE_THRESHOLD', 0.5))
+        is_valid = score >= threshold
+        
+        if not is_valid:
+            logger.info(f"reCAPTCHA: Score {score} inférieur au seuil {threshold}")
+        
+        return is_valid, score
         
     except requests.RequestException as e:
         logger.error(f"reCAPTCHA API error: {e}")
@@ -71,7 +105,11 @@ class ContactView(FormView):
     def form_valid(self, form: ContactForm) -> HttpResponse:
         # Vérifier reCAPTCHA
         recaptcha_token = self.request.POST.get('g-recaptcha-response', '')
-        is_valid, score = verify_recaptcha(recaptcha_token, self.get_client_ip())
+        is_valid, score = verify_recaptcha(
+            token=recaptcha_token,
+            remote_ip=self.get_client_ip(),
+            expected_action='contact'
+        )
         
         if not is_valid:
             logger.warning(f"reCAPTCHA rejected submission with score: {score}")
