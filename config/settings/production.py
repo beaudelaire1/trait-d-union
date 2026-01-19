@@ -100,23 +100,28 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
 CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
 
 # Vérifier si on est en train de builder (collectstatic)
 import sys
 IS_BUILDING = 'collectstatic' in sys.argv
 
-if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
+if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY):
     if not IS_BUILDING:
-        print(f"✅ Cloudinary configuration found for cloud: {CLOUDINARY_CLOUD_NAME}")
+        print(f"✅ Cloudinary configuration found")
     
     # Configuration Cloudinary
     INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
     
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
-        'API_KEY': CLOUDINARY_API_KEY,
-        'API_SECRET': CLOUDINARY_API_SECRET,
-    }
+    if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+            'API_KEY': CLOUDINARY_API_KEY,
+            'API_SECRET': CLOUDINARY_API_SECRET,
+        }
+    else:
+        # Si CLOUDINARY_URL est défini, on laisse la lib le gérer
+        CLOUDINARY_STORAGE = {}
     
     # Configuration moderne Django 5+
     STORAGES = {
