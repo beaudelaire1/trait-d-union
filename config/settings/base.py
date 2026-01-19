@@ -181,7 +181,13 @@ TASK_NOTIFICATION_EMAIL = os.environ.get('TASK_NOTIFICATION_EMAIL', os.environ.g
 # Obtenez vos clés sur https://www.google.com/recaptcha/admin
 RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
-RECAPTCHA_SCORE_THRESHOLD = 0.5  # Score minimum (0.0 à 1.0)
+# Score minimum (0.0 à 1.0) - les scores plus bas sont considérés comme des bots
+# Valeur recommandée: 0.5. Réduire si trop de faux positifs.
+_threshold_str = os.environ.get('RECAPTCHA_SCORE_THRESHOLD', '0.5')
+try:
+    RECAPTCHA_SCORE_THRESHOLD = max(0.0, min(1.0, float(_threshold_str)))
+except (ValueError, TypeError):
+    RECAPTCHA_SCORE_THRESHOLD = 0.5
 
 # ==============================================================================
 # PHASE 3 : STRIPE PAYMENT CONFIGURATION
