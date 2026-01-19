@@ -1,5 +1,6 @@
 """Tests for the leads app."""
 import pytest
+import requests
 from unittest.mock import patch, MagicMock
 from django.test import TestCase, Client, override_settings
 from django.urls import reverse
@@ -96,8 +97,7 @@ class VerifyRecaptchaTest(TestCase):
     @patch('apps.leads.views.requests.post')
     def test_network_error_passes(self, mock_post):
         """Test that network errors allow submission (graceful degradation)."""
-        import requests as req
-        mock_post.side_effect = req.RequestException("Connection timeout")
+        mock_post.side_effect = requests.RequestException("Connection timeout")
 
         is_valid, score = verify_recaptcha('some-token', '127.0.0.1')
         self.assertTrue(is_valid)
@@ -107,8 +107,7 @@ class VerifyRecaptchaTest(TestCase):
     @patch('apps.leads.views.requests.post')
     def test_timeout_handled(self, mock_post):
         """Test that API timeout is handled gracefully."""
-        import requests as req
-        mock_post.side_effect = req.Timeout("Request timed out")
+        mock_post.side_effect = requests.Timeout("Request timed out")
 
         is_valid, score = verify_recaptcha('some-token', '127.0.0.1')
         self.assertTrue(is_valid)

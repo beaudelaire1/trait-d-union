@@ -76,7 +76,7 @@ def verify_recaptcha(token: str, remote_ip: str = '', expected_action: str = 'co
             return False, 0.0
         
         score = result.get('score', 0.0)
-        threshold = float(getattr(settings, 'RECAPTCHA_SCORE_THRESHOLD', 0.5))
+        threshold = getattr(settings, 'RECAPTCHA_SCORE_THRESHOLD', 0.5)
         is_valid = score >= threshold
         
         if not is_valid:
