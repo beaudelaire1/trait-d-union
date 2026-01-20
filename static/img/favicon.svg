@@ -1,0 +1,10 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+     <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0B2DFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2D5BFF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="100" fill="url(#grad)"/>
+  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="'Space Grotesk', Arial, sans-serif" font-weight="bold" font-size="240" fill="#F6F7FB" letter-spacing="-10">TUS</text>
+</svg>
