@@ -1,0 +1,13 @@
+<svg viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+    <defs>
+        <linearGradient id="tusGradDocStrong" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#0B2DFF"/>
+        <stop offset="0.70" stop-color="#2D5BFF"/>
+        <stop offset="1" stop-color="#F6F7FB"/>
+        </linearGradient>
+    </defs>
+
+    <text x="0" y="52" font-family="Space Grotesk, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="1.2" fill="#07080A">TRAIT D’UNION</text>
+    <rect x="0" y="66" width="260" height="4" rx="2" fill="url(#tusGradDocStrong)"/>
+    <text x="0" y="104" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(7,8,10,0.78)">STUDIO</text>
+</svg>
