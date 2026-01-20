@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 
 from config.sitemaps import StaticViewSitemap, PortfolioSitemap
 
@@ -32,6 +32,8 @@ urlpatterns = [
     # SEO
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
+    # Favicon à la racine pour Google Search
+    path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico', permanent=True), name='favicon'),
 ]
 
 # Servir les fichiers statiques et média en développement
