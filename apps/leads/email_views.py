@@ -3,12 +3,12 @@ from __future__ import annotations
 
 import logging
 from typing import Any
-from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import CreateView, ListView, DetailView
 from django.views import View
 
@@ -37,10 +37,11 @@ class EmailComposeView(LoginRequiredMixin, CreateView):
         # Check if we should send or save as draft
         if 'send' in self.request.POST:
             form.instance.is_draft = False
-            form.instance.sent_at = datetime.now()
-            # TODO: Actually send the email here
+            form.instance.sent_at = timezone.now()
+            # TODO: Actually send the email here using the email service
             # For now, we just mark it as sent
-            logger.info(f"Email would be sent to: {form.instance.to_emails}")
+            # Future implementation should integrate with core.services.email_backends
+            logger.info(f"Email marked for sending to: {form.instance.to_emails}")
         else:
             form.instance.is_draft = True
         
