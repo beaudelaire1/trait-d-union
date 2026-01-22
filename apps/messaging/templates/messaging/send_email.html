@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Envoyer un email - {{ prospect.contact_name }} | TUS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-tus-black">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex items-center space-x-4 mb-8">
+            <a href="{% url 'messaging:prospect_detail' prospect.pk %}" class="text-tus-white/60 hover:text-tus-white">
+                ← Retour
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-tus-white font-space">Envoyer un email</h1>
+                <p class="text-tus-white/60">À: {{ prospect.contact_name }} &lt;{{ prospect.email }}&gt;</p>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form method="post" class="bg-tus-surface rounded-xl p-8 border border-tus-white/10">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-tus-white/70 mb-2">Choisir un template</label>
+                    <div class="space-y-3">
+                        <label class="flex items-center p-4 bg-tus-black rounded-lg border border-tus-white/10 cursor-pointer hover:border-tus-blue/50 transition">
+                            <input type="radio" name="template" value="prospection-standard" checked class="mr-4 text-tus-blue">
+                            <div>
+                                <p class="text-tus-white font-medium">Template par défaut</p>
+                                <p class="text-tus-white/50 text-sm">Email de prospection standard Trait d'Union Studio</p>
+                            </div>
+                        </label>
+                        
+                        {% for template in templates %}
+                        <label class="flex items-center p-4 bg-tus-black rounded-lg border border-tus-white/10 cursor-pointer hover:border-tus-blue/50 transition">
+                            <input type="radio" name="template" value="{{ template.slug }}" class="mr-4 text-tus-blue">
+                            <div>
+                                <p class="text-tus-white font-medium">{{ template.name }}</p>
+                                <p class="text-tus-white/50 text-sm">{{ template.subject }}</p>
+                            </div>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview -->
+            <div class="mt-8 p-4 bg-tus-black rounded-lg border border-tus-white/10">
+                <p class="text-tus-white/50 text-sm mb-2">Aperçu du destinataire:</p>
+                <div class="flex items-center space-x-4">
+                    <div class="w-10 h-10 bg-tus-blue/20 rounded-full flex items-center justify-center">
+                        <span class="text-tus-blue font-semibold">{{ prospect.contact_name|slice:":1"|upper }}</span>
+                    </div>
+                    <div>
+                        <p class="text-tus-white font-medium">{{ prospect.contact_name }}</p>
+                        <p class="text-tus-white/50 text-sm">{{ prospect.email }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="mt-8 flex justify-end space-x-4">
+                <a href="{% url 'messaging:prospect_detail' prospect.pk %}" 
+                   class="px-6 py-2 bg-tus-black border border-tus-white/10 rounded-lg text-tus-white hover:bg-tus-white/5 transition">
+                    Annuler
+                </a>
+                <button type="submit" class="px-6 py-2 bg-tus-blue text-white rounded-lg hover:bg-tus-blue/90 transition inline-flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                    </svg>
+                    Envoyer l'email
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

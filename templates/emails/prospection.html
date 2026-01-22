@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject }}</title>
+    <style>
+        /* Charte Graphique TUS - Email Prospection */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7;
+            color: #07080A;
+            background-color: #07080A;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #0D1016;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(246, 247, 251, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #07080A 0%, #0D1016 100%);
+            padding: 40px 30px 30px;
+            text-align: center;
+            border-bottom: 1px solid rgba(246, 247, 251, 0.1);
+        }
+        .logo {
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 40px 35px;
+            background-color: #0D1016;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #F6F7FB;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        .message-text {
+            font-size: 15px;
+            color: rgba(246, 247, 251, 0.85);
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(11, 45, 255, 0.1) 0%, rgba(45, 91, 255, 0.05) 100%);
+            border: 1px solid rgba(11, 45, 255, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+        .highlight-title {
+            color: #F6F7FB;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .services-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .services-list li {
+            padding: 10px 0;
+            color: rgba(246, 247, 251, 0.8);
+            font-size: 14px;
+            border-bottom: 1px solid rgba(246, 247, 251, 0.05);
+            display: flex;
+            align-items: center;
+        }
+        .services-list li:last-child {
+            border-bottom: none;
+        }
+        .services-list li::before {
+            content: "→";
+            color: #0B2DFF;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        .objective-box {
+            background-color: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: center;
+        }
+        .objective-text {
+            color: #4ADE80;
+            font-size: 15px;
+            font-weight: 500;
+            margin: 0;
+        }
+        .cta-section {
+            background-color: rgba(246, 247, 251, 0.03);
+            border: 1px solid rgba(246, 247, 251, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .cta-title {
+            color: #F6F7FB;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .cta-list {
+            color: rgba(246, 247, 251, 0.7);
+            font-size: 14px;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        .cta-list li {
+            margin-bottom: 8px;
+        }
+        .cta-note {
+            color: rgba(246, 247, 251, 0.6);
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        .signature {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(246, 247, 251, 0.1);
+        }
+        .signature-text {
+            color: rgba(246, 247, 251, 0.6);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .signature-name {
+            color: #F6F7FB;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .signature-company {
+            color: #0B2DFF;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        .signature-email {
+            color: rgba(246, 247, 251, 0.5);
+            font-size: 13px;
+        }
+        .signature-email a {
+            color: #0B2DFF;
+            text-decoration: none;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%);
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 15px;
+        }
+        .footer {
+            background-color: #07080A;
+            padding: 25px 30px;
+            text-align: center;
+            border-top: 1px solid rgba(246, 247, 251, 0.1);
+        }
+        .footer p {
+            color: rgba(246, 247, 251, 0.4);
+            margin: 5px 0;
+            font-size: 12px;
+        }
+        .footer a {
+            color: #0B2DFF;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <!-- Logo TUS texte stylisé -->
+            <div class="logo">
+                <div style="font-family: 'Space Grotesk', Arial, sans-serif; font-size: 26px; font-weight: 700; color: #F6F7FB; letter-spacing: 1px;">TRAIT D'UNION</div>
+                <div style="width: 140px; height: 3px; margin: 8px auto; background: linear-gradient(90deg, #0B2DFF, #2D5BFF, #F6F7FB); border-radius: 2px;"></div>
+                <div style="font-family: 'Space Grotesk', Arial, sans-serif; font-size: 12px; font-weight: 600; color: rgba(246,247,251,0.8); letter-spacing: 4px;">STUDIO</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <p class="greeting">Bonjour,</p>
+            
+            <p class="message-text">
+                Je vous contacte car beaucoup de petites entreprises perdent du temps avec des tâches répétitives : 
+                <strong style="color: #F6F7FB;">devis, factures, relances, planning, suivi clients, stockage des infos, 
+                WhatsApp partout, Excel dispersés…</strong>
+            </p>
+            
+            <p class="message-text">
+                Mon travail, c'est de <strong style="color: #0B2DFF;">transformer ça en un outil simple et sur-mesure</strong>, 
+                adapté à votre façon de travailler.
+            </p>
+            
+            <p class="message-text">
+                Je suis <strong style="color: #F6F7FB;">Beaudelaire VILME</strong>, fondateur de 
+                <strong style="color: #0B2DFF;">Trait d'Union Studio</strong>, Guyane 
+                (<a href="https://www.traitdunion.it" style="color: #0B2DFF; text-decoration: none;">www.traitdunion.it</a>). 
+                Je conçois :
+            </p>
+            
+            <div class="highlight-box">
+                <div class="highlight-title">🛠️ Mes solutions sur-mesure</div>
+                <ul class="services-list">
+                    <li><strong style="color: #F6F7FB;">Mini-ERP / outils de gestion</strong> (devis → facture, relances, suivi paiements)</li>
+                    <li><strong style="color: #F6F7FB;">Planning / interventions / suivi d'équipe</strong></li>
+                    <li><strong style="color: #F6F7FB;">CRM simple</strong> (clients, historique, rappels)</li>
+                    <li><strong style="color: #F6F7FB;">Portail client</strong> (documents, demandes, validation)</li>
+                    <li><strong style="color: #F6F7FB;">Site vitrine</strong> connecté à vos outils (si besoin)</li>
+                </ul>
+            </div>
+            
+            <div class="objective-box">
+                <p class="objective-text">
+                    🎯 L'objectif : <strong>moins d'erreurs, moins de temps perdu, plus de visibilité sur l'activité.</strong>
+                </p>
+            </div>
+            
+            <div class="cta-section">
+                <div class="cta-title">📩 Si vous me répondez avec :</div>
+                <ul class="cta-list">
+                    <li>Votre <strong>activité</strong></li>
+                    <li>Ce qui vous fait <strong>perdre le plus de temps</strong> aujourd'hui</li>
+                </ul>
+                <p class="message-text" style="margin-bottom: 0;">
+                    Je vous envoie une <strong style="color: #4ADE80;">proposition concrète</strong> 
+                    (2–3 fonctionnalités prioritaires + une idée de budget/délai).
+                </p>
+                <p class="cta-note">
+                    📞 On peut aussi faire un <strong style="color: #F6F7FB;">appel rapide de 15 minutes</strong> : 
+                    répondez-moi avec un jour/heure qui vous arrange.
+                </p>
+            </div>
+            
+            <div class="signature">
+                <p class="signature-text">Bien à vous,</p>
+                <p class="signature-name">Beaudelaire VILME</p>
+                <p class="signature-company">Trait d'Union Studio</p>
+                <p class="signature-email">
+                    <a href="mailto:contact@traitdunion.it">contact@traitdunion.it</a>
+                </p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><a href="https://www.traitdunion.it">www.traitdunion.it</a></p>
+            <p>Outils numériques sur-mesure • Guyane</p>
+        </div>
+    </div>
+</body>
+</html>

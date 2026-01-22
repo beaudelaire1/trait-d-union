@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Templates Email | TUS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-tus-black">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-tus-white font-space">Templates Email</h1>
+                <p class="mt-1 text-tus-white/60">Modèles d'emails réutilisables</p>
+            </div>
+            <a href="{% url 'messaging:prospect_list' %}" 
+               class="mt-4 md:mt-0 inline-flex items-center px-4 py-2 bg-tus-surface text-tus-white border border-tus-white/10 rounded-lg hover:bg-tus-white/5 transition">
+                👥 Prospects
+            </a>
+        </div>
+
+        <!-- Templates Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for template in templates %}
+            <div class="bg-tus-surface rounded-xl p-6 border border-tus-white/10">
+                <div class="flex items-start justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-tus-white">{{ template.name }}</h3>
+                    {% if template.is_active %}
+                    <span class="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">Actif</span>
+                    {% else %}
+                    <span class="px-2 py-1 bg-gray-500/20 text-gray-400 rounded text-xs">Inactif</span>
+                    {% endif %}
+                </div>
+                
+                <p class="text-tus-white/70 text-sm mb-3">{{ template.subject }}</p>
+                
+                <div class="flex items-center justify-between">
+                    <span class="px-2 py-1 bg-tus-black rounded text-xs text-tus-white/60">
+                        {{ template.get_category_display }}
+                    </span>
+                    <span class="text-tus-white/40 text-xs">
+                        Modifié le {{ template.updated_at|date:"d/m/Y" }}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12 bg-tus-surface rounded-xl border border-tus-white/10">
+                <p class="text-tus-white/50 text-lg mb-2">Aucun template créé</p>
+                <p class="text-tus-white/40">Créez des templates depuis l'interface d'administration</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+<li>
+    <a href="/tus-gestion-secure/emails/compose/" class="addlink" style="background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;">
+        ✉️ Composer un email premium
+    </a>
+</li>
+<li>
+    <a href="/tus-gestion-secure/emails/" class="viewlink" style="padding: 10px 20px; border-radius: 8px;">
+        📬 Voir l'interface emails
+    </a>
+</li>
+{{ block.super }}
+{% endblock %}

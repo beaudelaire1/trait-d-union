@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Nouvelle Campagne | TUS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-tus-black">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex items-center space-x-4 mb-8">
+            <a href="{% url 'messaging:campaign_list' %}" class="text-tus-white/60 hover:text-tus-white">
+                ← Retour
+            </a>
+            <h1 class="text-2xl font-bold text-tus-white font-space">Nouvelle campagne</h1>
+        </div>
+
+        <!-- Form -->
+        <form method="post" class="bg-tus-surface rounded-xl p-8 border border-tus-white/10">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-tus-white/70 mb-1">Nom de la campagne *</label>
+                    {{ form.name }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-tus-white/70 mb-1">Template email *</label>
+                    {{ form.template }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-tus-white/70 mb-1">Date d'envoi planifiée</label>
+                    {{ form.scheduled_at }}
+                    <p class="mt-1 text-xs text-tus-white/50">Laissez vide pour envoyer manuellement</p>
+                </div>
+                
+                <!-- Prospects Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-tus-white/70 mb-2">Sélectionner les prospects</label>
+                    <div class="max-h-64 overflow-y-auto bg-tus-black rounded-lg border border-tus-white/10 p-4">
+                        {% for prospect in prospects %}
+                        <label class="flex items-center space-x-3 py-2 hover:bg-tus-white/5 px-2 rounded cursor-pointer">
+                            <input type="checkbox" name="prospects" value="{{ prospect.pk }}" 
+                                   class="w-4 h-4 rounded border-tus-white/30 bg-tus-black text-tus-blue focus:ring-tus-blue">
+                            <div class="flex-1">
+                                <span class="text-tus-white">{{ prospect.contact_name }}</span>
+                                {% if prospect.company_name %}
+                                <span class="text-tus-white/50">- {{ prospect.company_name }}</span>
+                                {% endif %}
+                            </div>
+                            <span class="text-tus-white/40 text-sm">{{ prospect.email }}</span>
+                        </label>
+                        {% empty %}
+                        <p class="text-tus-white/50 text-center py-4">Aucun prospect disponible</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="mt-8 flex justify-end space-x-4">
+                <a href="{% url 'messaging:campaign_list' %}" 
+                   class="px-6 py-2 bg-tus-black border border-tus-white/10 rounded-lg text-tus-white hover:bg-tus-white/5 transition">
+                    Annuler
+                </a>
+                <button type="submit" class="px-6 py-2 bg-tus-blue text-white rounded-lg hover:bg-tus-blue/90 transition">
+                    Créer la campagne
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-input, .form-select {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background-color: #07080A;
+    border: 1px solid rgba(246, 247, 251, 0.1);
+    border-radius: 0.5rem;
+    color: #F6F7FB;
+}
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #0B2DFF;
+}
+</style>
+{% endblock %}

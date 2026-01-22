@@ -4,9 +4,8 @@
 {% block title %}Composer un email - Trait d'Union Studio{% endblock %}
 
 {% block extra_head %}
-<!-- TinyMCE -->
-<!-- NOTE: For production, replace 'no-api-key' with a proper TinyMCE API key or use self-hosted version -->
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- TinyMCE - Version CDN gratuite jsDelivr (sans API key requise) -->
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.2/tinymce.min.js"></script>
 <style>
     /* Custom TinyMCE dark theme styling */
     .tox.tox-tinymce {
@@ -219,7 +218,11 @@
         if (!templateId) return;
         
         try {
-            const response = await fetch(`/contact/api/templates/${templateId}/`);
+            // Try admin_emails URL first, fallback to leads
+            let response = await fetch(`/tus-gestion-secure/emails/api/templates/${templateId}/`);
+            if (!response.ok) {
+                response = await fetch(`/contact/api/templates/${templateId}/`);
+            }
             const data = await response.json();
             
             if (data.success) {

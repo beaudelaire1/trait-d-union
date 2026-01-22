@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | TUS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-tus-black">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="flex items-center space-x-4 mb-8">
+            <a href="{% url 'messaging:prospect_list' %}" class="text-tus-white/60 hover:text-tus-white">
+                ← Retour
+            </a>
+            <h1 class="text-2xl font-bold text-tus-white font-space">{{ title }}</h1>
+        </div>
+
+        <!-- Form -->
+        <form method="post" class="bg-tus-surface rounded-xl p-8 border border-tus-white/10">
+            {% csrf_token %}
+            
+            <div class="space-y-6">
+                <!-- Contact Info -->
+                <div class="pb-6 border-b border-tus-white/10">
+                    <h2 class="text-lg font-semibold text-tus-white mb-4">Informations de contact</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Nom du contact *</label>
+                            {{ form.contact_name }}
+                            {% if form.contact_name.errors %}
+                            <p class="mt-1 text-sm text-red-400">{{ form.contact_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Entreprise</label>
+                            {{ form.company_name }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Email *</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <p class="mt-1 text-sm text-red-400">{{ form.email.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Téléphone</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Site web</label>
+                            {{ form.website }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Activity Info -->
+                <div class="pb-6 border-b border-tus-white/10">
+                    <h2 class="text-lg font-semibold text-tus-white mb-4">Activité</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Secteur d'activité</label>
+                            {{ form.sector }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Description de l'activité</label>
+                            {{ form.activity_description }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Points de douleur / Besoins identifiés</label>
+                            {{ form.pain_points }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CRM Info -->
+                <div class="pb-6 border-b border-tus-white/10">
+                    <h2 class="text-lg font-semibold text-tus-white mb-4">CRM</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Statut</label>
+                            {{ form.status }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Source</label>
+                            {{ form.source }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Priorité (1-5)</label>
+                            {{ form.priority }}
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Prochain suivi</label>
+                            {{ form.next_follow_up }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes & Tags -->
+                <div>
+                    <h2 class="text-lg font-semibold text-tus-white mb-4">Notes & Tags</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Tags (séparés par des virgules)</label>
+                            {{ form.tags }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-tus-white/70 mb-1">Notes internes</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="mt-8 flex justify-end space-x-4">
+                <a href="{% url 'messaging:prospect_list' %}" 
+                   class="px-6 py-2 bg-tus-black border border-tus-white/10 rounded-lg text-tus-white hover:bg-tus-white/5 transition">
+                    Annuler
+                </a>
+                <button type="submit" class="px-6 py-2 bg-tus-blue text-white rounded-lg hover:bg-tus-blue/90 transition">
+                    {% if prospect %}Mettre à jour{% else %}Créer le prospect{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background-color: #07080A;
+    border: 1px solid rgba(246, 247, 251, 0.1);
+    border-radius: 0.5rem;
+    color: #F6F7FB;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #0B2DFF;
+}
+.form-input::placeholder, .form-textarea::placeholder {
+    color: rgba(246, 247, 251, 0.4);
+}
+</style>
+{% endblock %}

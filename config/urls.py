@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
-from django.views.generic import TemplateView, RedirectView
+from django.views.generic import TemplateView
 
 from config.sitemaps import StaticViewSitemap, PortfolioSitemap
 
@@ -18,6 +18,8 @@ sitemaps = {
 urlpatterns = [
     # Dashboard BI (Phase 5)
     path('tus-gestion-secure/dashboard/', include('apps.pages.dashboard_urls')),
+    path('tus-gestion-secure/messaging/', include('apps.messaging.urls', namespace='messaging')),
+    path('tus-gestion-secure/emails/', include('apps.leads.email_urls', namespace='admin_emails')),
     path('tus-gestion-secure/', admin.site.urls),  # URL admin sécurisée
     path('', include('apps.pages.urls')),
     path('portfolio/', include('apps.portfolio.urls')),
@@ -32,8 +34,6 @@ urlpatterns = [
     # SEO
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
-    # Favicon à la racine pour Google Search
-    path('favicon.ico', RedirectView.as_view(url='/static/favicon.ico', permanent=True), name='favicon'),
 ]
 
 # Servir les fichiers statiques et média en développement

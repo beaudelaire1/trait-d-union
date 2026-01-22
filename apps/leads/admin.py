@@ -1,5 +1,6 @@
 """Admin pour les leads."""
 from django.contrib import admin
+from django.urls import reverse
 from django.utils.html import format_html
 from .models import Lead
 from .email_models import EmailTemplate, EmailComposition
@@ -59,12 +60,13 @@ class EmailTemplateAdmin(admin.ModelAdmin):
 
 @admin.register(EmailComposition)
 class EmailCompositionAdmin(admin.ModelAdmin):
-    list_display = ('subject', 'status_badge', 'to_emails_short', 'created_by', 'created_at')
+    list_display = ('subject', 'status_badge', 'to_emails_short', 'created_by', 'created_at', 'compose_link')
     list_filter = ('is_draft', 'created_at', 'sent_at')
     search_fields = ('subject', 'to_emails', 'body_html')
     readonly_fields = ('created_at', 'sent_at')
     ordering = ('-created_at',)
     date_hierarchy = 'created_at'
+    change_list_template = 'admin/leads/emailcomposition/change_list.html'
     
     def status_badge(self, obj):
         if obj.is_draft:
@@ -78,6 +80,12 @@ class EmailCompositionAdmin(admin.ModelAdmin):
             emails += "..."
         return emails
     to_emails_short.short_description = "Destinataires"
+    
+    def compose_link(self, obj):
+        return format_html(
+            '<a href="/tus-gestion-secure/emails/compose/" class="button" style="background: #0B2DFF; color: white; padding: 4px 12px; border-radius: 4px; text-decoration: none;">✉️ Nouveau</a>'
+        )
+    compose_link.short_description = "Action"
     
     fieldsets = (
         ('Destinataires', {

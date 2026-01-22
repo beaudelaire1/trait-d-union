@@ -1,0 +1,1044 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Composer un Email — Trait d'Union Studio{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TRAIT D'UNION STUDIO - Interface Premium de Composition Email
+   Charte: TUS Black #07080A | TUS Blue #0B2DFF | TUS Green #22C55E
+   ============================================================ */
+
+:root {
+    --tus-black: #07080A;
+    --tus-surface: #0D1016;
+    --tus-white: #F6F7FB;
+    --tus-blue: #0B2DFF;
+    --tus-blue-light: #2D5BFF;
+    --tus-green: #22C55E;
+    --tus-green-light: #4ADE80;
+    --tus-stroke: rgba(246, 247, 251, 0.10);
+    --tus-text-secondary: rgba(246, 247, 251, 0.70);
+    --tus-text-tertiary: rgba(246, 247, 251, 0.60);
+    --tus-text-muted: rgba(246, 247, 251, 0.40);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { background: var(--tus-black) !important; }
+
+/* Container Principal */
+.compose-premium {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 64px);
+    background: var(--tus-black);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--tus-white);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Blob Lumineux Background */
+.compose-premium::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(11, 45, 255, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.compose-premium::after {
+    content: '';
+    position: absolute;
+    bottom: -300px;
+    left: -200px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.compose-content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== SECTION 1: QUICK ADD PROSPECT ===== */
+.quick-add-section {
+    background: linear-gradient(180deg, var(--tus-surface) 0%, var(--tus-black) 100%);
+    border-bottom: 1px solid var(--tus-stroke);
+    padding: 16px 24px;
+}
+
+.quick-add-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.quick-add-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tus-white);
+    white-space: nowrap;
+}
+
+.quick-add-label .icon {
+    color: #FBBF24;
+    font-size: 16px;
+}
+
+.quick-input {
+    background: var(--tus-white);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    color: var(--tus-black);
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quick-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(11, 45, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quick-input::placeholder { color: #6B7280; }
+
+#quick-name { width: 180px; }
+#quick-email { width: 240px; }
+#quick-company { width: 140px; }
+
+.btn-quick-add {
+    background: transparent;
+    border: 1px solid var(--tus-stroke);
+    color: var(--tus-white);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-quick-add:hover {
+    border-color: var(--tus-green);
+    color: var(--tus-green);
+    background: rgba(34, 197, 94, 0.1);
+}
+
+/* ===== SECTION 2: DESTINATAIRE ===== */
+.recipient-section {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--tus-stroke);
+}
+
+.field-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.field-label {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tus-text-secondary);
+    min-width: 50px;
+    padding-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.blue-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--tus-blue);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--tus-blue);
+}
+
+.recipient-area {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+}
+
+.recipient-tag {
+    background: rgba(11, 45, 255, 0.15);
+    border: 1px solid rgba(11, 45, 255, 0.3);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.recipient-tag .remove {
+    cursor: pointer;
+    opacity: 0.6;
+    font-size: 16px;
+    transition: opacity 0.2s;
+}
+
+.recipient-tag .remove:hover { opacity: 1; color: #EF4444; }
+
+#recipient-input {
+    background: transparent;
+    border: none;
+    color: var(--tus-white);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    min-width: 250px;
+    padding: 8px 0;
+}
+
+#recipient-input::placeholder { color: var(--tus-text-muted); }
+
+/* Empty State */
+.empty-state {
+    padding: 24px;
+    text-align: center;
+    color: var(--tus-text-tertiary);
+    font-size: 14px;
+    border-bottom: 1px solid var(--tus-stroke);
+}
+
+/* ===== SECTION 3: OBJET ===== */
+.subject-section {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--tus-stroke);
+}
+
+#subject-input {
+    flex: 1;
+    background: var(--tus-white);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    color: var(--tus-black);
+    max-width: 500px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#subject-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(11, 45, 255, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== SECTION 4: MODÈLES PRÉ-DÉFINIS ===== */
+.templates-section {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--tus-stroke);
+    background: rgba(13, 16, 22, 0.5);
+}
+
+.templates-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.templates-header-icon {
+    font-size: 18px;
+}
+
+.templates-header-text {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--tus-white);
+}
+
+.templates-hint {
+    font-size: 12px;
+    color: var(--tus-text-muted);
+    margin-left: 8px;
+}
+
+.templates-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.template-card {
+    background: rgba(246, 247, 251, 0.03);
+    border: 1px solid var(--tus-stroke);
+    border-radius: 12px;
+    padding: 12px 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--tus-text-secondary);
+    font-family: 'Inter', sans-serif;
+}
+
+.template-card:hover {
+    background: rgba(11, 45, 255, 0.08);
+    border-color: rgba(11, 45, 255, 0.3);
+    color: var(--tus-white);
+    transform: translateY(-2px);
+}
+
+.template-card.active {
+    background: rgba(11, 45, 255, 0.15);
+    border-color: var(--tus-blue);
+    color: var(--tus-white);
+    box-shadow: 0 4px 20px rgba(11, 45, 255, 0.25);
+}
+
+.template-card .emoji {
+    font-size: 18px;
+}
+
+/* ===== SECTION 5: ÉDITEUR ===== */
+.editor-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    min-height: 450px;
+}
+
+.tox-tinymce {
+    border: none !important;
+    border-radius: 0 !important;
+}
+
+/* ===== SECTION 6: ACTIONS ===== */
+.actions-bar {
+    padding: 20px 24px;
+    background: var(--tus-surface);
+    border-top: 1px solid var(--tus-stroke);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.actions-left {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-secondary {
+    background: rgba(246, 247, 251, 0.05);
+    border: 1px solid var(--tus-stroke);
+    color: var(--tus-text-secondary);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary:hover {
+    background: rgba(246, 247, 251, 0.1);
+    border-color: rgba(246, 247, 251, 0.2);
+    color: var(--tus-white);
+}
+
+.btn-send {
+    background: linear-gradient(135deg, var(--tus-blue) 0%, var(--tus-blue-light) 100%);
+    border: none;
+    color: var(--tus-white);
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 20px rgba(11, 45, 255, 0.35);
+}
+
+.btn-send:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(11, 45, 255, 0.45);
+}
+
+.btn-send:active {
+    transform: scale(0.98);
+}
+
+.btn-send:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-send.success {
+    background: linear-gradient(135deg, var(--tus-green) 0%, var(--tus-green-light) 100%);
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.35);
+}
+
+/* Autocomplete Dropdown */
+.suggestions-dropdown {
+    position: absolute;
+    background: var(--tus-surface);
+    border: 1px solid var(--tus-stroke);
+    border-radius: 12px;
+    max-width: 380px;
+    z-index: 1000;
+    display: none;
+    margin-top: 4px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.suggestion-item {
+    padding: 14px 18px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--tus-stroke);
+    transition: background 0.2s;
+}
+
+.suggestion-item:hover {
+    background: rgba(11, 45, 255, 0.1);
+}
+
+.suggestion-item:last-child { border-bottom: none; }
+
+.suggestion-name {
+    font-weight: 600;
+    color: var(--tus-white);
+    margin-bottom: 2px;
+}
+
+.suggestion-email {
+    font-size: 12px;
+    color: var(--tus-text-muted);
+}
+
+/* Toast Notification */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--tus-surface);
+    border: 1px solid var(--tus-green);
+    color: var(--tus-white);
+    padding: 16px 28px;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast .icon { font-size: 20px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="compose-premium">
+    <div class="compose-content">
+
+        <!-- 1. Quick Add Prospect -->
+        <div class="quick-add-section">
+            <div class="quick-add-inner">
+                <div class="quick-add-label">
+                    <span class="icon">⚡</span>
+                    Ajouter rapidement un nouveau prospect
+                </div>
+                <input type="text" id="quick-name" class="quick-input" placeholder="Nom complet">
+                <input type="email" id="quick-email" class="quick-input" placeholder="email@exemple.com">
+                <input type="text" id="quick-company" class="quick-input" placeholder="Entreprise">
+                <button class="btn-quick-add" onclick="quickAddProspect()">+ Ajouter</button>
+            </div>
+        </div>
+
+        <!-- 2. Destinataire -->
+        <div class="recipient-section">
+            <div class="field-row">
+                <div class="field-label">
+                    <span>À</span>
+                    <div class="blue-indicator"></div>
+                </div>
+                <div class="recipient-area" id="recipient-area">
+                    <input type="text" id="recipient-input" placeholder="Rechercher ou saisir un email..." autocomplete="off">
+                </div>
+            </div>
+            <div class="suggestions-dropdown" id="suggestions"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state">
+            Aucun prospect sélectionné. Utilisez la barre ci-dessus pour en ajouter un rapidement.
+        </div>
+
+        <!-- 3. Objet -->
+        <div class="subject-section">
+            <div class="field-row">
+                <div class="field-label">Objet</div>
+                <input type="text" id="subject-input" placeholder="Simplifiez votre gestion : outils sur-mesure">
+            </div>
+        </div>
+
+        <!-- 4. Modèles Pré-définis -->
+        <div class="templates-section">
+            <div class="templates-header">
+                <span class="templates-header-icon">📄</span>
+                <span class="templates-header-text">Modèles pré-définis</span>
+                <span class="templates-hint">(cliquez pour charger)</span>
+            </div>
+            <div class="templates-grid">
+                <div class="template-card" onclick="loadTemplate('vide')" data-template="vide">
+                    <span class="emoji">📝</span>
+                    <span>Vide</span>
+                </div>
+                <div class="template-card active" onclick="loadTemplate('prospection')" data-template="prospection">
+                    <span class="emoji">🎯</span>
+                    <span>Prospection TUS</span>
+                </div>
+                <div class="template-card" onclick="loadTemplate('relance')" data-template="relance">
+                    <span class="emoji">🔄</span>
+                    <span>Relance douce</span>
+                </div>
+                <div class="template-card" onclick="loadTemplate('rdv')" data-template="rdv">
+                    <span class="emoji">🗓️</span>
+                    <span>Invitation RDV</span>
+                </div>
+                <div class="template-card" onclick="loadTemplate('proposition')" data-template="proposition">
+                    <span class="emoji">💼</span>
+                    <span>Proposition</span>
+                </div>
+                <div class="template-card" onclick="loadTemplate('remerciement')" data-template="remerciement">
+                    <span class="emoji">🙏</span>
+                    <span>Remerciement</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Éditeur TinyMCE -->
+        <div class="editor-section">
+            <textarea id="editor"></textarea>
+        </div>
+
+        <!-- 6. Actions -->
+        <div class="actions-bar">
+            <div class="actions-left">
+                <button class="btn-secondary" onclick="saveDraft()">
+                    <span>💾</span> Brouillon
+                </button>
+                <button class="btn-secondary" onclick="previewEmail()">
+                    <span>👁️</span> Aperçu
+                </button>
+            </div>
+            <button class="btn-send" id="btn-send" onclick="sendEmail()">
+                <span>Envoyer</span>
+                <span>→</span>
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+    <span class="icon">✅</span>
+    <span class="message">Prospect ajouté avec succès !</span>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+// ============================================================
+// TRAIT D'UNION STUDIO - Logique Premium Compose
+// ============================================================
+
+// État
+let recipients = [];
+let prospects = [];
+
+{% if prospects_json %}
+try { prospects = JSON.parse('{{ prospects_json|escapejs }}'); } catch(e) {}
+{% endif %}
+
+// ============================================================
+// MODÈLES PRÉ-DÉFINIS - Texte exact TUS (charte graphique)
+// ============================================================
+const TEMPLATES = {
+    vide: {
+        subject: '',
+        content: ''
+    },
+    prospection: {
+        subject: 'Simplifiez votre gestion : outils sur-mesure pour votre entreprise',
+        content: `
+<p style="margin-bottom: 20px;">Bonjour,</p>
+
+<p style="margin-bottom: 20px;">Je vous contacte car beaucoup de petites entreprises perdent du temps avec des tâches répétitives : <strong>devis, factures, relances, planning, suivi clients, stockage des infos, WhatsApp partout, Excel dispersés…</strong></p>
+
+<p style="margin-bottom: 20px;">Mon travail, c'est de <strong style="color: #0B2DFF;">transformer ça en un outil simple et sur-mesure</strong>, adapté à votre façon de travailler.</p>
+
+<p style="margin-bottom: 20px;">Je suis <strong>Beaudelaire VILME</strong>, fondateur de <strong style="color: #0B2DFF;">Trait d'Union Studio</strong>, Guyane (<a href="https://www.traitdunion.it" style="color: #0B2DFF;">www.traitdunion.it</a>). Je conçois :</p>
+
+<div style="background: linear-gradient(135deg, rgba(11, 45, 255, 0.1) 0%, rgba(45, 91, 255, 0.05) 100%); border: 1px solid rgba(11, 45, 255, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0;">
+    <p style="font-weight: 600; margin-bottom: 12px;">🛠️ Mes solutions sur-mesure</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li style="margin-bottom: 8px;"><strong>Mini-ERP / outils de gestion</strong> (devis → facture, relances, suivi paiements)</li>
+        <li style="margin-bottom: 8px;"><strong>Planning / interventions / suivi d'équipe</strong></li>
+        <li style="margin-bottom: 8px;"><strong>CRM simple</strong> (clients, historique, rappels)</li>
+        <li style="margin-bottom: 8px;"><strong>Portail client</strong> (documents, demandes, validation)</li>
+        <li><strong>Site vitrine</strong> connecté à vos outils (si besoin)</li>
+    </ul>
+</div>
+
+<div style="background-color: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 18px; margin: 20px 0; text-align: center;">
+    <p style="color: #4ADE80; font-weight: 500; margin: 0;">🎯 L'objectif : <strong>moins d'erreurs, moins de temps perdu, plus de visibilité sur l'activité.</strong></p>
+</div>
+
+<div style="background: rgba(246, 247, 251, 0.03); border: 1px solid rgba(246, 247, 251, 0.1); border-radius: 12px; padding: 20px; margin: 20px 0;">
+    <p style="font-weight: 600; margin-bottom: 12px;">📩 Si vous me répondez avec :</p>
+    <ul style="margin: 0 0 15px 0; padding-left: 20px;">
+        <li>Votre <strong>activité</strong></li>
+        <li>Ce qui vous fait <strong>perdre le plus de temps</strong> aujourd'hui</li>
+    </ul>
+    <p style="margin-bottom: 10px;">Je vous envoie une <strong style="color: #4ADE80;">proposition concrète</strong> (2–3 fonctionnalités prioritaires + une idée de budget/délai).</p>
+    <p style="color: rgba(246, 247, 251, 0.6); font-size: 14px; margin: 0;">📞 On peut aussi faire un <strong>appel rapide de 15 minutes</strong> : répondez-moi avec un jour/heure qui vous arrange.</p>
+</div>
+
+<p style="margin-top: 30px; color: rgba(246, 247, 251, 0.6);">Bien à vous,</p>
+<p style="margin: 5px 0; font-weight: 600;">Beaudelaire VILME</p>
+<p style="margin: 5px 0; color: #0B2DFF; font-weight: 500;">Trait d'Union Studio</p>
+<p style="margin: 5px 0; font-size: 13px;"><a href="mailto:contact@traitdunion.it" style="color: #0B2DFF;">contact@traitdunion.it</a></p>
+`
+    },
+    relance: {
+        subject: 'Suite à mon précédent message — Trait d\'Union Studio',
+        content: `
+<p style="margin-bottom: 20px;">Bonjour,</p>
+
+<p style="margin-bottom: 20px;">Je me permets de revenir vers vous suite à mon email de la semaine dernière concernant les <strong>outils de gestion sur-mesure</strong>.</p>
+
+<p style="margin-bottom: 20px;">Je comprends que vous ayez un emploi du temps chargé. Si le sujet vous intéresse mais que ce n'est pas le bon moment, dites-le-moi simplement – je me ferai un plaisir de vous recontacter plus tard.</p>
+
+<p style="margin-bottom: 20px;">En attendant, voici un <strong style="color: #0B2DFF;">cas concret</strong> : j'ai récemment aidé une entreprise de services en Guyane à passer de 3h de paperasse quotidienne à <strong>30 minutes</strong>, grâce à un outil de devis-factures automatisé.</p>
+
+<div style="background-color: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 18px; margin: 20px 0; text-align: center;">
+    <p style="color: #4ADE80; font-weight: 500; margin: 0;">💬 Un simple "intéressé" ou "pas pour moi" me suffit pour adapter mon suivi.</p>
+</div>
+
+<p style="margin-top: 30px; color: rgba(246, 247, 251, 0.6);">Bien à vous,</p>
+<p style="margin: 5px 0; font-weight: 600;">Beaudelaire VILME</p>
+<p style="margin: 5px 0; color: #0B2DFF; font-weight: 500;">Trait d'Union Studio</p>
+<p style="margin: 5px 0; font-size: 13px;"><a href="mailto:contact@traitdunion.it" style="color: #0B2DFF;">contact@traitdunion.it</a></p>
+`
+    },
+    rdv: {
+        subject: 'Échange rapide de 15 min ? — Trait d\'Union Studio',
+        content: `
+<p style="margin-bottom: 20px;">Bonjour,</p>
+
+<p style="margin-bottom: 20px;">Je vous propose un <strong style="color: #0B2DFF;">appel rapide de 15 minutes</strong> pour discuter de vos besoins en gestion et vous montrer un exemple concret d'outil sur-mesure.</p>
+
+<p style="margin-bottom: 20px;"><strong>Pas de présentation commerciale longue</strong>, juste un échange direct pour voir si je peux vous aider.</p>
+
+<div style="background: linear-gradient(135deg, rgba(11, 45, 255, 0.1) 0%, rgba(45, 91, 255, 0.05) 100%); border: 1px solid rgba(11, 45, 255, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0;">
+    <p style="font-weight: 600; margin-bottom: 12px;">🗓️ Mes disponibilités cette semaine :</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li style="margin-bottom: 8px;">Lundi à Vendredi : 9h-12h / 14h-18h</li>
+        <li>Samedi matin : sur rendez-vous</li>
+    </ul>
+</div>
+
+<p style="margin-bottom: 20px;"><strong>Répondez simplement avec le créneau qui vous arrange</strong>, et je vous envoie une invitation.</p>
+
+<p style="margin-top: 30px; color: rgba(246, 247, 251, 0.6);">À très vite,</p>
+<p style="margin: 5px 0; font-weight: 600;">Beaudelaire VILME</p>
+<p style="margin: 5px 0; color: #0B2DFF; font-weight: 500;">Trait d'Union Studio</p>
+<p style="margin: 5px 0; font-size: 13px;"><a href="mailto:contact@traitdunion.it" style="color: #0B2DFF;">contact@traitdunion.it</a></p>
+`
+    },
+    proposition: {
+        subject: 'Votre proposition sur-mesure — Trait d\'Union Studio',
+        content: `
+<p style="margin-bottom: 20px;">Bonjour,</p>
+
+<p style="margin-bottom: 20px;">Suite à notre échange, je vous envoie ma <strong style="color: #0B2DFF;">proposition sur-mesure</strong> pour répondre à vos besoins.</p>
+
+<div style="background: linear-gradient(135deg, rgba(11, 45, 255, 0.1) 0%, rgba(45, 91, 255, 0.05) 100%); border: 1px solid rgba(11, 45, 255, 0.3); border-radius: 12px; padding: 20px; margin: 20px 0;">
+    <p style="font-weight: 600; margin-bottom: 12px;">📋 Récapitulatif de votre projet</p>
+    <ul style="margin: 0; padding-left: 20px;">
+        <li style="margin-bottom: 8px;"><strong>Problématique identifiée :</strong> [À compléter]</li>
+        <li style="margin-bottom: 8px;"><strong>Solution proposée :</strong> [À compléter]</li>
+        <li style="margin-bottom: 8px;"><strong>Fonctionnalités clés :</strong> [À compléter]</li>
+        <li><strong>Délai estimé :</strong> [À compléter]</li>
+    </ul>
+</div>
+
+<div style="background-color: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 18px; margin: 20px 0;">
+    <p style="font-weight: 600; margin-bottom: 8px;">💰 Investissement</p>
+    <p style="color: #4ADE80; font-size: 24px; font-weight: 700; margin: 0;">[Montant] € HT</p>
+    <p style="color: rgba(246, 247, 251, 0.6); font-size: 13px; margin-top: 5px;">Paiement en plusieurs fois possible</p>
+</div>
+
+<p style="margin-bottom: 20px;">N'hésitez pas si vous avez des questions ou souhaitez ajuster certains points.</p>
+
+<p style="margin-top: 30px; color: rgba(246, 247, 251, 0.6);">Bien à vous,</p>
+<p style="margin: 5px 0; font-weight: 600;">Beaudelaire VILME</p>
+<p style="margin: 5px 0; color: #0B2DFF; font-weight: 500;">Trait d'Union Studio</p>
+<p style="margin: 5px 0; font-size: 13px;"><a href="mailto:contact@traitdunion.it" style="color: #0B2DFF;">contact@traitdunion.it</a></p>
+`
+    },
+    remerciement: {
+        subject: 'Merci pour votre confiance — Trait d\'Union Studio',
+        content: `
+<p style="margin-bottom: 20px;">Bonjour,</p>
+
+<p style="margin-bottom: 20px;">Je tenais à vous remercier sincèrement pour notre échange et pour la <strong style="color: #22C55E;">confiance que vous m'accordez</strong>.</p>
+
+<p style="margin-bottom: 20px;">C'est un vrai plaisir de travailler avec des entrepreneurs engagés comme vous. Je mets tout en œuvre pour que votre outil soit <strong>exactement ce dont vous avez besoin</strong>.</p>
+
+<div style="background-color: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 18px; margin: 20px 0; text-align: center;">
+    <p style="color: #4ADE80; font-weight: 500; margin: 0;">🤝 Je reste disponible à tout moment si vous avez des questions.</p>
+</div>
+
+<p style="margin-bottom: 20px;">À très vite pour la suite du projet !</p>
+
+<p style="margin-top: 30px; color: rgba(246, 247, 251, 0.6);">Chaleureusement,</p>
+<p style="margin: 5px 0; font-weight: 600;">Beaudelaire VILME</p>
+<p style="margin: 5px 0; color: #0B2DFF; font-weight: 500;">Trait d'Union Studio</p>
+<p style="margin: 5px 0; font-size: 13px;"><a href="mailto:contact@traitdunion.it" style="color: #0B2DFF;">contact@traitdunion.it</a></p>
+`
+    }
+};
+
+// ============================================================
+// INITIALISATION TINYMCE
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    tinymce.init({
+        selector: '#editor',
+        skin: 'oxide-dark',
+        content_css: 'dark',
+        height: '100%',
+        min_height: 450,
+        menubar: true,
+        plugins: 'lists link image table code preview autolink',
+        toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | removeformat code',
+        font_family_formats: 'Inter=Inter, sans-serif; Space Grotesk=Space Grotesk, sans-serif; Arial=arial,helvetica,sans-serif; Times=times new roman,times,serif',
+        content_style: `
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+            body { 
+                font-family: 'Inter', -apple-system, sans-serif; 
+                font-size: 15px; 
+                line-height: 1.7;
+                color: #F6F7FB; 
+                background: #07080A;
+                padding: 30px;
+                max-width: 700px;
+                margin: 0 auto;
+            }
+            a { color: #0B2DFF; }
+            strong { color: #F6F7FB; }
+        `,
+        setup: function(editor) {
+            editor.on('init', function() {
+                // Charger le template Prospection par défaut
+                loadTemplate('prospection');
+            });
+        }
+    });
+
+    setupAutocomplete();
+});
+
+// ============================================================
+// QUICK ADD PROSPECT
+// ============================================================
+function quickAddProspect() {
+    const name = document.getElementById('quick-name').value.trim();
+    const email = document.getElementById('quick-email').value.trim();
+    const company = document.getElementById('quick-company').value.trim();
+
+    if (!email || !email.includes('@')) {
+        showToast('❌', 'Email invalide');
+        return;
+    }
+
+    // Ajouter à la liste locale
+    prospects.push({ email, contact_name: name, company_name: company });
+    
+    // Ajouter comme destinataire
+    addRecipient(email, name || email);
+
+    // Clear inputs
+    document.getElementById('quick-name').value = '';
+    document.getElementById('quick-email').value = '';
+    document.getElementById('quick-company').value = '';
+
+    showToast('✅', `${name || email} ajouté avec succès !`);
+}
+
+// ============================================================
+// GESTION DES DESTINATAIRES
+// ============================================================
+function addRecipient(email, name) {
+    if (recipients.find(r => r.email === email)) return;
+
+    recipients.push({ email, name: name || email });
+    renderRecipients();
+}
+
+function removeRecipient(email) {
+    recipients = recipients.filter(r => r.email !== email);
+    renderRecipients();
+}
+
+function renderRecipients() {
+    const area = document.getElementById('recipient-area');
+    const input = document.getElementById('recipient-input');
+    const emptyState = document.getElementById('empty-state');
+
+    // Clear existing tags
+    area.querySelectorAll('.recipient-tag').forEach(t => t.remove());
+
+    // Add tags
+    recipients.forEach(r => {
+        const tag = document.createElement('div');
+        tag.className = 'recipient-tag';
+        tag.innerHTML = `
+            <span>${r.name}</span>
+            <span class="remove" onclick="removeRecipient('${r.email}')">&times;</span>
+        `;
+        area.insertBefore(tag, input);
+    });
+
+    // Toggle empty state
+    emptyState.style.display = recipients.length > 0 ? 'none' : 'block';
+}
+
+// ============================================================
+// AUTOCOMPLETE
+// ============================================================
+function setupAutocomplete() {
+    const input = document.getElementById('recipient-input');
+    const dropdown = document.getElementById('suggestions');
+
+    input.addEventListener('input', function() {
+        const val = this.value.toLowerCase();
+        if (val.length < 2) {
+            dropdown.style.display = 'none';
+            return;
+        }
+
+        const matches = prospects.filter(p =>
+            (p.email && p.email.toLowerCase().includes(val)) ||
+            (p.contact_name && p.contact_name.toLowerCase().includes(val))
+        ).slice(0, 6);
+
+        if (matches.length > 0) {
+            dropdown.innerHTML = matches.map(p => `
+                <div class="suggestion-item" onclick="selectSuggestion('${p.email}', '${p.contact_name || ''}')">
+                    <div class="suggestion-name">${p.contact_name || 'Sans nom'}</div>
+                    <div class="suggestion-email">${p.email}</div>
+                </div>
+            `).join('');
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.style.display = 'none';
+        }
+    });
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (this.value.includes('@')) {
+                addRecipient(this.value, this.value);
+                this.value = '';
+                dropdown.style.display = 'none';
+            }
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.recipient-section')) {
+            dropdown.style.display = 'none';
+        }
+    });
+}
+
+function selectSuggestion(email, name) {
+    addRecipient(email, name);
+    document.getElementById('recipient-input').value = '';
+    document.getElementById('suggestions').style.display = 'none';
+}
+
+// ============================================================
+// TEMPLATES
+// ============================================================
+function loadTemplate(id) {
+    // Update UI
+    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('active'));
+    document.querySelector(`[data-template="${id}"]`)?.classList.add('active');
+
+    // Load content
+    const t = TEMPLATES[id];
+    if (t) {
+        document.getElementById('subject-input').value = t.subject;
+        if (tinymce.get('editor')) {
+            tinymce.get('editor').setContent(t.content);
+        }
+    }
+}
+
+// ============================================================
+// ACTIONS
+// ============================================================
+function saveDraft() {
+    showToast('💾', 'Brouillon sauvegardé');
+}
+
+function previewEmail() {
+    const content = tinymce.get('editor').getContent();
+    const subject = document.getElementById('subject-input').value;
+    
+    const win = window.open('', '_blank');
+    win.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Aperçu: ${subject}</title>
+            <style>
+                body { font-family: Inter, sans-serif; background: #07080A; color: #F6F7FB; padding: 40px; max-width: 700px; margin: 0 auto; }
+            </style>
+        </head>
+        <body>${content}</body>
+        </html>
+    `);
+}
+
+async function sendEmail() {
+    const btn = document.getElementById('btn-send');
+    const subject = document.getElementById('subject-input').value;
+    const content = tinymce.get('editor').getContent();
+
+    // Check pending input
+    const pendingEmail = document.getElementById('recipient-input').value.trim();
+    if (pendingEmail && pendingEmail.includes('@')) {
+        addRecipient(pendingEmail, pendingEmail);
+    }
+
+    if (recipients.length === 0) {
+        showToast('❌', 'Ajoutez au moins un destinataire');
+        return;
+    }
+
+    if (!subject) {
+        showToast('❌', 'Ajoutez un objet à votre email');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span>Envoi en cours...</span>';
+
+    try {
+        const res = await fetch('{% url "messaging:api_send_email" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                recipients: recipients.map(r => r.email),
+                subject,
+                content
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            btn.classList.add('success');
+            btn.innerHTML = '<span>Envoyé !</span> <span>✓</span>';
+            showToast('✅', `Email envoyé à ${recipients.length} destinataire(s)`);
+            setTimeout(() => location.reload(), 2000);
+        } else {
+            showToast('❌', 'Erreur: ' + data.error);
+            btn.disabled = false;
+            btn.innerHTML = '<span>Envoyer</span> <span>→</span>';
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('❌', 'Erreur réseau');
+        btn.disabled = false;
+        btn.innerHTML = '<span>Envoyer</span> <span>→</span>';
+    }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(icon, message) {
+    const toast = document.getElementById('toast');
+    toast.querySelector('.icon').textContent = icon;
+    toast.querySelector('.message').textContent = message;
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+</script>
+{% endblock %}

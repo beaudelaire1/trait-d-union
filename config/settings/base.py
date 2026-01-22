@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'apps.devis',
     'apps.factures',
     'apps.clients',
+    'apps.messaging',
     'services',
 ]
 

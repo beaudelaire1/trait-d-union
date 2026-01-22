@@ -101,7 +101,7 @@ class BrevoEmailService:
 
         try:
             import sib_api_v3_sdk
-            from sib_api_v3_sdk.rest import ApiException
+            from sib_api_v3_sdk.rest import ApiException as BrevoApiException
 
             # Construction du payload
             send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
@@ -153,18 +153,19 @@ class BrevoEmailService:
                 'message_id': api_response.message_id
             }
 
-        except ApiException as e:
-            logger.error("Erreur API Brevo: %s", e)
-            return {
-                'success': False,
-                'error': str(e),
-                'status_code': e.status if hasattr(e, 'status') else None
-            }
         except Exception as e:
+            error_msg = str(e)
+            if 'ApiException' in type(e).__name__ or hasattr(e, 'status'):
+                logger.error("Erreur API Brevo: %s", e)
+                return {
+                    'success': False,
+                    'error': error_msg,
+                    'status_code': getattr(e, 'status', None)
+                }
             logger.error("Erreur lors de l'envoi via Brevo: %s", e)
             return {
                 'success': False,
-                'error': str(e)
+                'error': error_msg
             }
 
     def send_email_with_template(

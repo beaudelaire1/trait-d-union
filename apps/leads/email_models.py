@@ -9,12 +9,18 @@ User = get_user_model()
 
 class EmailTemplateCategory(models.TextChoices):
     """Categories of email templates."""
-    PROSPECTION = 'prospection', 'Prospection'
-    REMERCIEMENT = 'remerciement', 'Remerciement'
-    RELANCE = 'relance', 'Relance'
-    PROPOSITION = 'proposition', 'Proposition commerciale'
-    CONFIRMATION = 'confirmation', 'Confirmation de rendez-vous'
-    SUIVI = 'suivi', 'Suivi de projet'
+    PROSPECTION = 'prospection', '🎯 Prospection'
+    RELANCE = 'relance', '🔄 Relance'
+    DEVIS = 'devis', '💼 Devis'
+    REMERCIEMENT = 'remerciement', '🙏 Remerciement'
+    BONS_PLANS = 'bons_plans', '🎁 Bons plans'
+    CONFIRMATION = 'confirmation', '✅ Confirmation'
+    SUIVI = 'suivi', '📊 Suivi de projet'
+    BIENVENUE = 'bienvenue', '👋 Bienvenue'
+    ANNIVERSAIRE = 'anniversaire', '🎂 Anniversaire'
+    NEWSLETTER = 'newsletter', '📰 Newsletter'
+    SATISFACTION = 'satisfaction', '⭐ Satisfaction'
+    PARRAINAGE = 'parrainage', '🤝 Parrainage'
 
 
 class EmailTemplate(models.Model):
