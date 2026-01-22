@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import Lead
+from .email_models import EmailTemplate, EmailComposition
 
 
 @admin.register(Lead)
@@ -29,6 +30,64 @@ class LeadAdmin(admin.ModelAdmin):
         }),
         ('Métadonnées', {
             'fields': ('created_at',),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(EmailTemplate)
+class EmailTemplateAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'is_active', 'created_at')
+    list_filter = ('category', 'is_active', 'created_at')
+    search_fields = ('name', 'subject', 'body_html')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('category', 'name')
+    
+    fieldsets = (
+        ('Informations', {
+            'fields': ('name', 'category', 'is_active')
+        }),
+        ('Contenu', {
+            'fields': ('subject', 'body_html')
+        }),
+        ('Métadonnées', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(EmailComposition)
+class EmailCompositionAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'status_badge', 'to_emails_short', 'created_by', 'created_at')
+    list_filter = ('is_draft', 'created_at', 'sent_at')
+    search_fields = ('subject', 'to_emails', 'body_html')
+    readonly_fields = ('created_at', 'sent_at')
+    ordering = ('-created_at',)
+    date_hierarchy = 'created_at'
+    
+    def status_badge(self, obj):
+        if obj.is_draft:
+            return format_html('<span style="color: orange;">📝 Brouillon</span>')
+        return format_html('<span style="color: green;">✓ Envoyé</span>')
+    status_badge.short_description = "Statut"
+    
+    def to_emails_short(self, obj):
+        emails = obj.to_emails[:50]
+        if len(obj.to_emails) > 50:
+            emails += "..."
+        return emails
+    to_emails_short.short_description = "Destinataires"
+    
+    fieldsets = (
+        ('Destinataires', {
+            'fields': ('to_emails', 'cc_emails', 'bcc_emails')
+        }),
+        ('Contenu', {
+            'fields': ('subject', 'body_html', 'template_used')
+        }),
+        ('Métadonnées', {
+            'fields': ('created_by', 'created_at', 'sent_at', 'is_draft'),
             'classes': ('collapse',)
         }),
     )

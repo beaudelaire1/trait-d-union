@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ email.subject }} - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-tus-black text-tus-white py-12 px-4 sm:px-6 lg:px-8">
+    <!-- Background blobs -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-tus-blue/15 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-40 -left-40 w-[600px] h-[600px] bg-tus-green/10 rounded-full blur-[150px]"></div>
+    </div>
+
+    <div class="relative max-w-4xl mx-auto">
+        <!-- Back link -->
+        <div class="mb-8 animate-fade-in">
+            <a href="{% url 'leads:email_list' %}" class="inline-flex items-center text-tus-white/70 hover:text-tus-blue transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Retour à la liste
+            </a>
+        </div>
+
+        <!-- Email card -->
+        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl overflow-hidden animate-slide-up">
+            <!-- Header -->
+            <div class="border-b border-tus-white/10 p-6 md:p-8">
+                <div class="flex items-center justify-between mb-4">
+                    {% if email.is_draft %}
+                    <span class="inline-flex items-center px-4 py-2 bg-tus-white/10 text-tus-white/70 text-sm font-display font-semibold rounded-full">
+                        📝 Brouillon
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center px-4 py-2 bg-tus-green/10 text-tus-green text-sm font-display font-semibold rounded-full">
+                        ✓ Envoyé le {{ email.sent_at|date:"d/m/Y à H:i" }}
+                    </span>
+                    {% endif %}
+                    
+                    <span class="text-tus-white/40 text-sm">
+                        Créé le {{ email.created_at|date:"d/m/Y à H:i" }}
+                    </span>
+                </div>
+                
+                <h1 class="text-3xl md:text-4xl font-display font-bold text-tus-white mb-6">
+                    {{ email.subject }}
+                </h1>
+                
+                <!-- Recipients info -->
+                <div class="space-y-3">
+                    <div class="flex items-start">
+                        <span class="text-tus-white/60 font-display font-semibold min-w-[80px]">À:</span>
+                        <span class="text-tus-white break-all">{{ email.to_emails }}</span>
+                    </div>
+                    
+                    {% if email.cc_emails %}
+                    <div class="flex items-start">
+                        <span class="text-tus-white/60 font-display font-semibold min-w-[80px]">CC:</span>
+                        <span class="text-tus-white break-all">{{ email.cc_emails }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if email.bcc_emails %}
+                    <div class="flex items-start">
+                        <span class="text-tus-white/60 font-display font-semibold min-w-[80px]">BCC:</span>
+                        <span class="text-tus-white break-all">{{ email.bcc_emails }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 md:p-8">
+                <div class="prose prose-invert prose-lg max-w-none">
+                    {{ email.body_html|safe }}
+                </div>
+            </div>
+            
+            <!-- Template info if used -->
+            {% if email.template_used %}
+            <div class="border-t border-tus-white/10 p-6 md:p-8">
+                <div class="flex items-center text-tus-white/60 text-sm">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    Template utilisé: <span class="text-tus-blue ml-1">{{ email.template_used }}</span>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Prose styling for email body */
+    .prose-invert {
+        color: rgba(246, 247, 251, 0.9);
+    }
+    
+    .prose-invert h1, .prose-invert h2, .prose-invert h3, .prose-invert h4 {
+        color: #F6F7FB;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+    }
+    
+    .prose-invert a {
+        color: #0B2DFF;
+        text-decoration: none;
+    }
+    
+    .prose-invert a:hover {
+        color: #4ADE80;
+    }
+    
+    .prose-invert strong {
+        color: #F6F7FB;
+        font-weight: 600;
+    }
+    
+    .prose-invert ul, .prose-invert ol {
+        color: rgba(246, 247, 251, 0.9);
+    }
+</style>
+{% endblock %}
