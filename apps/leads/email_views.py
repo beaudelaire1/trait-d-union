@@ -247,3 +247,110 @@ class SendEmailView(View):
             return redirect('admin_emails:email_list')
         except:
             return redirect('leads:email_list')
+
+
+@method_decorator(staff_member_required, name='dispatch')
+class BulkEmailView(View):
+    """Vue pour l'envoi en masse d'emails (chaque destinataire reçoit un email individuel)."""
+    
+    def get(self, request: HttpRequest) -> HttpResponse:
+        templates = EmailTemplate.objects.filter(is_active=True)
+        return render(request, 'leads/email_bulk.html', {
+            'templates': templates,
+        })
+    
+    def post(self, request: HttpRequest) -> HttpResponse:
+        import time
+        from core.services.email_backends import brevo_service
+        
+        # Récupérer les données du formulaire
+        emails_raw = request.POST.get('emails', '')
+        subject = request.POST.get('subject', '')
+        body_html = request.POST.get('body_html', '')
+        template_id = request.POST.get('template')
+        delay_seconds = float(request.POST.get('delay', 1))  # Délai entre chaque envoi
+        
+        # Nettoyer et parser les emails
+        emails = []
+        for line in emails_raw.replace(',', '\n').replace(';', '\n').split('\n'):
+            email = line.strip()
+            if email and '@' in email:
+                emails.append(email)
+        
+        # Supprimer les doublons tout en préservant l'ordre
+        emails = list(dict.fromkeys(emails))
+        
+        if not emails:
+            messages.error(request, "❌ Aucune adresse email valide fournie")
+            return redirect('admin_emails:bulk_email')
+        
+        if not subject or not body_html:
+            messages.error(request, "❌ Sujet et contenu requis")
+            return redirect('admin_emails:bulk_email')
+        
+        # Préparer le HTML avec le template premium
+        branding = getattr(settings, 'INVOICE_BRANDING', {})
+        site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it').rstrip('/')
+        
+        html_body = render_to_string('emails/modele_email_premium.html', {
+            'subject': subject,
+            'body_content': body_html,
+            'branding': branding,
+            'site_url': site_url,
+        })
+        
+        # Envoyer les emails un par un
+        success_count = 0
+        failed_emails = []
+        
+        for i, recipient in enumerate(emails):
+            try:
+                result = brevo_service.send_email(
+                    to_email=recipient,
+                    subject=subject,
+                    html_content=html_body,
+                    tags=['bulk-email', 'prospection']
+                )
+                
+                if result.get('success'):
+                    success_count += 1
+                    logger.info(f"[{i+1}/{len(emails)}] Email envoyé à {recipient}")
+                else:
+                    failed_emails.append(recipient)
+                    logger.error(f"[{i+1}/{len(emails)}] Échec envoi à {recipient}: {result.get('error')}")
+                
+                # Délai entre chaque envoi pour éviter les limites de taux
+                if i < len(emails) - 1 and delay_seconds > 0:
+                    time.sleep(delay_seconds)
+                    
+            except Exception as e:
+                failed_emails.append(recipient)
+                logger.error(f"Erreur envoi à {recipient}: {e}")
+        
+        # Enregistrer la campagne dans EmailComposition pour historique
+        EmailComposition.objects.create(
+            to_emails=', '.join(emails[:10]) + (f'... (+{len(emails)-10})' if len(emails) > 10 else ''),
+            subject=f"[BULK x{len(emails)}] {subject}",
+            body_html=body_html,
+            template_id=template_id if template_id else None,
+            is_draft=False,
+            sent_at=timezone.now(),
+            created_by=request.user,
+        )
+        
+        # Messages de feedback
+        if success_count == len(emails):
+            messages.success(request, f"✅ {success_count} emails envoyés avec succès !")
+        elif success_count > 0:
+            messages.warning(
+                request, 
+                f"⚠️ {success_count}/{len(emails)} emails envoyés. "
+                f"Échecs: {', '.join(failed_emails[:5])}{'...' if len(failed_emails) > 5 else ''}"
+            )
+        else:
+            messages.error(request, f"❌ Échec de l'envoi. Vérifiez la configuration Brevo.")
+        
+        try:
+            return redirect('admin_emails:email_list')
+        except:
+            return redirect('leads:email_list')

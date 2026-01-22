@@ -27,26 +27,25 @@ class Command(BaseCommand):
             {
                 'name': 'Prospection initiale',
                 'category': EmailTemplateCategory.PROSPECTION,
-                'subject': 'Boostez votre présence digitale avec Trait d\'Union Studio',
+                'subject': 'Accompagnement digital sur-mesure – Trait d\'Union Studio',
                 'body_html': f'''
 <p>Bonjour,</p>
 
-<p>Je me permets de vous contacter car <strong>Trait d'Union Studio</strong> accompagne des entreprises comme la vôtre dans leur transformation digitale en <strong>Guyane et aux Antilles</strong>.</p>
+<p>Je vous contacte au nom de <strong>Trait d'Union Studio (TUS)</strong>. Nous accompagnons des entreprises en <strong>Guyane et aux Antilles</strong> dans leur transformation digitale, avec une approche qui va <strong>au-delà d'une agence web classique</strong> : nous concevons des <strong>outils concrets</strong> qui améliorent l'organisation, le suivi client et la performance au quotidien.</p>
 
-<p>🚀 <strong>Ce que nous pouvons vous apporter :</strong></p>
+<p>Concrètement, nous pouvons vous aider sur :</p>
 <ul>
-    <li>✨ Sites web <strong>sur-mesure</strong> et ultra-performants</li>
-    <li>🛒 Boutiques e-commerce qui convertissent</li>
-    <li>📱 Applications web modernes et intuitives</li>
-    <li>🎨 Design premium qui vous démarque</li>
+    <li><strong>Sites web sur mesure</strong> (rapides, fiables, orientés résultats)</li>
+    <li><strong>E-commerce</strong> : parcours d'achat optimisé, gestion produits/commandes, paiement, suivi</li>
+    <li><strong>Applications web & outils internes (mini-ERP)</strong> : devis/facturation, CRM, suivi des prestations, tableaux de bord, espaces client/équipe, automatisations</li>
+    <li><strong>Identité & design premium</strong> : une image cohérente et professionnelle qui vous différencie</li>
 </ul>
 
-<p>💡 <strong>Pourquoi nous choisir ?</strong></p>
-<p>Nous ne faisons pas du "site vitrine standard". Chaque projet est pensé pour <strong>générer des résultats concrets</strong> : plus de visibilité, plus de clients, plus de chiffre d'affaires.</p>
+<p>Notre objectif n'est pas seulement "d'être présent en ligne", mais de mettre en place un <strong>écosystème digital utile</strong>, pensé pour vous faire gagner du temps et soutenir votre croissance.</p>
 
-<p>📞 Seriez-vous disponible pour un <strong>appel découverte de 15 minutes</strong> cette semaine ? C'est sans engagement et ça pourrait changer la donne pour votre business.</p>
+<p>Si vous le souhaitez, je peux vous proposer un <strong>court échange</strong> (10–15 min) pour comprendre vos besoins et vous dire, très simplement, ce qu'on pourrait améliorer ou automatiser chez vous.</p>
 
-<p>À très vite,</p>
+<p>Bien à vous,</p>
 {SIGNATURE}
                 '''
             },
