@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #10b981; color: white; padding: 20px; text-align: center; }
+        .content { padding: 30px 20px; background: #f9fafb; }
+        .amount { font-size: 24px; color: #10b981; font-weight: bold; }
+        .button { display: inline-block; padding: 12px 24px; background: #2563eb; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Paiement reçu ✓</h1>
+        </div>
+        
+        <div class="content">
+            <p>Bonjour {{ client_name }},</p>
+            
+            {% if is_partial %}
+                <p>Nous avons bien reçu votre <strong>paiement partiel</strong> pour la facture <strong>{{ invoice_number }}</strong>.</p>
+                
+                <p class="amount">{{ amount }}€ reçu</p>
+                
+                <p>Solde restant : <strong>{{ invoice.total_ttc|floatformat:2|sub:amount|floatformat:2 }}€</strong></p>
+                
+                <p>Merci pour ce versement. Nous restons à votre disposition pour tout complément.</p>
+            {% else %}
+                <p>Nous avons bien reçu votre paiement pour la facture <strong>{{ invoice_number }}</strong>.</p>
+                
+                <p class="amount">{{ amount }}€ reçu</p>
+                
+                <p>🎉 <strong>Votre facture est soldée !</strong></p>
+                
+                <p>Merci pour votre confiance. Nous espérons avoir l'occasion de collaborer à nouveau avec vous.</p>
+            {% endif %}
+            
+            <a href="{{ site_url }}/espace-client/factures/{{ invoice.pk }}/" class="button">Voir ma facture</a>
+            
+            <p>Pour toute question, contactez-nous à contact@traitdunion.it</p>
+            
+            <p>Cordialement,<br>
+            <strong>L'équipe Trait d'Union Studio</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>Trait d'Union Studio<br>
+            Email : contact@traitdunion.it<br>
+            Web : {{ site_url }}</p>
+        </div>
+    </div>
+</body>
+</html>

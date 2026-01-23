@@ -262,8 +262,9 @@ class StripePaymentService:
             quote.save(update_fields=['status'])
             logger.info(f"Devis {quote.number} marqué comme ACCEPTÉ (paiement acompte)")
 
-            # TODO: Envoyer email de confirmation au client
-            # TODO: Enregistrer la signature si présente
+            # Envoyer email de confirmation au client
+            from core.services.payment_email_service import send_quote_deposit_confirmation_email
+            send_quote_deposit_confirmation_email(quote)
 
             return True
         except Quote.DoesNotExist:
@@ -293,7 +294,9 @@ class StripePaymentService:
             invoice.save(update_fields=['status'])
             logger.info(f"Facture {invoice.number} marquée comme {'PARTIEL' if is_partial else 'PAYÉE'}")
 
-            # TODO: Envoyer email de confirmation
+            # Envoyer email de confirmation
+            from core.services.payment_email_service import send_invoice_payment_confirmation_email
+            send_invoice_payment_confirmation_email(invoice, is_partial=is_partial)
 
             return True
         except Invoice.DoesNotExist:

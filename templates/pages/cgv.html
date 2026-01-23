@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Conditions Générales de Vente - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-16 max-w-4xl">
+    <h1 class="text-4xl font-bold mb-8">Conditions Générales de Vente</h1>
+    
+    <div class="prose prose-lg max-w-none">
+        <p class="text-gray-600 mb-8">En vigueur au {{ "now"|date:"d/m/Y" }}</p>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 1 - Champ d'application</h2>
+            <p>
+                Les présentes Conditions Générales de Vente (CGV) s'appliquent à toutes les prestations de services 
+                proposées par Trait d'Union Studio aux clients professionnels et particuliers.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 2 - Prestations</h2>
+            <p>Nos prestations incluent :</p>
+            <ul class="list-disc ml-6 mb-4">
+                <li>Conception et développement de sites web</li>
+                <li>Design graphique et identité visuelle</li>
+                <li>Maintenance et support technique</li>
+                <li>Conseil et stratégie digitale</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 3 - Devis et commande</h2>
+            <p>
+                Tout devis est valable 30 jours à compter de sa date d'émission. La commande devient ferme 
+                après signature du devis et versement de l'acompte éventuel.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 4 - Prix</h2>
+            <p>
+                Les prix sont indiqués en euros hors taxes (HT). La TVA applicable est de 20% sauf mention contraire. 
+                Les prix sont fermes et non révisables pendant la durée du projet.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 5 - Modalités de paiement</h2>
+            <p>Le paiement s'effectue selon les modalités suivantes :</p>
+            <ul class="list-disc ml-6 mb-4">
+                <li><strong>Acompte</strong> : 30 à 50% à la signature du devis</li>
+                <li><strong>Solde</strong> : à la livraison ou selon échéancier convenu</li>
+            </ul>
+            <p>Moyens de paiement acceptés : virement bancaire, carte bancaire (Stripe).</p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 6 - Délais de réalisation</h2>
+            <p>
+                Les délais sont indicatifs et dépendent de la collaboration du client (fourniture de contenus, validations). 
+                Un retard de livraison ne peut donner lieu à pénalités ou annulation de commande.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 7 - Propriété intellectuelle</h2>
+            <p>
+                Les créations réalisées restent la propriété de Trait d'Union Studio jusqu'au paiement intégral. 
+                Une fois le projet soldé, les droits d'exploitation sont transférés au client pour l'usage convenu.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 8 - Garanties et maintenance</h2>
+            <p>
+                Nous garantissons le bon fonctionnement des livrables pendant 3 mois suivant la livraison (hors modifications du client). 
+                Des contrats de maintenance peuvent être souscrits séparément.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 9 - Responsabilité</h2>
+            <p>
+                Notre responsabilité est limitée au montant de la prestation. Nous ne saurions être tenus responsables 
+                des dommages indirects résultant de l'utilisation de nos services.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 10 - Résiliation</h2>
+            <p>
+                En cas de manquement grave de l'une des parties, le contrat peut être résilié après mise en demeure 
+                restée sans effet pendant 15 jours. Les sommes déjà versées restent acquises.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 11 - Litiges</h2>
+            <p>
+                En cas de litige, une solution amiable sera recherchée. À défaut, les tribunaux français sont seuls compétents.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Article 12 - Modification des CGV</h2>
+            <p>
+                Nous nous réservons le droit de modifier ces CGV à tout moment. Les CGV applicables sont celles en vigueur 
+                à la date de signature du devis.
+            </p>
+        </section>
+    </div>
+</div>
+{% endblock %}

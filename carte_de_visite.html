@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carte de Visite - Trait d'Union Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tus-black': '#07080A',
+                        'tus-white': '#F6F7FB',
+                        'tus-blue': '#0B2DFF',
+                        'surface-dark': '#0D1016',
+                    },
+                    fontFamily: {
+                        'display': ['Space Grotesk', 'sans-serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap: 40px;
+            padding: 20px;
+        }
+        .business-card {
+            width: 85mm;
+            height: 55mm;
+            /* Scale for screen viewing (approx 3.78px per mm typically, but simpler to fix px) */
+            width: 500px; /* Enhanced for viewing */
+            height: 300px; /* maintain roughly ratio */
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .print-mark {
+            display: none;
+        }
+        @media print {
+            body {
+                background: white;
+                display: block;
+            }
+            .no-print {
+                display: none;
+            }
+            .business-card {
+                width: 85mm;
+                height: 55mm;
+                box-shadow: none;
+                page-break-inside: avoid;
+                border: 1px solid #ddd;
+                margin-bottom: 20px;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            .page-break {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print text-center mb-4 flex gap-4 justify-center">
+        <div>
+            <h1 class="text-2xl font-display font-bold text-gray-800">Carte de Visite — Trait d'Union Studio</h1>
+            <p class="text-gray-600 font-body">Version Recto-Verso (Format 85x55mm)</p>
+            <div class="flex gap-2 justify-center mt-4">
+                <button onclick="window.print()" class="bg-tus-blue text-white px-6 py-2 rounded-full font-body font-medium hover:bg-blue-700 transition">Imprimer / PDF</button>
+                <button onclick="downloadLogoPNG()" class="bg-tus-black text-white px-6 py-2 rounded-full font-body font-medium hover:bg-gray-800 transition">Télécharger Logo (PNG)</button>
+            </div>
+            <p class="text-xs text-gray-500 mt-2">Le PNG sera généré haute qualité (fond transparent).</p>
+        </div>
+    </div>
+
+    <script>
+        function downloadLogoPNG() {
+            // Target the SVG content directly from the page
+            // We use the first SVG found in the 'business-card' Recto section
+            const svgElement = document.querySelector('.business-card svg');
+            
+            if (!svgElement) {
+                alert('Logo SVG non trouvé sur la page');
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set high resolution for the PNG (e.g., 2000px width for print quality)
+            const targetWidth = 2000; 
+            const viewBox = svgElement.getAttribute('viewBox').split(' ').map(parseFloat);
+            const aspectRatio = viewBox[2] / viewBox[3];
+            const targetHeight = targetWidth / aspectRatio;
+
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+
+            // Serialize SVG to string
+            const serializer = new XMLSerializer();
+            let svgString = serializer.serializeToString(svgElement);
+
+            // Create image from SVG blob
+            const img = new Image();
+            const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+                URL.revokeObjectURL(url);
+
+                // Trigger download
+                const link = document.createElement('a');
+                link.download = 'TUS-Logo-Officiel.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            };
+            
+            img.src = url;
+        }
+    </script>
+
+
+    <!-- RECTO -->
+    <div class="business-card bg-tus-black relative flex items-center justify-center">
+        <!-- Background Elements -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-tus-blue/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-tus-blue/5 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4"></div>
+
+        <!-- LOGO COMPLET (Embeded SVG from src/static/img/tus-logo.svg) -->
+        <div class="relative z-10 w-3/4">
+            <svg viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+              <defs>
+                <linearGradient id="tusGradNavStrongCard" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                  <stop offset="0" stop-color="#0B2DFF"/>
+                  <stop offset="0.62" stop-color="#2D5BFF"/>
+                  <stop offset="1" stop-color="#F6F7FB"/>
+                </linearGradient>
+              </defs>
+            
+              <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D’UNION</text>
+              <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradNavStrongCard)"/>
+              <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- VERSO -->
+    <div class="business-card bg-tus-white relative flex flex-col justify-between p-8">
+        
+        <!-- Header Verso -->
+        <div class="flex justify-between items-start">
+            <div>
+                 <h2 class="font-display font-bold text-2xl text-tus-black mb-1">Prénom NOM</h2>
+                 <p class="font-body text-tus-blue font-medium text-sm tracking-wide">FONDATEUR & CEO</p>
+            </div>
+            <!-- Petit Logo Rappel -->
+            <div class="w-12 opacity-90">
+                <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="192" height="192" rx="36" fill="#0B2DFF"/>
+                  <text x="50%" y="56%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="82" fill="#F6F7FB" letter-spacing="-2">TUS</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Coordonnées -->
+        <div class="space-y-3 font-body text-tus-black/80 text-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full bg-tus-blue/10 flex items-center justify-center text-tus-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.05 12.05 0 0 0 .57 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.03 12.03 0 0 0 2.81.57A2 2 0 0 1 22 16.92z"></path></svg>
+                </div>
+                <span>+594 694 XX XX XX</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="w-6 h-6 rounded-full bg-tus-blue/10 flex items-center justify-center text-tus-blue">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </div>
+                <span>contact@traitdunion.studio</span>
+            </div>
+            <div class="flex items-center gap-3">
+                 <div class="w-6 h-6 rounded-full bg-tus-blue/10 flex items-center justify-center text-tus-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+                </div>
+                <span class="font-semibold text-tus-blue">www.traitdunion.studio</span>
+            </div>
+        </div>
+
+        <!-- Footer Lines -->
+        <div class="flex gap-1 w-full mt-2">
+            <div class="h-1 w-full bg-tus-blue rounded-full"></div>
+            <div class="h-1 w-1/3 bg-tus-black/10 rounded-full"></div>
+        </div>
+
+    </div>
+
+</body>
+</html>
