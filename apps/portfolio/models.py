@@ -40,6 +40,34 @@ class Project(models.Model):
         from django.urls import reverse
         return reverse('portfolio:detail', kwargs={'slug': self.slug})
 
+    def tech_list(self) -> list[str]:
+        """Return normalized list of technologies regardless of stored JSON shape.
+
+        Supports list[str], comma-separated string, or dict with common keys
+        like 'technologies', 'stack', 'modules_cles', 'modules', 'tech', 'tags'.
+        """
+        t = self.technologies
+        if isinstance(t, dict):
+            candidates: list[str] = []
+            for key in ('stack', 'technologies', 'modules_cles', 'modules', 'tech', 'tags'):
+                v = t.get(key)
+                if isinstance(v, list):
+                    candidates += [str(x) for x in v]
+                elif isinstance(v, str):
+                    candidates += [s.strip() for s in v.split(',')]
+            if not candidates:
+                for v in t.values():
+                    if isinstance(v, list):
+                        candidates += [str(x) for x in v]
+                    elif isinstance(v, str):
+                        candidates += [s.strip() for s in v.split(',')]
+            return [x for x in candidates if x]
+        if isinstance(t, list):
+            return [str(x) for x in t]
+        if isinstance(t, str):
+            return [s.strip() for s in t.split(',')]
+        return []
+
 
 class ProjectImage(models.Model):
     """Additional images for a project."""

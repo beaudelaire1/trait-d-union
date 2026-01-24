@@ -129,7 +129,7 @@
                 <!-- Sidebar -->
                 <div class="space-y-6">
                     <!-- Technologies -->
-                    {% if project.technologies %}
+                    {% if project.tech_list %}
                     <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-6 opacity-0 hover:border-tus-blue/30 transition-all duration-300"
                          style="animation: fadeSlideUp 0.6s ease-out 0.9s forwards;">
                         <h3 class="text-sm font-semibold text-tus-white/80 mb-4 uppercase tracking-wider flex items-center gap-2">
@@ -139,7 +139,7 @@
                             Technologies
                         </h3>
                         <div class="flex flex-wrap gap-2">
-                            {% for tech in project.technologies %}
+                            {% for tech in project.tech_list %}
                             <span class="tech-tag px-3 py-1.5 bg-tus-blue/10 text-tus-blue text-sm rounded-lg border border-tus-blue/20 hover:bg-tus-blue/20 hover:scale-105 transition-all duration-200 cursor-default">
                                 {{ tech }}
                             </span>

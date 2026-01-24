@@ -14,9 +14,9 @@
             <div class="absolute inset-0 bg-gradient-to-t from-tus-black/90 via-tus-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             
             <!-- Tech badges sur l'image -->
-            {% if project.technologies %}
+            {% if project.tech_list %}
             <div class="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
-                {% for tech in project.technologies|slice:":3" %}
+                {% for tech in project.tech_list|slice":3" %}
                 <span class="px-2 py-0.5 text-[10px] font-medium text-tus-white/90 bg-tus-black/60 backdrop-blur-sm rounded-full">
                     {{ tech }}
                 </span>
@@ -54,9 +54,9 @@
             </div>
             
             <!-- Tech badges -->
-            {% if project.technologies %}
+            {% if project.tech_list %}
             <div class="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
-                {% for tech in project.technologies|slice:":3" %}
+                {% for tech in project.tech_list|slice":3" %}
                 <span class="px-2 py-0.5 text-[10px] font-medium text-tus-white/90 bg-tus-black/60 backdrop-blur-sm rounded-full">
                     {{ tech }}
                 </span>
