@@ -25,6 +25,27 @@
             </p>
         </div>
 
+        <!-- Stacks par projet (références GitHub) -->
+        <div class="mb-12 animate-slide-up">
+            <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-6">
+                <h2 class="text-lg font-display font-semibold text-tus-white mb-4">Stacks par projet</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-tus-white/70">
+                    <div class="p-4 rounded-xl bg-tus-white/5 border border-tus-white/10">
+                        <p class="text-tus-white font-semibold mb-2">Trait d'Union Studio</p>
+                        <p>Django/Python, HTMX, Tailwind, Celery + Redis, PostgreSQL/PostGIS, Mapbox, Leaflet, Matterport API, Stripe/Stripe Connect, Colissimo API, Brevo, Cloudinary, S3/R2, WeasyPrint, ReportLab, TinyMCE/MCETiny, Sentry.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-tus-white/5 border border-tus-white/10">
+                        <p class="text-tus-white font-semibold mb-2">Gestion EEBC</p>
+                        <p>Django 4.2, Jazzmin, django-htmx, crispy-forms/Bootstrap5, django-filter, Celery, Redis, PostgreSQL, Stripe, Twilio, pytesseract, boto3 + django-storages, WeasyPrint, openpyxl/pandas, django-otp + qrcode, django-cors-headers, django-cryptography, Sentry, pytest/pytest-django/pytest-cov, black/isort/flake8/mypy, gunicorn.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-tus-white/5 border border-tus-white/10">
+                        <p class="text-tus-white font-semibold mb-2">Xeros Project</p>
+                        <p>Dépôt public limité à la licence (stack non publiée à ce jour).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Filtres -->
         <div class="flex flex-wrap justify-center gap-3 mb-12 animate-slide-up">
             <button hx-get="?" hx-target="#project-list" hx-push-url="true"
