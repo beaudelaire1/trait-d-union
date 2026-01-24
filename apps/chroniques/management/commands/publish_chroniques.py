@@ -11,12 +11,8 @@ from django.core.management.base import BaseCommand, CommandError
 from apps.chroniques.models import Article
 
 
-COVER_PLACEHOLDER_URL = "https://images.unsplash.com/photo-1590102425712-1c28a0d6b85b?q=80&w=1200&auto=format&fit=crop"
-COVER_PLACEHOLDER_URL_CYBER = "https://plus.unsplash.com/premium_photo-1723601137214-1d5bfe3181f6?q=80&w=1200&auto=format&fit=crop"
-
-
 class Command(BaseCommand):
-    help = "Publie deux articles Chroniques (design/charte et bonnes pratiques cybersécurité). Optionnel: ajoute des images de couverture."
+    help = "Publie deux articles Chroniques (design/charte et bonnes pratiques cybersécurité)."
 
     def add_arguments(self, parser):
         parser.add_argument(
