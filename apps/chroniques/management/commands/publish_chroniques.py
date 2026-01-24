@@ -11,8 +11,8 @@ from django.core.management.base import BaseCommand, CommandError
 from apps.chroniques.models import Article
 
 
-COVER_PLACEHOLDER_URL = "https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=1200&auto=format&fit=crop"
-COVER_PLACEHOLDER_URL_CYBER = "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1200&auto=format&fit=crop"
+COVER_PLACEHOLDER_URL = "https://images.unsplash.com/photo-y1efzWi1XYU?q=80&w=1200&auto=format&fit=crop"
+COVER_PLACEHOLDER_URL_CYBER = "https://images.unsplash.com/photo-HbrkV4cRThE?q=80&w=1200&auto=format&fit=crop"
 
 
 class Command(BaseCommand):
