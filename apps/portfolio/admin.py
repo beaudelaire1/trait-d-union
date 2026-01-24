@@ -1,6 +1,7 @@
 """Admin pour le portfolio."""
 from django.contrib import admin
 from .models import Project, ProjectImage
+from .forms import ProjectAdminForm
 
 
 class ProjectImageInline(admin.TabularInline):
@@ -10,6 +11,7 @@ class ProjectImageInline(admin.TabularInline):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
+    form = ProjectAdminForm
     list_display = ('title', 'project_type', 'client_name', 'is_featured', 'is_published', 'created_at')
     list_filter = ('project_type', 'is_featured', 'is_published')
     search_fields = ('title', 'client_name', 'objective')
