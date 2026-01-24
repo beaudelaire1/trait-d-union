@@ -102,8 +102,8 @@ class ClientNotification(models.Model):
     message = models.TextField(
         "Message"
     )
-    link = models.CharField(
-        "Lien",
+    related_url = models.CharField(
+        "URL associée",
         max_length=255,
         blank=True
     )

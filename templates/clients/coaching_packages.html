@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Forfaits de Coaching - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header -->
+    <div class="mb-12">
+      <h1 class="text-4xl font-bold text-slate-900 mb-2">Coaching Professionnel</h1>
+      <p class="text-xl text-slate-600">Séances 1-on-1 personnalisées avec nos experts</p>
+    </div>
+
+    <!-- Current Subscription Alert -->
+    {% if current_subscription %}
+      <div class="mb-8 bg-green-50 border-l-4 border-green-500 p-6 rounded">
+        <p class="text-green-900">
+          <strong>Vous avez un abonnement actif:</strong> {{ current_subscription.package.name }} 
+          (expire le {{ current_subscription.expires_at|date:"d/m/Y" }})
+        </p>
+        <a href="{% url 'clients:coaching_detail' current_subscription.id %}" class="text-green-600 hover:text-green-700 font-semibold mt-2 inline-block">
+          Voir mes détails →
+        </a>
+      </div>
+    {% endif %}
+
+    <!-- Coaching Packages Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {% for package in packages %}
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow transform hover:-translate-y-1">
+          
+          <!-- Header -->
+          <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-8 text-center">
+            <div class="text-4xl mb-3">{{ package.icon }}</div>
+            <h2 class="text-3xl font-bold mb-2">{{ package.name }}</h2>
+            <p class="text-blue-100">{{ package.description }}</p>
+          </div>
+
+          <!-- Pricing -->
+          <div class="bg-slate-50 p-8 text-center border-b">
+            <div class="mb-4">
+              <div class="text-sm text-slate-600 mb-1">Mensuel</div>
+              <div class="text-4xl font-bold text-blue-600">{{ package.monthly_price|floatformat:0 }}€</div>
+            </div>
+            <div class="text-sm text-slate-600 mb-4">ou</div>
+            <div class="mb-4">
+              <div class="text-sm text-slate-600 mb-1">Annuel ({{ package.get_discount_percent_display }}% de réduction)</div>
+              <div class="text-2xl font-bold text-green-600">{{ package.annual_price|floatformat:0 }}€</div>
+            </div>
+          </div>
+
+          <!-- Features -->
+          <div class="p-8">
+            <h3 class="font-bold text-slate-900 mb-4">Inclus:</h3>
+            <ul class="space-y-3 mb-6">
+              <li class="flex items-center text-slate-600">
+                <span class="text-blue-600 font-bold mr-3">✓</span>
+                <strong>{{ package.monthly_hours }}h/mois</strong> - {{ package.monthly_sessions }} session(s)
+              </li>
+              <li class="flex items-center text-slate-600">
+                <span class="text-blue-600 font-bold mr-3">✓</span>
+                Sessions de {{ package.session_duration_minutes }} minutes
+              </li>
+              {% for feature in package.features %}
+                <li class="flex items-center text-slate-600">
+                  <span class="text-blue-600 font-bold mr-3">✓</span>
+                  {{ feature }}
+                </li>
+              {% endfor %}
+            </ul>
+
+            <!-- Action Button -->
+            {% if not current_subscription or current_subscription.package.tier != package.tier %}
+              <form method="post" action="{% url 'clients:subscribe_coaching' package.id %}">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                  S'abonner maintenant
+                </button>
+              </form>
+            {% else %}
+              <button disabled class="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg opacity-75 cursor-not-allowed">
+                Abonnement actif ✓
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Benefits Section -->
+    <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-white rounded-lg p-6 shadow">
+        <div class="text-3xl mb-3">👨‍💼</div>
+        <h3 class="font-bold text-slate-900 mb-2">Experts Qualifiés</h3>
+        <p class="text-slate-600">Coaches expérimentés en web design et stratégie digitale</p>
+      </div>
+      <div class="bg-white rounded-lg p-6 shadow">
+        <div class="text-3xl mb-3">📅</div>
+        <h3 class="font-bold text-slate-900 mb-2">Flexible</h3>
+        <p class="text-slate-600">Planifiez vos sessions selon votre emploi du temps</p>
+      </div>
+      <div class="bg-white rounded-lg p-6 shadow">
+        <div class="text-3xl mb-3">🎯</div>
+        <h3 class="font-bold text-slate-900 mb-2">Résultats Mesurables</h3>
+        <p class="text-slate-600">Rapports de progression et recommandations personnalisées</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

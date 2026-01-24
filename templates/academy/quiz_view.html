@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ course.title }} - Quiz{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12">
+  <div class="max-w-3xl mx-auto px-4">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <a href="{% url 'resources:academy_lesson' course.id lesson.id %}" class="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-flex items-center">
+        ← Retour à la leçon
+      </a>
+      <h1 class="text-3xl font-bold text-slate-900">{{ lesson.title }} - Quiz</h1>
+    </div>
+
+    <!-- Quiz Form -->
+    <form method="post" class="bg-white rounded-lg shadow-lg p-8">
+      {% csrf_token %}
+      
+      {% for question in quiz.questions %}
+        <div class="mb-8 pb-8 border-b last:border-b-0">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4">
+            Question {{ forloop.counter }} / {{ quiz.questions|length }}
+          </h3>
+          
+          <p class="text-slate-700 font-semibold mb-6">{{ question.question }}</p>
+          
+          <div class="space-y-3">
+            {% for answer in question.answers %}
+              <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:border-blue-400 cursor-pointer transition-colors">
+                <input type="radio" name="answer_{{ forloop.parentloop.counter0 }}" 
+                       value="{{ forloop.counter0 }}" required
+                       class="w-4 h-4 text-blue-600">
+                <span class="ml-4 text-slate-700">{{ answer }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+
+      <!-- Submit Button -->
+      <div class="flex justify-between items-center mt-8 pt-8 border-t">
+        <a href="{% url 'resources:academy_lesson' course.id lesson.id %}" 
+           class="text-slate-600 hover:text-slate-700 font-semibold">
+          Ignorer ce quiz
+        </a>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">
+          Valider les réponses
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

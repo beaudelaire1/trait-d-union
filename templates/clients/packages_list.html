@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Packages de Services - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header -->
+    <div class="mb-12">
+      <h1 class="text-4xl font-bold text-slate-900 mb-2">Nos Packages de Services</h1>
+      <p class="text-xl text-slate-600">Choisissez le package qui correspond à vos besoins et personnalisez-le</p>
+    </div>
+
+    <!-- Packages Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for package in packages %}
+        <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition-all transform hover:-translate-y-1 overflow-hidden {% if package.is_featured %}ring-2 ring-amber-400{% endif %}">
+          
+          <!-- Featured Badge -->
+          {% if package.is_featured %}
+            <div class="bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 text-center">
+              ⭐ POPULAIRE
+            </div>
+          {% endif %}
+
+          <!-- Package Header -->
+          <div class="bg-gradient-to-r from-slate-50 to-slate-100 p-6 border-b">
+            <div class="text-3xl mb-2">{{ package.icon }}</div>
+            <h3 class="text-2xl font-bold text-slate-900">{{ package.name }}</h3>
+            <p class="text-sm text-slate-600 mt-2">{{ package.description|truncatewords:15 }}</p>
+          </div>
+
+          <!-- Price -->
+          <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 text-center">
+            <div class="text-3xl font-bold">{{ package.base_price|floatformat:0 }}€</div>
+            <div class="text-sm opacity-90">Livraison en {{ package.duration_days }} jours</div>
+          </div>
+
+          <!-- Features -->
+          <div class="p-6">
+            <h4 class="font-semibold text-slate-900 mb-3 text-sm">Inclus:</h4>
+            <ul class="space-y-2 text-sm text-slate-600 mb-6">
+              {% for feature in package.features_list %}
+                <li class="flex items-start">
+                  <span class="text-green-600 font-bold mr-2">✓</span>
+                  <span>{{ feature }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+
+            <!-- Details -->
+            <div class="bg-slate-50 rounded p-3 text-xs text-slate-600 space-y-1 mb-6">
+              <div><strong>Support:</strong> {{ package.support_included_months }} mois inclus</div>
+              <div><strong>Révisions:</strong> {{ package.revision_count }} incluses</div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-2">
+              <a href="{% url 'clients:package_configurator' package.slug %}" 
+                 class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center">
+                Configurer
+              </a>
+              <button onclick="showDetails('{{ package.slug }}')" 
+                      class="w-full border-2 border-slate-300 hover:border-slate-400 text-slate-600 font-semibold py-2 px-4 rounded-lg transition-colors">
+                Détails
+              </button>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Existing Packages -->
+    {% if request.user.is_authenticated %}
+      <div class="mt-12">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">Mes Packages</h2>
+        <a href="{% url 'clients:my_packages' %}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+          Voir mes packages existants
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

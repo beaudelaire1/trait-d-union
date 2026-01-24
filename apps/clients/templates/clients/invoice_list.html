@@ -121,15 +121,19 @@
                                 </td>
                                 <td>
                                     <div class="table-actions">
-                                        {% if invoice.pdf_file %}
-                                        <a href="{{ invoice.pdf_file.url }}" class="btn-table" title="Télécharger" target="_blank">
+                                        <a href="{% url 'clients:invoice_detail' invoice.id %}" class="btn-table" title="Consulter">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </a>
+                                        <a href="{% url 'clients:invoice_pdf_download' invoice.id %}" class="btn-table" title="Télécharger" download>
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                                 <polyline points="7 10 12 15 17 10"></polyline>
                                                 <line x1="12" y1="15" x2="12" y2="3"></line>
                                             </svg>
                                         </a>
-                                        {% endif %}
                                     </div>
                                 </td>
                             </tr>

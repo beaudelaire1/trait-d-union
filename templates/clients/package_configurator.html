@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Configurateur de Package - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <a href="{% url 'clients:packages_list' %}" class="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-flex items-center">
+        ← Retour aux packages
+      </a>
+      <h1 class="text-4xl font-bold text-slate-900">Configurez votre package</h1>
+    </div>
+
+    <!-- Main Form -->
+    <form method="post" class="space-y-8">
+      {% csrf_token %}
+
+      <!-- Base Package Info -->
+      <div class="bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">{{ package.name }}</h2>
+        
+        <div class="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <div class="text-sm text-slate-600">Prix de base</div>
+            <div class="text-3xl font-bold text-blue-600">{{ package.base_price|floatformat:0 }}€</div>
+          </div>
+          <div>
+            <div class="text-sm text-slate-600">Livraison</div>
+            <div class="text-2xl font-bold text-slate-900">{{ package.duration_days }} jours</div>
+          </div>
+        </div>
+
+        <p class="text-slate-600">{{ package.description }}</p>
+
+        <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t">
+          {% for feature in package.features_list %}
+            <div class="flex items-start">
+              <span class="text-green-600 font-bold mr-2">✓</span>
+              <span class="text-sm text-slate-600">{{ feature }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Add-ons Selection -->
+      {% if addons %}
+        <div class="bg-white rounded-lg shadow-md p-8">
+          <h3 class="text-xl font-bold text-slate-900 mb-6">Options supplémentaires</h3>
+          <p class="text-sm text-slate-600 mb-6">Sélectionnez les fonctionnalités additionnelles pour personnaliser votre package</p>
+
+          <div class="space-y-4">
+            {% for addon in addons %}
+              <label class="flex items-start p-4 border-2 border-slate-200 rounded-lg hover:border-blue-400 cursor-pointer transition-colors">
+                <input type="checkbox" name="addons" value="{{ addon.id }}" 
+                       class="addon-checkbox mt-1 w-4 h-4 text-blue-600" 
+                       data-price="{{ addon.price }}">
+                <div class="ml-4 flex-1">
+                  <div class="font-semibold text-slate-900">
+                    {{ addon.icon }} {{ addon.name }}
+                  </div>
+                  <p class="text-sm text-slate-600">{{ addon.description }}</p>
+                </div>
+                <div class="text-right font-bold text-blue-600 whitespace-nowrap">
+                  +{{ addon.price|floatformat:0 }}€
+                </div>
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Price Summary -->
+      <div class="bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-300 rounded-lg p-8">
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between items-center text-slate-600">
+            <span>Prix de base</span>
+            <span id="base-price" class="font-semibold">{{ package.base_price|floatformat:2 }}€</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-600">
+            <span>Add-ons</span>
+            <span id="addons-price" class="font-semibold">0€</span>
+          </div>
+          <div class="border-t-2 border-blue-300 pt-3 flex justify-between items-center text-xl font-bold text-blue-700">
+            <span>Total</span>
+            <span id="total-price">{{ package.base_price|floatformat:2 }}€</span>
+          </div>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+          Créer mon devis avec ce package
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<script>
+  const basePrice = parseFloat("{{ package.base_price }}");
+  
+  document.querySelectorAll('.addon-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', updatePrice);
+  });
+
+  function updatePrice() {
+    const checkboxes = document.querySelectorAll('.addon-checkbox:checked');
+    let addonsTotal = 0;
+    
+    checkboxes.forEach(cb => {
+      addonsTotal += parseFloat(cb.dataset.price);
+    });
+    
+    const total = basePrice + addonsTotal;
+    
+    document.getElementById('addons-price').textContent = addonsTotal.toFixed(2) + '€';
+    document.getElementById('total-price').textContent = total.toFixed(2) + '€';
+  }
+</script>
+{% endblock %}

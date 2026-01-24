@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Résultats du Quiz - Academy{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12">
+  <div class="max-w-3xl mx-auto px-4">
+    
+    <!-- Score Card -->
+    <div class="bg-white rounded-lg shadow-lg p-12 text-center mb-8">
+      <h1 class="text-3xl font-bold text-slate-900 mb-4">Résultats du Quiz</h1>
+      
+      <!-- Score Display -->
+      <div class="mb-8">
+        {% if result.score_percent >= 70 %}
+          <div class="text-6xl font-bold text-green-600 mb-3">{{ result.score_percent }}%</div>
+          <p class="text-2xl text-green-600 font-semibold">Excellent! 🎉</p>
+        {% elif result.score_percent >= 50 %}
+          <div class="text-6xl font-bold text-yellow-600 mb-3">{{ result.score_percent }}%</div>
+          <p class="text-2xl text-yellow-600 font-semibold">Pas mal! 👍</p>
+        {% else %}
+          <div class="text-6xl font-bold text-red-600 mb-3">{{ result.score_percent }}%</div>
+          <p class="text-2xl text-red-600 font-semibold">À revoir 📚</p>
+        {% endif %}
+      </div>
+
+      <!-- Details -->
+      <div class="bg-slate-50 rounded-lg p-6 mb-8">
+        <p class="text-slate-600">
+          Vous avez répondu correctement à <strong class="text-slate-900">{{ result.score_percent }}%</strong> des questions.
+        </p>
+      </div>
+
+      <!-- Pass/Fail Message -->
+      {% if result.score_percent >= 70 %}
+        <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-8">
+          <p class="text-green-900">
+            ✓ Bien joué! Vous avez réussi ce quiz. La leçon est marquée comme complétée.
+          </p>
+        </div>
+      {% else %}
+        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 mb-8">
+          <p class="text-yellow-900">
+            ⚠️ Vous devez obtenir au moins 70% pour passer ce quiz. Réessayez!
+          </p>
+        </div>
+      {% endif %}
+
+      <!-- Action Buttons -->
+      <div class="flex justify-center gap-4">
+        <a href="{% url 'resources:academy_quiz' course.id result.lesson.id %}" 
+           class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors inline-block">
+          Recommencer le quiz
+        </a>
+        <a href="{% url 'resources:academy_course_detail' course.id %}" 
+           class="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg transition-colors inline-block">
+          Retour au cours
+        </a>
+      </div>
+    </div>
+
+    <!-- Answer Breakdown (Optional) -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-6">Détails des réponses</h2>
+      <p class="text-slate-600 text-center">
+        Les détails des réponses seraient affichés ici (à implémenter).
+      </p>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

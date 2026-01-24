@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Facture {{ invoice.number }} - Espace Client | Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="client-portal">
+    <!-- Sidebar -->
+    <aside class="client-sidebar">
+        <div class="sidebar-header">
+            <div class="user-avatar">
+                <span>{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}</span>
+            </div>
+            <div class="user-info">
+                <h3>{{ request.user.get_full_name|default:request.user.username }}</h3>
+                <p>{{ request.user.client_profile.company_name|default:"Client" }}</p>
+            </div>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="{% url 'clients:dashboard' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span>Tableau de bord</span>
+            </a>
+            <a href="{% url 'clients:invoices' %}" class="nav-item active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                <span>Factures</span>
+            </a>
+            <a href="{% url 'clients:quotes' %}" class="nav-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                <span>Devis</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="client-main">
+        <header class="client-header">
+            <div class="header-content">
+                <div>
+                    <nav class="breadcrumb">
+                        <a href="{% url 'clients:dashboard' %}">Tableau de bord</a>
+                        <span>/</span>
+                        <a href="{% url 'clients:invoices' %}">Factures</a>
+                        <span>/</span>
+                        <span>{{ invoice.number }}</span>
+                    </nav>
+                    <h1>Facture {{ invoice.number }}</h1>
+                </div>
+            </div>
+        </header>
+
+        <div class="client-content">
+            <div class="detail-card">
+                <!-- Info Bar -->
+                <div class="info-bar" style="display: flex; gap: 20px; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 20px; background: #f5f7fa; border-radius: 8px;">
+                    <div>
+                        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">Statut</p>
+                        <span class="status-badge status-{{ invoice.status }}">{{ invoice.get_status_display }}</span>
+                    </div>
+                    <div>
+                        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">Date d'émission</p>
+                        <strong>{{ invoice.issue_date|date:"d/m/Y" }}</strong>
+                    </div>
+                    {% if invoice.due_date %}
+                    <div>
+                        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">Date limite</p>
+                        <strong>{{ invoice.due_date|date:"d/m/Y" }}</strong>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <p style="color: #6b7280; font-size: 12px; text-transform: uppercase; margin-bottom: 5px;">Montant TTC</p>
+                        <strong style="font-size: 18px; color: #0b2dff;">{{ invoice.total_ttc|floatformat:2 }} €</strong>
+                    </div>
+                    <div>
+                        <a href="{% url 'clients:invoice_pdf_download' invoice.id %}" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px;" download>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Télécharger
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Invoice Details -->
+                <div style="background: white; padding: 30px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                    <h2 style="font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #1f2937;">Détails de la facture</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                        <!-- Émetteur -->
+                        <div>
+                            <h3 style="font-size: 12px; text-transform: uppercase; color: #6b7280; margin-bottom: 10px;">Émetteur</h3>
+                            <p style="font-size: 16px; font-weight: 600; color: #1f2937;">Trait d'Union Studio</p>
+                            <p style="font-size: 13px; color: #6b7280; margin-top: 8px; line-height: 1.6;">
+                                258 Av Justin Catayée<br>
+                                Rte de la Madeleine<br>
+                                97300 Cayenne, Guyane<br>
+                                <a href="tel:+594695358041" style="color: #0b2dff; text-decoration: none;">+594 695 35 80 41</a><br>
+                                <a href="mailto:contact@traitdunion.it" style="color: #0b2dff; text-decoration: none;">contact@traitdunion.it</a><br>
+                                <strong>SIRET:</strong> 908 264 112 00016
+                            </p>
+                        </div>
+
+                        <!-- Client -->
+                        <div>
+                            <h3 style="font-size: 12px; text-transform: uppercase; color: #6b7280; margin-bottom: 10px;">Destinataire</h3>
+                            <p style="font-size: 16px; font-weight: 600; color: #1f2937;">
+                                {% if invoice.quote.client.company %}{{ invoice.quote.client.company }}{% else %}{{ invoice.quote.client.full_name }}{% endif %}
+                            </p>
+                            <p style="font-size: 13px; color: #6b7280; margin-top: 8px; line-height: 1.6;">
+                                {% if invoice.quote.client.company and invoice.quote.client.full_name %}{{ invoice.quote.client.full_name }}<br>{% endif %}
+                                {% if invoice.quote.client.address_line %}{{ invoice.quote.client.address_line }}<br>{% endif %}
+                                {% if invoice.quote.client.zip_code or invoice.quote.client.city %}{{ invoice.quote.client.zip_code }} {{ invoice.quote.client.city }}<br>{% endif %}
+                                <a href="mailto:{{ invoice.quote.client.email }}" style="color: #0b2dff; text-decoration: none;">{{ invoice.quote.client.email }}</a>
+                                {% if invoice.quote.client.phone %}<br>{{ invoice.quote.client.phone }}{% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Items Table -->
+                    {% if invoice.invoice_items.all %}
+                    <table style="width: 100%; margin: 30px 0; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #e5e7eb;">
+                                <th style="text-align: left; padding: 12px; font-size: 12px; text-transform: uppercase; color: #6b7280; font-weight: 600;">Description</th>
+                                <th style="text-align: center; padding: 12px; font-size: 12px; text-transform: uppercase; color: #6b7280; font-weight: 600; width: 80px;">Qté</th>
+                                <th style="text-align: right; padding: 12px; font-size: 12px; text-transform: uppercase; color: #6b7280; font-weight: 600; width: 150px;">Prix unit.</th>
+                                <th style="text-align: right; padding: 12px; font-size: 12px; text-transform: uppercase; color: #6b7280; font-weight: 600; width: 100px;">TVA</th>
+                                <th style="text-align: right; padding: 12px; font-size: 12px; text-transform: uppercase; color: #6b7280; font-weight: 600; width: 150px;">Total TTC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in invoice.invoice_items.all %}
+                            <tr style="border-bottom: 1px solid #f3f4f6;">
+                                <td style="padding: 12px; color: #1f2937;">
+                                    <strong>{{ item.description }}</strong>
+                                    {% if item.detail %}<br><small style="color: #6b7280;">{{ item.detail }}</small>{% endif %}
+                                </td>
+                                <td style="text-align: center; padding: 12px; color: #1f2937;">{{ item.quantity }}</td>
+                                <td style="text-align: right; padding: 12px; color: #1f2937;">{{ item.unit_price|floatformat:2 }} €</td>
+                                <td style="text-align: right; padding: 12px; color: #1f2937;">{{ item.vat_rate|default:"20"|floatformat:0 }}%</td>
+                                <td style="text-align: right; padding: 12px; font-weight: 600; color: #0b2dff;">{{ item.total_ttc|floatformat:2 }} €</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endif %}
+
+                    <!-- Totals -->
+                    <div style="display: flex; justify-content: flex-end; margin-top: 30px;">
+                        <div style="width: 300px; border: 2px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f3f4f6;">
+                                <span style="color: #6b7280;">Total HT</span>
+                                <strong style="color: #1f2937;">{{ invoice.total_ht|floatformat:2 }} €</strong>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f3f4f6;">
+                                <span style="color: #6b7280;">TVA (20%)</span>
+                                <strong style="color: #1f2937;">{{ invoice.tva|floatformat:2 }} €</strong>
+                            </div>
+                            {% if invoice.discount %}
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #f3f4f6;">
+                                <span style="color: #6b7280;">Remise</span>
+                                <strong style="color: #1f2937;">-{{ invoice.discount|floatformat:2 }} €</strong>
+                            </div>
+                            {% endif %}
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="font-size: 16px; font-weight: 600; color: #1f2937;">Total TTC</span>
+                                <strong style="font-size: 18px; color: #0b2dff;">{{ invoice.total_ttc|floatformat:2 }} €</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Status -->
+                    {% if invoice.status == 'paid' %}
+                    <div style="margin-top: 30px; padding: 20px; background: #dcfce7; border: 1px solid #86efac; border-radius: 8px;">
+                        <p style="color: #166534; font-weight: 600;">✓ Facture payée le {{ invoice.paid_at|date:"d/m/Y" }}</p>
+                    </div>
+                    {% elif invoice.status == 'sent' or invoice.status == 'overdue' %}
+                    <div style="margin-top: 30px; padding: 20px; background: #fef08a; border: 1px solid #fcd34d; border-radius: 8px;">
+                        <p style="color: #b45309; font-weight: 600;">En attente de paiement</p>
+                        <a href="#" style="color: #b45309; text-decoration: underline; margin-top: 10px; display: inline-block;">Payer la facture</a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Notes -->
+                    {% if invoice.notes %}
+                    <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #e5e7eb;">
+                        <h3 style="font-size: 14px; font-weight: 600; color: #1f2937; margin-bottom: 10px;">Notes</h3>
+                        <p style="color: #6b7280; white-space: pre-wrap;">{{ invoice.notes }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-draft {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.status-sent {
+    background: #fef08a;
+    color: #b45309;
+}
+
+.status-paid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-overdue {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status-partial {
+    background: #dbeafe;
+    color: #0369a1;
+}
+
+.btn-primary {
+    background: #0b2dff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.btn-primary:hover {
+    background: #0a1fb8;
+}
+</style>
+{% endblock %}

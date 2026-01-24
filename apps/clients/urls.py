@@ -23,7 +23,12 @@ urlpatterns = [
     
     # Quotes & Invoices
     path('devis/', views.QuoteListView.as_view(), name='quotes'),
+    path('devis/<int:pk>/', views.quote_detail, name='quote_detail'),
+    path('devis/<int:pk>/pdf/', views.quote_pdf_download, name='quote_pdf_download'),
+    path('devis/<int:pk>/pdf/view/', views.quote_pdf_view, name='quote_pdf_view'),
     path('factures/', views.InvoiceListView.as_view(), name='invoices'),
+    path('factures/<int:pk>/', views.invoice_detail, name='invoice_detail'),
+    path('factures/<int:pk>/pdf/', views.invoice_pdf_download, name='invoice_pdf_download'),
     
     # Simplified request flow for existing clients
     path('nouvelle-demande/', views.NewClientRequestView.as_view(), name='new_request'),

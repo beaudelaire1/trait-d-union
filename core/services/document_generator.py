@@ -25,11 +25,11 @@ logger = logging.getLogger(__name__)
 # Branding par défaut pour TUS
 DEFAULT_BRANDING = {
     'name': 'Trait d\'Union Studio',
-    'address': 'CD 8 PK 21 Avenue Paule Berthelot',
-    'city': 'Mana',
-    'zip_code': '97360',
-    'country': 'France',
-    'phone': '+594 694 93 50 56',
+    'address': '258 Av Justin Catayée Rte de la Madeleine',
+    'city': 'Cayenne',
+    'zip_code': '97300',
+    'country': 'Guyane française',
+    'phone': '+594 695 35 80 41',
     'email': 'contact@traitdunion.it',
     'website': 'https://traitdunion.it',
     'siret': '908 264 112 00016',
