@@ -16,7 +16,7 @@
             <!-- Tech badges sur l'image -->
             {% if project.tech_list %}
             <div class="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
-                {% for tech in project.tech_list|slice":3" %}
+                {% for tech in project.tech_list|slice:":3" %}
                 <span class="px-2 py-0.5 text-[10px] font-medium text-tus-white/90 bg-tus-black/60 backdrop-blur-sm rounded-full">
                     {{ tech }}
                 </span>
@@ -56,7 +56,7 @@
             <!-- Tech badges -->
             {% if project.tech_list %}
             <div class="absolute bottom-3 left-3 flex flex-wrap gap-1.5">
-                {% for tech in project.tech_list|slice":3" %}
+                {% for tech in project.tech_list|slice:":3" %}
                 <span class="px-2 py-0.5 text-[10px] font-medium text-tus-white/90 bg-tus-black/60 backdrop-blur-sm rounded-full">
                     {{ tech }}
                 </span>
