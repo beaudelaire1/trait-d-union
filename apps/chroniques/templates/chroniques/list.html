@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Chroniques TUS — Articles & réflexions{% endblock %}
+{% block meta_description %}Chroniques TUS : articles, réflexions et actualités sur le design et le développement web premium.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-20 px-6 relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-[500px] h-[500px] bg-tus-blue/10 rounded-full blur-[140px]"></div>
+    </div>
+    <div class="max-w-7xl mx-auto relative z-10">
+        <div class="text-center mb-12 animate-fade-in">
+            <h1 class="text-4xl md:text-5xl font-display font-bold mb-4">Chroniques <span class="text-tus-blue">TUS</span></h1>
+            <p class="text-tus-white/70">Articles courts et points de vue sur nos pratiques.</p>
+        </div>
+
+        {% if page_obj %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-slide-up">
+            {% for a in page_obj %}
+            <a href="{{ a.get_absolute_url }}" class="group block rounded-2xl overflow-hidden bg-tus-white/5 border border-tus-white/10 hover:border-tus-blue/40 transition-all">
+                <div class="h-40 bg-tus-white/5 flex items-center justify-center">
+                    {% if a.cover_image %}
+                    <img src="{{ a.cover_image.url }}" alt="{{ a.title }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <div class="w-16 h-16 rounded-xl bg-tus-blue/20 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20l9-5-9-5-9 5 9 5zm0-10l9-5-9-5-9 5 9 5z"/>
+                        </svg>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="p-6">
+                    <h3 class="text-lg font-display font-semibold text-tus-white mb-2 group-hover:text-tus-blue transition-colors">{{ a.title }}</h3>
+                    {% if a.excerpt %}
+                    <p class="text-tus-white/60 text-sm line-clamp-3">{{ a.excerpt }}</p>
+                    {% endif %}
+                    <div class="mt-4 text-xs text-tus-white/40">Publié le {{ a.publish_date|date:'d/m/Y' }}</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        <div class="mt-12 flex items-center justify-center gap-2">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm">Précédent</a>
+            {% endif %}
+            <span class="px-4 py-2 text-sm text-tus-white/60">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm">Suivant</a>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="text-center py-16 text-tus-white/60">Aucun article pour le moment.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}{{ article.title }} — Chroniques TUS{% endblock %}
+{% block meta_description %}{{ article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen py-20 px-6 relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -left-40 w-[500px] h-[500px] bg-tus-blue/10 rounded-full blur-[140px]"></div>
+    </div>
+    <div class="max-w-4xl mx-auto relative z-10">
+        <a href="{% url 'chroniques:list' %}" class="inline-flex items-center gap-2 text-tus-blue hover:underline mb-6">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l-4 4m0 0l-4 4m4-4h14"/></svg>
+            Retour aux Chroniques
+        </a>
+
+        <h1 class="text-3xl md:text-4xl font-display font-bold mb-4 text-tus-white">{{ article.title }}</h1>
+        <div class="text-tus-white/50 text-sm mb-8">Publié le {{ article.publish_date|date:'d/m/Y' }}</div>
+
+        {% if article.cover_image %}
+        <div class="rounded-2xl overflow-hidden border border-tus-white/10 mb-8">
+            <img src="{{ article.cover_image.url }}" alt="{{ article.title }}" class="w-full h-auto">
+        </div>
+        {% endif %}
+
+        <div class="prose prose-invert max-w-none">
+            {{ article.body|linebreaksbr }}
+        </div>
+    </div>
+</div>
+{% endblock %}
