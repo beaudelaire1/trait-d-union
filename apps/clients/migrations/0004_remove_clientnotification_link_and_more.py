@@ -10,6 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RemoveField(
+            model_name='clientnotification',
+            name='link',
+        ),
         migrations.AddField(
             model_name='clientnotification',
             name='related_url',
