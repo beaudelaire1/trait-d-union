@@ -442,38 +442,17 @@ def quote_detail(request, pk):
 def quote_pdf_download(request, pk):
     """Download quote PDF."""
     from apps.devis.models import Quote
+    from django.http import HttpResponse
+    from core.services.document_generator import DocumentGenerator
     
     quote = get_object_or_404(Quote, pk=pk, client__email=request.user.email)
     
-    # Si un PDF est référencé, vérifier qu'il existe réellement sur le stockage
+    # Toujours générer à la volée (filesystem éphémère sur Render)
     try:
-        from django.core.files.storage import default_storage
-        pdf_exists = bool(quote.pdf) and default_storage.exists(quote.pdf.name)
-    except Exception:
-        pdf_exists = False
-
-    if pdf_exists:
-        try:
-            return FileResponse(
-                quote.pdf.open('rb'),
-                as_attachment=True,
-                filename=f"devis_{quote.number}.pdf"
-            )
-        except Exception:
-            # En cas d'échec d'ouverture, on génère un nouveau PDF
-            pass
-    
-    # Generate PDF if not exists
-    from core.services.document_generator import DocumentGenerator
-    
-    try:
-        pdf_bytes = DocumentGenerator.generate_quote_pdf(quote, attach=True)
-        return FileResponse(
-            iter([pdf_bytes]),
-            as_attachment=True,
-            filename=f"devis_{quote.number}.pdf",
-            content_type='application/pdf'
-        )
+        pdf_bytes = DocumentGenerator.generate_quote_pdf(quote, attach=False)
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="devis_{quote.number}.pdf"'
+        return response
     except Exception as e:
         messages.error(request, f"Erreur lors de la génération du PDF: {str(e)}")
         return redirect('clients:quotes')
@@ -484,25 +463,13 @@ def quote_pdf_view(request, pk):
     """Afficher le PDF du devis en ligne (inline)."""
     from apps.devis.models import Quote
     from django.http import HttpResponse
-    from django.core.files.storage import default_storage
     from core.services.document_generator import DocumentGenerator
 
     quote = get_object_or_404(Quote, pk=pk, client__email=request.user.email)
 
-    # Essayer de servir le fichier existant s'il est présent
+    # Toujours générer à la volée (filesystem éphémère sur Render)
     try:
-        if quote.pdf and default_storage.exists(quote.pdf.name):
-            with quote.pdf.open('rb') as f:
-                content = f.read()
-                resp = HttpResponse(content, content_type='application/pdf')
-                resp['Content-Disposition'] = f'inline; filename="devis_{quote.number}.pdf"'
-                return resp
-    except Exception:
-        pass
-
-    # Sinon, générer à la volée
-    try:
-        pdf_bytes = DocumentGenerator.generate_quote_pdf(quote, attach=True)
+        pdf_bytes = DocumentGenerator.generate_quote_pdf(quote, attach=False)
         resp = HttpResponse(pdf_bytes, content_type='application/pdf')
         resp['Content-Disposition'] = f'inline; filename="devis_{quote.number}.pdf"'
         return resp

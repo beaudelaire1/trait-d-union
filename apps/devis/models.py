@@ -28,6 +28,15 @@ from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from services.models import Service
+
+# Storage pour les fichiers PDF sur Cloudinary (raw files, pas images)
+def get_pdf_storage():
+    """Retourne le storage approprié pour les PDFs (raw sur Cloudinary)."""
+    try:
+        from cloudinary_storage.storage import RawMediaCloudinaryStorage
+        return RawMediaCloudinaryStorage()
+    except ImportError:
+        return None  # Utilise le storage par défaut
 from typing import List
 
 
@@ -180,7 +189,7 @@ class Quote(models.Model):
     # ``media/devis/`` and named after the quote number.  This field
     # allows automated emailing of professional quotes and a central
     # repository of generated documents.
-    pdf = models.FileField(upload_to="devis", blank=True, null=True)
+    pdf = models.FileField(upload_to="devis", blank=True, null=True, storage=get_pdf_storage)
 
     # ===========================================
     # PHASE 3 : Signature électronique & Paiement
