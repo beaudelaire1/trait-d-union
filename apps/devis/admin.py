@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 from django.urls import path, reverse
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.html import format_html
 from django import forms
 from .models import Quote, QuoteItem, Client
 
@@ -59,7 +60,7 @@ class ClientAdmin(admin.ModelAdmin):
 @admin.register(Quote)
 class QuoteAdmin(admin.ModelAdmin):
     form = QuoteAdminForm
-    list_display = ("number", "client", "status", "total_ttc", "pdf")
+    list_display = ("number", "client", "status", "total_ttc", "pdf_link")
     inlines = [QuoteItemInline]
 
     actions = [
@@ -67,6 +68,12 @@ class QuoteAdmin(admin.ModelAdmin):
         "action_convert_to_invoice",
         "action_send_quote_email",
     ]
+
+    def pdf_link(self, obj: Quote) -> str:
+        """Retourne un lien vers la vue de téléchargement du PDF (généré à la volée)."""
+        url = reverse("devis:download", args=[obj.pk])
+        return format_html("<a href='{}' target='_blank'>Ouvrir</a>", url)
+    pdf_link.short_description = "PDF"
 
     def get_urls(self):
         urls = super().get_urls()
