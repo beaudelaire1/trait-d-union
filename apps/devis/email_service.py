@@ -226,6 +226,12 @@ def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> 
         
         logger.info(f"Devis {quote.number} envoyé à {recipient} via {backend}")
         
+        # Mettre à jour le statut du devis à "sent" si c'était un brouillon
+        if quote.status == 'draft':
+            quote.status = 'sent'
+            quote.save(update_fields=['status'])
+            logger.info(f"Statut du devis {quote.number} mis à jour à 'sent'")
+        
     except Exception as e:
         logger.error(f"Erreur lors de l'envoi du devis {quote.number}: {e}")
         raise

@@ -25,9 +25,11 @@ logger = logging.getLogger(__name__)
 # Branding par défaut pour TUS
 DEFAULT_BRANDING = {
     'name': 'Trait d\'Union Studio',
+    'tagline': 'Agence Web & Digitale',
     'address': '258 Av Justin Catayée Rte de la Madeleine',
     'city': 'Cayenne',
     'zip_code': '97300',
+    'region': 'Guyane française',
     'country': 'Guyane française',
     'phone': '+594 695 35 80 41',
     'email': 'contact@traitdunion.it',
