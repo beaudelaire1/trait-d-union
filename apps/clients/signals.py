@@ -20,7 +20,7 @@ def notify_quote_created(sender, instance, created, **kwargs):
                     notification_type='quote',
                     title='Nouveau devis disponible',
                     message=f'Un nouveau devis #{instance.number} a été créé pour vous.',
-                    link_url=f'/espace-client/devis/{instance.pk}/'
+                    related_url=f'/espace-client/devis/{instance.pk}/'
                 )
         except Exception:
             pass  # Ne pas bloquer la création du devis si la notification échoue
@@ -38,7 +38,7 @@ def notify_quote_accepted(sender, instance, **kwargs):
                     notification_type='quote',
                     title='Devis accepté',
                     message=f'Votre devis #{instance.number} a été accepté. Nous commençons votre projet !',
-                    link_url=f'/espace-client/devis/{instance.pk}/'
+                    related_url=f'/espace-client/devis/{instance.pk}/'
                 )
         except Exception:
             pass
@@ -58,7 +58,7 @@ def notify_invoice_created(sender, instance, created, **kwargs):
                         notification_type='invoice',
                         title='Nouvelle facture disponible',
                         message=f'La facture #{instance.number} est disponible pour un montant de {instance.total_ttc}€.',
-                        link_url=f'/espace-client/factures/{instance.pk}/'
+                        related_url=f'/espace-client/factures/{instance.pk}/'
                     )
         except Exception:
             pass
@@ -77,7 +77,7 @@ def notify_invoice_paid(sender, instance, **kwargs):
                         notification_type='invoice',
                         title='Paiement reçu',
                         message=f'Votre paiement pour la facture #{instance.number} a été reçu. Merci !',
-                        link_url=f'/espace-client/factures/{instance.pk}/'
+                        related_url=f'/espace-client/factures/{instance.pk}/'
                     )
         except Exception:
             pass
