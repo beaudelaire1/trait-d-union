@@ -125,7 +125,8 @@ class ProjectDetailView(ClientRequiredMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['milestones'] = self.object.milestones.all()
+        milestones = list(self.object.milestones.all())
+        context['milestones'] = milestones
         context['documents'] = self.object.documents.all()
         
         # Activity log (visible to client only)
@@ -159,6 +160,74 @@ class ProjectDetailView(ClientRequiredMixin, DetailView):
         status_order = ['briefing', 'design', 'development', 'review', 'delivered']
         current_index = status_order.index(self.object.status) if self.object.status in status_order else 0
         context['completed_stages'] = status_order[:current_index]
+        
+        # === BARRE DE PROGRESSION DYNAMIQUE ===
+        total_milestones = len(milestones)
+        if total_milestones > 0:
+            completed_count = sum(1 for m in milestones if m.status == 'completed')
+            in_progress_idx = next(
+                (i for i, m in enumerate(milestones) if m.status == 'in_progress'),
+                None
+            )
+            
+            # Étape courante (en cours ou prochaine à faire)
+            if in_progress_idx is not None:
+                current_step = in_progress_idx + 1
+                current_milestone = milestones[in_progress_idx]
+            elif completed_count < total_milestones:
+                # Première étape pending
+                pending_idx = next(
+                    (i for i, m in enumerate(milestones) if m.status == 'pending'),
+                    completed_count
+                )
+                current_step = pending_idx + 1
+                current_milestone = milestones[pending_idx] if pending_idx < total_milestones else None
+            else:
+                current_step = total_milestones
+                current_milestone = milestones[-1] if milestones else None
+            
+            # Pourcentage de progression
+            progress_percent = int((completed_count / total_milestones) * 100)
+            if in_progress_idx is not None:
+                # Ajouter 50% de l'étape en cours
+                progress_percent = int(((completed_count + 0.5) / total_milestones) * 100)
+            
+            context['milestone_progress'] = {
+                'total': total_milestones,
+                'completed': completed_count,
+                'current_step': current_step,
+                'current_milestone': current_milestone,
+                'percent': min(progress_percent, 100),
+            }
+        else:
+            context['milestone_progress'] = None
+        
+        # === CALCUL DÉLAI PROJET ===
+        from datetime import date
+        project = self.object
+        if project.start_date and project.estimated_delivery:
+            total_days = (project.estimated_delivery - project.start_date).days
+            elapsed_days = (date.today() - project.start_date).days
+            remaining_days = (project.estimated_delivery - date.today()).days
+            
+            # Semaines
+            total_weeks = max(1, total_days // 7)
+            elapsed_weeks = max(0, elapsed_days // 7)
+            remaining_weeks = max(0, remaining_days // 7)
+            
+            # Pourcentage temps écoulé
+            time_percent = min(100, max(0, int((elapsed_days / total_days) * 100))) if total_days > 0 else 0
+            
+            context['project_timeline'] = {
+                'total_weeks': total_weeks,
+                'elapsed_weeks': elapsed_weeks,
+                'remaining_weeks': remaining_weeks,
+                'remaining_days': remaining_days,
+                'time_percent': time_percent,
+                'is_overdue': remaining_days < 0,
+            }
+        else:
+            context['project_timeline'] = None
         
         return context
 

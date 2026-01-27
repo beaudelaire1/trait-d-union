@@ -18,8 +18,14 @@ class ClientProfileAdmin(admin.ModelAdmin):
 class ProjectMilestoneInline(admin.TabularInline):
     """Inline for project milestones."""
     model = ProjectMilestone
-    extra = 1
+    extra = 3  # 3 lignes vides par défaut pour ajouter rapidement
     ordering = ['order']
+    fields = ['order', 'title', 'description', 'status', 'due_date']
+    
+    class Media:
+        css = {
+            'all': ['admin/css/forms.css']
+        }
 
 
 class ClientDocumentInline(admin.TabularInline):

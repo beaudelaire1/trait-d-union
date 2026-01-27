@@ -3,271 +3,271 @@
 {% block title %}{{ project.name }} - Suivi projet{% endblock %}
 
 {% block content %}
-<div class="client-portal">
-    <header class="client-header">
+<div class="project-detail-page" x-data="projectTracker({{ milestone_progress.percent|default:0 }}, {{ project_timeline.time_percent|default:0 }})">
+    
+    <!-- Blobs lumineux arrière-plan -->
+    <div class="blob blob-blue"></div>
+    <div class="blob blob-green"></div>
+    
+    <!-- Header avec breadcrumb -->
+    <header class="project-header">
         <div class="container">
-            <nav class="client-breadcrumb">
-                <a href="{% url 'clients:dashboard' %}">Espace client</a>
-                <span>/</span>
+            <nav class="breadcrumb">
+                <a href="{% url 'clients:dashboard' %}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                    </svg>
+                    Espace client
+                </a>
+                <span class="separator">/</span>
                 <a href="{% url 'clients:projects' %}">Projets</a>
-                <span>/</span>
-                <span>{{ project.name }}</span>
+                <span class="separator">/</span>
+                <span class="current">{{ project.name|truncatechars:30 }}</span>
             </nav>
         </div>
     </header>
 
+    <!-- Hero Section -->
     <section class="project-hero">
         <div class="container">
-            <div class="project-hero-content">
-                <div class="project-info">
-                    <h1>{{ project.name }}</h1>
-                    <p class="project-description">{{ project.description|default:"" }}</p>
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="project-badge">
+                        <span class="status-dot status-{{ project.status }}"></span>
+                        {{ project.get_status_display }}
+                    </div>
+                    <h1 class="animate-fade-in">{{ project.name }}</h1>
+                    <p class="project-description">{{ project.description|default:"Votre projet est entre de bonnes mains." }}</p>
+                    
                     {% if project.estimated_delivery %}
-                        <p class="project-eta">
-                            <span class="icon">📅</span>
-                            Livraison estimée : {{ project.estimated_delivery|date:"d F Y" }}
-                        </p>
+                    <div class="delivery-card">
+                        <div class="delivery-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                        </div>
+                        <div>
+                            <span class="delivery-label">Livraison estimée</span>
+                            <span class="delivery-date">{{ project.estimated_delivery|date:"d F Y" }}</span>
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
-                <div class="project-progress-card">
-                    <div class="progress-circle" data-progress="{{ project.progress }}">
-                        <svg viewBox="0 0 100 100">
-                            <circle class="progress-bg" cx="50" cy="50" r="45"/>
-                            <circle class="progress-fill" cx="50" cy="50" r="45" 
-                                stroke-dasharray="{{ project.progress|default:0 }}% 283"/>
+                
+                <!-- Cercle de progression -->
+                <div class="hero-progress">
+                    <div class="progress-ring-wrap">
+                        <svg class="progress-ring" viewBox="0 0 120 120">
+                            <defs>
+                                <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#0B2DFF"/>
+                                    <stop offset="100%" stop-color="#22C55E"/>
+                                </linearGradient>
+                            </defs>
+                            <circle class="ring-bg" cx="60" cy="60" r="52"/>
+                            <circle class="ring-fill" cx="60" cy="60" r="52" 
+                                    :stroke-dashoffset="326.7 - (326.7 * animatedProgress / 100)"
+                                    stroke-dasharray="326.7"/>
                         </svg>
-                        <span class="progress-value">{{ project.progress }}%</span>
+                        <div class="ring-content">
+                            <span class="ring-value" x-text="Math.round(animatedProgress) + '%'">0%</span>
+                            <span class="ring-label">Complété</span>
+                        </div>
                     </div>
-                    <span class="progress-label">Progression</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Timeline -->
-    <section class="project-timeline-section">
+    <!-- Tracker Card -->
+    {% if milestone_progress %}
+    <section class="tracker-section">
         <div class="container">
-            <h2>Avancement du projet</h2>
-            <div class="timeline">
-                {% for stage in stages %}
-                <div class="timeline-step {% if project.status == stage.id %}active{% elif forloop.counter0 < stages|length and project.status in 'development,review,delivered,maintenance' and stage.id == 'briefing' %}completed{% elif project.status in 'review,delivered,maintenance' and stage.id == 'design' %}completed{% elif project.status in 'delivered,maintenance' and stage.id == 'development' %}completed{% elif project.status == 'maintenance' and stage.id == 'review' %}completed{% elif project.status == 'maintenance' and stage.id == 'delivered' %}completed{% endif %}">
-                    <div class="step-marker">
-                        <span class="step-icon">{{ stage.icon }}</span>
+            <div class="tracker-card glass-card" x-data="{ expanded: false }">
+                <div class="tracker-header">
+                    <div class="tracker-title">
+                        <div class="tracker-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Étape <span class="text-tus-blue">{{ milestone_progress.current_step }}</span> sur {{ milestone_progress.total }}</h2>
+                            {% if milestone_progress.current_milestone %}
+                            <p class="current-task">{{ milestone_progress.current_milestone.title }}</p>
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="step-content">
-                        <span class="step-label">{{ stage.label }}</span>
+                    <div class="tracker-stats">
+                        <div class="stat">
+                            <span class="stat-value text-tus-green">{{ milestone_progress.completed }}</span>
+                            <span class="stat-label">Terminée{{ milestone_progress.completed|pluralize }}</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">{{ milestone_progress.total|add:"-"|add:milestone_progress.completed }}</span>
+                            <span class="stat-label">Restante{{ milestone_progress.total|add:"-"|add:milestone_progress.completed|pluralize }}</span>
+                        </div>
                     </div>
                 </div>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
 
-    <!-- Milestones -->
-    {% if milestones %}
-    <section class="project-milestones">
-        <div class="container">
-            <h2>Jalons du projet</h2>
-            <div class="milestones-list">
-                {% for milestone in milestones %}
-                <div class="milestone-item status-{{ milestone.status }}">
-                    <div class="milestone-status">
-                        {% if milestone.status == 'completed' %}✅
-                        {% elif milestone.status == 'in_progress' %}🔄
-                        {% else %}⏳{% endif %}
+                <!-- Barre de progression -->
+                <div class="progress-wrapper">
+                    <div class="progress-track">
+                        <div class="progress-fill" :style="'width: ' + animatedProgress + '%'"></div>
+                        <div class="progress-marker" :style="'left: ' + animatedProgress + '%'"></div>
                     </div>
-                    <div class="milestone-content">
-                        <h3>{{ milestone.title }}</h3>
-                        {% if milestone.description %}
-                            <p>{{ milestone.description }}</p>
-                        {% endif %}
-                        {% if milestone.due_date %}
-                            <span class="milestone-date">
-                                {% if milestone.completed_at %}
-                                    Terminé le {{ milestone.completed_at|date:"d/m/Y" }}
-                                {% else %}
-                                    Échéance : {{ milestone.due_date|date:"d/m/Y" }}
-                                {% endif %}
-                            </span>
-                        {% endif %}
+                    <div class="progress-labels">
+                        <span>Début</span>
+                        <span class="progress-percent" x-text="Math.round(animatedProgress) + '%'"></span>
+                        <span>Fin</span>
                     </div>
                 </div>
-                {% endfor %}
+
+                {% if project_timeline %}
+                <div class="timeline-bar-section">
+                    <div class="timeline-header">
+                        <span class="timeline-title">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            Délai du projet
+                        </span>
+                        <span class="timeline-remaining {% if project_timeline.is_overdue %}overdue{% endif %}">
+                            {% if project_timeline.is_overdue %}⚠️ Dépassé{% else %}{{ project_timeline.remaining_weeks }} sem. restante{{ project_timeline.remaining_weeks|pluralize }}{% endif %}
+                        </span>
+                    </div>
+                    <div class="timeline-track">
+                        <div class="timeline-fill {% if project_timeline.is_overdue %}overdue{% endif %}" :style="'width: ' + animatedTime + '%'"></div>
+                        <div class="timeline-marker" :style="'left: ' + animatedTime + '%'"></div>
+                    </div>
+                    <div class="timeline-labels">
+                        <span>{{ project.start_date|date:"d/m" }}</span>
+                        <span>Sem. {{ project_timeline.elapsed_weeks }}/{{ project_timeline.total_weeks }}</span>
+                        <span>{{ project.estimated_delivery|date:"d/m" }}</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <button class="expand-btn" @click="expanded = !expanded">
+                    <span x-text="expanded ? 'Masquer les détails' : 'Voir toutes les étapes'"></span>
+                    <svg :class="{ 'rotated': expanded }" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+
+                <div class="milestones-list" x-show="expanded" x-collapse>
+                    {% for milestone in milestones %}
+                    <div class="milestone-row status-{{ milestone.status }}">
+                        <div class="milestone-num">{{ forloop.counter }}</div>
+                        <div class="milestone-info">
+                            <h4>{{ milestone.title }}</h4>
+                            {% if milestone.description %}<p>{{ milestone.description }}</p>{% endif %}
+                        </div>
+                        <div class="milestone-status">
+                            {% if milestone.status == 'completed' %}
+                            <span class="badge badge-success">✓ Terminé</span>
+                            {% elif milestone.status == 'in_progress' %}
+                            <span class="badge badge-blue"><span class="pulse"></span>En cours</span>
+                            {% else %}
+                            <span class="badge badge-neutral">À venir</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </section>
     {% endif %}
 
     <!-- Documents -->
-    <section class="project-documents">
-        <div class="container">
-            <div class="section-header">
-                <h2>Documents du projet</h2>
-                <a href="{% url 'clients:upload_document_project' project.pk %}" class="btn btn-sm">
-                    + Ajouter un fichier
-                </a>
-            </div>
-            
-            {% if documents %}
-                <div class="documents-grid">
-                    {% for doc in documents %}
-                    <a href="{{ doc.file.url }}" target="_blank" class="document-card">
-                        <div class="doc-preview">
-                            {% if doc.is_image %}
-                                <img src="{{ doc.file.url }}" alt="{{ doc.title }}">
-                            {% else %}
-                                <span class="doc-ext">.{{ doc.file_extension }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="doc-info">
-                            <span class="doc-title">{{ doc.title }}</span>
-                            <span class="doc-meta">{{ doc.created_at|date:"d/m/Y" }}</span>
-                        </div>
-                    </a>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <p>Aucun document pour ce projet</p>
-                    <a href="{% url 'clients:upload_document_project' project.pk %}" class="btn btn-outline">
-                        Uploader un fichier
-                    </a>
-                </div>
-            {% endif %}
-        </div>
-    </section>
-
-    <!-- Linked Quote -->
-    {% if project.quote %}
-    <section class="project-quote">
-        <div class="container">
-            <h2>Devis associé</h2>
-            <a href="{% url 'devis:quote_detail' project.quote.pk %}" class="quote-card">
-                <span class="quote-ref">{{ project.quote.reference }}</span>
-                <span class="quote-amount">{{ project.quote.total_ttc|floatformat:2 }}€ TTC</span>
-                <span class="quote-status">{{ project.quote.get_status_display }}</span>
-            </a>
-        </div>
-    </section>
-    {% endif %}
-
-    <!-- Activity Log - Transparence radicale -->
-    <section class="project-activity">
+    <section class="documents-section">
         <div class="container">
             <div class="section-header">
                 <h2>
-                    <span class="section-icon">📊</span>
-                    Journal d'activité
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                    Documents
                 </h2>
-                <span class="tus-badge">Transparence radicale</span>
+                <a href="{% url 'clients:upload_document_project' project.pk %}" class="btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Ajouter
+                </a>
             </div>
-            
-            {% if activities %}
-            <div class="activity-feed">
-                {% for activity in activities %}
-                <div class="activity-item" data-type="{{ activity.activity_type }}">
-                    <div class="activity-icon">{{ activity.icon }}</div>
-                    <div class="activity-content">
-                        <div class="activity-header">
-                            <span class="activity-title">{{ activity.title }}</span>
-                            <span class="activity-date">{{ activity.created_at|date:"d/m/Y à H:i" }}</span>
-                        </div>
-                        {% if activity.description %}
-                        <p class="activity-desc">{{ activity.description }}</p>
-                        {% endif %}
-                        {% if activity.performed_by %}
-                        <span class="activity-author">
-                            Par {{ activity.performed_by.get_full_name|default:"Équipe TUS" }}
-                        </span>
-                        {% endif %}
+            {% if documents %}
+            <div class="documents-grid">
+                {% for doc in documents %}
+                <a href="{{ doc.file.url }}" target="_blank" class="doc-card glass-card">
+                    <div class="doc-preview">
+                        {% if doc.is_image %}<img src="{{ doc.file.url }}" alt="{{ doc.title }}">
+                        {% else %}<span class="doc-ext">.{{ doc.file_extension }}</span>{% endif %}
                     </div>
-                </div>
+                    <div class="doc-info">
+                        <span class="doc-name">{{ doc.title }}</span>
+                        <span class="doc-date">{{ doc.created_at|date:"d/m/Y" }}</span>
+                    </div>
+                </a>
                 {% endfor %}
             </div>
             {% else %}
-            <div class="activity-empty">
-                <p>Le journal d'activité apparaîtra ici dès le début du projet</p>
+            <div class="empty-state glass-card">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                </svg>
+                <p>Aucun document</p>
+                <a href="{% url 'clients:upload_document_project' project.pk %}" class="btn-outline">Uploader un fichier</a>
             </div>
             {% endif %}
         </div>
     </section>
 
-    <!-- Comments Section - Communication -->
-    <section class="project-comments">
+    <!-- Commentaires -->
+    <section class="comments-section">
         <div class="container">
             <div class="section-header">
                 <h2>
-                    <span class="section-icon">💬</span>
-                    Échanges avec l'équipe
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Échanges
                 </h2>
-                <span class="comments-count">{{ comments.count }} message{{ comments.count|pluralize }}</span>
+                <span class="badge badge-neutral">{{ comments.count }} message{{ comments.count|pluralize }}</span>
             </div>
-            
-            <div class="comments-wrapper">
-                <!-- Comment Form -->
-                <form class="comment-form" 
-                      hx-post="{% url 'clients:add_project_comment' project.pk %}"
-                      hx-target="#comments-list"
-                      hx-swap="beforeend"
-                      hx-on::after-request="this.reset()">
+            <div class="comments-wrap">
+                <form class="comment-form glass-card" hx-post="{% url 'clients:add_project_comment' project.pk %}" hx-target="#comments-list" hx-swap="afterbegin" hx-on::after-request="this.reset()">
                     {% csrf_token %}
-                    <div class="form-group">
-                        <textarea name="message" 
-                                  placeholder="Posez une question ou partagez un retour..." 
-                                  rows="3"
-                                  required></textarea>
-                    </div>
+                    <textarea name="message" placeholder="Posez une question ou partagez un retour..." rows="3" required></textarea>
                     <div class="form-actions">
-                        <label class="file-upload">
-                            <input type="file" name="attachment" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.zip">
-                            <span class="file-btn">📎 Joindre un fichier</span>
-                        </label>
-                        <button type="submit" class="btn btn-primary">
-                            Envoyer
-                        </button>
+                        <label class="file-label"><input type="file" name="attachment"><span>📎 Fichier</span></label>
+                        <button type="submit" class="btn-primary">Envoyer</button>
                     </div>
                 </form>
-                
-                <!-- Comments List -->
                 <div class="comments-list" id="comments-list">
-                    {% if comments %}
-                        {% for comment in comments %}
-                        <div class="comment-item {% if comment.is_from_client %}from-client{% else %}from-team{% endif %}">
-                            <div class="comment-avatar">
-                                {% if comment.is_from_client %}
-                                    <span>{{ comment.author.first_name|slice:":1"|upper }}{{ comment.author.last_name|slice:":1"|upper }}</span>
-                                {% else %}
-                                    <span class="team-avatar">TUS</span>
-                                {% endif %}
+                    {% for comment in comments %}
+                    <div class="comment-item {% if comment.is_from_client %}from-client{% else %}from-team{% endif %}">
+                        <div class="comment-avatar">{% if comment.is_from_client %}{{ comment.author.first_name|slice:":1"|upper }}{{ comment.author.last_name|slice:":1"|upper }}{% else %}TUS{% endif %}</div>
+                        <div class="comment-body">
+                            <div class="comment-meta">
+                                <span class="author">{% if comment.is_from_client %}Vous{% else %}{{ comment.author.get_full_name|default:"Équipe TUS" }}{% endif %}</span>
+                                <span class="time">{{ comment.created_at|date:"d/m H:i" }}</span>
                             </div>
-                            <div class="comment-content">
-                                <div class="comment-header">
-                                    <span class="comment-author">
-                                        {% if comment.is_from_client %}
-                                            Vous
-                                        {% else %}
-                                            {{ comment.author.get_full_name|default:"Équipe TUS" }}
-                                        {% endif %}
-                                    </span>
-                                    <span class="comment-date">{{ comment.created_at|date:"d/m/Y à H:i" }}</span>
-                                </div>
-                                <div class="comment-body">
-                                    {{ comment.message|linebreaks }}
-                                </div>
-                                {% if comment.attachment %}
-                                <a href="{{ comment.attachment.url }}" target="_blank" class="comment-attachment">
-                                    📎 Pièce jointe
-                                </a>
-                                {% endif %}
-                            </div>
+                            <div class="comment-text">{{ comment.message|linebreaks }}</div>
+                            {% if comment.attachment %}<a href="{{ comment.attachment.url }}" class="attachment" target="_blank">📎 Pièce jointe</a>{% endif %}
                         </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="comments-empty">
-                            <p>Aucun message pour le moment</p>
-                            <span>Commencez la conversation avec notre équipe</span>
-                        </div>
-                    {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="no-comments"><p>Aucun message</p><span>Commencez la conversation !</span></div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -275,693 +275,721 @@
 </div>
 
 <style>
-.client-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-}
-
-.client-breadcrumb a {
-    color: var(--primary);
-}
-
-.client-breadcrumb span {
-    color: var(--gray-400);
-}
-
-.project-hero {
-    padding: 2rem 0 3rem;
-}
-
-.project-hero-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.project-info {
-    flex: 1;
-}
-
-.project-info h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.project-description {
-    color: var(--gray-600);
-    max-width: 500px;
-}
-
-.project-eta {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    color: var(--gray-600);
-}
-
-.project-progress-card {
-    text-align: center;
-}
-
-.progress-circle {
+/* ========================================
+   VARIABLES TUS
+   ======================================== */
+.project-detail-page {
+    --tus-black: #07080A;
+    --tus-white: #F6F7FB;
+    --tus-blue: #0B2DFF;
+    --tus-green: #22C55E;
+    --tus-green-light: #4ADE80;
+    --surface-dark: #0D1016;
+    background: var(--tus-black);
+    color: var(--tus-white);
+    min-height: 100vh;
     position: relative;
-    width: 120px;
-    height: 120px;
+    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
 }
 
-.progress-circle svg {
-    transform: rotate(-90deg);
-    width: 100%;
-    height: 100%;
+/* Blobs lumineux */
+.blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(150px);
+    pointer-events: none;
+    z-index: 0;
+}
+.blob-blue {
+    top: -200px;
+    left: -200px;
+    width: 600px;
+    height: 600px;
+    background: rgba(11, 45, 255, 0.15);
+}
+.blob-green {
+    bottom: -300px;
+    right: -200px;
+    width: 500px;
+    height: 500px;
+    background: rgba(34, 197, 94, 0.1);
 }
 
-.progress-circle circle {
-    fill: none;
-    stroke-width: 8;
-    stroke-linecap: round;
-}
-
-.progress-bg {
-    stroke: var(--gray-200);
-}
-
-.progress-fill {
-    stroke: var(--primary);
-    transition: stroke-dasharray 0.5s ease;
-}
-
-.progress-value {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.progress-label {
-    display: block;
-    margin-top: 0.5rem;
-    color: var(--gray-500);
-}
-
-.project-timeline-section {
-    padding: 3rem 0;
-    background: white;
-}
-
-.project-timeline-section h2 {
-    margin-bottom: 2rem;
-}
-
-.timeline {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    max-width: 800px;
+.container {
+    max-width: 1100px;
     margin: 0 auto;
-}
-
-.timeline::before {
-    content: '';
-    position: absolute;
-    top: 25px;
-    left: 50px;
-    right: 50px;
-    height: 3px;
-    background: var(--gray-200);
-}
-
-.timeline-step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding: 0 1.5rem;
     position: relative;
     z-index: 1;
 }
 
-.step-marker {
-    width: 50px;
-    height: 50px;
+/* Glass Card */
+.glass-card {
+    background: rgba(246, 247, 251, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(246, 247, 251, 0.1);
+    border-radius: 16px;
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+.project-header {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid rgba(246, 247, 251, 0.1);
+}
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+.breadcrumb a {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: rgba(246, 247, 251, 0.6);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.breadcrumb a:hover { color: var(--tus-blue); }
+.breadcrumb .separator { color: rgba(246, 247, 251, 0.3); }
+.breadcrumb .current { color: var(--tus-white); font-weight: 500; }
+
+/* ========================================
+   HERO
+   ======================================== */
+.project-hero {
+    padding: 3rem 0 4rem;
+}
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3rem;
+    align-items: center;
+}
+.project-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(11, 45, 255, 0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--tus-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+.status-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: white;
-    border: 3px solid var(--gray-200);
+    background: var(--tus-green);
+    animation: pulse 2s infinite;
+}
+.status-dot.status-briefing { background: #f59e0b; }
+.status-dot.status-design { background: #8b5cf6; }
+.status-dot.status-development { background: var(--tus-blue); }
+.status-dot.status-review { background: #06b6d4; }
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+}
+.hero-content h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+    line-height: 1.2;
+}
+.project-description {
+    font-size: 1.05rem;
+    color: rgba(246, 247, 251, 0.7);
+    max-width: 500px;
+    line-height: 1.7;
+    margin: 0 0 1.5rem;
+}
+.delivery-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(246, 247, 251, 0.05);
+    border: 1px solid rgba(246, 247, 251, 0.1);
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+}
+.delivery-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(11, 45, 255, 0.1);
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    transition: all 0.3s;
+    color: var(--tus-blue);
+}
+.delivery-label {
+    display: block;
+    font-size: 0.7rem;
+    color: rgba(246, 247, 251, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.delivery-date {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
 }
 
-.timeline-step.completed .step-marker {
-    border-color: var(--primary);
-    background: var(--primary);
+/* ========================================
+   PROGRESS RING
+   ======================================== */
+.hero-progress { position: relative; z-index: 1; }
+.progress-ring-wrap {
+    position: relative;
+    width: 160px;
+    height: 160px;
+}
+.progress-ring {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+.ring-bg {
+    fill: none;
+    stroke: rgba(246, 247, 251, 0.1);
+    stroke-width: 10;
+}
+.ring-fill {
+    fill: none;
+    stroke: url(#ringGradient);
+    stroke-width: 10;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ring-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.ring-value {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 700;
+}
+.ring-label {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(246, 247, 251, 0.6);
 }
 
-.timeline-step.active .step-marker {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.2);
-    transform: scale(1.1);
+/* ========================================
+   TRACKER CARD
+   ======================================== */
+.tracker-section {
+    margin-top: -2rem;
+    padding-bottom: 2rem;
+    position: relative;
+    z-index: 10;
+}
+.tracker-card {
+    padding: 2rem;
+}
+.tracker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+.tracker-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.tracker-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, rgba(11, 45, 255, 0.2), rgba(34, 197, 94, 0.1));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tus-blue);
+}
+.tracker-title h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+.text-tus-blue { color: var(--tus-blue); }
+.text-tus-green { color: var(--tus-green); }
+.current-task {
+    font-size: 0.9rem;
+    color: rgba(246, 247, 251, 0.6);
+    margin: 0;
+}
+.tracker-stats {
+    display: flex;
+    gap: 2rem;
+}
+.tracker-stats .stat { text-align: center; }
+.tracker-stats .stat-value {
+    display: block;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: rgba(246, 247, 251, 0.4);
+}
+.tracker-stats .stat-label {
+    display: block;
+    font-size: 0.7rem;
+    color: rgba(246, 247, 251, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
 }
 
-.step-label {
+/* ========================================
+   PROGRESS BAR
+   ======================================== */
+.progress-wrapper { margin-bottom: 1.5rem; }
+.progress-track {
+    position: relative;
+    height: 16px;
+    background: rgba(246, 247, 251, 0.1);
+    border-radius: 8px;
+    overflow: visible;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 8px;
+    background: linear-gradient(90deg, var(--tus-blue), var(--tus-green));
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 20px rgba(11, 45, 255, 0.4);
+}
+.progress-marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    background: var(--tus-white);
+    border: 3px solid var(--tus-green);
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+    transition: left 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
     margin-top: 0.75rem;
-    font-weight: 500;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
+    color: rgba(246, 247, 251, 0.4);
+}
+.progress-percent {
+    font-weight: 600;
+    color: var(--tus-white);
 }
 
-.timeline-step.active .step-label {
-    color: var(--primary);
-}
-
-.project-milestones,
-.project-documents,
-.project-quote {
-    padding: 3rem 0;
-}
-
-.project-milestones h2,
-.project-documents h2,
-.project-quote h2 {
+/* Timeline bar */
+.timeline-bar-section {
+    background: rgba(246, 247, 251, 0.03);
+    border-radius: 12px;
+    padding: 1.25rem;
     margin-bottom: 1.5rem;
 }
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+.timeline-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(246, 247, 251, 0.7);
+}
+.timeline-remaining {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--tus-green);
+}
+.timeline-remaining.overdue { color: #ef4444; }
+.timeline-track {
+    position: relative;
+    height: 6px;
+    background: rgba(246, 247, 251, 0.1);
+    border-radius: 3px;
+    overflow: visible;
+}
+.timeline-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--tus-blue), #8b5cf6);
+    border-radius: 3px;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.timeline-fill.overdue {
+    background: linear-gradient(90deg, #f97316, #ef4444);
+}
+.timeline-marker {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: var(--tus-white);
+    border: 2px solid var(--tus-blue);
+    border-radius: 50%;
+    transition: left 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.timeline-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    font-size: 0.7rem;
+    color: rgba(246, 247, 251, 0.4);
+}
 
+/* ========================================
+   EXPAND & MILESTONES
+   ======================================== */
+.expand-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(246, 247, 251, 0.05);
+    border: 1px solid rgba(246, 247, 251, 0.1);
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(246, 247, 251, 0.7);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.expand-btn:hover {
+    background: rgba(246, 247, 251, 0.1);
+    color: var(--tus-white);
+    border-color: rgba(11, 45, 255, 0.3);
+}
+.expand-btn svg { transition: transform 0.3s; }
+.expand-btn svg.rotated { transform: rotate(180deg); }
+.milestones-list {
+    margin-top: 1.5rem;
+    border-top: 1px solid rgba(246, 247, 251, 0.1);
+    padding-top: 1.5rem;
+}
+.milestone-row {
+    display: grid;
+    grid-template-columns: 40px 1fr auto;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    background: rgba(246, 247, 251, 0.03);
+    transition: all 0.2s;
+}
+.milestone-row:hover { background: rgba(246, 247, 251, 0.06); }
+.milestone-row.status-completed { background: rgba(34, 197, 94, 0.08); }
+.milestone-row.status-in_progress {
+    background: rgba(11, 45, 255, 0.1);
+    border: 1px solid rgba(11, 45, 255, 0.2);
+}
+.milestone-num {
+    width: 40px;
+    height: 40px;
+    background: rgba(246, 247, 251, 0.05);
+    border: 2px solid rgba(246, 247, 251, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: rgba(246, 247, 251, 0.4);
+}
+.milestone-row.status-completed .milestone-num {
+    background: var(--tus-green);
+    border-color: var(--tus-green);
+    color: #fff;
+}
+.milestone-row.status-in_progress .milestone-num {
+    background: var(--tus-blue);
+    border-color: var(--tus-blue);
+    color: #fff;
+}
+.milestone-info h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem;
+}
+.milestone-info p {
+    font-size: 0.8rem;
+    color: rgba(246, 247, 251, 0.5);
+    margin: 0;
+}
+.milestone-status { text-align: right; }
+
+/* Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.badge-success { background: rgba(34, 197, 94, 0.15); color: var(--tus-green); }
+.badge-blue { background: rgba(11, 45, 255, 0.15); color: var(--tus-blue); }
+.badge-neutral { background: rgba(246, 247, 251, 0.1); color: rgba(246, 247, 251, 0.6); }
+.badge .pulse {
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+}
+
+/* ========================================
+   DOCUMENTS & COMMENTS
+   ======================================== */
+.documents-section, .comments-section { padding: 2.5rem 0; }
 .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
 }
-
-.milestones-list {
+.section-header h2 {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 600px;
-}
-
-.milestone-item {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 0.75rem;
-    border-left: 4px solid var(--gray-300);
-}
-
-.milestone-item.status-completed {
-    border-left-color: #22c55e;
-}
-
-.milestone-item.status-in_progress {
-    border-left-color: var(--primary);
-}
-
-.milestone-status {
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
 }
-
-.milestone-content h3 {
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 1.25rem;
+    background: var(--tus-blue);
+    color: var(--tus-white);
+    border: none;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
 }
-
-.milestone-content p {
-    font-size: 0.875rem;
-    color: var(--gray-600);
-    margin-bottom: 0.5rem;
+.btn-primary:hover {
+    background: #0926cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(11, 45, 255, 0.4);
 }
-
-.milestone-date {
-    font-size: 0.75rem;
-    color: var(--gray-500);
+.btn-outline {
+    display: inline-flex;
+    padding: 0.6rem 1.25rem;
+    border: 2px solid var(--tus-blue);
+    color: var(--tus-blue);
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
 }
-
+.btn-outline:hover {
+    background: var(--tus-blue);
+    color: var(--tus-white);
+}
 .documents-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
 }
-
-.document-card {
-    background: white;
-    border-radius: 0.75rem;
-    overflow: hidden;
+.doc-card {
     text-decoration: none;
     color: inherit;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s;
 }
-
-.document-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.doc-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(11, 45, 255, 0.4);
+    box-shadow: 0 8px 30px rgba(11, 45, 255, 0.15);
 }
-
 .doc-preview {
-    height: 120px;
-    background: var(--gray-100);
+    height: 100px;
+    background: rgba(246, 247, 251, 0.03);
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.doc-preview img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.doc-ext {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--gray-400);
-    text-transform: uppercase;
-}
-
-.document-card .doc-info {
-    padding: 1rem;
-}
-
-.document-card .doc-title {
-    display: block;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-    white-space: nowrap;
+    border-radius: 16px 16px 0 0;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
-
-.document-card .doc-meta {
-    font-size: 0.75rem;
-    color: var(--gray-500);
-}
-
-.quote-card {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1.5rem;
-    background: white;
-    border-radius: 0.75rem;
-    text-decoration: none;
-    color: inherit;
-    max-width: 500px;
-}
-
-.quote-ref {
-    font-weight: 600;
-}
-
-.quote-amount {
-    font-size: 1.25rem;
-    font-weight: 700;
-}
-
-.quote-status {
-    padding: 0.25rem 0.75rem;
-    background: var(--gray-100);
-    border-radius: 1rem;
-    font-size: 0.875rem;
-}
-
+.doc-preview img { width: 100%; height: 100%; object-fit: cover; }
+.doc-ext { font-size: 1.25rem; font-weight: 700; color: rgba(246, 247, 251, 0.3); text-transform: uppercase; }
+.doc-info { padding: 0.75rem 1rem; }
+.doc-name { display: block; font-weight: 500; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.doc-date { display: block; font-size: 0.7rem; color: rgba(246, 247, 251, 0.4); margin-top: 0.25rem; }
 .empty-state {
     text-align: center;
     padding: 3rem;
-    background: white;
-    border-radius: 0.75rem;
 }
+.empty-state svg { color: rgba(246, 247, 251, 0.2); margin-bottom: 1rem; }
+.empty-state p { color: rgba(246, 247, 251, 0.5); margin: 0 0 1rem; }
 
-@media (max-width: 768px) {
-    .timeline {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .timeline::before {
-        display: none;
-    }
-    
-    .timeline-step {
-        flex-direction: row;
-        gap: 1rem;
-    }
-    
-    .step-marker {
-        width: 40px;
-        height: 40px;
-        font-size: 1.25rem;
-    }
-}
-
-/* ========================================
-   TUS BADGE
-   ======================================== */
-.tus-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.35rem 0.75rem;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(11, 45, 255, 0.15));
-    border: 1px solid rgba(16, 185, 129, 0.3);
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #10b981;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.section-icon {
-    margin-right: 0.5rem;
-}
-
-/* ========================================
-   ACTIVITY FEED
-   ======================================== */
-.project-activity {
-    padding: 3rem 0;
-    background: #f8fafc;
-}
-
-.activity-feed {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    max-width: 700px;
-}
-
-.activity-item {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
-    background: white;
-    border-radius: 12px;
-    border-left: 3px solid var(--gray-200);
-    transition: all 0.2s ease;
-}
-
-.activity-item:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.activity-item[data-type="status_change"] { border-left-color: #3b82f6; }
-.activity-item[data-type="progress_update"] { border-left-color: #8b5cf6; }
-.activity-item[data-type="milestone_completed"] { border-left-color: #10b981; }
-.activity-item[data-type="document_added"] { border-left-color: #f59e0b; }
-.activity-item[data-type="comment_added"] { border-left-color: #06b6d4; }
-.activity-item[data-type="delivery"] { border-left-color: #22c55e; }
-.activity-item[data-type="meeting"] { border-left-color: #ec4899; }
-
-.activity-icon {
-    font-size: 1.25rem;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--gray-100);
-    border-radius: 8px;
-    flex-shrink: 0;
-}
-
-.activity-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.activity-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 0.25rem;
-}
-
-.activity-title {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--gray-900);
-}
-
-.activity-date {
-    font-size: 0.75rem;
-    color: var(--gray-500);
-    white-space: nowrap;
-}
-
-.activity-desc {
-    font-size: 0.875rem;
-    color: var(--gray-600);
-    margin: 0 0 0.25rem 0;
-}
-
-.activity-author {
-    font-size: 0.75rem;
-    color: var(--gray-500);
-}
-
-.activity-empty {
-    text-align: center;
-    padding: 2rem;
-    background: white;
-    border-radius: 12px;
-    color: var(--gray-500);
-}
-
-/* ========================================
-   COMMENTS SECTION
-   ======================================== */
-.project-comments {
-    padding: 3rem 0;
-}
-
-.comments-count {
-    font-size: 0.875rem;
-    color: var(--gray-500);
-}
-
-.comments-wrapper {
-    max-width: 700px;
-}
-
-.comment-form {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    border: 2px solid var(--gray-200);
-}
-
+/* Comments */
+.comments-wrap { max-width: 700px; }
+.comment-form { padding: 1.25rem; margin-bottom: 2rem; }
 .comment-form textarea {
     width: 100%;
     padding: 1rem;
-    border: 1px solid var(--gray-200);
-    border-radius: 8px;
+    background: rgba(246, 247, 251, 0.05);
+    border: 1px solid rgba(246, 247, 251, 0.1);
+    border-radius: 10px;
+    color: var(--tus-white);
     font-size: 0.95rem;
-    resize: vertical;
-    min-height: 80px;
+    resize: none;
     font-family: inherit;
 }
-
+.comment-form textarea::placeholder { color: rgba(246, 247, 251, 0.4); }
 .comment-form textarea:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+    border-color: var(--tus-blue);
+    box-shadow: 0 0 0 3px rgba(11, 45, 255, 0.1);
 }
-
 .form-actions {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: 1rem;
 }
-
-.file-upload input[type="file"] {
-    display: none;
-}
-
-.file-btn {
+.file-label { cursor: pointer; }
+.file-label input { display: none; }
+.file-label span {
     display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: var(--gray-100);
-    border-radius: 6px;
-    font-size: 0.875rem;
-    color: var(--gray-600);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.file-btn:hover {
-    background: var(--gray-200);
-}
-
-.btn-primary {
-    padding: 0.75rem 1.5rem;
-    background: var(--primary);
-    color: white;
-    border: none;
+    padding: 0.5rem 0.75rem;
+    background: rgba(246, 247, 251, 0.05);
     border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
+    font-size: 0.8rem;
+    color: rgba(246, 247, 251, 0.6);
     transition: all 0.2s;
 }
-
-.btn-primary:hover {
-    background: var(--primary-dark, #0026cc);
-    transform: translateY(-1px);
-}
-
-.comments-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
+.file-label:hover span { background: rgba(246, 247, 251, 0.1); }
+.comments-list { display: flex; flex-direction: column; gap: 1rem; }
 .comment-item {
     display: flex;
     gap: 1rem;
     padding: 1.25rem;
-    background: white;
-    border-radius: 12px;
+    background: rgba(246, 247, 251, 0.03);
+    border-radius: 14px;
 }
-
 .comment-item.from-team {
-    background: linear-gradient(135deg, rgba(11, 45, 255, 0.03), rgba(139, 92, 246, 0.03));
+    background: linear-gradient(135deg, rgba(11, 45, 255, 0.08), rgba(34, 197, 94, 0.03));
     border: 1px solid rgba(11, 45, 255, 0.1);
 }
-
 .comment-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--gray-200);
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(246, 247, 251, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    font-size: 0.875rem;
+    font-weight: 700;
+    font-size: 0.8rem;
     flex-shrink: 0;
 }
-
 .comment-item.from-team .comment-avatar {
-    background: linear-gradient(135deg, var(--primary), #8b5cf6);
-    color: white;
+    background: linear-gradient(135deg, var(--tus-blue), var(--tus-green));
 }
-
-.team-avatar {
-    font-size: 0.7rem;
-    letter-spacing: 1px;
-}
-
-.comment-content {
-    flex: 1;
-    min-width: 0;
-}
-
-.comment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.comment-author {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.comment-date {
-    font-size: 0.75rem;
-    color: var(--gray-500);
-}
-
-.comment-body {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--gray-700);
-}
-
-.comment-body p {
-    margin: 0 0 0.5rem 0;
-}
-
-.comment-body p:last-child {
-    margin-bottom: 0;
-}
-
-.comment-attachment {
+.comment-body { flex: 1; min-width: 0; }
+.comment-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.comment-meta .author { font-weight: 600; font-size: 0.9rem; }
+.comment-meta .time { font-size: 0.75rem; color: rgba(246, 247, 251, 0.4); }
+.comment-text { font-size: 0.9rem; line-height: 1.6; color: rgba(246, 247, 251, 0.8); }
+.comment-text p { margin: 0 0 0.5rem; }
+.comment-text p:last-child { margin: 0; }
+.attachment {
     display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
     margin-top: 0.75rem;
-    padding: 0.5rem 0.75rem;
-    background: var(--gray-100);
+    padding: 0.4rem 0.75rem;
+    background: rgba(246, 247, 251, 0.05);
     border-radius: 6px;
     font-size: 0.8rem;
-    color: var(--gray-700);
+    color: rgba(246, 247, 251, 0.6);
     text-decoration: none;
 }
+.attachment:hover { background: rgba(246, 247, 251, 0.1); color: var(--tus-blue); }
+.no-comments { text-align: center; padding: 2rem; color: rgba(246, 247, 251, 0.5); }
+.no-comments p { font-weight: 500; margin: 0 0 0.25rem; }
+.no-comments span { font-size: 0.85rem; }
 
-.comment-attachment:hover {
-    background: var(--gray-200);
-}
-
-.comments-empty {
-    text-align: center;
-    padding: 2rem;
-    background: white;
-    border-radius: 12px;
-    color: var(--gray-500);
-}
-
-.comments-empty p {
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-}
-
-.comments-empty span {
-    font-size: 0.875rem;
-}
-
-/* ========================================
-   RESPONSIVE
-   ======================================== */
+/* Responsive */
 @media (max-width: 768px) {
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-    
-    .activity-header {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .file-upload {
-        width: 100%;
-    }
-    
-    .file-btn {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .btn-primary {
-        width: 100%;
-    }
+    .hero-grid { grid-template-columns: 1fr; text-align: center; }
+    .hero-content h1 { font-size: 1.75rem; }
+    .project-description { max-width: 100%; }
+    .delivery-card { margin: 0 auto; }
+    .hero-progress { display: flex; justify-content: center; margin-top: 1rem; }
+    .tracker-header { flex-direction: column; text-align: center; }
+    .tracker-title { flex-direction: column; text-align: center; }
+    .tracker-stats { width: 100%; justify-content: center; }
+    .milestone-row { grid-template-columns: 36px 1fr; }
+    .milestone-status { grid-column: 2; text-align: left; margin-top: 0.5rem; }
+    .section-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    .form-actions { flex-direction: column; gap: 0.75rem; }
+    .file-label, .btn-primary { width: 100%; justify-content: center; }
 }
 </style>
+
+<!-- Alpine.js Collapse Plugin -->
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+
+<script>
+function projectTracker(targetProgress, targetTime) {
+    return {
+        animatedProgress: 0,
+        animatedTime: 0,
+        
+        init() {
+            setTimeout(() => {
+                this.animateValue('animatedProgress', targetProgress, 1500);
+                this.animateValue('animatedTime', targetTime, 1500);
+            }, 300);
+        },
+        
+        animateValue(property, target, duration) {
+            const start = this[property];
+            const change = target - start;
+            const startTime = performance.now();
+            
+            const animate = (currentTime) => {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                this[property] = start + (change * eased);
+                if (progress < 1) requestAnimationFrame(animate);
+            };
+            
+            requestAnimationFrame(animate);
+        }
+    }
+}
+</script>
 {% endblock %}

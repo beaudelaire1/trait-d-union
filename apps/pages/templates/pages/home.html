@@ -201,6 +201,15 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <div>
+                            <p class="font-semibold text-tus-white">Suivi projet en temps réel</p>
+                            <p class="text-sm text-tus-white/50">Visualisez chaque étape, progression et délais de votre projet</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3 reveal">
+                        <svg class="w-6 h-6 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
                             <p class="font-semibold text-tus-white">Tableau de bord unifié</p>
                             <p class="text-sm text-tus-white/50">Tous vos projets, devis et factures centralisés</p>
                         </div>
@@ -253,6 +262,31 @@
                         </div>
                         <!-- Dashboard Preview -->
                         <div class="p-6 space-y-4">
+                            <!-- Project Progress Card -->
+                            <div class="p-4 rounded-xl bg-white/[0.03] border border-white/10">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-tus-blue/30 to-tus-green/20 flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-semibold text-tus-white">Étape 4/8</p>
+                                            <p class="text-xs text-tus-white/40">Module Authentification</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-lg font-bold text-tus-green">44%</span>
+                                </div>
+                                <!-- Progress Bar -->
+                                <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                                    <div class="h-full w-[44%] bg-gradient-to-r from-tus-blue to-tus-green rounded-full"></div>
+                                </div>
+                                <div class="flex justify-between mt-2 text-xs text-tus-white/30">
+                                    <span>3 terminées</span>
+                                    <span>5 restantes</span>
+                                </div>
+                            </div>
                             <!-- Stats Row -->
                             <div class="grid grid-cols-3 gap-3">
                                 <div class="p-3 rounded-xl bg-tus-blue/10 border border-tus-blue/20">
@@ -270,6 +304,17 @@
                             </div>
                             <!-- Activity -->
                             <div class="space-y-2">
+                                <div class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                                    <div class="w-8 h-8 rounded-full bg-tus-green/20 flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-tus-white truncate">Jalon "Base de données" terminé</p>
+                                        <p class="text-xs text-tus-white/40">Il y a 2 heures</p>
+                                    </div>
+                                </div>
                                 <div class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
                                     <div class="w-8 h-8 rounded-full bg-tus-blue/20 flex items-center justify-center">
                                         <svg class="w-4 h-4 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
