@@ -2,6 +2,10 @@
 
 {% block title %}{{ project.name }} - Suivi projet{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/client-portal.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="project-detail-page" x-data="projectTracker({{ milestone_progress.percent|default:0 }}, {{ project_timeline.time_percent|default:0 }})">
     
@@ -275,9 +279,6 @@
 </div>
 
 <style>
-/* ========================================
-   VARIABLES TUS
-   ======================================== */
 .project-detail-page {
     --tus-black: #07080A;
     --tus-white: #F6F7FB;
@@ -332,34 +333,14 @@
     border-radius: 16px;
 }
 
-/* ========================================
-   HEADER
-   ======================================== */
 .project-header {
     padding: 1.25rem 0;
     border-bottom: 1px solid rgba(246, 247, 251, 0.1);
-}
-.breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-}
-.breadcrumb a {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    color: rgba(246, 247, 251, 0.6);
-    text-decoration: none;
-    transition: color 0.2s;
 }
 .breadcrumb a:hover { color: var(--tus-blue); }
 .breadcrumb .separator { color: rgba(246, 247, 251, 0.3); }
 .breadcrumb .current { color: var(--tus-white); font-weight: 500; }
 
-/* ========================================
-   HERO
-   ======================================== */
 .project-hero {
     padding: 3rem 0 4rem;
 }
@@ -383,18 +364,7 @@
     letter-spacing: 0.5px;
     margin-bottom: 1rem;
 }
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--tus-green);
-    animation: pulse 2s infinite;
-}
-.status-dot.status-briefing { background: #f59e0b; }
-.status-dot.status-design { background: #0B2DFF; }
-.status-dot.status-development { background: var(--tus-blue); }
-.status-dot.status-review { background: #06b6d4; }
-@keyframes pulse {
+.status-dot.status-dot.status-dot.status-dot@keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.3); }
 }
@@ -444,9 +414,6 @@
     font-size: 0.95rem;
 }
 
-/* ========================================
-   PROGRESS RING
-   ======================================== */
 .hero-progress { position: relative; z-index: 1; }
 .progress-ring-wrap {
     position: relative;
@@ -489,9 +456,6 @@
     color: rgba(246, 247, 251, 0.6);
 }
 
-/* ========================================
-   TRACKER CARD
-   ======================================== */
 .tracker-section {
     margin-top: -2rem;
     padding-bottom: 2rem;
@@ -558,9 +522,6 @@
     margin-top: 0.25rem;
 }
 
-/* ========================================
-   PROGRESS BAR
-   ======================================== */
 .progress-wrapper { margin-bottom: 1.5rem; }
 .progress-track {
     position: relative;
@@ -568,13 +529,6 @@
     background: rgba(246, 247, 251, 0.1);
     border-radius: 8px;
     overflow: visible;
-}
-.progress-fill {
-    height: 100%;
-    border-radius: 8px;
-    background: linear-gradient(90deg, var(--tus-blue), var(--tus-green));
-    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 20px rgba(11, 45, 255, 0.4);
 }
 .progress-marker {
     position: absolute;
@@ -662,9 +616,6 @@
     color: rgba(246, 247, 251, 0.4);
 }
 
-/* ========================================
-   EXPAND & MILESTONES
-   ======================================== */
 .expand-btn {
     display: flex;
     align-items: center;
@@ -704,12 +655,7 @@
     transition: all 0.2s;
 }
 .milestone-row:hover { background: rgba(246, 247, 251, 0.06); }
-.milestone-row.status-completed { background: rgba(34, 197, 94, 0.08); }
-.milestone-row.status-in_progress {
-    background: rgba(11, 45, 255, 0.1);
-    border: 1px solid rgba(11, 45, 255, 0.2);
-}
-.milestone-num {
+.milestone-row.milestone-row.milestone-num {
     width: 40px;
     height: 40px;
     background: rgba(246, 247, 251, 0.05);
@@ -764,9 +710,6 @@
     animation: pulse 1.5s infinite;
 }
 
-/* ========================================
-   DOCUMENTS & COMMENTS
-   ======================================== */
 .documents-section, .comments-section { padding: 2.5rem 0; }
 .section-header {
     display: flex;
@@ -782,26 +725,6 @@
     font-size: 1.25rem;
     font-weight: 700;
     margin: 0;
-}
-.btn-primary {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.6rem 1.25rem;
-    background: var(--tus-blue);
-    color: var(--tus-white);
-    border: none;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.btn-primary:hover {
-    background: #0926cc;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(11, 45, 255, 0.4);
 }
 .btn-outline {
     display: inline-flex;
@@ -846,13 +769,7 @@
 .doc-info { padding: 0.75rem 1rem; }
 .doc-name { display: block; font-weight: 500; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .doc-date { display: block; font-size: 0.7rem; color: rgba(246, 247, 251, 0.4); margin-top: 0.25rem; }
-.empty-state {
-    text-align: center;
-    padding: 3rem;
-}
 .empty-state svg { color: rgba(246, 247, 251, 0.2); margin-bottom: 1rem; }
-.empty-state p { color: rgba(246, 247, 251, 0.5); margin: 0 0 1rem; }
-
 /* Comments */
 .comments-wrap { max-width: 700px; }
 .comment-form { padding: 1.25rem; margin-bottom: 2rem; }
@@ -954,8 +871,7 @@
     .milestone-status { grid-column: 2; text-align: left; margin-top: 0.5rem; }
     .section-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
     .form-actions { flex-direction: column; gap: 0.75rem; }
-    .file-label, .btn-primary { width: 100%; justify-content: center; }
-}
+    .file-label, }
 </style>
 
 <!-- Alpine.js Collapse Plugin -->

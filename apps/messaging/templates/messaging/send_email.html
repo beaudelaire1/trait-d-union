@@ -28,7 +28,7 @@
                             <input type="radio" name="template" value="prospection-standard" checked class="mr-4 text-tus-blue">
                             <div>
                                 <p class="text-tus-white font-medium">Template par défaut</p>
-                                <p class="text-tus-white/50 text-sm">Email de prospection standard Trait d'Union Studio</p>
+                                <p class="text-tus-white/60 text-sm">Email de prospection standard Trait d'Union Studio</p>
                             </div>
                         </label>
                         
@@ -37,7 +37,7 @@
                             <input type="radio" name="template" value="{{ template.slug }}" class="mr-4 text-tus-blue">
                             <div>
                                 <p class="text-tus-white font-medium">{{ template.name }}</p>
-                                <p class="text-tus-white/50 text-sm">{{ template.subject }}</p>
+                                <p class="text-tus-white/60 text-sm">{{ template.subject }}</p>
                             </div>
                         </label>
                         {% endfor %}
@@ -47,14 +47,14 @@
 
             <!-- Preview -->
             <div class="mt-8 p-4 bg-tus-black rounded-lg border border-tus-white/10">
-                <p class="text-tus-white/50 text-sm mb-2">Aperçu du destinataire:</p>
+                <p class="text-tus-white/60 text-sm mb-2">Aperçu du destinataire:</p>
                 <div class="flex items-center space-x-4">
                     <div class="w-10 h-10 bg-tus-blue/20 rounded-full flex items-center justify-center">
                         <span class="text-tus-blue font-semibold">{{ prospect.contact_name|slice:":1"|upper }}</span>
                     </div>
                     <div>
                         <p class="text-tus-white font-medium">{{ prospect.contact_name }}</p>
-                        <p class="text-tus-white/50 text-sm">{{ prospect.email }}</p>
+                        <p class="text-tus-white/60 text-sm">{{ prospect.email }}</p>
                     </div>
                 </div>
             </div>

@@ -104,7 +104,7 @@
                                 <a href="{% url 'messaging:prospect_detail' prospect.pk %}" class="text-tus-white font-medium hover:text-tus-blue">
                                     {{ prospect.contact_name }}
                                 </a>
-                                <p class="text-sm text-tus-white/50">{{ prospect.email }}</p>
+                                <p class="text-sm text-tus-white/60">{{ prospect.email }}</p>
                             </div>
                         </td>
                         <td class="px-6 py-4 text-tus-white/70">{{ prospect.company_name|default:'-' }}</td>
@@ -123,7 +123,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-tus-white/70 text-sm">{{ prospect.get_source_display }}</td>
-                        <td class="px-6 py-4 text-tus-white/50 text-sm">
+                        <td class="px-6 py-4 text-tus-white/60 text-sm">
                             {% if prospect.last_contacted_at %}
                                 {{ prospect.last_contacted_at|date:"d/m/Y H:i" }}
                             {% else %}
@@ -148,7 +148,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="px-6 py-12 text-center text-tus-white/50">
+                        <td colspan="7" class="px-6 py-12 text-center text-tus-white/60">
                             <p class="text-lg mb-2">Aucun prospect trouvé</p>
                             <a href="{% url 'messaging:prospect_create' %}" class="text-tus-blue hover:underline">
                                 Créer votre premier prospect →

@@ -31,7 +31,7 @@
                 <div>
                     <label class="block text-sm font-medium text-tus-white/70 mb-1">Date d'envoi planifiée</label>
                     {{ form.scheduled_at }}
-                    <p class="mt-1 text-xs text-tus-white/50">Laissez vide pour envoyer manuellement</p>
+                    <p class="mt-1 text-xs text-tus-white/60">Laissez vide pour envoyer manuellement</p>
                 </div>
                 
                 <!-- Prospects Selection -->
@@ -45,13 +45,13 @@
                             <div class="flex-1">
                                 <span class="text-tus-white">{{ prospect.contact_name }}</span>
                                 {% if prospect.company_name %}
-                                <span class="text-tus-white/50">- {{ prospect.company_name }}</span>
+                                <span class="text-tus-white/60">- {{ prospect.company_name }}</span>
                                 {% endif %}
                             </div>
                             <span class="text-tus-white/60 text-sm">{{ prospect.email }}</span>
                         </label>
                         {% empty %}
-                        <p class="text-tus-white/50 text-center py-4">Aucun prospect disponible</p>
+                        <p class="text-tus-white/60 text-center py-4">Aucun prospect disponible</p>
                         {% endfor %}
                     </div>
                 </div>

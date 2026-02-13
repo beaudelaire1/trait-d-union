@@ -79,8 +79,8 @@
                                 {{ recipient.get_status_display }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-tus-white/50 text-sm">{{ recipient.sent_at|date:"d/m/Y H:i"|default:'-' }}</td>
-                        <td class="px-6 py-4 text-tus-white/50 text-sm">{{ recipient.opened_at|date:"d/m/Y H:i"|default:'-' }}</td>
+                        <td class="px-6 py-4 text-tus-white/60 text-sm">{{ recipient.sent_at|date:"d/m/Y H:i"|default:'-' }}</td>
+                        <td class="px-6 py-4 text-tus-white/60 text-sm">{{ recipient.opened_at|date:"d/m/Y H:i"|default:'-' }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
