@@ -38,8 +38,8 @@ COPY . .
 # Créer les répertoires
 RUN mkdir -p /app/staticfiles /app/media
 
-# Collecter les fichiers statiques (afficher les erreurs)
-RUN python manage.py collectstatic --noinput --clear --verbosity 2
+# Collecter les fichiers statiques (StaticFilesStorage en prod, pas de manifest strict)
+RUN python manage.py collectstatic --noinput --clear
 
 # Port
 EXPOSE ${PORT}

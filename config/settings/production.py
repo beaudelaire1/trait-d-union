@@ -91,8 +91,9 @@ else:
 # WhiteNoise doit être après SecurityMiddleware
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-# Compression et cache long terme
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Utiliser ManifestStaticFilesStorage (pas CompressedManifest qui est trop strict)
+# Cela permet à WhiteNoise de servir les fichiers sans exiger de manifest complet
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 
 # ==============================================================================
 # MEDIA FILES (Cloudinary - recommandé pour simplicité)
