@@ -11,6 +11,8 @@ module.exports = {
         'tus-black': '#07080A',
         'tus-white': '#F6F7FB',
         'tus-blue': '#0B2DFF',
+        'tus-blue-a11y': '#4D6FFF', /* WCAG AA sur fond noir (4.6:1) */
+        'tus-green': '#22C55E',
         'surface-dark': '#0D1016',
         'stroke-dark': 'rgba(246,247,251,0.10)',
       },

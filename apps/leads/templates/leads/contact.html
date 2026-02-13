@@ -107,20 +107,34 @@
             <div class="grid md:grid-cols-2 gap-6">
                 <!-- Nom -->
                 <div class="space-y-2">
-                    <label for="id_name" class="block text-sm font-medium text-tus-white/80">{{ form.name.label }}</label>
-                    <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}"
-                           class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/30 focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300"
-                           placeholder="Votre nom complet">
-                    {% if form.name.errors %}<p class="text-red-400 text-sm mt-1">{{ form.name.errors.0 }}</p>{% endif %}
+                    <label for="id_name" class="block text-sm font-medium text-tus-white/80 required">{{ form.name.label }}</label>
+                    <div class="input-wrapper">
+                        <input type="text" name="name" id="id_name" value="{{ form.name.value|default:'' }}"
+                               class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/30 focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300"
+                               placeholder="Votre nom complet"
+                               required
+                               aria-required="true"
+                               aria-describedby="name-help{% if form.name.errors %} name-error{% endif %}"
+                               {% if form.name.errors %}aria-invalid="true"{% endif %}>
+                    </div>
+                    <p id="name-help" class="input-helper">Prénom et nom de famille</p>
+                    {% if form.name.errors %}<p id="name-error" class="text-red-400 text-sm mt-1" role="alert">{{ form.name.errors.0 }}</p>{% endif %}
                 </div>
                 
                 <!-- Email -->
                 <div class="space-y-2">
-                    <label for="id_email" class="block text-sm font-medium text-tus-white/80">{{ form.email.label }}</label>
-                    <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}"
-                           class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/30 focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300"
-                           placeholder="votre@email.com">
-                    {% if form.email.errors %}<p class="text-red-400 text-sm mt-1">{{ form.email.errors.0 }}</p>{% endif %}
+                    <label for="id_email" class="block text-sm font-medium text-tus-white/80 required">{{ form.email.label }}</label>
+                    <div class="input-wrapper">
+                        <input type="email" name="email" id="id_email" value="{{ form.email.value|default:'' }}"
+                               class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/30 focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300"
+                               placeholder="votre@email.com"
+                               required
+                               aria-required="true"
+                               aria-describedby="email-help{% if form.email.errors %} email-error{% endif %}"
+                               {% if form.email.errors %}aria-invalid="true"{% endif %}>
+                    </div>
+                    <p id="email-help" class="input-helper">Nous ne partagerons jamais votre email</p>
+                    {% if form.email.errors %}<p id="email-error" class="text-red-400 text-sm mt-1" role="alert">{{ form.email.errors.0 }}</p>{% endif %}
                 </div>
             </div>
 
@@ -145,11 +159,17 @@
 
             <!-- Message -->
             <div class="space-y-2">
-                <label for="id_message" class="block text-sm font-medium text-tus-white/80">{{ form.message.label }}</label>
+                <label for="id_message" class="block text-sm font-medium text-tus-white/80 required">{{ form.message.label }}</label>
                 <textarea name="message" id="id_message" rows="5"
                           class="w-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/30 focus:bg-tus-white/10 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:shadow-[0_0_20px_rgba(11,45,255,0.15)] transition-all duration-300 resize-none"
-                          placeholder="Décrivez votre projet, vos objectifs, votre vision...">{{ form.message.value|default:'' }}</textarea>
-                {% if form.message.errors %}<p class="text-red-400 text-sm mt-1">{{ form.message.errors.0 }}</p>{% endif %}
+                          placeholder="Décrivez votre projet, vos objectifs, votre vision..."
+                          required
+                          aria-required="true"
+                          aria-describedby="message-help{% if form.message.errors %} message-error{% endif %}"
+                          {% if form.message.errors %}aria-invalid="true"{% endif %}
+                          minlength="20">{{ form.message.value|default:'' }}</textarea>
+                <p id="message-help" class="input-helper">Minimum 20 caractères</p>
+                {% if form.message.errors %}<p id="message-error" class="text-red-400 text-sm mt-1" role="alert">{{ form.message.errors.0 }}</p>{% endif %}
             </div>
 
             <div class="grid md:grid-cols-2 gap-6">
@@ -197,7 +217,8 @@
                 <!-- Glow externe -->
                 <div class="absolute -inset-1 bg-gradient-to-r from-tus-blue via-[#2D5BFF] to-tus-blue rounded-2xl opacity-50 blur-lg group-hover:opacity-80 transition-all duration-500"></div>
                 <button type="submit" id="submit-btn"
-                        class="relative w-full bg-gradient-to-r from-tus-blue to-[#2D5BFF] text-tus-white font-display font-semibold py-4 px-8 rounded-xl border border-tus-white/20 hover:border-tus-white/40 hover:shadow-[0_0_40px_rgba(11,45,255,0.4)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300">
+                        class="relative w-full bg-gradient-to-r from-tus-blue to-[#2D5BFF] text-tus-white font-display font-semibold py-4 px-8 rounded-xl border border-tus-white/20 hover:border-tus-white/40 hover:shadow-[0_0_40px_rgba(11,45,255,0.4)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
+                        aria-label="Envoyer ma demande de contact">
                     <span class="relative z-10">Envoyer ma demande</span>
                     <!-- Shine effect -->
                     <div class="absolute inset-0 rounded-xl overflow-hidden">
@@ -207,7 +228,7 @@
             </div>
             
             <!-- Note de confidentialité reCAPTCHA -->
-            <p class="text-xs text-tus-white/40 text-center mt-4">
+            <p class="text-xs text-tus-white/60 text-center mt-4">
                 Ce site est protégé par reCAPTCHA. La <a href="https://policies.google.com/privacy" target="_blank" class="underline hover:text-tus-blue transition-colors">Politique de confidentialité</a> et les <a href="https://policies.google.com/terms" target="_blank" class="underline hover:text-tus-blue transition-colors">Conditions d'utilisation</a> de Google s'appliquent.
             </p>
         </form>

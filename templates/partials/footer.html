@@ -48,7 +48,7 @@
                         97300 Cayenne, Guyane
                     </li>
                     <li><a href="tel:+594695358041" class="hover:text-tus-blue transition-colors">+594 695 35 80 41</a></li>
-                    <li><a href="mailto:contact@traitdunion.it" class="hover:text-tus-blue transition-colors">contact@traitdunion.it</a></li>
+                    <li>{% include 'partials/contact_email.html' with link_style="hover:text-tus-blue transition-colors" %}</li>
                 </ul>
             </div>
             
@@ -68,9 +68,9 @@
             </div>
         </div>
         
-        <div class="mt-12 pt-6 border-t border-stroke-dark flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-tus-white/50">
+        <div class="mt-12 pt-6 border-t border-stroke-dark flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-tus-white/60">
             <p>&copy; 2026 Trait d'Union Studio. Tous droits réservés.</p>
-            <p class="font-display text-tus-white/30">« Quand l'élégance se conçoit, la performance se déploie. »</p>
+            <p class="font-display text-tus-white/50">« Quand l'élégance se conçoit, la performance se déploie. »</p>
         </div>
     </div>
 </footer>

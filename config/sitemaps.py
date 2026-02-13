@@ -25,12 +25,13 @@ class StaticViewSitemap(Sitemap):
         return reverse(item)
     
     def priority(self, item):
+        # Priorité maximale pour pages stratégiques SEO Guyane/Outre-Mer
         if item == 'pages:home':
             return 1.0
         elif item in ('pages:services', 'leads:contact'):
-            return 0.9
+            return 0.95  # Augmenté pour conversion
         elif item == 'pages:method':
-            return 0.8
+            return 0.85  # Augmenté pour différenciation
         return 0.5
 
 

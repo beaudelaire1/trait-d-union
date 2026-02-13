@@ -1,0 +1,25 @@
+{% comment %}
+Composant email obfusqué anti-spam
+
+Usage dans les templates :
+    {% include 'partials/contact_email.html' with link_style="text-tus-blue hover:underline" %}
+
+Protections :
+- Email encodé Base64, décodé par script global dans base.html
+- Noscript fallback avec format [at] [dot] pour humains
+- Honeypot invisible pour piéger les bots
+- Style personnalisable via paramètre link_style
+
+Note : Le script de désobfuscation est dans base.html (fin du <body>)
+{% endcomment %}
+
+<!-- Email obfusqué (affichage non explicite pour limiter le scraping visuel) -->
+<a href="#" 
+   class="tus-email-link {{ link_style|default:'text-tus-blue hover:underline transition-colors' }}" 
+   data-email="Y29udGFjdEB0cmFpdGR1bmlvbi5pdA=="
+   data-label="{{ link_label|default:'Nous écrire' }}"
+   aria-label="Envoyer un email à Trait d'Union Studio"
+   rel="nofollow">
+    {{ link_label|default:'Nous écrire' }}
+    <noscript>Formulaire de contact</noscript>
+</a>

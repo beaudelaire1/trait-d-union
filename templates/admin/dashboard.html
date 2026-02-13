@@ -121,6 +121,11 @@
         <!-- Top Bar -->
         <header class="dashboard-topbar">
             <div class="topbar-left">
+                <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="Ouvrir le menu admin" aria-expanded="false">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
                 <h1 class="topbar-title">Dashboard</h1>
                 <span class="topbar-date">{{ today|date:"l d F Y" }}</span>
             </div>
@@ -130,7 +135,7 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="M21 21l-4.35-4.35"></path>
                     </svg>
-                    <input type="text" placeholder="Rechercher..." class="search-input">
+                    <input type="text" placeholder="Rechercher... (/)" class="search-input" aria-label="Recherche rapide dans le dashboard admin" autocomplete="off">
                 </div>
                 <div class="topbar-user">
                     <span class="user-avatar">{{ request.user.username|slice:":2"|upper }}</span>
@@ -143,21 +148,21 @@
         <div class="dashboard-content">
             <!-- Quick Actions -->
             <section class="quick-actions">
-                <a href="/tus-gestion-secure/devis/quote/add/" class="action-btn primary">
+                <a href="/tus-gestion-secure/devis/quote/add/" class="action-btn primary" aria-label="Créer un nouveau devis">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     Nouveau devis
                 </a>
-                <a href="/tus-gestion-secure/factures/invoice/add/" class="action-btn">
+                <a href="/tus-gestion-secure/factures/invoice/add/" class="action-btn" aria-label="Créer une nouvelle facture">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                     Nouvelle facture
                 </a>
-                <a href="/tus-gestion-secure/leads/lead/add/" class="action-btn">
+                <a href="/tus-gestion-secure/leads/lead/add/" class="action-btn" aria-label="Ajouter un nouveau lead">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                         <circle cx="8.5" cy="7" r="4"></circle>
@@ -413,8 +418,8 @@
     --dash-border: #2a2a30;
     --dash-text: #f5f5f7;
     --dash-text-muted: #8e8e93;
-    --dash-accent: #0a84ff;
-    --dash-accent-hover: #409cff;
+    --dash-accent: #0B2DFF;
+    --dash-accent-hover: #2D5BFF;
     --dash-success: #30d158;
     --dash-warning: #ff9f0a;
     --dash-danger: #ff453a;
@@ -427,6 +432,7 @@
     min-height: 100vh;
     background: var(--dash-bg);
     color: var(--dash-text);
+    position: relative;
 }
 
 /* Sidebar */
@@ -439,6 +445,7 @@
     position: fixed;
     height: 100vh;
     z-index: 100;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .sidebar-header {
@@ -506,7 +513,7 @@
     text-decoration: none;
     font-size: 0.9rem;
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     position: relative;
 }
 
@@ -594,6 +601,30 @@
     position: sticky;
     top: 0;
     z-index: 50;
+    backdrop-filter: blur(10px);
+}
+
+.sidebar-toggle {
+    display: none;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--dash-border);
+    border-radius: 10px;
+    background: var(--dash-surface-hover);
+    color: var(--dash-text);
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    border-color: var(--dash-accent);
+    color: var(--dash-accent);
+}
+
+.sidebar-toggle svg {
+    width: 18px;
+    height: 18px;
 }
 
 .topbar-left {
@@ -703,7 +734,7 @@
     text-decoration: none;
     font-size: 0.85rem;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: all 0.25s ease;
 }
 
 .action-btn svg {
@@ -714,6 +745,7 @@
 .action-btn:hover {
     background: var(--dash-surface-hover);
     border-color: var(--dash-text-muted);
+    transform: translateY(-1px);
 }
 
 .action-btn.primary {
@@ -724,6 +756,15 @@
 .action-btn.primary:hover {
     background: var(--dash-accent-hover);
     border-color: var(--dash-accent-hover);
+}
+
+/* Focus visible cohérent charte */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid var(--dash-accent);
+    outline-offset: 2px;
+    border-radius: 8px;
 }
 
 /* Alert Banner */
@@ -1185,17 +1226,54 @@
 }
 
 @media (max-width: 1024px) {
+    .sidebar-toggle {
+        display: inline-flex;
+    }
+
     .dashboard-sidebar {
         transform: translateX(-100%);
+    }
+
+    .dashboard-layout.sidebar-open .dashboard-sidebar {
+        transform: translateX(0);
+        box-shadow: 10px 0 40px rgba(0, 0, 0, 0.45);
     }
     
     .dashboard-main {
         margin-left: 0;
     }
+
+    .topbar-left {
+        align-items: center;
+    }
 }
 
 @media (max-width: 768px) {
     .topbar-search {
+        display: block;
+        width: 100%;
+    }
+
+    .search-input {
+        width: 100%;
+    }
+
+    .dashboard-topbar {
+        height: auto;
+        min-height: var(--topbar-height);
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+    }
+
+    .topbar-right {
+        width: 100%;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .user-name {
         display: none;
     }
     
@@ -1212,6 +1290,26 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const dashboardLayout = document.querySelector('.dashboard-layout');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    if (dashboardLayout && sidebarToggle) {
+        sidebarToggle.addEventListener('click', function () {
+            const isOpen = dashboardLayout.classList.toggle('sidebar-open');
+            sidebarToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', function (event) {
+            if (window.innerWidth > 1024) return;
+            const sidebar = document.querySelector('.dashboard-sidebar');
+            if (!sidebar || !dashboardLayout.classList.contains('sidebar-open')) return;
+            if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
+                dashboardLayout.classList.remove('sidebar-open');
+                sidebarToggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
     // Chart.js global config
     Chart.defaults.color = '#8e8e93';
     Chart.defaults.borderColor = '#2a2a30';

@@ -42,17 +42,34 @@
     <meta name="twitter:description" content="{% block twitter_description %}Studio de design et développement web de luxe technologique.{% endblock %}">
     <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}{% endblock %}">
     
-    <!-- Google Analytics (G4) -->
+    <!-- Google Analytics (G4) avec consentement RGPD -->
     {% if not debug %}
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VNHN8BQGMJ"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-XXXXXXXXXX', {
+        
+        // Configuration avec anonymisation IP et respect RGPD
+        gtag('config', 'G-VNHN8BQGMJ', {
             'anonymize_ip': true,
-            'cookie_flags': 'SameSite=None;Secure'
+            'cookie_flags': 'SameSite=None;Secure',
+            'cookie_domain': 'traitdunion.it',
+            'cookie_expires': 63072000  // 2 ans
         });
+        
+        // Événements custom pour tracking conversions
+        function trackEvent(category, action, label) {
+            gtag('event', action, {
+                'event_category': category,
+                'event_label': label
+            });
+        }
+        
+        // Tracking conversion contact
+        if (window.location.pathname === '/contact/' && document.referrer.includes('traitdunion.it')) {
+            gtag('event', 'page_view_contact_form');
+        }
     </script>
     {% endif %}
     
@@ -237,16 +254,224 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
         
-        /* Focus states accessibles et élégants */
-        :focus-visible {
-            outline: 2px solid #0B2DFF;
+        /* ============================================
+           ACCESSIBILITÉ CLAVIER - WCAG 2.1 AA
+           ============================================ */
+        /* Focus visible moderne pour tous les éléments interactifs */
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
+        select:focus-visible,
+        [tabindex]:focus-visible {
+            outline: 3px solid #0B2DFF;
+            outline-offset: 2px;
+            border-radius: 6px;
+            transition: outline 0.15s ease;
+        }
+        
+        /* Focus réduit pour liens dans le texte */
+        p a:focus-visible,
+        li a:focus-visible {
+            outline-width: 2px;
             outline-offset: 3px;
-            border-radius: 4px;
+        }
+        
+        /* Focus premium pour boutons primaires */
+        .btn-primary:focus-visible,
+        button[type="submit"]:focus-visible {
+            outline: 3px solid #00D4FF;
+            outline-offset: 4px;
+            box-shadow: 0 0 0 6px rgba(11, 45, 255, 0.15);
+        }
+        
+        /* Focus pour inputs avec style cohérent */
+        input[type="text"]:focus-visible,
+        input[type="email"]:focus-visible,
+        input[type="tel"]:focus-visible,
+        input[type="password"]:focus-visible,
+        textarea:focus-visible {
+            outline: 2px solid #0B2DFF;
+            outline-offset: 0;
+            border-color: #0B2DFF;
+            box-shadow: 0 0 0 3px rgba(11, 45, 255, 0.1);
+        }
+        
+        /* Zones tactiles minimales 44x44px (WCAG 2.5.5) */
+        button,
+        a[role="button"],
+        input[type="submit"],
+        input[type="button"] {
+            min-height: 44px;
+            min-width: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Exception pour icônes dans boutons (padding interne) */
+        button > svg,
+        a > svg {
+            pointer-events: none;
         }
         
         /* Smooth scroll */
         html {
             scroll-behavior: smooth;
+        }
+        
+        /* ============================================
+           LOADING STATES & FEEDBACK VISUEL
+           ============================================ */
+        /* Bouton en état de chargement */
+        button[disabled],
+        button[aria-busy="true"],
+        .btn-loading {
+            position: relative;
+            color: transparent !important;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        /* Spinner de chargement */
+        button[disabled]::after,
+        button[aria-busy="true"]::after,
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(246, 247, 251, 0.3);
+            border-top-color: #F6F7FB;
+            border-radius: 50%;
+            animation: spinner 0.8s linear infinite;
+        }
+        
+        @keyframes spinner {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        /* ============================================
+           VALIDATION INLINE & MESSAGES
+           ============================================ */
+        /* Conteneur de messages (ajouté via JS) */
+        .form-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInDown 0.3s ease-out;
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .form-message.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+        }
+        
+        .form-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+        
+        .form-message.warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
+        }
+        
+        /* États de validation pour inputs */
+        input.valid,
+        textarea.valid,
+        select.valid {
+            border-color: #22c55e !important;
+            background: rgba(34, 197, 94, 0.05);
+        }
+        
+        input.invalid,
+        textarea.invalid,
+        select.invalid {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.05);
+        }
+        
+        /* Icônes de validation (SVG inline) */
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper.has-success::after {
+            content: '✓';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #22c55e;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .input-wrapper.has-error::after {
+            content: '✕';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ef4444;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        /* Labels accessibles avec indicateur requis */
+        label.required::after {
+            content: ' *';
+            color: #ef4444;
+            font-weight: bold;
+        }
+        
+        /* Helper text sous les inputs */
+        .input-helper {
+            font-size: 0.75rem;
+            color: rgba(246, 247, 251, 0.5);
+            margin-top: 4px;
+            transition: color 0.2s ease;
+        }
+        
+        input:focus + .input-helper,
+        textarea:focus + .input-helper {
+            color: rgba(11, 45, 255, 0.8);
+        }
+        
+        /* Annonces pour lecteurs d'écran */
+        .sr-only-announce {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
         }
         
         /* Reduced motion for accessibility */
@@ -439,6 +664,180 @@
         }, { threshold: 0.5 });
 
         counters.forEach(c => counterObserver.observe(c));
+
+        // ============================================
+        // VALIDATION INLINE & ARIA LIVE ANNOUNCEMENTS
+        // ============================================
+        
+        // Créer un conteneur d'annonces pour les lecteurs d'écran
+        (function initializeAccessibility() {
+            // Conteneur aria-live pour annonces dynamiques
+            if (!document.getElementById('aria-announcer')) {
+                const announcer = document.createElement('div');
+                announcer.id = 'aria-announcer';
+                announcer.className = 'sr-only-announce';
+                announcer.setAttribute('aria-live', 'polite');
+                announcer.setAttribute('aria-atomic', 'true');
+                document.body.appendChild(announcer);
+            }
+            
+            // Fonction d'annonce accessible
+            window.announce = function(message, priority = 'polite') {
+                const announcer = document.getElementById('aria-announcer');
+                if (announcer) {
+                    announcer.setAttribute('aria-live', priority);
+                    announcer.textContent = '';
+                    setTimeout(() => {
+                        announcer.textContent = message;
+                    }, 100);
+                }
+            };
+            
+            // Validation en temps réel pour les formulaires
+            const forms = document.querySelectorAll('form:not(.no-validate)');
+            forms.forEach(form => {
+                // État de chargement lors de la soumission
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn && !submitBtn.hasAttribute('data-no-loading')) {
+                        submitBtn.setAttribute('disabled', 'true');
+                        submitBtn.setAttribute('aria-busy', 'true');
+                        const originalText = submitBtn.textContent;
+                        submitBtn.dataset.originalText = originalText;
+                        
+                        // Annonce pour lecteurs d'écran
+                        window.announce('Envoi en cours, veuillez patienter', 'assertive');
+                        
+                        // Restaurer après 30s maximum (sécurité)
+                        setTimeout(() => {
+                            if (submitBtn.hasAttribute('disabled')) {
+                                submitBtn.removeAttribute('disabled');
+                                submitBtn.removeAttribute('aria-busy');
+                                submitBtn.textContent = submitBtn.dataset.originalText;
+                            }
+                        }, 30000);
+                    }
+                });
+                
+                // Validation des inputs en temps réel
+                const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+                inputs.forEach(input => {
+                    // Ajouter attribut aria-required
+                    input.setAttribute('aria-required', 'true');
+                    
+                    // Valider au blur
+                    input.addEventListener('blur', function() {
+                        validateInput(this);
+                    });
+                    
+                    // Valider pendant la saisie (debounced)
+                    let timeout;
+                    input.addEventListener('input', function() {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                            if (this.value.length > 0) {
+                                validateInput(this);
+                            }
+                        }, 500);
+                    });
+                });
+            });
+            
+            // Fonction de validation d'input
+            function validateInput(input) {
+                const value = input.value.trim();
+                const type = input.type;
+                let isValid = true;
+                let message = '';
+                
+                // Validation selon le type
+                if (input.hasAttribute('required') && !value) {
+                    isValid = false;
+                    message = 'Ce champ est requis';
+                } else if (type === 'email' && value) {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    isValid = emailRegex.test(value);
+                    message = isValid ? 'Email valide' : 'Format email invalide';
+                } else if (type === 'tel' && value) {
+                    const telRegex = /^[\d\s\-\+\(\)]+$/;
+                    isValid = telRegex.test(value);
+                    message = isValid ? 'Numéro valide' : 'Format téléphone invalide';
+                } else if (input.hasAttribute('minlength') && value) {
+                    const minLength = parseInt(input.getAttribute('minlength'));
+                    isValid = value.length >= minLength;
+                    message = isValid ? 'Longueur suffisante' : `Minimum ${minLength} caractères`;
+                } else if (value) {
+                    isValid = true;
+                    message = 'Champ valide';
+                }
+                
+                // Appliquer les classes visuelles
+                input.classList.remove('valid', 'invalid');
+                if (value) {
+                    input.classList.add(isValid ? 'valid' : 'invalid');
+                    input.setAttribute('aria-invalid', !isValid);
+                }
+                
+                // Wrapper parent pour icône
+                const wrapper = input.closest('.input-wrapper');
+                if (wrapper && value) {
+                    wrapper.classList.remove('has-success', 'has-error');
+                    wrapper.classList.add(isValid ? 'has-success' : 'has-error');
+                }
+                
+                // Afficher message si erreur
+                let messageEl = input.parentElement.querySelector('.form-message');
+                if (!isValid && value) {
+                    if (!messageEl) {
+                        messageEl = document.createElement('div');
+                        messageEl.className = 'form-message error';
+                        messageEl.setAttribute('role', 'alert');
+                        input.parentElement.appendChild(messageEl);
+                    }
+                    messageEl.innerHTML = `<span>⚠</span><span>${message}</span>`;
+                    messageEl.classList.remove('success');
+                    messageEl.classList.add('error');
+                    
+                    // Annonce pour lecteurs d'écran
+                    window.announce(`Erreur : ${message}`, 'assertive');
+                } else if (messageEl) {
+                    messageEl.remove();
+                }
+                
+                return isValid;
+            }
+            
+            // Exposer la fonction globalement pour usage externe
+            window.validateInput = validateInput;
+        })();
+
+        // ============================================
+        // EMAIL OBFUSCATION (Anti-Spam Protection)
+        // ============================================
+        // Décode les emails encodés Base64 dans les liens .tus-email-link
+        // Exécuté une seule fois au chargement de la page
+        (function() {
+            function decodeEmails() {
+                const links = document.querySelectorAll('.tus-email-link[data-email]');
+                links.forEach(link => {
+                    try {
+                        const encoded = link.getAttribute('data-email');
+                        const decoded = atob(encoded); // Décodage Base64
+                        const label = link.getAttribute('data-label') || 'Nous écrire';
+                        link.href = 'mailto:' + decoded;
+                        link.textContent = label;
+                        link.removeAttribute('data-email'); // Nettoyer après utilisation
+                    } catch (e) {
+                        console.warn('⚠️ Erreur décodage email:', e);
+                        link.textContent = 'Nous contacter';
+                        link.href = '/contact/';
+                    }
+                });
+            }
+            
+            // Exécuter immédiatement (déjà dans DOMContentLoaded via script parent)
+            decodeEmails();
+        })();
     </script>
     {% block extra_js %}{% endblock %}
     

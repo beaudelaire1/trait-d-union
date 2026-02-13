@@ -1,0 +1,1226 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   TRAIT D'UNION STUDIO — Admin Premium Theme
+   Charte : #07080A · #F6F7FB · #0B2DFF · #22C55E · Space Grotesk / Inter
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Fonts ─────────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+/* ── Design Tokens ─────────────────────────────────────────────────────── */
+:root {
+    /* Couleurs TUS */
+    --tus-black: #07080A;
+    --tus-white: #F6F7FB;
+    --tus-blue: #0B2DFF;
+    --tus-blue-soft: #4D6FFF;
+    --tus-blue-glow: rgba(11, 45, 255, 0.35);
+    --tus-green: #22C55E;
+    --tus-green-light: #4ADE80;
+
+    /* Surfaces */
+    --tus-surface-0: #07080A;
+    --tus-surface-1: #0D1016;
+    --tus-surface-2: #111827;
+    --tus-surface-3: #1a2236;
+    --tus-surface-glass: rgba(13, 16, 22, 0.72);
+
+    /* Bordures */
+    --tus-border: rgba(246, 247, 251, 0.08);
+    --tus-border-strong: rgba(246, 247, 251, 0.14);
+    --tus-border-blue: rgba(11, 45, 255, 0.30);
+
+    /* Texte */
+    --tus-text: #F6F7FB;
+    --tus-text-70: rgba(246, 247, 251, 0.70);
+    --tus-text-50: rgba(246, 247, 251, 0.50);
+    --tus-text-30: rgba(246, 247, 251, 0.30);
+
+    /* Gradient premium */
+    --tus-gradient: linear-gradient(135deg, #0B2DFF 0%, #22C55E 100%);
+    --tus-gradient-subtle: linear-gradient(135deg, rgba(11,45,255,0.15) 0%, rgba(34,197,94,0.08) 100%);
+    --tus-gradient-sidebar: linear-gradient(180deg, #07080A 0%, #0D1016 50%, #0a0f1a 100%);
+
+    /* Ombres */
+    --tus-shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
+    --tus-shadow-md: 0 4px 16px rgba(0,0,0,0.5);
+    --tus-shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+    --tus-shadow-glow: 0 0 24px rgba(11, 45, 255, 0.15);
+
+    /* Rayons */
+    --tus-radius-sm: 8px;
+    --tus-radius-md: 12px;
+    --tus-radius-lg: 16px;
+    --tus-radius-xl: 20px;
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────── */
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    letter-spacing: 0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--tus-surface-0) !important;
+    color: var(--tus-text) !important;
+}
+
+h1, h2, h3, h4, h5, h6,
+.content-header h1,
+#content h1,
+.card-title,
+.brand-text,
+.nav-sidebar .nav-header,
+.info-box-text,
+.info-box-number,
+.small-box h3 {
+    font-family: 'Space Grotesk', 'Inter', sans-serif !important;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* ── Navbar — Barre supérieure premium ─────────────────────────────────── */
+.main-header.navbar {
+    background: var(--tus-surface-glass) !important;
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border-bottom: 1px solid var(--tus-border) !important;
+    box-shadow: 0 1px 12px rgba(0,0,0,0.3);
+    min-height: 56px;
+}
+
+.main-header .nav-link {
+    color: var(--tus-text-70) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 500;
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+    padding: 8px 14px !important;
+    border-radius: var(--tus-radius-sm);
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.main-header .nav-link:hover {
+    color: var(--tus-white) !important;
+    background: rgba(11, 45, 255, 0.12);
+}
+
+.main-header .nav-link.active,
+.main-header .nav-item.active > .nav-link {
+    color: var(--tus-white) !important;
+    background: rgba(11, 45, 255, 0.18);
+}
+
+/* Badge notification */
+.navbar-badge {
+    background: var(--tus-gradient) !important;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 6px;
+    padding: 2px 5px;
+}
+
+/* Dropdown menus */
+.dropdown-menu {
+    background: var(--tus-surface-2) !important;
+    border: 1px solid var(--tus-border-strong) !important;
+    border-radius: var(--tus-radius-md) !important;
+    box-shadow: var(--tus-shadow-lg);
+    backdrop-filter: blur(16px);
+    padding: 6px !important;
+}
+
+.dropdown-item {
+    color: var(--tus-text-70) !important;
+    border-radius: var(--tus-radius-sm);
+    padding: 8px 14px !important;
+    font-size: 0.875rem;
+    transition: all 0.15s ease;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+    color: var(--tus-white) !important;
+    background: rgba(11, 45, 255, 0.15) !important;
+}
+
+/* ── Sidebar — Navigation latérale premium ─────────────────────────────── */
+.main-sidebar {
+    background: var(--tus-gradient-sidebar) !important;
+    border-right: 1px solid var(--tus-border) !important;
+    box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+}
+
+.main-sidebar .brand-link {
+    border-bottom: 1px solid var(--tus-border) !important;
+    padding: 14px 12px !important;
+    background: transparent !important;
+}
+
+.main-sidebar .brand-link .brand-image {
+    max-height: 36px;
+    margin-top: -2px;
+    opacity: 1 !important;
+}
+
+.main-sidebar .brand-link .brand-text {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.03em;
+    color: var(--tus-white) !important;
+}
+
+/* Sidebar nav items */
+.nav-sidebar .nav-item > .nav-link {
+    color: var(--tus-text-50) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500;
+    font-size: 0.82rem;
+    padding: 9px 14px !important;
+    margin: 2px 8px !important;
+    border-radius: var(--tus-radius-sm) !important;
+    transition: all 0.2s ease;
+}
+
+.nav-sidebar .nav-item > .nav-link:hover {
+    color: var(--tus-white) !important;
+    background: rgba(11, 45, 255, 0.10) !important;
+}
+
+.nav-sidebar .nav-item > .nav-link.active,
+.nav-sidebar .nav-item.menu-is-opening > .nav-link,
+.nav-sidebar .nav-item.menu-open > .nav-link {
+    color: var(--tus-white) !important;
+    background: rgba(11, 45, 255, 0.18) !important;
+    box-shadow: inset 3px 0 0 0 var(--tus-blue);
+}
+
+/* Sidebar section header */
+.nav-sidebar .nav-header {
+    color: var(--tus-text-30) !important;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 16px 14px 6px !important;
+    margin: 0 8px;
+}
+
+/* Sidebar icons */
+.nav-sidebar .nav-icon {
+    color: var(--tus-text-30) !important;
+    font-size: 0.9rem;
+    width: 1.6rem;
+    text-align: center;
+    transition: color 0.2s ease;
+}
+
+.nav-sidebar .nav-item > .nav-link:hover .nav-icon,
+.nav-sidebar .nav-item > .nav-link.active .nav-icon {
+    color: var(--tus-blue-soft) !important;
+}
+
+/* Sidebar sub-menu */
+.nav-treeview {
+    background: rgba(0,0,0,0.15) !important;
+    border-radius: 0 0 var(--tus-radius-sm) var(--tus-radius-sm);
+    margin: 0 8px !important;
+    padding: 4px 0 !important;
+}
+
+.nav-treeview > .nav-item > .nav-link {
+    font-size: 0.78rem !important;
+    padding: 6px 14px 6px 38px !important;
+    color: var(--tus-text-50) !important;
+}
+
+.nav-treeview > .nav-item > .nav-link.active {
+    color: var(--tus-blue-soft) !important;
+    background: transparent !important;
+    box-shadow: none;
+}
+
+/* User panel sidebar */
+.user-panel {
+    border-bottom: 1px solid var(--tus-border) !important;
+    padding: 12px !important;
+}
+
+.user-panel .info a {
+    color: var(--tus-text-70) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 500;
+}
+
+/* ── Content Wrapper ──────────────────────────────────────────────────── */
+.content-wrapper {
+    background: var(--tus-surface-0) !important;
+}
+
+.content-header {
+    padding: 20px 24px 8px !important;
+}
+
+.content-header h1 {
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    color: var(--tus-white) !important;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background: transparent !important;
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumb-item,
+.breadcrumb-item a {
+    color: var(--tus-text-50) !important;
+    font-size: 0.78rem;
+}
+
+.breadcrumb-item.active {
+    color: var(--tus-blue-soft) !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--tus-text-30) !important;
+}
+
+/* ── Cards — glassmorphism premium ─────────────────────────────────────── */
+.card {
+    background: var(--tus-surface-1) !important;
+    border: 1px solid var(--tus-border) !important;
+    border-radius: var(--tus-radius-lg) !important;
+    box-shadow: var(--tus-shadow-sm);
+    overflow: hidden;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card:hover {
+    border-color: var(--tus-border-strong) !important;
+    box-shadow: var(--tus-shadow-md);
+}
+
+.card-header {
+    background: var(--tus-surface-2) !important;
+    border-bottom: 1px solid var(--tus-border) !important;
+    padding: 14px 20px !important;
+}
+
+.card-header .card-title {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: var(--tus-white) !important;
+}
+
+.card-body {
+    padding: 20px !important;
+}
+
+.card-footer {
+    background: var(--tus-surface-2) !important;
+    border-top: 1px solid var(--tus-border) !important;
+    padding: 12px 20px !important;
+}
+
+/* Small boxes / info boxes */
+.small-box {
+    border-radius: var(--tus-radius-lg) !important;
+    border: 1px solid var(--tus-border) !important;
+    background: var(--tus-surface-1) !important;
+    overflow: hidden;
+    position: relative;
+}
+
+.small-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--tus-gradient);
+    opacity: 0.7;
+}
+
+.small-box h3 {
+    font-size: 1.6rem !important;
+    color: var(--tus-white) !important;
+}
+
+.small-box p {
+    color: var(--tus-text-70) !important;
+}
+
+.small-box .icon {
+    color: rgba(11, 45, 255, 0.15) !important;
+}
+
+.small-box .small-box-footer {
+    background: rgba(0,0,0,0.2) !important;
+    color: var(--tus-text-50) !important;
+    border-top: 1px solid var(--tus-border);
+    font-size: 0.78rem;
+}
+
+.small-box .small-box-footer:hover {
+    color: var(--tus-white) !important;
+    background: rgba(11, 45, 255, 0.12) !important;
+}
+
+.info-box {
+    background: var(--tus-surface-1) !important;
+    border: 1px solid var(--tus-border) !important;
+    border-radius: var(--tus-radius-lg) !important;
+    box-shadow: var(--tus-shadow-sm);
+    min-height: 80px;
+}
+
+/* ── Formulaires — Premium inputs ──────────────────────────────────────── */
+.form-control,
+select,
+textarea,
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+input[type="tel"],
+input[type="date"],
+input[type="datetime-local"] {
+    background: var(--tus-surface-2) !important;
+    border: 1px solid var(--tus-border-strong) !important;
+    border-radius: var(--tus-radius-sm) !important;
+    color: var(--tus-text) !important;
+    min-height: 42px;
+    padding: 8px 14px !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus,
+select:focus,
+textarea:focus,
+input:focus {
+    border-color: var(--tus-blue) !important;
+    box-shadow: 0 0 0 3px var(--tus-blue-glow) !important;
+    outline: none !important;
+    background: var(--tus-surface-3) !important;
+}
+
+.form-control::placeholder {
+    color: var(--tus-text-30) !important;
+}
+
+/* Labels */
+label {
+    color: var(--tus-text-70) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+    margin-bottom: 4px;
+}
+
+/* Help text */
+.helptext,
+.help-block,
+.form-text {
+    color: var(--tus-text-30) !important;
+    font-size: 0.78rem;
+}
+
+/* Select2 (Jazzmin autocomplete) */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    background: var(--tus-surface-2) !important;
+    border: 1px solid var(--tus-border-strong) !important;
+    border-radius: var(--tus-radius-sm) !important;
+    min-height: 42px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: var(--tus-text) !important;
+    line-height: 42px !important;
+}
+
+.select2-dropdown {
+    background: var(--tus-surface-2) !important;
+    border: 1px solid var(--tus-border-strong) !important;
+    border-radius: var(--tus-radius-md) !important;
+    box-shadow: var(--tus-shadow-lg);
+}
+
+.select2-results__option--highlighted {
+    background: rgba(11, 45, 255, 0.20) !important;
+    color: var(--tus-white) !important;
+}
+
+/* Fieldsets */
+fieldset {
+    border: 1px solid var(--tus-border) !important;
+    border-radius: var(--tus-radius-md) !important;
+    padding: 16px 20px !important;
+    margin-bottom: 20px !important;
+    background: var(--tus-surface-1);
+}
+
+fieldset legend,
+fieldset h2 {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600;
+    font-size: 0.9rem !important;
+    color: var(--tus-blue-soft) !important;
+    letter-spacing: 0.02em;
+    padding: 0 8px;
+}
+
+/* ── Boutons — Premium gradient CTA ────────────────────────────────────── */
+.btn {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.03em;
+    min-height: 40px;
+    border-radius: var(--tus-radius-sm) !important;
+    padding: 8px 18px !important;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-primary,
+input[type="submit"].default,
+.submit-row input[type="submit"] {
+    background: var(--tus-blue) !important;
+    border: 1px solid var(--tus-blue) !important;
+    color: var(--tus-white) !important;
+    box-shadow: 0 2px 12px rgba(11, 45, 255, 0.3);
+}
+
+.btn-primary:hover,
+input[type="submit"].default:hover,
+.submit-row input[type="submit"]:hover {
+    background: var(--tus-blue-soft) !important;
+    border-color: var(--tus-blue-soft) !important;
+    box-shadow: 0 4px 20px rgba(11, 45, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: var(--tus-green) !important;
+    border-color: var(--tus-green) !important;
+    color: var(--tus-black) !important;
+    font-weight: 700;
+}
+
+.btn-success:hover {
+    background: var(--tus-green-light) !important;
+    border-color: var(--tus-green-light) !important;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: transparent !important;
+    border: 1px solid #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+.btn-danger:hover {
+    background: #ef4444 !important;
+    color: var(--tus-white) !important;
+}
+
+.btn-outline-light,
+.btn-secondary {
+    background: transparent !important;
+    border: 1px solid var(--tus-border-strong) !important;
+    color: var(--tus-text-70) !important;
+}
+
+.btn-outline-light:hover,
+.btn-secondary:hover {
+    background: rgba(246, 247, 251, 0.06) !important;
+    color: var(--tus-white) !important;
+    border-color: var(--tus-text-50) !important;
+}
+
+input[type="submit"],
+button[type="submit"] {
+    min-height: 40px;
+    border-radius: var(--tus-radius-sm) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* Submit row */
+.submit-row {
+    background: var(--tus-surface-2) !important;
+    border: 1px solid var(--tus-border) !important;
+    border-radius: var(--tus-radius-md) !important;
+    padding: 12px 16px !important;
+    margin-top: 24px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    position: sticky;
+    bottom: 12px;
+    z-index: 10;
+    box-shadow: var(--tus-shadow-md);
+}
+
+.submit-row .deletelink-box a {
+    color: #ef4444 !important;
+    font-weight: 600;
+}
+
+.submit-row .deletelink-box a:hover {
+    color: #f87171 !important;
+}
+
+/* ── Object tools — Actions header ─────────────────────────────────────── */
+.object-tools {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.object-tools a,
+.object-tools .addlink,
+.object-tools .historylink,
+.object-tools .deletelink {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 16px;
+    border-radius: var(--tus-radius-sm);
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.02em;
+    background: var(--tus-surface-2) !important;
+    border: 1px solid var(--tus-border-strong);
+    color: var(--tus-text-70) !important;
+    transition: all 0.2s ease;
+}
+
+.object-tools a:hover {
+    background: rgba(11, 45, 255, 0.12) !important;
+    color: var(--tus-white) !important;
+    border-color: var(--tus-border-blue);
+}
+
+.object-tools .addlink {
+    background: var(--tus-blue) !important;
+    border-color: var(--tus-blue) !important;
+    color: var(--tus-white) !important;
+}
+
+.object-tools .addlink:hover {
+    background: var(--tus-blue-soft) !important;
+    box-shadow: 0 2px 12px rgba(11, 45, 255, 0.35);
+}
+
+/* ── Tableaux — Changelists premium ────────────────────────────────────── */
+.table,
+#result_list {
+    background: transparent !important;
+    border: none !important;
+}
+
+.table thead th,
+#result_list thead th {
+    background: var(--tus-surface-2) !important;
+    color: var(--tus-text-50) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--tus-border) !important;
+    padding: 12px 16px !important;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    white-space: nowrap;
+}
+
+.table tbody td,
+#result_list tbody td {
+    border-bottom: 1px solid var(--tus-border) !important;
+    padding: 10px 16px !important;
+    color: var(--tus-text-70) !important;
+    font-size: 0.85rem;
+    vertical-align: middle;
+}
+
+.table tbody tr,
+#result_list tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover,
+#result_list tbody tr:hover {
+    background: rgba(11, 45, 255, 0.06) !important;
+}
+
+#result_list tbody tr:hover td {
+    color: var(--tus-text) !important;
+}
+
+/* Links in tables */
+#result_list a,
+.table a {
+    color: var(--tus-blue-soft) !important;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+
+#result_list a:hover,
+.table a:hover {
+    color: var(--tus-white) !important;
+}
+
+/* ── Changelist bar — Recherche & filtres ───────────────────────────────── */
+#changelist-search {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+#changelist-search input[type="text"] {
+    min-width: 320px;
+    background: var(--tus-surface-2) !important;
+}
+
+#changelist-search input[type="submit"] {
+    background: var(--tus-blue) !important;
+    border-color: var(--tus-blue) !important;
+    color: var(--tus-white) !important;
+    padding: 8px 20px !important;
+}
+
+/* Filtres latéraux */
+#changelist-filter {
+    background: var(--tus-surface-1) !important;
+    border: 1px solid var(--tus-border) !important;
+    border-radius: var(--tus-radius-md) !important;
+    padding: 16px !important;
+}
+
+#changelist-filter h2,
+#changelist-filter h3 {
+    color: var(--tus-text-50) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+}
+
+#changelist-filter ul {
+    padding: 0;
+    list-style: none;
+}
+
+#changelist-filter li {
+    margin: 1px 0;
+}
+
+#changelist-filter a {
+    color: var(--tus-text-50) !important;
+    font-size: 0.82rem;
+    padding: 5px 10px;
+    display: block;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+
+#changelist-filter a:hover {
+    color: var(--tus-white) !important;
+    background: rgba(11, 45, 255, 0.10);
+}
+
+#changelist-filter li.selected a {
+    color: var(--tus-white) !important;
+    background: rgba(11, 45, 255, 0.18);
+    font-weight: 600;
+}
+
+/* Actions bar */
+.changelist-form .actions {
+    background: var(--tus-surface-2) !important;
+    border: 1px solid var(--tus-border) !important;
+    border-radius: var(--tus-radius-sm);
+    padding: 10px 14px !important;
+    margin-bottom: 12px;
+}
+
+.changelist-form .actions select {
+    min-width: 200px;
+}
+
+/* ── Pagination ────────────────────────────────────────────────────────── */
+.pagination {
+    gap: 4px;
+}
+
+.page-link {
+    background: var(--tus-surface-2) !important;
+    border: 1px solid var(--tus-border) !important;
+    color: var(--tus-text-70) !important;
+    border-radius: var(--tus-radius-sm) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600;
+    font-size: 0.82rem;
+    min-width: 36px;
+    text-align: center;
+    transition: all 0.15s ease;
+}
+
+.page-link:hover {
+    background: rgba(11, 45, 255, 0.12) !important;
+    color: var(--tus-white) !important;
+    border-color: var(--tus-border-blue) !important;
+}
+
+.page-item.active .page-link {
+    background: var(--tus-blue) !important;
+    border-color: var(--tus-blue) !important;
+    color: var(--tus-white) !important;
+}
+
+/* Changelist paginator */
+.paginator {
+    color: var(--tus-text-50) !important;
+    font-size: 0.82rem;
+    padding: 12px 0;
+}
+
+.paginator a {
+    color: var(--tus-blue-soft) !important;
+    font-weight: 600;
+}
+
+/* ── Tabs — Changeform ─────────────────────────────────────────────────── */
+.nav-tabs {
+    border-bottom: 1px solid var(--tus-border) !important;
+    gap: 2px;
+}
+
+.nav-tabs .nav-link {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    color: var(--tus-text-50) !important;
+    border: none !important;
+    border-radius: var(--tus-radius-sm) var(--tus-radius-sm) 0 0 !important;
+    padding: 10px 18px !important;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--tus-white) !important;
+    background: rgba(246, 247, 251, 0.04);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--tus-white) !important;
+    background: rgba(11, 45, 255, 0.18) !important;
+    border-bottom: 2px solid var(--tus-blue) !important;
+}
+
+/* Tab content */
+.tab-content {
+    padding: 20px 0 !important;
+}
+
+/* ── Focus clavier — Accessibilité ─────────────────────────────────────── */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible,
+.btn:focus-visible,
+.page-link:focus-visible {
+    outline: 3px solid var(--tus-blue-soft) !important;
+    outline-offset: 2px;
+    border-radius: var(--tus-radius-sm);
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+.main-footer {
+    background: var(--tus-surface-1) !important;
+    border-top: 1px solid var(--tus-border) !important;
+    color: var(--tus-text-30) !important;
+    font-size: 0.75rem;
+    padding: 10px 20px !important;
+}
+
+.main-footer a {
+    color: var(--tus-text-50) !important;
+}
+
+/* ── Login page — Branding premium ─────────────────────────────────────── */
+.login-page {
+    background: var(--tus-surface-0) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.login-page::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(11, 45, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(34, 197, 94, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.login-box {
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+}
+
+.login-box .card {
+    background: var(--tus-surface-glass) !important;
+    backdrop-filter: blur(24px) saturate(1.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.5);
+    border: 1px solid var(--tus-border-strong) !important;
+    border-radius: var(--tus-radius-xl) !important;
+    box-shadow: var(--tus-shadow-lg), var(--tus-shadow-glow);
+    overflow: visible;
+}
+
+.login-box .card-header {
+    background: transparent !important;
+    border-bottom: 1px solid var(--tus-border) !important;
+    text-align: center;
+    padding: 28px 24px 20px !important;
+}
+
+.login-box .card-header a {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--tus-white) !important;
+    letter-spacing: 0.04em;
+}
+
+.login-box .card-body {
+    padding: 28px 24px !important;
+}
+
+.login-box .btn-primary {
+    width: 100%;
+    min-height: 46px;
+    font-size: 0.9rem;
+    background: var(--tus-gradient) !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(11, 45, 255, 0.3);
+}
+
+.login-box .btn-primary:hover {
+    box-shadow: 0 6px 28px rgba(11, 45, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.login-logo a {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 700;
+    color: var(--tus-white) !important;
+    letter-spacing: 0.06em;
+}
+
+/* ── Modals ─────────────────────────────────────────────────────────────── */
+.modal-content {
+    background: var(--tus-surface-1) !important;
+    border: 1px solid var(--tus-border-strong) !important;
+    border-radius: var(--tus-radius-lg) !important;
+    box-shadow: var(--tus-shadow-lg);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--tus-border) !important;
+    padding: 16px 20px !important;
+}
+
+.modal-header .modal-title {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600;
+    color: var(--tus-white) !important;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--tus-border) !important;
+    padding: 12px 20px !important;
+}
+
+/* ── Inline admin ──────────────────────────────────────────────────────── */
+.inline-group {
+    margin-top: 16px;
+}
+
+.inline-group .inline-related {
+    background: var(--tus-surface-1) !important;
+    border: 1px solid var(--tus-border) !important;
+    border-radius: var(--tus-radius-md) !important;
+    padding: 16px !important;
+    margin-bottom: 10px !important;
+}
+
+.inline-group h2 {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 0.88rem !important;
+    color: var(--tus-blue-soft) !important;
+}
+
+.inline-group .add-row a {
+    color: var(--tus-blue-soft) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+
+/* ── Related widget — Lookup/Add ───────────────────────────────────────── */
+.related-widget-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.related-widget-wrapper .related-lookup,
+.related-widget-wrapper .change-related,
+.related-widget-wrapper .add-related,
+.related-widget-wrapper .delete-related {
+    color: var(--tus-text-50) !important;
+    opacity: 0.8;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.related-widget-wrapper .related-lookup:hover,
+.related-widget-wrapper .change-related:hover,
+.related-widget-wrapper .add-related:hover {
+    color: var(--tus-blue-soft) !important;
+    opacity: 1;
+}
+
+/* ── Messages / Alerts ─────────────────────────────────────────────────── */
+.alert,
+.messagelist li,
+.messages li {
+    border-radius: var(--tus-radius-sm) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.85rem;
+    padding: 12px 18px !important;
+    border: 1px solid transparent;
+}
+
+.alert-success,
+.messagelist .success,
+.messages .success {
+    background: rgba(34, 197, 94, 0.12) !important;
+    border-color: rgba(34, 197, 94, 0.25) !important;
+    color: var(--tus-green-light) !important;
+}
+
+.alert-error,
+.alert-danger,
+.messagelist .error,
+.messages .error {
+    background: rgba(239, 68, 68, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.25) !important;
+    color: #fca5a5 !important;
+}
+
+.alert-warning,
+.messagelist .warning,
+.messages .warning {
+    background: rgba(245, 158, 11, 0.12) !important;
+    border-color: rgba(245, 158, 11, 0.25) !important;
+    color: #fcd34d !important;
+}
+
+.alert-info,
+.messagelist .info,
+.messages .info {
+    background: rgba(11, 45, 255, 0.10) !important;
+    border-color: rgba(11, 45, 255, 0.22) !important;
+    color: var(--tus-blue-soft) !important;
+}
+
+/* ── Dashboard app list ────────────────────────────────────────────────── */
+.dashboard .app-list,
+#content-main .module {
+    background: var(--tus-surface-1) !important;
+    border: 1px solid var(--tus-border) !important;
+    border-radius: var(--tus-radius-lg) !important;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.module caption,
+.module h2 {
+    background: var(--tus-surface-2) !important;
+    color: var(--tus-text-70) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 600;
+    font-size: 0.82rem;
+    padding: 12px 16px !important;
+    border-bottom: 1px solid var(--tus-border);
+}
+
+.module table td,
+.module table th {
+    border-color: var(--tus-border) !important;
+    padding: 10px 16px !important;
+}
+
+.module table td a {
+    color: var(--tus-blue-soft) !important;
+    font-weight: 500;
+}
+
+.module table td a:hover {
+    color: var(--tus-white) !important;
+}
+
+/* Recent actions */
+#recent-actions-module {
+    background: var(--tus-surface-1) !important;
+    border: 1px solid var(--tus-border) !important;
+    border-radius: var(--tus-radius-lg) !important;
+}
+
+#recent-actions-module h2 {
+    background: var(--tus-surface-2) !important;
+    color: var(--tus-text-70) !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+}
+
+#recent-actions-module li a {
+    color: var(--tus-blue-soft) !important;
+}
+
+/* ── Checkboxes custom ─────────────────────────────────────────────────── */
+input[type="checkbox"] {
+    accent-color: var(--tus-blue);
+    width: 16px;
+    height: 16px;
+}
+
+/* ── Scrollbars ────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--tus-border-strong);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--tus-text-30);
+}
+
+/* ── Animations subtiles ───────────────────────────────────────────────── */
+.content-wrapper,
+.content,
+.card,
+.small-box,
+.main-footer,
+.main-header,
+.main-sidebar,
+.dropdown-menu {
+    transition: background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+/* ── Indicateur de soumission ──────────────────────────────────────────── */
+form.is-submitting {
+    opacity: 0.7;
+    pointer-events: none;
+    filter: grayscale(0.3);
+}
+
+/* ── Barre accent haut de page ─────────────────────────────────────────── */
+.content-wrapper::before {
+    content: '';
+    display: block;
+    height: 2px;
+    background: var(--tus-gradient);
+    opacity: 0.5;
+}
+
+/* ── Motion reduction ──────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+    #changelist-filter {
+        margin-top: 12px;
+    }
+
+    #changelist-search input[type="text"] {
+        min-width: 100%;
+    }
+
+    .submit-row {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .object-tools {
+        width: 100%;
+    }
+
+    .object-tools li,
+    .object-tools a {
+        width: 100%;
+    }
+
+    .content-header h1 {
+        font-size: 1.2rem !important;
+    }
+
+    .card-body {
+        padding: 14px !important;
+    }
+
+    .login-box {
+        margin: 16px;
+    }
+}

@@ -1,19 +1,50 @@
 {% extends "admin/change_list.html" %}
 {% load i18n admin_urls %}
 
+{% block extrahead %}
+{{ block.super }}
+<style>
+    .tus-admin-tools {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        min-height: 40px;
+    }
+
+    .tus-admin-tools.primary {
+        background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%);
+        color: #fff;
+    }
+
+    .tus-admin-tools.success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #fff;
+    }
+
+    .tus-admin-tools.neutral {
+        border: 1px solid rgba(246, 247, 251, 0.2);
+        color: inherit;
+    }
+</style>
+{% endblock %}
+
 {% block object-tools-items %}
 <li>
-    <a href="/tus-gestion-secure/emails/compose/" class="addlink" style="background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;">
+    <a href="/tus-gestion-secure/emails/compose/" class="addlink tus-admin-tools primary" aria-label="Composer un email premium">
         ✉️ Composer un email premium
     </a>
 </li>
 <li>
-    <a href="/tus-gestion-secure/emails/bulk/" class="addlink" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-weight: 600;">
+    <a href="/tus-gestion-secure/emails/bulk/" class="addlink tus-admin-tools success" aria-label="Lancer un envoi d'emails en masse">
         🚀 Envoi en masse
     </a>
 </li>
 <li>
-    <a href="/tus-gestion-secure/emails/" class="viewlink" style="padding: 10px 20px; border-radius: 8px;">
+    <a href="/tus-gestion-secure/emails/" class="viewlink tus-admin-tools neutral" aria-label="Voir l'interface emails">
         📬 Voir l'interface emails
     </a>
 </li>

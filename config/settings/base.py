@@ -245,122 +245,104 @@ SITE_URL = os.environ.get('SITE_URL', 'https://traitdunion.it')
 
 # Jazzmin Admin Theme Configuration
 JAZZMIN_SETTINGS = {
-    # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "Trait d'Union Studio",
-
-    # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "TUS Admin",
-
-    # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "Trait d'Union Studio",
-
-    # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": None,
-
-    # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
-    "login_logo": None,
-
-    # CSS classes that are applied to the logo above
-    "site_logo_classes": "img-circle",
-
-    # Relative path to a favicon for your site, will default to site_logo if absent (ideally 32x32 px)
-    "site_icon": None,
-
-    # Welcome text on the login screen
-    "welcome_sign": "Bienvenue sur l'administration TUS",
-
-    # Copyright on the footer
-    "copyright": "Trait d'Union Studio",
-
-    # Field name on user model that contains avatar ImageField/URLField/Charfield or a callable that receives the user
+    # Branding
+    "site_title": "TUS · Admin",
+    "site_header": "TUS",
+    "site_brand": "Trait d'Union",
+    "site_logo": "img/tus-logo.svg",
+    "login_logo": "img/tus-logo.svg",
+    "site_logo_classes": "",
+    "site_icon": "img/tus-icon.svg",
+    "welcome_sign": "",
+    "copyright": "Trait d'Union Studio · Guyane",
     "user_avatar": None,
 
-    # Links to put along the top menu
+    # Top menu — accès rapide
     "topmenu_links": [
-        # Url that gets reversed (Permissions can be added)
-        {"name": "Accueil", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Voir le site", "url": "/", "new_window": True},
+        {"name": "Dashboard", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Leads", "url": "admin:leads_lead_changelist", "permissions": ["leads.view_lead"]},
+        {"name": "Devis", "url": "admin:devis_quote_changelist", "permissions": ["devis.view_quote"]},
+        {"name": "Factures", "url": "admin:factures_invoice_changelist", "permissions": ["factures.view_invoice"]},
+        {"name": "↗ Site", "url": "/", "new_window": True},
     ],
 
-    # Whether to display the side menu
+    # Sidebar
     "show_sidebar": True,
-
-    # Whether to aut expand the menu
-    "navigation_expanded": True,
-
-    # Hide these apps when generating side menu e.g (auth)
+    "navigation_expanded": False,
     "hide_apps": [],
-
-    # Hide these models when generating side menu (e.g auth.user)
     "hide_models": [],
+    "order_with_respect_to": [
+        "leads", "devis", "factures", "clients",
+        "portfolio", "chroniques", "pages", "resources",
+        "auth",
+    ],
 
-    # List of apps (and/or models) to base side menu ordering off of (does not need to contain all apps/models)
-    "order_with_respect_to": ["auth", "apps.leads", "apps.portfolio", "apps.devis", "apps.factures"],
-
-    # Custom icons for side menu apps/models
+    # Icônes premium
     "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-        "leads.Lead": "fas fa-envelope",
-        "leads.Client": "fas fa-address-book",
-        "portfolio.Project": "fas fa-briefcase",
-        "portfolio.ProjectImage": "fas fa-images",
-        "devis.Quote": "fas fa-file-alt",
-        "devis.QuoteItem": "fas fa-list",
-        "factures.Invoice": "fas fa-file-invoice",
-        "factures.InvoiceItem": "fas fa-list-alt",
+        "auth": "fas fa-shield-alt",
+        "auth.user": "fas fa-user-astronaut",
+        "auth.Group": "fas fa-layer-group",
+        "leads.Lead": "fas fa-bolt",
+        "leads.Client": "fas fa-handshake",
+        "leads.EmailComposition": "fas fa-paper-plane",
+        "portfolio.Project": "fas fa-gem",
+        "portfolio.ProjectImage": "fas fa-camera-retro",
+        "devis.Quote": "fas fa-file-signature",
+        "devis.QuoteItem": "fas fa-stream",
+        "factures.Invoice": "fas fa-file-invoice-dollar",
+        "factures.InvoiceItem": "fas fa-receipt",
+        "clients.ClientProfile": "fas fa-id-badge",
+        "chroniques.Article": "fas fa-pen-nib",
+        "chroniques.Category": "fas fa-tags",
+        "pages.Page": "fas fa-pager",
+        "resources.Resource": "fas fa-cubes",
+        "services.Service": "fas fa-concierge-bell",
     },
+    "default_icon_parents": "fas fa-chevron-right",
+    "default_icon_children": "fas fa-angle-right",
 
-    # Icons that are used when one is not manually specified
-    "default_icon_parents": "fas fa-chevron-circle-right",
-    "default_icon_children": "fas fa-circle",
-
-    # Use modals instead of popups
-    "related_modal_active": False,
-
-    # Custom CSS/JS (must be present in static files)
-    "custom_css": None,
-    "custom_js": None,
-
-    # Whether to show the UI customizer on the sidebar
+    # UX
+    "related_modal_active": True,
+    "custom_css": "css/admin_custom.css",
+    "custom_js": "js/admin_custom.js",
     "show_ui_builder": False,
-
-    # Theme overrides
     "changeform_format": "horizontal_tabs",
-    "changeform_format_overrides": {"auth.user": "collapsible", "auth.group": "vertical_tabs"},
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs",
+    },
 }
 
 # Jazzmin UI Tweaks
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
-    "footer_small_text": False,
+    "footer_small_text": True,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": "navbar-dark",
+    "brand_colour": "",
     "accent": "accent-primary",
     "navbar": "navbar-dark",
-    "no_navbar_border": False,
-    "navbar_fixed": False,
+    "no_navbar_border": True,
+    "navbar_fixed": True,
     "layout_boxed": False,
     "footer_fixed": False,
     "sidebar_fixed": True,
     "sidebar": "sidebar-dark-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
-    "sidebar_nav_child_indent": False,
-    "sidebar_nav_compact_style": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": True,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
     "theme": "darkly",
     "dark_mode_theme": None,
     "button_classes": {
         "primary": "btn-primary",
-        "secondary": "btn-secondary",
+        "secondary": "btn-outline-light",
         "info": "btn-info",
         "warning": "btn-warning",
         "danger": "btn-danger",
-        "success": "btn-success"
+        "success": "btn-success",
     },
     "actions_sticky_top": True,
 }

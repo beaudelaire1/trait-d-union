@@ -1,0 +1,5 @@
+<svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <rect width="40" height="40" rx="8" fill="#07080A"/>
+  <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle" font-family="Space Grotesk, Arial, sans-serif" font-weight="800" font-size="18" fill="#F6F7FB" letter-spacing="-0.5">TUS</text>
+  <rect x="8" y="32" width="24" height="2.5" rx="1.25" fill="#0B2DFF"/>
+</svg>

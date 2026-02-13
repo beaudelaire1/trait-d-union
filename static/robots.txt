@@ -1,13 +1,20 @@
-# robots.txt for Trait d'Union Studio
+# robots.txt for Trait d'Union Studio - SEO Optimized
 User-agent: *
 Allow: /
 
-# Sitemap location
+# Sitemap location (priorité SEO)
 Sitemap: https://traitdunion.it/sitemap.xml
+Sitemap: https://www.traitdunion.it/sitemap.xml
 
-# Disallow admin
+# Disallow admin and private areas
 User-agent: *
+Disallow: /tus-gestion-secure/
 Disallow: /admin/
 
-# Disallow media uploads
+# Disallow media uploads (privacy)
 Disallow: /media/leads/
+Disallow: /media/devis/
+Disallow: /media/factures/
+
+# Crawl-delay for respectful bots
+Crawl-delay: 1

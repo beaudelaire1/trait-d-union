@@ -14,7 +14,7 @@
                 Auto-entrepreneur<br>
                 SIRET : [À COMPLÉTER]<br>
                 Adresse : [À COMPLÉTER]<br>
-                Email : contact@traitdunion.it<br>
+                Email : {% include 'partials/contact_email.html' with link_style="" %}<br>
                 Téléphone : [À COMPLÉTER]
             </p>
         </section>
@@ -49,7 +49,7 @@
                 Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition aux données vous concernant.
             </p>
             <p>
-                Pour exercer ces droits, contactez-nous à : <a href="mailto:contact@traitdunion.it" class="text-blue-600 hover:underline">contact@traitdunion.it</a>
+                Pour exercer ces droits, contactez-nous à : {% include 'partials/contact_email.html' with link_style="text-blue-600 hover:underline" %}
             </p>
         </section>
 

@@ -242,6 +242,16 @@ LOGGING = {
 }
 
 # ==============================================================================
+# GOOGLE ANALYTICS 4 (SEO & TRACKING)
+# ==============================================================================
+# ID de mesure GA4 (créer propriété sur https://analytics.google.com)
+# Format: G-XXXXXXXXXX
+GA4_MEASUREMENT_ID = os.environ.get('GA4_MEASUREMENT_ID', '')
+
+# L'ID est injecté dans base.html si DEBUG=False
+# Ne jamais hardcoder l'ID en production pour faciliter les changements
+
+# ==============================================================================
 # PERFORMANCE
 # ==============================================================================
 # Cache templates en production

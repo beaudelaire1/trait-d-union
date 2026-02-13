@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.http import JsonResponse, FileResponse
 from django.core.files.storage import default_storage
+from django.views.decorators.clickjacking import xframe_options_sameorigin
 
 from .models import ClientProfile, Project, ProjectMilestone, ClientDocument, ClientNotification
 from .forms import ClientProfileForm, DocumentUploadForm, ClientRequestForm
@@ -528,6 +529,7 @@ def quote_pdf_download(request, pk):
 
 
 @login_required
+@xframe_options_sameorigin
 def quote_pdf_view(request, pk):
     """Afficher le PDF du devis en ligne (inline)."""
     from apps.devis.models import Quote
@@ -543,8 +545,19 @@ def quote_pdf_view(request, pk):
         resp['Content-Disposition'] = f'inline; filename="devis_{quote.number}.pdf"'
         return resp
     except Exception as e:
-        messages.error(request, f"Erreur lors de l'affichage du PDF: {str(e)}")
-        return redirect('clients:quote_detail', pk=pk)
+        # Retourner une page d'erreur simple au lieu d'un redirect (pour l'iframe)
+        quote_detail_url = reverse_lazy('clients:quote_detail', kwargs={'pk': pk})
+        return HttpResponse(
+            f'<html><body style="display:flex;align-items:center;justify-content:center;'
+            f'height:100vh;background:#12121a;color:#f6f7fb;font-family:Inter,sans-serif;'
+            f'text-align:center;"><div><p style="font-size:1.1rem;margin-bottom:1rem;">'
+            f'Aperçu indisponible</p><p style="color:rgba(246,247,251,0.5);font-size:0.9rem;">'
+            f'Le PDF ne peut pas être affiché pour le moment.</p><a href="{quote_detail_url}" target="_top" '
+            f'style="color:#0B2DFF;margin-top:1rem;display:inline-block;">Télécharger le PDF</a>'
+            f'</div></body></html>',
+            content_type='text/html',
+            status=200,
+        )
 
 
 @login_required
