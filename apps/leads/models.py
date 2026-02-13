@@ -8,6 +8,7 @@ class ProjectTypeChoice(models.TextChoices):
     VITRINE = 'vitrine', 'Site Vitrine'
     ECOMMERCE = 'ecommerce', 'E‑commerce'
     PLATEFORME = 'plateforme', 'Plateforme / Mini‑ERP'
+    OTHER = 'other', 'Autre'
 
 
 class BudgetRange(models.TextChoices):

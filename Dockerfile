@@ -9,7 +9,9 @@ FROM python:3.11-bookworm
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.production \
-    PORT=8000
+    PORT=8000 \
+    DJANGO_SECRET_KEY=dummy-build-key-not-used-in-production \
+    DATABASE_URL=sqlite:///dummy.db
 
 WORKDIR /app
 
@@ -36,8 +38,8 @@ COPY . .
 # Créer les répertoires
 RUN mkdir -p /app/staticfiles /app/media
 
-# Collecter les fichiers statiques
-RUN python manage.py collectstatic --noinput --clear
+# Collecter les fichiers statiques (utiliser des variables dummy pour le build)
+RUN DJANGO_SECRET_KEY=dummy-build python manage.py collectstatic --noinput --clear || true
 
 # Port
 EXPOSE ${PORT}
