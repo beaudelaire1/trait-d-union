@@ -38,8 +38,8 @@ COPY . .
 # Créer les répertoires
 RUN mkdir -p /app/staticfiles /app/media
 
-# Collecter les fichiers statiques (utiliser des variables dummy pour le build)
-RUN DJANGO_SECRET_KEY=dummy-build python manage.py collectstatic --noinput --clear || true
+# Collecter les fichiers statiques (afficher les erreurs)
+RUN python manage.py collectstatic --noinput --clear --verbosity 2
 
 # Port
 EXPOSE ${PORT}
