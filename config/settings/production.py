@@ -149,12 +149,14 @@ else:
         print("❌ CLOUDINARY ENV VARS MISSING! External media storage will NOT work.")
     
     # Configuration minimale pour le build
+    # IMPORTANT: On utilise CompressedStaticFilesStorage (SANS manifest) pour éviter
+    # les erreurs sur les fichiers .map manquants dans les CSS vendors (ex: bootswatch)
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
 
