@@ -225,6 +225,7 @@
             border-collapse: collapse;
             font-size: 8pt;
             border: 1px solid var(--tus-gray);
+            table-layout: fixed; /* Force layout fixe pour colonnes */
         }
         
         .items-table thead th {
@@ -237,6 +238,8 @@
             padding: 10px 8px;
             text-align: left;
             border: 1px solid var(--tus-gray);
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
         
         .items-table thead th:last-child { text-align: right; }
@@ -247,6 +250,9 @@
             padding: 10px 8px;
             border: 1px solid var(--tus-light);
             vertical-align: top;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.5;
         }
         
         .items-table tbody tr:last-child td {
@@ -255,6 +261,22 @@
         
         .items-table tbody td.center { text-align: center; }
         .items-table tbody td.right { text-align: right; }
+        
+        /* Définir widths des colonnes avec :nth-child */
+        .items-table th:nth-child(1),
+        .items-table td:nth-child(1) { width: 40%; } /* Description */
+        
+        .items-table th:nth-child(2),
+        .items-table td:nth-child(2) { width: 12%; } /* Qté */
+        
+        .items-table th:nth-child(3),
+        .items-table td:nth-child(3) { width: 16%; } /* Prix unitaire */
+        
+        .items-table th:nth-child(4),
+        .items-table td:nth-child(4) { width: 12%; } /* TVA */
+        
+        .items-table th:nth-child(5),
+        .items-table td:nth-child(5) { width: 20%; } /* Total TTC */
         
         .item-description {
             font-weight: 600;
@@ -578,11 +600,11 @@
             <table class="items-table">
                 <thead>
                     <tr>
-                        <th style="width: 45%;">Description</th>
-                        <th class="center" style="width: 10%;">Qté</th>
-                        <th class="right" style="width: 15%;">Prix unit. HT</th>
-                        <th class="center" style="width: 10%;">TVA</th>
-                        <th class="right" style="width: 20%;">Total TTC</th>
+                        <th>Description</th>
+                        <th class="center">Qté</th>
+                        <th class="right">Prix unit. HT</th>
+                        <th class="center">TVA</th>
+                        <th class="right">Total TTC</th>
                     </tr>
                 </thead>
                 <tbody>
