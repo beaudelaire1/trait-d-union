@@ -36,7 +36,7 @@
                     <span class="px-2 py-1 bg-tus-black rounded text-xs text-tus-white/60">
                         {{ template.get_category_display }}
                     </span>
-                    <span class="text-tus-white/40 text-xs">
+                    <span class="text-tus-white/60 text-xs">
                         Modifié le {{ template.updated_at|date:"d/m/Y" }}
                     </span>
                 </div>
@@ -44,7 +44,7 @@
             {% empty %}
             <div class="col-span-full text-center py-12 bg-tus-surface rounded-xl border border-tus-white/10">
                 <p class="text-tus-white/50 text-lg mb-2">Aucun template créé</p>
-                <p class="text-tus-white/40">Créez des templates depuis l'interface d'administration</p>
+                <p class="text-tus-white/60">Créez des templates depuis l'interface d'administration</p>
             </div>
             {% endfor %}
         </div>

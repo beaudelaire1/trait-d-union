@@ -1,0 +1,12 @@
+<!-- Card Glassmorphism Standard - Composant réutilisable -->
+<div class="group relative {{ extra_classes|default:'' }}">
+    <!-- Glow au hover -->
+    <div class="absolute -inset-0.5 bg-gradient-to-r from-tus-blue/50 to-tus-green/30 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+    <!-- Carte principale -->
+    <div class="relative bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-6 hover:border-tus-blue/30 transition-all duration-500">
+        <!-- Reflet en haut -->
+        <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-tus-white/20 to-transparent"></div>
+        <!-- Contenu -->
+        {{ content }}
+    </div>
+</div>

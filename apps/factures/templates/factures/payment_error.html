@@ -7,32 +7,32 @@
 <section class="min-h-screen bg-tus-black flex items-center justify-center py-20 relative overflow-hidden">
     <!-- Background effects -->
     <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-red-500/10 rounded-full blur-[150px]"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-tus-blue/10 rounded-full blur-[150px]"></div>
     </div>
 
     <div class="max-w-xl mx-auto px-6 text-center relative z-10">
         <!-- Error Icon -->
         <div class="relative w-24 h-24 mx-auto mb-8">
-            <div class="relative w-24 h-24 bg-red-500/20 rounded-full flex items-center justify-center">
-                <svg class="w-12 h-12 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="relative w-24 h-24 bg-tus-blue/20 rounded-full flex items-center justify-center">
+                <svg class="w-12 h-12 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </div>
         </div>
 
         <h1 class="font-display text-4xl font-bold text-tus-white mb-4">
-            Erreur de <span class="text-red-400">paiement</span>
+            Erreur de <span class="text-tus-blue">paiement</span>
         </h1>
         
         <p class="text-tus-white/60 text-lg mb-8">
             Une erreur est survenue lors du traitement de votre paiement.
             <br>
-            <span class="text-tus-white/50">Aucun montant n'a été débité de votre compte.</span>
+            <span class="text-tus-white/60">Aucun montant n'a été débité de votre compte.</span>
         </p>
 
         {% if error_message %}
-        <div class="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 mb-8">
-            <p class="text-red-400 text-sm">{{ error_message }}</p>
+        <div class="bg-tus-blue/10 border border-tus-blue/30 rounded-2xl p-4 mb-8">
+            <p class="text-tus-blue text-sm">{{ error_message }}</p>
         </div>
         {% endif %}
 
@@ -95,7 +95,7 @@
         </div>
 
         <!-- Back home -->
-        <p class="mt-8 text-tus-white/40 text-sm">
+        <p class="mt-8 text-tus-white/60 text-sm">
             <a href="{% url 'pages:home' %}" class="hover:text-tus-white transition-colors">← Retour à l'accueil</a>
         </p>
     </div>

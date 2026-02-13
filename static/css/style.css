@@ -8,14 +8,12 @@
     --tus-black: #07080A;
     --tus-white: #F6F7FB;
     --tus-blue: #0B2DFF;
-    --tus-blue-light: #4D6FFF; /* WCAG AA compliant sur fond #07080A (ratio 4.6:1) */
+    --tus-blue-a11y: #4D6FFF; /* WCAG AA compliant sur fond #07080A (ratio 4.6:1) */
     --tus-green: #22C55E;
     --tus-green-light: #4ADE80;
     --surface-dark: #0D1016;
     --stroke-dark: rgba(246,247,251,0.10);
-    --tus-gray: #6B7280;
-    --tus-gray-light: #9CA3AF; /* WCAG AA pour texte secondaire sur noir (ratio 5.2:1) */
-    --tus-red: #DC2626;
+    /* ❌ Couleurs hors charte supprimées : tus-gray, tus-gray-light, tus-red */
     
     /* Opacités accessibles WCAG AA (ratio min 4.5:1 sur #07080A) */
     /* text-tus-white/80 = #C5C6C9 → ratio 9.4:1 ✅ AA */
@@ -24,6 +22,41 @@
     /* ⚠️ text-tus-white/50 = #7E8087 → ratio 4.5:1 → borderline, remonter à /60 préféré */
     /* ❌ text-tus-white/40 = #656870 → ratio 3.3:1 → FAIL AA, utiliser /50 minimum */
     /* ❌ text-tus-white/30 = #4D505A → ratio 2.3:1 → FAIL AA, OK pour décoratif uniquement */
+}
+
+/* Utility classes missing from Tailwind config */
+.bg-tus-surface {
+    background-color: var(--surface-dark);
+}
+
+.font-space {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+#navbar {
+    view-transition-name: navbar;
+}
+
+.main-view-transition {
+    view-transition-name: main-content;
+}
+
+.mobile-menu-overlay {
+    background-color: #07080A !important;
+    background: linear-gradient(180deg, #07080A 0%, #000033 60%, #0B2DFF 100%) !important;
+    overflow-y: auto;
+    height: 100vh;
+}
+
+/* Accessibility overrides for legacy opacity utility classes */
+.text-tus-white\/40,
+.text-tus-white\/30 {
+    color: rgba(246, 247, 251, 0.6) !important;
+}
+
+.placeholder-tus-white\/40::placeholder,
+.placeholder-tus-white\/30::placeholder {
+    color: rgba(246, 247, 251, 0.5) !important;
 }
 
 /* ============================================
@@ -129,8 +162,8 @@ a {
    ============================================ */
 .glass {
     background: rgba(13, 16, 22, 0.8);
-    backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
 }
 
 /* ============================================
@@ -329,6 +362,114 @@ select {
     animation: float 6s ease-in-out infinite;
 }
 
+/* Ticker premium (contact page) */
+.ticker-premium {
+    animation: tickerPremium 28s linear infinite;
+    padding-left: 100%;
+}
+
+.ticker-word {
+    display: inline-block;
+    margin: 0 0.3em;
+    color: rgba(246, 247, 251, 0.7);
+    animation: wordShimmer 3s ease-in-out infinite;
+    background: linear-gradient(90deg,
+        rgba(246, 247, 251, 0.7) 0%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(246, 247, 251, 0.7) 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+@keyframes tickerPremium {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+@keyframes wordShimmer {
+    0%, 100% { background-position: 200% center; }
+    50% { background-position: -200% center; }
+}
+
+/* ============================================
+   Client Portal - Palette Enforcement
+   ============================================ */
+.client-portal {
+    background: var(--tus-black) !important;
+}
+
+.client-sidebar {
+    background: var(--surface-dark) !important;
+    border-right: 1px solid var(--stroke-dark) !important;
+}
+
+.nav-item.active {
+    background: rgba(11, 45, 255, 0.12) !important;
+    color: var(--tus-blue) !important;
+}
+
+.nav-item.active svg {
+    stroke: var(--tus-blue) !important;
+}
+
+.nav-item.logout {
+    color: rgba(246, 247, 251, 0.6) !important;
+}
+
+.nav-item.logout:hover {
+    background: rgba(246, 247, 251, 0.06) !important;
+    color: var(--tus-white) !important;
+}
+
+.client-portal .btn-client-primary,
+.client-portal .btn-primary {
+    background: var(--tus-blue) !important;
+    border-radius: 10px;
+    color: var(--tus-white) !important;
+}
+
+.client-portal .btn-client-primary:hover,
+.client-portal .btn-primary:hover {
+    background: rgba(11, 45, 255, 0.9) !important;
+    box-shadow: 0 4px 20px rgba(11, 45, 255, 0.35) !important;
+}
+
+.client-portal .status-delivered,
+.client-portal .status-accepted,
+.client-portal .status-paid {
+    background: rgba(34, 197, 94, 0.2) !important;
+    color: var(--tus-green) !important;
+}
+
+.client-portal .status-briefing,
+.client-portal .status-design,
+.client-portal .status-development,
+.client-portal .status-review,
+.client-portal .status-sent {
+    background: rgba(11, 45, 255, 0.15) !important;
+    color: var(--tus-blue) !important;
+}
+
+.client-portal .status-paused,
+.client-portal .status-expired,
+.client-portal .status-draft,
+.client-portal .status-rejected,
+.client-portal .status-overdue,
+.client-portal .status-cancelled {
+    background: rgba(246, 247, 251, 0.12) !important;
+    color: rgba(246, 247, 251, 0.7) !important;
+}
+
+.client-portal .empty-icon {
+    background: rgba(11, 45, 255, 0.12) !important;
+}
+
+.client-portal .empty-icon svg {
+    stroke: var(--tus-blue) !important;
+}
+
 /* Stagger delay utilities */
 .stagger-1 { animation-delay: 0.1s; }
 .stagger-2 { animation-delay: 0.2s; }
@@ -457,8 +598,8 @@ select {
    ============================================ */
 .navbar-scrolled {
     background-color: rgba(7, 8, 10, 0.95) !important;
-    backdrop-filter: blur(30px) saturate(180%) !important;
     -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+    backdrop-filter: blur(30px) saturate(180%) !important;
     border-color: rgba(246, 247, 251, 0.08) !important;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }

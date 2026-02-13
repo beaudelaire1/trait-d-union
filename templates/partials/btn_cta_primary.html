@@ -1,0 +1,18 @@
+<!-- Bouton CTA Primary Premium - Composant réutilisable -->
+<a href="{{ url }}" class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-700 hover:scale-[1.02] btn-glow">
+    <!-- Outer glow permanent -->
+    <span class="absolute -inset-1 bg-gradient-to-r from-tus-blue via-cyan-400 to-tus-blue rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity duration-500"></span>
+    <!-- Fond principal -->
+    <span class="absolute inset-0 bg-gradient-to-r from-tus-blue to-[#1a4aff] rounded-2xl"></span>
+    <!-- Reflet brillant -->
+    <span class="absolute inset-0 rounded-2xl overflow-hidden">
+        <span class="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 ease-out"></span>
+    </span>
+    <!-- Text + icon -->
+    <span class="relative z-10 flex items-center gap-3">
+        <span class="font-display font-bold text-lg text-tus-white">{{ text }}</span>
+        <svg class="w-5 h-5 text-tus-white group-hover:translate-x-2 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+    </span>
+</a>

@@ -143,6 +143,10 @@
                 <p class="text-4xl md:text-5xl font-display font-bold text-tus-blue mb-2">6j/7</p>
                 <p class="text-tus-white/60 text-sm">Support réactif</p>
             </div>
+            <div class="text-center">
+                <p class="text-4xl md:text-5xl font-display font-bold text-tus-green mb-2">0</p>
+                <p class="text-tus-white/60 text-sm">Plugin tiers</p>
+            </div>
         </div>
     </section>
 
@@ -155,12 +159,8 @@
             <p class="text-tus-white/70 mb-8">
                 Réservez votre appel découverte gratuit de 30 minutes.
             </p>
-            <a href="{% url 'leads:contact' %}" class="group relative inline-flex items-center gap-2">
-                <div class="absolute -inset-1 bg-gradient-to-r from-tus-blue to-[#2D5BFF] rounded-xl blur opacity-60 group-hover:opacity-100 transition duration-500"></div>
-                <span class="relative px-8 py-4 bg-tus-blue rounded-xl text-tus-white font-display font-semibold group-hover:-translate-y-0.5 transition-transform duration-300">
-                    Planifier un appel
-                </span>
-            </a>
+            {% url 'leads:contact' as contact_url %}
+            {% include 'partials/btn_cta_primary.html' with url=contact_url text='Planifier un appel' %}
         </div>
     </section>
 </div>

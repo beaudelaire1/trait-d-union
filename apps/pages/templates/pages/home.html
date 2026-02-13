@@ -30,29 +30,13 @@
             « Quand l'élégance se conçoit, la performance se déploie. »
         </p>
         
-        <p class="text-lg text-tus-white/50 max-w-3xl mx-auto mb-12 reveal" style="animation-delay: 0.3s;">
+        <p class="text-lg text-tus-white/60 max-w-3xl mx-auto mb-12 reveal" style="animation-delay: 0.3s;">
             Studio d'ingénierie web basé à <strong class="text-tus-white/70">Cayenne, Guyane française</strong>, au service des entreprises des Outre-mer (Martinique, Guadeloupe).
         </p>
         
         <div class="flex flex-col sm:flex-row gap-6 justify-center reveal" style="animation-delay: 0.4s;">
             <!-- Bouton principal ULTRA premium -->
-            <a href="/contact/" class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-700 hover:scale-[1.02] btn-glow">
-                <!-- Outer glow permanent -->
-                <span class="absolute -inset-1 bg-gradient-to-r from-tus-blue via-cyan-400 to-tus-blue rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity duration-500"></span>
-                <!-- Fond principal -->
-                <span class="absolute inset-0 bg-gradient-to-r from-tus-blue to-[#1a4aff] rounded-2xl"></span>
-                <!-- Reflet brillant -->
-                <span class="absolute inset-0 rounded-2xl overflow-hidden">
-                    <span class="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 group-hover:left-full transition-all duration-1000 ease-out"></span>
-                </span>
-                <!-- Text + icon -->
-                <span class="relative z-10 flex items-center gap-3">
-                    <span class="font-display font-bold text-lg text-tus-white">Démarrer un projet</span>
-                    <svg class="w-5 h-5 text-tus-white group-hover:translate-x-2 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                    </svg>
-                </span>
-            </a>
+            {% include 'partials/btn_cta_primary.html' with url='/contact/' text='Démarrer un projet' %}
             <!-- Bouton secondaire -->
             <a href="/portfolio/" class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-500 hover:scale-[1.02] border border-tus-white/20 hover:border-tus-blue/50 hover:bg-tus-blue/10">
                 <span class="relative z-10 font-display font-bold text-lg text-tus-white/90 group-hover:text-tus-white transition-colors">Voir nos réalisations</span>
@@ -69,7 +53,7 @@
 </section>
 
 <!-- Services Section - Clean Apple Style -->
-<section class="py-32 relative">
+<section class="py-20 relative">
     <div class="max-w-6xl mx-auto px-6">
         <div class="text-center mb-20">
             <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Nos expertises</span>
@@ -80,9 +64,8 @@
                 Une ingénierie propriétaire pour chaque projet. Pas de plugins, pas de compromis.
             </p>
             <!-- Standard TUS Badge -->
-            <div class="mt-8 reveal inline-flex items-center gap-3 px-6 py-3 rounded-full border border-tus-blue/30 bg-tus-blue/5">
-                <span class="w-2 h-2 bg-tus-blue rounded-full animate-pulse"></span>
-                <span class="text-sm font-medium text-tus-white/80">Toutes nos offres incluent le <strong class="text-tus-blue">Standard TUS</strong></span>
+            <div class="mt-8 reveal">
+                {% include 'partials/badge_standard_tus.html' %}
             </div>
         </div>
         
@@ -94,7 +77,7 @@
                 </svg>
                 <div>
                     <p class="font-semibold text-tus-white text-sm">Accès Portail Client</p>
-                    <p class="text-xs text-tus-white/50">Suivi temps réel sécurisé</p>
+                    <p class="text-xs text-tus-white/60">Suivi temps réel sécurisé</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 p-4 rounded-xl border border-tus-green/20 bg-tus-green/5">
@@ -103,7 +86,7 @@
                 </svg>
                 <div>
                     <p class="font-semibold text-tus-white text-sm">Performance Grade A</p>
-                    <p class="text-xs text-tus-white/50">Architecture légère native</p>
+                    <p class="text-xs text-tus-white/60">Architecture légère native</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 p-4 rounded-xl border border-tus-green/20 bg-tus-green/5">
@@ -112,7 +95,7 @@
                 </svg>
                 <div>
                     <p class="font-semibold text-tus-white text-sm">Sécurité Zero-Plugin</p>
-                    <p class="text-xs text-tus-white/50">Code propriétaire auditable</p>
+                    <p class="text-xs text-tus-white/60">Code propriétaire auditable</p>
                 </div>
             </div>
         </div>
@@ -203,7 +186,7 @@
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Suivi projet en temps réel</p>
-                            <p class="text-sm text-tus-white/50">Visualisez chaque étape, progression et délais de votre projet</p>
+                            <p class="text-sm text-tus-white/60">Visualisez chaque étape, progression et délais de votre projet</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3 reveal">
@@ -212,7 +195,7 @@
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Tableau de bord unifié</p>
-                            <p class="text-sm text-tus-white/50">Tous vos projets, devis et factures centralisés</p>
+                            <p class="text-sm text-tus-white/60">Tous vos projets, devis et factures centralisés</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3 reveal">
@@ -221,7 +204,7 @@
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Transparence radicale</p>
-                            <p class="text-sm text-tus-white/50">Historique complet des échanges et validations</p>
+                            <p class="text-sm text-tus-white/60">Historique complet des échanges et validations</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3 reveal">
@@ -230,7 +213,7 @@
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Sécurité industrielle</p>
-                            <p class="text-sm text-tus-white/50">Accès privé, données chiffrées, conformité RGPD</p>
+                            <p class="text-sm text-tus-white/60">Accès privé, données chiffrées, conformité RGPD</p>
                         </div>
                     </li>
                 </ul>

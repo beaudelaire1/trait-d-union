@@ -116,7 +116,7 @@
                     <div class="space-y-3">
                         {% for activity in activities %}
                         <div class="flex items-center space-x-3 text-sm">
-                            <span class="text-tus-white/40">{{ activity.created_at|date:"d/m/Y H:i" }}</span>
+                            <span class="text-tus-white/60">{{ activity.created_at|date:"d/m/Y H:i" }}</span>
                             <span class="px-2 py-0.5 bg-tus-white/5 rounded text-tus-white/70">{{ activity.get_activity_type_display }}</span>
                             <span class="text-tus-white/60">{{ activity.description }}</span>
                         </div>
