@@ -9,12 +9,6 @@ from typing import TYPE_CHECKING
 from django.conf import settings
 from django.template.loader import render_to_string
 
-try:
-    from weasyprint import HTML, CSS
-    WEASYPRINT_AVAILABLE = True
-except ImportError:
-    WEASYPRINT_AVAILABLE = False
-
 if TYPE_CHECKING:
     from apps.devis.models import Quote
     from apps.factures.models import Invoice
@@ -52,16 +46,52 @@ class DocumentGenerator:
     
     @classmethod
     def _render_pdf(cls, html_content: str) -> bytes:
-        """Convertit du HTML en PDF."""
-        if not WEASYPRINT_AVAILABLE:
+        """Convertit du HTML en PDF avec fallback pour les fonts offline."""
+        try:
+            from weasyprint import HTML, CSS
+        except Exception as exc:
             raise ImportError(
                 "WeasyPrint n'est pas installé. "
                 "Installez-le avec: pip install weasyprint"
-            )
+            ) from exc
+
+        # Remplacer Google Fonts par fallback CSS local pour éviter timeouts sur Render
+        html_content = cls._patch_fonts(html_content)
         
-        html = HTML(string=html_content, base_url=settings.BASE_DIR)
-        pdf_bytes = html.write_pdf()
-        return pdf_bytes
+        try:
+            html = HTML(string=html_content, base_url=settings.BASE_DIR)
+            pdf_bytes = html.write_pdf(timeout=30)  # 30s timeout pour Render
+            return pdf_bytes
+        except Exception as e:
+            logger.error(f"Erreur WeasyPrint: {e}", exc_info=True)
+            raise RuntimeError(f"Erreur lors de la génération du PDF: {str(e)}") from e
+    
+    @classmethod
+    def _patch_fonts(cls, html_content: str) -> str:
+        """Remplace les imports Google Fonts par CSS avec fallbacks locaux."""
+        # Remplacer l'import Google Fonts par un CSS local
+        google_fonts_import = "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');"
+        
+        # CSS fallback utilisant des fonts système
+        local_fonts_css = """
+        @font-face {
+            font-family: 'Inter';
+            font-weight: 400;
+            src: local('Inter'), local('Helvetica Neue'), system-ui, -apple-system, sans-serif;
+        }
+        @font-face {
+            font-family: 'Space Grotesk';
+            font-weight: 600;
+            font-weight: 700;
+            src: local('Space Grotesk'), local('Arial'), system-ui, -apple-system, sans-serif;
+        }
+        """
+        
+        html_content = html_content.replace(
+            google_fonts_import,
+            local_fonts_css
+        )
+        return html_content
     
     @classmethod
     def generate_quote_pdf(cls, quote: "Quote", attach: bool = True) -> bytes:

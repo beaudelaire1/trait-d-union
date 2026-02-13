@@ -26,13 +26,15 @@ logger = logging.getLogger(__name__)
 def create_invoice(request, quote_id: int):
     """
     Crée une facture à partir d'un devis existant.
-    Approche directe via le modèle Invoice.
+    Utilise le service de conversion Quote → Invoice.
     """
     quote = get_object_or_404(Quote, pk=quote_id)
     
     try:
-        # Création de la facture via la méthode de classe du modèle
-        invoice = Invoice.create_from_quote(quote)
+        # Création de la facture via le service dédi é
+        from apps.devis.services import create_invoice_from_quote
+        result = create_invoice_from_quote(quote)
+        invoice = result.invoice
         
         # Génération du PDF
         invoice.generate_pdf(attach=True)
@@ -44,6 +46,7 @@ def create_invoice(request, quote_id: int):
             messages.warning(request, "Attention : la facture créée ne contient aucune ligne.")
             
     except Exception as e:
+        logger.error(f"Erreur lors de la création de facture depuis devis {quote_id}: {e}", exc_info=True)
         messages.error(request, f"Erreur lors de la création de la facture : {str(e)}")
         
     return redirect(reverse("factures:archive"))

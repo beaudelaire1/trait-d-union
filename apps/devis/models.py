@@ -216,6 +216,25 @@ class Quote(models.Model):
     # Date de paiement de l'acompte
     deposit_paid_at = models.DateTimeField(null=True, blank=True)
 
+    # Champs additionnels pour les options du service
+    included_support_months = models.IntegerField(
+        default=0,
+        help_text="Nombre de mois de support inclus"
+    )
+    installment_plan = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Plan d'échelonnement (ex: '3x', '12x')"
+    )
+    money_back_guarantee = models.BooleanField(
+        default=False,
+        help_text="Garantie satisfait ou remboursé"
+    )
+    unlimited_revisions = models.BooleanField(
+        default=False,
+        help_text="Révisions illimitées incluses"
+    )
+
     def amount_letter(self):
         """Montant TTC en toutes lettres (affiché sur le PDF devis)."""
         return f"{_num2words_fr(self.total_ttc).title()} euros"

@@ -566,24 +566,22 @@
                         <tr>
                             <td>
                                 <div class="item-description">{{ item.description }}</div>
-                                {% if item.detail %}<div class="item-detail">{{ item.detail }}</div>{% endif %}
                             </td>
                             <td class="center">{{ item.quantity }}</td>
                             <td class="right amount-cell">{{ item.unit_price|floatformat:2 }} €</td>
-                            <td class="center">{{ item.vat_rate|default:"20"|floatformat:0 }}%</td>
+                            <td class="center">{{ item.tax_rate|default:"20"|floatformat:2 }}%</td>
                             <td class="right amount-cell">{{ item.total_ttc|floatformat:2 }} €</td>
                         </tr>
                         {% endfor %}
                     {% elif invoice.quote %}
-                        {% for item in invoice.quote.items.all %}
+                        {% for item in invoice.quote.quote_items.all %}
                         <tr>
                             <td>
                                 <div class="item-description">{{ item.description }}</div>
-                                {% if item.detail %}<div class="item-detail">{{ item.detail }}</div>{% endif %}
                             </td>
                             <td class="center">{{ item.quantity }}</td>
                             <td class="right amount-cell">{{ item.unit_price|floatformat:2 }} €</td>
-                            <td class="center">{{ item.vat_rate|default:"20"|floatformat:0 }}%</td>
+                            <td class="center">{{ item.tax_rate|default:"20"|floatformat:2 }}%</td>
                             <td class="right amount-cell">{{ item.total_ttc|floatformat:2 }} €</td>
                         </tr>
                         {% endfor %}
@@ -655,23 +653,23 @@
                     <div class="footer-col">
                         <h5>Contact</h5>
                         <p>
-                            {{ branding.address }}<br>
-                            {{ branding.zip_code }} {{ branding.city }}<br>
-                            {{ branding.phone }}
+                            {% if branding.address %}{{ branding.address }}<br>{% endif %}
+                            {% if branding.zip_code or branding.city %}{{ branding.zip_code }} {{ branding.city }}<br>{% endif %}
+                            {% if branding.phone %}{{ branding.phone }}{% endif %}
                         </p>
                     </div>
                     <div class="footer-col">
                         <h5>Légal</h5>
                         <p>
-                            <span class="highlight">SIRET:</span> {{ branding.siret }}<br>
-                            <span class="highlight">TVA:</span> {{ branding.tva_intra }}
+                            {% if branding.siret %}<span class="highlight">SIRET:</span> {{ branding.siret }}<br>{% endif %}
+                            {% if branding.tva_intra %}<span class="highlight">TVA:</span> {{ branding.tva_intra }}{% endif %}
                         </p>
                     </div>
                     <div class="footer-col">
                         <h5>Banque</h5>
                         <p>
-                            <span class="highlight">IBAN:</span> {{ branding.iban }}<br>
-                            <span class="highlight">BIC:</span> {{ branding.bic }}
+                            {% if branding.iban %}<span class="highlight">IBAN:</span> {{ branding.iban }}<br>{% endif %}
+                            {% if branding.bic %}<span class="highlight">BIC:</span> {{ branding.bic }}{% endif %}
                         </p>
                     </div>
                 </div>
