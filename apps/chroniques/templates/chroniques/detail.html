@@ -14,16 +14,19 @@
         </a>
 
         <h1 class="text-3xl md:text-4xl font-display font-bold mb-4 text-tus-white">{{ article.title }}</h1>
+        {% if article.excerpt %}
+        <p class="text-tus-white/70 text-base md:text-lg mb-3">{{ article.excerpt }}</p>
+        {% endif %}
         <div class="text-tus-white/60 text-sm mb-8">Publié le {{ article.publish_date|date:'d/m/Y' }}</div>
 
         {% if article.cover_image %}
-        <div class="rounded-2xl overflow-hidden border border-tus-white/10 mb-8">
-            <img src="{{ article.cover_image.url }}" alt="{{ article.title }}" class="w-full h-auto">
+        <div class="rounded-2xl overflow-hidden border border-tus-white/10 mb-8 aspect-video bg-tus-white/5">
+            <img src="{{ article.cover_image.url }}" alt="{{ article.title }}" class="w-full h-full object-cover">
         </div>
         {% endif %}
 
-        <div class="prose prose-invert max-w-none">
-            {{ article.body|linebreaksbr }}
+        <div class="article-content max-w-none">
+            {{ article.body|safe|linebreaksbr }}
         </div>
     </div>
 </div>

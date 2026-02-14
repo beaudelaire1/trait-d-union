@@ -1,0 +1,40 @@
+.tox.tox-tinymce {
+  border-radius: 12px;
+  border: 1px solid rgba(246, 247, 251, 0.1);
+  box-shadow: none;
+}
+
+.tox .tox-edit-area__iframe {
+  background: #0D1016;
+}
+
+.tox .tox-toolbar,
+.tox .tox-toolbar__primary,
+.tox .tox-toolbar__overflow,
+.tox .tox-menubar {
+  background: #0D1016;
+  border-bottom: 1px solid rgba(246, 247, 251, 0.08);
+}
+
+.tox .tox-tbtn {
+  color: #F6F7FB;
+}
+
+.tox .tox-tbtn svg {
+  fill: #F6F7FB;
+}
+
+.tox .tox-tbtn:hover {
+  background: rgba(11, 45, 255, 0.12);
+}
+
+.tox .tox-statusbar {
+  background: #0D1016;
+  border-top: 1px solid rgba(246, 247, 251, 0.08);
+  color: rgba(246, 247, 251, 0.7);
+}
+
+.tox .tox-statusbar__path-item,
+.tox .tox-statusbar__wordcount {
+  color: rgba(246, 247, 251, 0.7);
+}

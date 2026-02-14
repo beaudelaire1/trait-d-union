@@ -86,4 +86,61 @@
     @apply focus:outline-none focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/20;
     @apply transition-all duration-300;
   }
+
+  .article-content {
+    color: rgba(246, 247, 251, 0.86);
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+
+  .article-content p {
+    margin: 0 0 1.25rem;
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  .article-content h2 {
+    margin: 2.2rem 0 1rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #F6F7FB;
+  }
+
+  .article-content h3 {
+    margin: 1.8rem 0 0.8rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #F6F7FB;
+  }
+
+  .article-content ul,
+  .article-content ol {
+    padding-left: 1.4rem;
+    margin: 0 0 1.25rem;
+  }
+
+  .article-content li {
+    margin-bottom: 0.5rem;
+  }
+
+  .article-content a {
+    color: #0B2DFF;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .article-content strong {
+    font-weight: 700;
+    color: #F6F7FB;
+  }
+
+  .article-content em {
+    font-style: italic;
+    color: rgba(246, 247, 251, 0.9);
+  }
+
+  .article-content u {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
