@@ -11,7 +11,7 @@ from apps.leads.email_models import EmailTemplate
 SIGNATURE = '''
 <hr style="border: none; border-top: 1px solid rgba(246, 247, 251, 0.1); margin: 30px 0;">
 <p style="margin: 0;"><strong>L'équipe Trait d'Union Studio</strong></p>
-<p style="margin: 5px 0; color: rgba(246, 247, 251, 0.7);"><em>Design & Développement Web Premium</em></p>
+<p style="margin: 5px 0; color: rgba(246, 247, 251, 0.7);"><em>Architecture Digitale</em></p>
 <p style="margin: 10px 0;">
     🌐 <a href="https://www.traitdunion.it" style="color: #0B2DFF;">www.traitdunion.it</a><br>
     📧 <a href="mailto:contact@traitdunion.it" style="color: #0B2DFF;">contact@traitdunion.it</a><br>
@@ -28,7 +28,8 @@ for template in EmailTemplate.objects.all():
         old_signatures = [
             "<p><strong>L'équipe Trait d'Union Studio</strong></p>",
             "<p><strong>L'équipe Trait d'Union Studio</strong><br>",
-            "<em>Design & Développement Web Premium</em></p>",
+            "<em>Développement Web</em></p>",
+            "<em>Architecture Digitale</em></p>",
         ]
         for old_sig in old_signatures:
             body = body.replace(old_sig, '')

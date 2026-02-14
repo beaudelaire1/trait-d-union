@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # Branding par défaut pour TUS
 DEFAULT_BRANDING = {
     'name': 'Trait d\'Union Studio',
-    'tagline': 'Agence Web & Digitale',
+    'tagline': 'Architecture Digitale & Design',
     'address': '258 Av Justin Catayée Rte de la Madeleine',
     'city': 'Cayenne',
     'zip_code': '97300',

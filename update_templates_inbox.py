@@ -21,14 +21,13 @@ Trait d'Union Studio
 # Template Prospection initiale - format simple
 PROSPECTION_SIMPLE = f'''<p>Bonjour,</p>
 
-<p>Je vous contacte au nom de Trait d'Union Studio (TUS). Nous accompagnons des entreprises en Guyane et aux Antilles dans leur transformation digitale, avec une approche qui va au-delà d'une agence web classique : nous concevons des outils concrets qui améliorent l'organisation, le suivi client et la performance au quotidien.</p>
+<p>Je vous contacte au nom de Trait d'Union Studio (TUS). Nous accompagnons des entreprises en Guyane et aux Antilles dans leur transformation digitale : nous concevons des outils concrets qui améliorent l'organisation, le suivi client et la performance au quotidien.</p>
 
 <p>Concrètement, nous pouvons vous aider sur :</p>
 
 <p>• Sites web sur mesure (rapides, fiables, orientés résultats)<br>
 • E-commerce : parcours d'achat optimisé, gestion produits/commandes, paiement, suivi<br>
-• Applications web & outils internes (mini-ERP) : devis/facturation, CRM, suivi des prestations, tableaux de bord, espaces client/équipe, automatisations<br>
-• Identité & design premium : une image cohérente et professionnelle qui vous différencie</p>
+• Applications web & outils internes (mini-ERP) : devis/facturation, CRM, suivi des prestations, tableaux de bord, espaces client/équipe, automatisations</p>
 
 <p>Notre objectif n'est pas seulement "d'être présent en ligne", mais de mettre en place un écosystème digital utile, pensé pour vous faire gagner du temps et soutenir votre croissance.</p>
 

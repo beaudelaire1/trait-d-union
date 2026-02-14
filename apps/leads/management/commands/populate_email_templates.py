@@ -7,7 +7,7 @@ from apps.leads.email_models import EmailTemplate, EmailTemplateCategory
 SIGNATURE = '''
 <hr style="border: none; border-top: 1px solid rgba(246, 247, 251, 0.1); margin: 30px 0;">
 <p style="margin: 0;"><strong>L'équipe Trait d'Union Studio</strong></p>
-<p style="margin: 5px 0; color: rgba(246, 247, 251, 0.7);"><em>Design & Développement Web Premium</em></p>
+<p style="margin: 5px 0; color: rgba(246, 247, 251, 0.7);"><em>Architecture Digitale</em></p>
 <p style="margin: 10px 0;">
     🌐 <a href="https://www.traitdunion.it" style="color: #0B2DFF;">www.traitdunion.it</a><br>
     📧 <a href="mailto:contact@traitdunion.it" style="color: #0B2DFF;">contact@traitdunion.it</a><br>
@@ -31,7 +31,7 @@ class Command(BaseCommand):
                 'body_html': f'''
 <p>Bonjour,</p>
 
-<p>Je vous contacte au nom de <strong>Trait d'Union Studio (TUS)</strong>. Nous accompagnons des entreprises en <strong>Guyane et aux Antilles</strong> dans leur transformation digitale, avec une approche qui va <strong>au-delà d'une agence web classique</strong> : nous concevons des <strong>outils concrets</strong> qui améliorent l'organisation, le suivi client et la performance au quotidien.</p>
+<p>Je vous contacte au nom de <strong>Trait d'Union Studio (TUS)</strong>. Nous accompagnons des entreprises en <strong>Guyane et aux Antilles</strong> dans leur transformation digitale : nous concevons des <strong>outils concrets</strong> qui améliorent l'organisation, le suivi client et la performance au quotidien.</p>
 
 <p>Concrètement, nous pouvons vous aider sur :</p>
 <ul>
@@ -369,11 +369,11 @@ class Command(BaseCommand):
 
 <p>Votre site web est un <strong>investissement précieux</strong>. Il mérite d'être chouchouté !</p>
 
-<p>🛡️ <strong>Notre Pack Maintenance Premium :</strong></p>
+<p>🛡️ <strong>Notre Pack Maintenance :</strong></p>
 <ul>
     <li>✓ Mises à jour de sécurité mensuelles</li>
     <li>✓ Sauvegardes automatiques quotidiennes</li>
-    <li>✓ Monitoring 24/7</li>
+    <li>✓ Monitoring actif</li>
     <li>✓ Support prioritaire</li>
     <li>✓ Petites modifications incluses (2h/mois)</li>
 </ul>

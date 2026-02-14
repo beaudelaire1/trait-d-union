@@ -228,7 +228,7 @@ class Quote(models.Model):
     )
     money_back_guarantee = models.BooleanField(
         default=False,
-        help_text="Garantie satisfait ou remboursé"
+        help_text="Condition de remboursement"
     )
     unlimited_revisions = models.BooleanField(
         default=False,
