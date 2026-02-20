@@ -46,12 +46,14 @@ L'équipe Trait d'Union Studio
 def send_invoice_payment_confirmation_email(invoice, is_partial=False):
     """Send confirmation email after invoice payment."""
     try:
+        remaining_balance = invoice.total_ttc - (invoice.amount_paid or 0)
         context = {
             'invoice': invoice,
             'is_partial': is_partial,
             'client_name': invoice.quote.client.full_name if invoice.quote else 'Client',
             'invoice_number': invoice.number,
             'amount': invoice.amount_paid,
+            'remaining_balance': remaining_balance,
             'site_url': settings.SITE_URL,
         }
         

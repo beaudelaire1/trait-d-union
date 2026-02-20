@@ -26,7 +26,7 @@
                 
                 <p class="amount">{{ amount }}€ reçu</p>
                 
-                <p>Solde restant : <strong>{{ invoice.total_ttc|floatformat:2|sub:amount|floatformat:2 }}€</strong></p>
+                <p>Solde restant : <strong>{{ remaining_balance|floatformat:2 }}€</strong></p>
                 
                 <p>Merci pour ce versement. Nous restons à votre disposition pour tout complément.</p>
             {% else %}
