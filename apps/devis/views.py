@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 from django.utils import timezone
@@ -93,7 +94,7 @@ def admin_quote_edit(request, pk):
                 result = create_invoice_from_quote(quote)
                 invoice = result.invoice
                 messages.success(request, f"Converti en facture : {invoice.number}")
-                return redirect(f"/admin/factures/invoice/{invoice.pk}/change/")
+                return redirect(reverse("admin:factures_invoice_change", args=[invoice.pk]))
             return redirect("devis:admin_quote_edit", pk=quote.pk)
     else:
         form = QuoteAdminForm(instance=quote)
