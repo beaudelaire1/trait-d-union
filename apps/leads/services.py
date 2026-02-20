@@ -112,7 +112,7 @@ class EmailService:
                     {'label': 'URL existante', 'value': lead.existing_url or '—'},
                     {'label': 'IP', 'value': lead.ip_address or '—'},
                 ],
-                'action_url': f"{site_url}/admin/leads/lead/{lead.pk}/change/",
+                'action_url': f"{site_url}/tus-gestion-secure/leads/lead/{lead.pk}/change/",
                 'action_label': 'Voir dans l\'admin',
                 'reference': f"LEAD-{lead.pk}",
             },

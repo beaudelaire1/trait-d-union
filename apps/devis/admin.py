@@ -112,7 +112,7 @@ class QuoteAdmin(admin.ModelAdmin):
         quote = get_object_or_404(Quote, pk=pk)
         invoice = quote.convert_to_invoice()
         self.message_user(request, f"Devis converti en facture : {invoice.number}", level=messages.SUCCESS)
-        return redirect(f"/admin/factures/invoice/{invoice.pk}/change/")
+        return redirect(reverse("admin:factures_invoice_change", args=[invoice.pk]))
 
     @admin.action(description="📄 Générer le devis en PDF")
     def action_generate_pdf(self, request, queryset):

@@ -76,7 +76,7 @@ def send_quote_request_received(self, quote_request_id: int) -> None:
 
     site_url = getattr(settings, "SITE_URL", "http://localhost:8000").rstrip("/")
     admin_dashboard_url = site_url + "/dashboard/"
-    admin_request_url = site_url + "/admin/devis/quoterequest/"
+    admin_request_url = site_url + "/tus-gestion-secure/devis/quoterequest/"
 
     # -------------------------
     # 1) Email client (confirmation)
