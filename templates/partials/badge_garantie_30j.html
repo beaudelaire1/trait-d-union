@@ -1,0 +1,85 @@
+{% load static %}
+<!-- Section CTA + Garantie 30 Jours — Flux continu premium -->
+<section class="relative overflow-hidden">
+
+    <!-- Transition gradient haut : fondu depuis la section précédente -->
+    <div class="h-24 bg-gradient-to-b from-transparent to-tus-blue/[0.04]"></div>
+
+    <!-- Zone principale -->
+    <div class="relative pb-32 pt-12" style="background: linear-gradient(180deg, rgba(11,45,255,0.04) 0%, rgba(11,45,255,0.12) 40%, rgba(11,45,255,0.06) 70%, transparent 100%);">
+
+        <!-- Blobs lumineux -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-tus-blue/10 rounded-full blur-[180px]"></div>
+            <div class="absolute bottom-20 right-0 w-[400px] h-[400px] bg-tus-green/8 rounded-full blur-[140px]"></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10">
+
+            <!-- Bloc garantie premium (badge dominant, sans rond décoratif) -->
+            <div class="reveal mb-12">
+                <div class="group relative max-w-4xl mx-auto rounded-3xl border border-tus-white/10 bg-tus-white/[0.03] backdrop-blur-sm p-8 md:p-10">
+                    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-tus-white/20 to-transparent"></div>
+
+                    <div class="grid md:grid-cols-[220px_1fr] gap-8 items-center">
+                        <div class="relative mx-auto">
+                            <div class="absolute -inset-5 bg-gradient-to-br from-tus-green/25 to-tus-blue/20 rounded-full blur-2xl opacity-60 group-hover:opacity-90 transition-opacity duration-500"></div>
+                            <div class="relative w-44 h-44 md:w-52 md:h-52 rounded-full overflow-hidden ring-1 ring-tus-white/15">
+                                <img
+                                    src="{% static 'img/badge.png' %}"
+                                    alt="Badge Garantie 30 jours après mise en production"
+                                    class="w-full h-full object-cover scale-[1.06] mix-blend-multiply contrast-125 brightness-110 drop-shadow-[0_0_30px_rgba(34,197,94,0.24)] transition-transform duration-500 group-hover:scale-[1.1]"
+                                    loading="lazy"
+                                    width="208"
+                                    height="208"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="text-center md:text-left">
+                            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-tus-green/10 border border-tus-green/20 mb-4">
+                                <span class="w-1.5 h-1.5 bg-tus-green rounded-full animate-pulse"></span>
+                                <span class="text-xs font-display font-medium text-tus-green tracking-wide">Garantie 30 jours après mise en production</span>
+                            </span>
+
+                            <p class="text-tus-white/80 text-lg md:text-xl leading-relaxed">
+                                Votre plateforme ne s'arrête pas à la livraison. 30 jours d'accompagnement pour transformer le projet livré en outil opérationnel : formation, ajustements en contexte réel, support dédié.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-tus-green/20 to-transparent"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-center mb-12 reveal" style="animation-delay: 0.15s;">
+                <p class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-tus-green/40 bg-tus-green/10 text-lg md:text-2xl font-display font-bold tracking-wide text-tus-green animate-pulse animate-pulse-glow">
+                    <span class="w-1.5 h-1.5 bg-tus-green rounded-full"></span>
+                    Satisfait ou remboursé
+                </p>
+            </div>
+
+            <div class="flex justify-center my-14 reveal" style="animation-delay: 0.2s;">
+                <div class="w-16 h-px bg-gradient-to-r from-transparent via-tus-white/15 to-transparent"></div>
+            </div>
+
+            <!-- CTA — continuité naturelle -->
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-8 text-center reveal" style="animation-delay: 0.25s;">
+                Prêt à transformer<br>
+                <span class="text-tus-blue">votre vision</span> en réalité ?
+            </h2>
+            <p class="text-xl text-tus-white/60 mb-12 max-w-xl mx-auto text-center reveal" style="animation-delay: 0.3s;">
+                Discutons de votre projet et créons ensemble une expérience digitale à votre mesure.
+            </p>
+            <div class="text-center reveal" style="animation-delay: 0.35s;">
+                <a href="/contact/" class="group inline-flex items-center gap-3 bg-tus-white text-tus-black px-10 py-5 rounded-2xl font-display font-bold text-lg hover:bg-tus-blue hover:text-tus-white transition-all duration-300 hover:scale-105 animate-pulse-glow">
+                    Contactez-nous
+                    <svg class="w-5 h-5 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>
