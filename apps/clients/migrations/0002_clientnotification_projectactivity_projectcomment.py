@@ -5,6 +5,13 @@ from django.conf import settings
 from django.db import migrations, models
 
 
+def create_client_notification_table_if_missing(apps, schema_editor):
+    ClientNotification = apps.get_model('clients', 'ClientNotification')
+    if ClientNotification._meta.db_table in schema_editor.connection.introspection.table_names():
+        return
+    schema_editor.create_model(ClientNotification)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -13,24 +20,29 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='ClientNotification',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('notification_type', models.CharField(choices=[('quote', 'Nouveau devis'), ('invoice', 'Nouvelle facture'), ('project', 'Mise à jour projet'), ('document', 'Nouveau document'), ('message', 'Message')], default='message', max_length=20, verbose_name='Type')),
-                ('title', models.CharField(max_length=200, verbose_name='Titre')),
-                ('message', models.TextField(verbose_name='Message')),
-                ('related_url', models.CharField(blank=True, max_length=255, verbose_name='URL associée')),
-                ('read', models.BooleanField(default=False, verbose_name='Lu')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notifications', to='clients.clientprofile', verbose_name='Client')),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.CreateModel(
+                    name='ClientNotification',
+                    fields=[
+                        ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                        ('notification_type', models.CharField(choices=[('quote', 'Nouveau devis'), ('invoice', 'Nouvelle facture'), ('project', 'Mise à jour projet'), ('document', 'Nouveau document'), ('message', 'Message')], default='message', max_length=20, verbose_name='Type')),
+                        ('title', models.CharField(max_length=200, verbose_name='Titre')),
+                        ('message', models.TextField(verbose_name='Message')),
+                        ('related_url', models.CharField(blank=True, max_length=255, verbose_name='URL associée')),
+                        ('read', models.BooleanField(default=False, verbose_name='Lu')),
+                        ('created_at', models.DateTimeField(auto_now_add=True)),
+                        ('client', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notifications', to='clients.clientprofile', verbose_name='Client')),
+                    ],
+                    options={
+                        'verbose_name': 'Notification',
+                        'verbose_name_plural': 'Notifications',
+                        'ordering': ['-created_at'],
+                    },
+                ),
             ],
-            options={
-                'verbose_name': 'Notification',
-                'verbose_name_plural': 'Notifications',
-                'ordering': ['-created_at'],
-            },
         ),
+        migrations.RunPython(create_client_notification_table_if_missing, migrations.RunPython.noop),
         migrations.CreateModel(
             name='ProjectActivity',
             fields=[
