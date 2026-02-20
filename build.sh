@@ -7,6 +7,9 @@
 
 set -o errexit  # Exit immédiatement si une commande échoue
 
+# Forcer l'utilisation de la configuration production
+export DJANGO_SETTINGS_MODULE=config.settings.production
+
 echo "=========================================="
 echo "🚀 TRAIT D'UNION STUDIO - Build Script"
 echo "=========================================="
