@@ -12,6 +12,20 @@ def create_client_notification_table_if_missing(apps, schema_editor):
     schema_editor.create_model(ClientNotification)
 
 
+def create_project_activity_table_if_missing(apps, schema_editor):
+    ProjectActivity = apps.get_model('clients', 'ProjectActivity')
+    if ProjectActivity._meta.db_table in schema_editor.connection.introspection.table_names():
+        return
+    schema_editor.create_model(ProjectActivity)
+
+
+def create_project_comment_table_if_missing(apps, schema_editor):
+    ProjectComment = apps.get_model('clients', 'ProjectComment')
+    if ProjectComment._meta.db_table in schema_editor.connection.introspection.table_names():
+        return
+    schema_editor.create_model(ProjectComment)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -43,43 +57,53 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.RunPython(create_client_notification_table_if_missing, migrations.RunPython.noop),
-        migrations.CreateModel(
-            name='ProjectActivity',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('activity_type', models.CharField(choices=[('status_change', '🔄 Changement de statut'), ('progress_update', '📊 Mise à jour progression'), ('milestone_completed', '✅ Jalon terminé'), ('document_added', '📄 Document ajouté'), ('comment_added', '💬 Commentaire'), ('delivery', '🚀 Livraison'), ('feedback', '📝 Retour client'), ('meeting', '📅 Réunion')], max_length=30, verbose_name="Type d'activité")),
-                ('title', models.CharField(max_length=200, verbose_name='Titre')),
-                ('description', models.TextField(blank=True, verbose_name='Description')),
-                ('is_client_visible', models.BooleanField(default=True, verbose_name='Visible par le client')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('milestone', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='activities', to='clients.projectmilestone', verbose_name='Jalon associé')),
-                ('performed_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='project_activities', to=settings.AUTH_USER_MODEL, verbose_name='Effectué par')),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='activities', to='clients.project', verbose_name='Projet')),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.CreateModel(
+                    name='ProjectActivity',
+                    fields=[
+                        ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                        ('activity_type', models.CharField(choices=[('status_change', '🔄 Changement de statut'), ('progress_update', '📊 Mise à jour progression'), ('milestone_completed', '✅ Jalon terminé'), ('document_added', '📄 Document ajouté'), ('comment_added', '💬 Commentaire'), ('delivery', '🚀 Livraison'), ('feedback', '📝 Retour client'), ('meeting', '📅 Réunion')], max_length=30, verbose_name="Type d'activité")),
+                        ('title', models.CharField(max_length=200, verbose_name='Titre')),
+                        ('description', models.TextField(blank=True, verbose_name='Description')),
+                        ('is_client_visible', models.BooleanField(default=True, verbose_name='Visible par le client')),
+                        ('created_at', models.DateTimeField(auto_now_add=True)),
+                        ('milestone', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='activities', to='clients.projectmilestone', verbose_name='Jalon associé')),
+                        ('performed_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='project_activities', to=settings.AUTH_USER_MODEL, verbose_name='Effectué par')),
+                        ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='activities', to='clients.project', verbose_name='Projet')),
+                    ],
+                    options={
+                        'verbose_name': 'Activité projet',
+                        'verbose_name_plural': 'Activités projet',
+                        'ordering': ['-created_at'],
+                    },
+                ),
             ],
-            options={
-                'verbose_name': 'Activité projet',
-                'verbose_name_plural': 'Activités projet',
-                'ordering': ['-created_at'],
-            },
         ),
-        migrations.CreateModel(
-            name='ProjectComment',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('message', models.TextField(verbose_name='Message')),
-                ('attachment', models.FileField(blank=True, null=True, upload_to='projects/comments/%Y/%m/', verbose_name='Pièce jointe')),
-                ('is_internal', models.BooleanField(default=False, verbose_name='Note interne (invisible client)')),
-                ('read_by_client', models.BooleanField(default=False, verbose_name='Lu par le client')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='project_comments', to=settings.AUTH_USER_MODEL, verbose_name='Auteur')),
-                ('milestone', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='comments', to='clients.projectmilestone', verbose_name='Jalon associé')),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='clients.project', verbose_name='Projet')),
+        migrations.RunPython(create_project_activity_table_if_missing, migrations.RunPython.noop),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.CreateModel(
+                    name='ProjectComment',
+                    fields=[
+                        ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                        ('message', models.TextField(verbose_name='Message')),
+                        ('attachment', models.FileField(blank=True, null=True, upload_to='projects/comments/%Y/%m/', verbose_name='Pièce jointe')),
+                        ('is_internal', models.BooleanField(default=False, verbose_name='Note interne (invisible client)')),
+                        ('read_by_client', models.BooleanField(default=False, verbose_name='Lu par le client')),
+                        ('created_at', models.DateTimeField(auto_now_add=True)),
+                        ('updated_at', models.DateTimeField(auto_now=True)),
+                        ('author', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='project_comments', to=settings.AUTH_USER_MODEL, verbose_name='Auteur')),
+                        ('milestone', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='comments', to='clients.projectmilestone', verbose_name='Jalon associé')),
+                        ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='clients.project', verbose_name='Projet')),
+                    ],
+                    options={
+                        'verbose_name': 'Commentaire projet',
+                        'verbose_name_plural': 'Commentaires projet',
+                        'ordering': ['created_at'],
+                    },
+                ),
             ],
-            options={
-                'verbose_name': 'Commentaire projet',
-                'verbose_name_plural': 'Commentaires projet',
-                'ordering': ['created_at'],
-            },
         ),
+        migrations.RunPython(create_project_comment_table_if_missing, migrations.RunPython.noop),
     ]
