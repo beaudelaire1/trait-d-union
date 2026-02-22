@@ -49,7 +49,22 @@
                 <h2>Connexion</h2>
                 <p class="auth-subtitle">Bienvenue ! Connectez-vous à votre espace.</p>
                 
-                {% if form.errors %}
+                {% if form.non_field_errors %}
+                {% with form.non_field_errors|striptags as error_text %}
+                <div class="auth-error">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    {% if "verification de securite" in error_text %}
+                    <span>{{ error_text }}</span>
+                    {% else %}
+                    <span>Email ou mot de passe incorrect</span>
+                    {% endif %}
+                </div>
+                {% endwith %}
+                {% elif form.errors %}
                 <div class="auth-error">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -101,6 +116,22 @@
                     {% if redirect_field_value %}
                     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
                     {% endif %}
+
+                    {% if turnstile_site_key or recaptcha_site_key %}
+                    <div class="captcha-block">
+                        {% if turnstile_site_key %}
+                        <div id="turnstile-container" class="captcha-turnstile"></div>
+                        {% endif %}
+                        {% if recaptcha_site_key %}
+                        <div id="recaptcha-container" class="captcha-recaptcha {% if turnstile_site_key %}is-hidden{% endif %}">
+                            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}" data-theme="dark"></div>
+                        </div>
+                        <p id="recaptcha-privacy" class="captcha-privacy {% if turnstile_site_key %}is-hidden{% endif %}">
+                            Ce site est protege par reCAPTCHA. La <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" class="underline">Politique de confidentialite</a> et les <a href="https://policies.google.com/terms" target="_blank" rel="noopener" class="underline">Conditions d'utilisation</a> de Google s'appliquent.
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                     
                     <button type="submit" class="btn-auth-submit">
                         Connexion
@@ -118,6 +149,60 @@
         </div>
     </div>
 </div>
+
+<script>
+(() => {
+    const turnstileSiteKey = "{{ turnstile_site_key|default:'' }}";
+    const recaptchaSiteKey = "{{ recaptcha_site_key|default:'' }}";
+    const fallbackMs = {{ turnstile_fallback_timeout_ms|default:2500 }};
+    const recaptchaContainer = document.getElementById('recaptcha-container');
+    const recaptchaPrivacy = document.getElementById('recaptcha-privacy');
+    let recaptchaScriptLoaded = false;
+
+    const showRecaptcha = () => {
+        if (!recaptchaSiteKey || !recaptchaContainer) {
+            return;
+        }
+        recaptchaContainer.classList.remove('is-hidden');
+        if (recaptchaPrivacy) {
+            recaptchaPrivacy.classList.remove('is-hidden');
+        }
+        if (!recaptchaScriptLoaded) {
+            recaptchaScriptLoaded = true;
+            const script = document.createElement('script');
+            script.src = 'https://www.google.com/recaptcha/api.js';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+    };
+
+    if (turnstileSiteKey) {
+        window.turnstileRendered = false;
+        window.turnstileOnLoad = () => {
+            const container = document.getElementById('turnstile-container');
+            if (!container || !window.turnstile) {
+                return;
+            }
+            window.turnstileRendered = true;
+            window.turnstile.render(container, {
+                sitekey: turnstileSiteKey,
+            });
+        };
+
+        window.setTimeout(() => {
+            if (!window.turnstileRendered) {
+                showRecaptcha();
+            }
+        }, fallbackMs);
+    } else {
+        showRecaptcha();
+    }
+})();
+</script>
+{% if turnstile_site_key %}
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileOnLoad&render=explicit" async defer></script>
+{% endif %}
 
 <style>
 /* ========================================
@@ -257,6 +342,22 @@
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+}
+
+.captcha-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.captcha-recaptcha.is-hidden,
+.captcha-privacy.is-hidden {
+    display: none;
+}
+
+.captcha-privacy {
+    font-size: 0.75rem;
+    color: rgba(246,247,251,0.6);
 }
 
 .form-group label {

@@ -105,6 +105,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.captcha_settings',
             ],
         },
     },
@@ -184,6 +185,12 @@ TASK_NOTIFICATION_EMAIL = os.environ.get('TASK_NOTIFICATION_EMAIL', os.environ.g
 # Choisissez reCAPTCHA v2 "Je ne suis pas un robot" (checkbox)
 RECAPTCHA_SITE_KEY = os.environ.get('RECAPTCHA_SITE_KEY', '')
 RECAPTCHA_SECRET_KEY = os.environ.get('RECAPTCHA_SECRET_KEY', '')
+TURNSTILE_SITE_KEY = os.environ.get('TURNSTILE_SITE_KEY', '')
+TURNSTILE_SECRET_KEY = os.environ.get('TURNSTILE_SECRET_KEY', '')
+try:
+    TURNSTILE_FALLBACK_TIMEOUT_MS = int(os.environ.get('TURNSTILE_FALLBACK_TIMEOUT_MS', '2500') or 2500)
+except (TypeError, ValueError):
+    TURNSTILE_FALLBACK_TIMEOUT_MS = 2500
 
 # ==============================================================================
 # PHASE 3 : STRIPE PAYMENT CONFIGURATION
@@ -363,6 +370,9 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''  # Pas de préfixe [Site]
+ACCOUNT_FORMS = {
+    'login': 'core.forms.CaptchaLoginForm',
+}
 
 # Redirections
 LOGIN_REDIRECT_URL = '/espace-client/'

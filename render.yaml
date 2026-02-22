@@ -68,6 +68,14 @@ services:
         sync: false
       - key: RECAPTCHA_SECRET_KEY
         sync: false
+
+      # Cloudflare Turnstile (à configurer manuellement)
+      - key: TURNSTILE_SITE_KEY
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+      - key: TURNSTILE_FALLBACK_TIMEOUT_MS
+        value: "2500"
       
       # Superuser initial (optionnel)
       - key: DJANGO_SUPERUSER_USERNAME
