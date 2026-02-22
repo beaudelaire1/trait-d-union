@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Connexion - Espace Client | Trait d'Union Studio{% endblock %}
+{% block title %}Connexion - Écosystème TUS | Trait d'Union Studio{% endblock %}
 
 {% block content %}
 <div class="auth-page">
@@ -23,7 +23,7 @@
                         <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
                     </svg>
                 </div>
-                <h1>Espace Client</h1>
+                <h1>Écosystème TUS</h1>
                 <p>Accédez à vos projets, devis et factures en toute sécurité.</p>
                 
                 <div class="features-list">
@@ -127,7 +127,7 @@
                             <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}" data-theme="dark"></div>
                         </div>
                         <p id="recaptcha-privacy" class="captcha-privacy {% if turnstile_site_key %}is-hidden{% endif %}">
-                            Ce site est protege par reCAPTCHA. La <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" class="underline">Politique de confidentialite</a> et les <a href="https://policies.google.com/terms" target="_blank" rel="noopener" class="underline">Conditions d'utilisation</a> de Google s'appliquent.
+                            Ce site est protégé par reCAPTCHA. La <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" class="underline">Politique de confidentialité</a> et les <a href="https://policies.google.com/terms" target="_blank" rel="noopener" class="underline">Conditions d'utilisation</a> de Google s'appliquent.
                         </p>
                         {% endif %}
                     </div>

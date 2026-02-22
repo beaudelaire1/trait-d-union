@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Déconnexion - Espace Client | Trait d'Union Studio{% endblock %}
+{% block title %}Déconnexion - Écosystème TUS | Trait d'Union Studio{% endblock %}
 
 {% block content %}
 <div class="auth-page">
@@ -16,7 +16,7 @@
             </div>
             
             <h1>Se déconnecter ?</h1>
-            <p>Êtes-vous sûr de vouloir quitter votre espace client ?</p>
+            <p>Êtes-vous sûr de vouloir quitter votre Écosystème TUS ?</p>
             
             <form method="post" action="{% url 'account_logout' %}" class="logout-form">
                 {% csrf_token %}
