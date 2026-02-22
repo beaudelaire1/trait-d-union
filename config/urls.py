@@ -30,7 +30,7 @@ urlpatterns = [
     path('devis/', include('apps.devis.urls')),
     path('factures/', include('apps.factures.urls')),
     # Client portal (Phase 4)
-    path('ecosysteme-tus/', include('apps.clients.urls')),
+    path('espace-client/', include('apps.clients.urls')),
     path('accounts/', include('allauth.urls')),
     # SEO
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),

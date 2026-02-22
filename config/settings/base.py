@@ -375,6 +375,6 @@ ACCOUNT_FORMS = {
 }
 
 # Redirections
-LOGIN_REDIRECT_URL = '/ecosysteme-tus/'
+LOGIN_REDIRECT_URL = '/espace-client/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
