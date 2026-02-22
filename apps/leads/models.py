@@ -5,9 +5,9 @@ from django.db import models
 
 
 class ProjectTypeChoice(models.TextChoices):
-    VITRINE = 'vitrine', 'Site Vitrine'
-    ECOMMERCE = 'ecommerce', 'E‑commerce'
-    PLATEFORME = 'plateforme', 'Plateforme / Mini‑ERP'
+    SITE = 'site', 'Site'
+    COMMERCE = 'commerce', 'Commerce'
+    OUTILS_METIER = 'outils_metier', 'Outils métier'
     OTHER = 'other', 'Autre'
 
 

@@ -34,7 +34,7 @@ class VerifyRecaptchaTest(TestCase):
         self.assertFalse(is_valid)
 
     @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
-    @patch('apps.leads.views.requests.post')
+    @patch('core.services.captcha.requests.post')
     def test_successful_verification(self, mock_post):
         """Test successful verification."""
         mock_response = MagicMock()
@@ -48,7 +48,7 @@ class VerifyRecaptchaTest(TestCase):
         self.assertTrue(is_valid)
 
     @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
-    @patch('apps.leads.views.requests.post')
+    @patch('core.services.captcha.requests.post')
     def test_failed_verification(self, mock_post):
         """Test that failed verification returns False."""
         mock_response = MagicMock()
@@ -62,7 +62,7 @@ class VerifyRecaptchaTest(TestCase):
         self.assertFalse(is_valid)
 
     @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
-    @patch('apps.leads.views.requests.post')
+    @patch('core.services.captcha.requests.post')
     def test_invalid_secret_passes(self, mock_post):
         """Test that invalid secret key error allows submission (graceful degradation)."""
         mock_response = MagicMock()
@@ -76,7 +76,7 @@ class VerifyRecaptchaTest(TestCase):
         self.assertTrue(is_valid)
 
     @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
-    @patch('apps.leads.views.requests.post')
+    @patch('core.services.captcha.requests.post')
     def test_network_error_passes(self, mock_post):
         """Test that network errors allow submission (graceful degradation)."""
         mock_post.side_effect = requests.RequestException("Connection timeout")
@@ -85,7 +85,7 @@ class VerifyRecaptchaTest(TestCase):
         self.assertTrue(is_valid)
 
     @override_settings(RECAPTCHA_SECRET_KEY='test-secret', RECAPTCHA_SITE_KEY='test-site-key')
-    @patch('apps.leads.views.requests.post')
+    @patch('core.services.captcha.requests.post')
     def test_timeout_handled(self, mock_post):
         """Test that API timeout is handled gracefully."""
         mock_post.side_effect = requests.Timeout("Request timed out")
@@ -102,13 +102,13 @@ class LeadModelTest(TestCase):
         lead = Lead.objects.create(
             name="Jean Dupont",
             email="jean@example.com",
-            project_type=ProjectTypeChoice.VITRINE,
+            project_type=ProjectTypeChoice.SITE,
             message="Je souhaite un site vitrine pour mon entreprise.",
             budget=BudgetRange.MEDIUM,
         )
         self.assertEqual(lead.name, "Jean Dupont")
         self.assertEqual(lead.email, "jean@example.com")
-        self.assertEqual(lead.project_type, ProjectTypeChoice.VITRINE)
+        self.assertEqual(lead.project_type, ProjectTypeChoice.SITE)
         self.assertFalse(lead.is_processed)
 
     def test_lead_str(self):
@@ -116,10 +116,10 @@ class LeadModelTest(TestCase):
         lead = Lead.objects.create(
             name="Marie Martin",
             email="marie@example.com",
-            project_type=ProjectTypeChoice.ECOMMERCE,
+            project_type=ProjectTypeChoice.COMMERCE,
             message="Boutique en ligne",
         )
-        self.assertEqual(str(lead), "Marie Martin – ecommerce")
+        self.assertEqual(str(lead), "Marie Martin – commerce")
 
 
 class ContactFormTest(TestCase):
@@ -130,7 +130,7 @@ class ContactFormTest(TestCase):
         form_data = {
             'name': 'Test User',
             'email': 'test@example.com',
-            'project_type': ProjectTypeChoice.VITRINE,
+            'project_type': ProjectTypeChoice.SITE,
             'message': 'Ceci est un message de test.',
             'budget': BudgetRange.SMALL,
             'honeypot': '',
@@ -143,7 +143,7 @@ class ContactFormTest(TestCase):
         form_data = {
             'name': 'Spammer',
             'email': 'spam@example.com',
-            'project_type': ProjectTypeChoice.VITRINE,
+            'project_type': ProjectTypeChoice.SITE,
             'message': 'Spam message',
             'honeypot': 'I am a bot',
         }
@@ -184,7 +184,7 @@ class ContactViewTest(TestCase):
         form_data = {
             'name': 'Test Submission',
             'email': 'submit@example.com',
-            'project_type': ProjectTypeChoice.PLATEFORME,
+            'project_type': ProjectTypeChoice.OUTILS_METIER,
             'message': 'Test submission message',
             'budget': BudgetRange.LARGE,
             'honeypot': '',
@@ -202,7 +202,7 @@ class EmailServiceTest(TestCase):
         lead = Lead.objects.create(
             name="Email Test",
             email="email@test.com",
-            project_type=ProjectTypeChoice.VITRINE,
+            project_type=ProjectTypeChoice.SITE,
             message="Testing email",
         )
         EmailService.send_confirmation_email(lead)
@@ -215,7 +215,7 @@ class EmailServiceTest(TestCase):
         lead = Lead.objects.create(
             name="Admin Test",
             email="admin@test.com",
-            project_type=ProjectTypeChoice.ECOMMERCE,
+            project_type=ProjectTypeChoice.COMMERCE,
             message="Testing admin notification",
         )
         EmailService.send_admin_notification(lead)
