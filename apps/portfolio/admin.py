@@ -9,15 +9,23 @@ class ProjectImageInline(admin.TabularInline):
     extra = 1
 
 
-class StrategyPhaseInline(admin.TabularInline):
+class StrategyPhaseInline(admin.StackedInline):
     model = StrategyPhase
     extra = 0
     min_num = 0
     max_num = 10
-    fields = ('order', 'phase_label', 'title', 'description', 'icon')
     ordering = ('order',)
     verbose_name = 'Phase de stratégie'
     verbose_name_plural = 'Ch.03 — Phases de stratégie (timeline)'
+    fieldsets = (
+        (None, {
+            'fields': (
+                ('order', 'phase_label', 'icon'),
+                'title',
+                'description',
+            ),
+        }),
+    )
 
 
 @admin.register(Project)
