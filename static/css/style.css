@@ -1286,8 +1286,10 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
 
 /* ============================================
    PROSE CHAPTER — Markdown rendered content
+   Override Tailwind CDN preflight resets
    ============================================ */
 .prose-chapter p {
+    display: block !important;
     margin-bottom: 1em;
 }
 .prose-chapter p:last-child {
@@ -1295,29 +1297,35 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
 }
 .prose-chapter ul,
 .prose-chapter ol {
-    margin: 1em 0;
-    padding-left: 1.5em;
+    display: block !important;
+    margin: 1em 0 !important;
+    padding-left: 1.5em !important;
 }
 .prose-chapter ul {
-    list-style-type: disc;
+    list-style-type: disc !important;
 }
 .prose-chapter ol {
-    list-style-type: decimal;
+    list-style-type: decimal !important;
 }
 .prose-chapter li {
+    display: list-item !important;
     margin-bottom: 0.4em;
     line-height: 1.6;
 }
 .prose-chapter strong,
 .prose-chapter b {
-    font-weight: 600;
+    font-weight: 700 !important;
     color: rgba(255, 255, 255, 0.95);
 }
 .prose-chapter em,
 .prose-chapter i {
-    font-style: italic;
+    font-style: italic !important;
+}
+.prose-chapter u {
+    text-decoration: underline !important;
 }
 .prose-chapter blockquote {
+    display: block !important;
     border-left: 3px solid rgba(56, 189, 248, 0.4);
     padding-left: 1.2em;
     margin: 1.2em 0;
@@ -1325,25 +1333,43 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
     font-style: italic;
 }
 .prose-chapter h3 {
+    display: block !important;
     font-size: 1.25em;
-    font-weight: 700;
+    font-weight: 700 !important;
     margin: 1.5em 0 0.5em;
     color: rgba(255, 255, 255, 0.9);
 }
 .prose-chapter h4 {
+    display: block !important;
     font-size: 1.1em;
-    font-weight: 600;
+    font-weight: 600 !important;
     margin: 1.2em 0 0.4em;
     color: rgba(255, 255, 255, 0.85);
 }
+.prose-chapter h5 {
+    display: block !important;
+    font-size: 1em;
+    font-weight: 600 !important;
+    margin: 1em 0 0.3em;
+    color: rgba(255, 255, 255, 0.8);
+}
 .prose-chapter a {
     color: rgb(56, 189, 248);
-    text-decoration: underline;
+    text-decoration: underline !important;
     text-underline-offset: 2px;
     transition: color 0.3s;
 }
 .prose-chapter a:hover {
     color: rgb(96, 220, 255);
+}
+.prose-chapter br {
+    display: block !important;
+}
+.prose-chapter hr {
+    display: block !important;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 2em 0;
 }
 
 .narrative-word {
