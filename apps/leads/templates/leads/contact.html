@@ -160,10 +160,17 @@
 
             {{ form.honeypot }}
             
-            <!-- reCAPTCHA v2 checkbox -->
-            {% if recaptcha_site_key %}
-            <div class="flex justify-center">
-                <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}" data-theme="dark"></div>
+            <!-- Captcha : Turnstile (prioritaire) + reCAPTCHA (fallback) -->
+            {% if turnstile_site_key or recaptcha_site_key %}
+            <div class="captcha-block flex justify-center">
+                {% if turnstile_site_key %}
+                <div id="turnstile-container"></div>
+                {% endif %}
+                {% if recaptcha_site_key %}
+                <div id="recaptcha-container" class="{% if turnstile_site_key %}hidden{% endif %}">
+                    <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}" data-theme="dark"></div>
+                </div>
+                {% endif %}
             </div>
             {% endif %}
 
@@ -182,8 +189,8 @@
                 </button>
             </div>
             
-            <!-- Note de confidentialité reCAPTCHA -->
-            <p class="text-xs text-tus-white/60 text-center mt-4">
+            <!-- Note de confidentialité captcha -->
+            <p id="captcha-privacy" class="text-xs text-tus-white/60 text-center mt-4 {% if turnstile_site_key %}hidden{% endif %}">
                 Ce site est protégé par reCAPTCHA. La <a href="https://policies.google.com/privacy" target="_blank" class="underline hover:text-tus-blue transition-colors">Politique de confidentialité</a> et les <a href="https://policies.google.com/terms" target="_blank" class="underline hover:text-tus-blue transition-colors">Conditions d'utilisation</a> de Google s'appliquent.
             </p>
         </form>
@@ -192,7 +199,49 @@
 {% endblock %}
 
 {% block extra_js %}
-{% if recaptcha_site_key %}
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script>
+(() => {
+    const turnstileSiteKey = "{{ turnstile_site_key|default:'' }}";
+    const recaptchaSiteKey = "{{ recaptcha_site_key|default:'' }}";
+    const fallbackMs = {{ turnstile_fallback_timeout_ms|default:2500 }};
+    const recaptchaContainer = document.getElementById('recaptcha-container');
+    const captchaPrivacy = document.getElementById('captcha-privacy');
+    let recaptchaScriptLoaded = false;
+
+    const showRecaptcha = () => {
+        if (!recaptchaSiteKey || !recaptchaContainer) return;
+        recaptchaContainer.classList.remove('hidden');
+        if (captchaPrivacy) captchaPrivacy.classList.remove('hidden');
+        if (!recaptchaScriptLoaded) {
+            recaptchaScriptLoaded = true;
+            const script = document.createElement('script');
+            script.src = 'https://www.google.com/recaptcha/api.js';
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+    };
+
+    if (turnstileSiteKey) {
+        window.turnstileRendered = false;
+        window.turnstileOnLoad = () => {
+            const container = document.getElementById('turnstile-container');
+            if (!container || !window.turnstile) return;
+            window.turnstileRendered = true;
+            window.turnstile.render(container, {
+                sitekey: turnstileSiteKey,
+                theme: 'dark',
+            });
+        };
+        window.setTimeout(() => {
+            if (!window.turnstileRendered) showRecaptcha();
+        }, fallbackMs);
+    } else {
+        showRecaptcha();
+    }
+})();
+</script>
+{% if turnstile_site_key %}
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileOnLoad&render=explicit" async defer></script>
 {% endif %}
 {% endblock %}

@@ -88,6 +88,7 @@ MIDDLEWARE = [
     # custom middlewares
     'config.middleware.RateLimitMiddleware',
     'config.middleware.SecurityHeadersMiddleware',
+    'config.middleware.CacheControlMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

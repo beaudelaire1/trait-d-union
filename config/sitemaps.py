@@ -3,6 +3,7 @@ from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
 from apps.portfolio.models import Project
+from apps.chroniques.models import Article
 
 
 class StaticViewSitemap(Sitemap):
@@ -43,6 +44,19 @@ class PortfolioSitemap(Sitemap):
     
     def items(self):
         return Project.objects.filter(is_published=True)
+    
+    def lastmod(self, obj):
+        return obj.updated_at
+
+
+class ChroniquesSitemap(Sitemap):
+    """Sitemap for blog articles (Chroniques TUS)."""
+    
+    changefreq = 'weekly'
+    priority = 0.7
+    
+    def items(self):
+        return Article.objects.filter(is_published=True)
     
     def lastmod(self, obj):
         return obj.updated_at

@@ -6,13 +6,14 @@ from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
 from django.views.generic import TemplateView
 
-from config.sitemaps import StaticViewSitemap, PortfolioSitemap
+from config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap
 
 
 # Sitemap configuration
 sitemaps = {
     'static': StaticViewSitemap,
     'portfolio': PortfolioSitemap,
+    'chroniques': ChroniquesSitemap,
 }
 
 urlpatterns = [

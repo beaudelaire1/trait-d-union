@@ -1,20 +1,24 @@
-# robots.txt for Trait d'Union Studio - SEO Optimized
+# Robots.txt pour Trait d'Union Studio
+# https://www.robotstxt.org/
+
 User-agent: *
 Allow: /
 
-# Sitemap location (priorité SEO)
-Sitemap: https://traitdunion.it/sitemap.xml
-Sitemap: https://www.traitdunion.it/sitemap.xml
-
-# Disallow admin and private areas
-User-agent: *
+# Bloquer l'accès à l'administration
 Disallow: /tus-gestion-secure/
-Disallow: /admin/
 
-# Disallow media uploads (privacy)
-Disallow: /media/leads/
+# Bloquer les fichiers médias privés
 Disallow: /media/devis/
 Disallow: /media/factures/
+Disallow: /media/leads/
 
-# Crawl-delay for respectful bots
+# Bloquer l'espace client (authentification requise)
+Disallow: /espace-client/
+Disallow: /accounts/
+
+# Crawl-delay pour éviter la surcharge
 Crawl-delay: 1
+
+# Sitemap
+Sitemap: https://traitdunion.it/sitemap.xml
+Sitemap: https://www.traitdunion.it/sitemap.xml

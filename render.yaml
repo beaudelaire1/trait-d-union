@@ -22,6 +22,21 @@ services:
     # Health check
     healthCheckPath: /
     
+    # Headers HTTP — Empêcher le CDN Render de mettre en cache les pages HTML
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache, must-revalidate
+      - path: /static/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+      - path: /sitemap.xml
+        name: Cache-Control
+        value: public, max-age=3600
+      - path: /robots.txt
+        name: Cache-Control
+        value: public, max-age=86400
+    
     # Variables d'environnement
     envVars:
       - key: DJANGO_SETTINGS_MODULE

@@ -1,10 +1,12 @@
 """Custom middleware for TUS website."""
 import time
 from collections import defaultdict
+from datetime import datetime, timezone
 from typing import Any, Callable
 
 from django.http import HttpRequest, HttpResponse
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.http import http_date
 
 
 class RateLimitMiddleware(MiddlewareMixin):
@@ -54,4 +56,48 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
         response.setdefault('X-Content-Type-Options', 'nosniff')
         response.setdefault('Referrer-Policy', 'same-origin')
         response.setdefault('X-XSS-Protection', '1; mode=block')
+        return response
+
+
+class CacheControlMiddleware(MiddlewareMixin):
+    """Middleware that sets proper Cache-Control headers for SEO freshness.
+
+    Problem: Without explicit cache directives, browsers and Googlebot may
+    serve stale versions of pages indefinitely after a deploy.
+
+    Strategy:
+    - HTML pages: ``no-cache`` (always revalidate with server before showing)
+      with ``must-revalidate`` so proxies don't serve stale content.
+    - Static files: left to WhiteNoise (which handles them before Django).
+    - Admin pages: ``no-store`` to never cache sensitive data.
+    - Also sets ``Last-Modified`` so Googlebot can send conditional requests
+      (``If-Modified-Since``) and get fast 304 responses.
+    """
+
+    def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
+        # Skip if Cache-Control is already set (e.g. by WhiteNoise or a view)
+        if 'Cache-Control' in response:
+            return response
+
+        content_type = response.get('Content-Type', '')
+
+        # Admin/private pages: never cache
+        if request.path.startswith(('/tus-gestion-secure/', '/espace-client/', '/accounts/')):
+            response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            return response
+
+        # HTML pages: allow caching but force revalidation on every visit
+        # Googlebot will fetch a fresh copy and index new content immediately
+        if 'text/html' in content_type:
+            response['Cache-Control'] = 'no-cache, must-revalidate'
+            # Add Last-Modified so Googlebot can do conditional requests (304)
+            if 'Last-Modified' not in response:
+                response['Last-Modified'] = http_date(time.time())
+            return response
+
+        # API / JSON responses: short cache
+        if 'application/json' in content_type:
+            response['Cache-Control'] = 'no-cache, must-revalidate'
+            return response
+
         return response

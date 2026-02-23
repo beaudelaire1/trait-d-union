@@ -21,4 +21,5 @@ Crawl-delay: 1
 
 # Sitemap
 Sitemap: https://traitdunion.it/sitemap.xml
+Sitemap: https://www.traitdunion.it/sitemap.xml
 

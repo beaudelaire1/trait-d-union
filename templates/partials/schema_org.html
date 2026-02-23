@@ -12,13 +12,14 @@ Include in base.html within <head> tag
     "@type": "ProfessionalService",
     "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization",
     "name": "Trait d'Union Studio",
-    "alternateName": "TUS",
+    "alternateName": ["TUS", "Trait d'Union Studio Guyane", "Studio Web Cayenne"],
     "url": "{{ request.scheme }}://{{ request.get_host }}",
     "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/tus-logo.svg' %}",
     "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/tus-logo.svg' %}",
-    "description": "Studio d'architecture digitale en Guyane et Outre-mer. Création de sites vitrines, e-commerce et plateformes sur-mesure.",
+    "description": "Studio d'architecture digitale en Guyane et Outre-mer. Création de sites internet, e-commerce et plateformes métier sur mesure à Cayenne, Kourou, Saint-Laurent, Martinique et Guadeloupe.",
     "telephone": "+594 695 35 80 41",
     "email": "contact@traitdunion.it",
+    "foundingDate": "2024",
     "address": {
         "@type": "PostalAddress",
         "streetAddress": "258 Avenue Justin Catayée, Route de la Madeleine",
@@ -32,6 +33,45 @@ Include in base.html within <head> tag
         "latitude": 4.9372,
         "longitude": -52.3260
     },
+    "areaServed": [
+        {
+            "@type": "AdministrativeArea",
+            "name": "Guyane française",
+            "sameAs": "https://fr.wikipedia.org/wiki/Guyane"
+        },
+        {
+            "@type": "City",
+            "name": "Cayenne",
+            "sameAs": "https://fr.wikipedia.org/wiki/Cayenne"
+        },
+        {
+            "@type": "City",
+            "name": "Kourou",
+            "sameAs": "https://fr.wikipedia.org/wiki/Kourou"
+        },
+        {
+            "@type": "City",
+            "name": "Saint-Laurent-du-Maroni"
+        },
+        {
+            "@type": "City",
+            "name": "Matoury"
+        },
+        {
+            "@type": "City",
+            "name": "Remire-Montjoly"
+        },
+        {
+            "@type": "AdministrativeArea",
+            "name": "Martinique",
+            "sameAs": "https://fr.wikipedia.org/wiki/Martinique"
+        },
+        {
+            "@type": "AdministrativeArea",
+            "name": "Guadeloupe",
+            "sameAs": "https://fr.wikipedia.org/wiki/Guadeloupe"
+        }
+    ],
     "sameAs": [
         "https://www.linkedin.com/company/trait-d-union-studio",
         "https://github.com/traitdunion",
@@ -39,36 +79,66 @@ Include in base.html within <head> tag
     ],
     "priceRange": "€€€",
     "openingHours": "Mo-Fr 09:00-18:00",
+    "knowsAbout": [
+        "Création de sites internet",
+        "Développement web",
+        "Architecture digitale",
+        "E-commerce",
+        "Applications web sur mesure",
+        "Design UI/UX",
+        "Référencement SEO",
+        "Plateformes métier",
+        "Refonte de site web",
+        "Projet web en Guyane",
+        "Projet web en Martinique",
+        "Projet web en Guadeloupe"
+    ],
     "hasOfferCatalog": {
         "@type": "OfferCatalog",
-        "name": "Services Web",
+        "name": "Services d'architecture digitale",
         "itemListElement": [
             {
                 "@type": "Offer",
                 "itemOffered": {
                     "@type": "Service",
-                    "name": "Site Vitrine",
-                    "description": "Création de sites vitrines élégants et performants"
+                    "name": "Création de site internet vitrine",
+                    "description": "Conception et développement de sites vitrines sur mesure, référencés et performants",
+                    "serviceType": "Création de site internet"
                 }
             },
             {
                 "@type": "Offer",
                 "itemOffered": {
                     "@type": "Service",
-                    "name": "E-commerce",
-                    "description": "Boutiques en ligne optimisées pour la conversion"
+                    "name": "Création de site e-commerce",
+                    "description": "Boutiques en ligne sécurisées avec tunnel de conversion optimisé",
+                    "serviceType": "Développement e-commerce"
                 }
             },
             {
                 "@type": "Offer",
                 "itemOffered": {
                     "@type": "Service",
-                    "name": "Plateforme / Mini-ERP",
-                    "description": "Applications métier sur mesure"
+                    "name": "Plateforme métier et application web",
+                    "description": "Applications métier sur mesure : CRM, ERP, portails clients, API",
+                    "serviceType": "Développement d'application web"
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Refonte de site internet",
+                    "description": "Modernisation complète de sites existants avec migration SEO",
+                    "serviceType": "Refonte de site web"
                 }
             }
         ]
-    }
+    },
+    "additionalType": [
+        "https://schema.org/WebDesign",
+        "https://schema.org/SoftwareApplication"
+    ]
 }
 </script>
 
