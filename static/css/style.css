@@ -1284,6 +1284,68 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
     line-height: 1.65;
 }
 
+/* ============================================
+   PROSE CHAPTER — Markdown rendered content
+   ============================================ */
+.prose-chapter p {
+    margin-bottom: 1em;
+}
+.prose-chapter p:last-child {
+    margin-bottom: 0;
+}
+.prose-chapter ul,
+.prose-chapter ol {
+    margin: 1em 0;
+    padding-left: 1.5em;
+}
+.prose-chapter ul {
+    list-style-type: disc;
+}
+.prose-chapter ol {
+    list-style-type: decimal;
+}
+.prose-chapter li {
+    margin-bottom: 0.4em;
+    line-height: 1.6;
+}
+.prose-chapter strong,
+.prose-chapter b {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+}
+.prose-chapter em,
+.prose-chapter i {
+    font-style: italic;
+}
+.prose-chapter blockquote {
+    border-left: 3px solid rgba(56, 189, 248, 0.4);
+    padding-left: 1.2em;
+    margin: 1.2em 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+}
+.prose-chapter h3 {
+    font-size: 1.25em;
+    font-weight: 700;
+    margin: 1.5em 0 0.5em;
+    color: rgba(255, 255, 255, 0.9);
+}
+.prose-chapter h4 {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin: 1.2em 0 0.4em;
+    color: rgba(255, 255, 255, 0.85);
+}
+.prose-chapter a {
+    color: rgb(56, 189, 248);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.3s;
+}
+.prose-chapter a:hover {
+    color: rgb(96, 220, 255);
+}
+
 .narrative-word {
     display: inline;
     will-change: opacity;

@@ -25,20 +25,20 @@ class ProjectAdmin(admin.ModelAdmin):
             'fields': ('title', 'slug', 'project_type', 'client_name')
         }),
         ('Ch.01 — Pourquoi (Objectif)', {
-            'description': 'Contexte du projet : pourquoi le client a fait appel à nous, quel était le besoin.',
+            'description': 'Contexte du projet. Markdown : **gras**, *italique*, - liste à puces, 1. liste numérotée, > citation',
             'fields': ('objective',)
         }),
         ('Ch.02 — Défi technique (Solution)', {
-            'description': 'Le problème technique à résoudre et la solution conçue.',
-            'fields': ('solution',)
+            'description': 'Problème technique et solution. Markdown : **gras**, *italique*, - liste à puces, 1. liste numérotée',
+            'fields': ('solution', 'image_ch02')
         }),
         ('Ch.03 — Stratégie (Approche)', {
-            'description': 'Méthodologie déployée, processus en phases, choix d\'architecture. Laissez vide pour afficher le texte par défaut.',
-            'fields': ('strategy',)
+            'description': 'Méthodologie et processus. Laissez vide = texte par défaut. Markdown : **gras**, *italique*, - liste à puces',
+            'fields': ('strategy', 'image_ch03')
         }),
         ('Ch.04 — Résultat (Impact)', {
-            'description': 'Résultat final, impact mesurable, livrables.',
-            'fields': ('result',)
+            'description': 'Impact et livrables. Markdown : **gras**, *italique*, - liste à puces, 1. liste numérotée',
+            'fields': ('result', 'image_ch04')
         }),
         ('Stack technique', {
             'fields': ('technologies',)

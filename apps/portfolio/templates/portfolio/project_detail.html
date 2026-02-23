@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static portfolio_tags %}
 {% block title %}Projet Web {{ project.title }} - {{ project.get_category_display }} - Trait d'Union Studio{% endblock %}
 {% block meta_description %}{{ project.objective|truncatewords:30 }} - Réalisation de site web et application en Guyane et Antilles par Trait d'Union Studio.{% endblock %}
 
@@ -117,9 +117,9 @@
 
             <!-- Narration — pleine largeur, immersive -->
             <div class="space-y-8 reveal" style="transition-delay: 0.15s;">
-                <p class="text-2xl md:text-3xl text-tus-white/85 leading-[1.5] font-light narrative-text">
-                    {{ project.objective }}
-                </p>
+                <div class="prose-chapter text-2xl md:text-3xl text-tus-white/85 leading-[1.5] font-light narrative-text">
+                    {{ project.objective|md }}
+                </div>
             </div>
 
             {% if project.client_name %}
@@ -183,7 +183,7 @@
             <div class="grid lg:grid-cols-2 gap-16 items-center">
                 <!-- Visual — Code placeholder LEFT -->
                 <div class="order-2 lg:order-1 reveal-left" style="transition-delay: 0.1s;">
-                    <!-- PLACEHOLDER CAPTURE CODE — remplacer le contenu par une <img> -->
+                    <!-- Capture Ch.02 -->
                     <div class="relative group">
                         <div class="absolute -inset-3 bg-gradient-to-br from-tus-blue/15 to-cyan-500/10 rounded-3xl blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700"></div>
                         <div class="relative rounded-2xl overflow-hidden border border-tus-white/10 bg-[#0d1117]">
@@ -196,7 +196,9 @@
                                 </div>
                                 <span class="ml-3 text-xs text-tus-white/30 font-mono">{{ project.title|slugify }}.py</span>
                             </div>
-                            <!-- Zone image code — REMPLACER CE BLOC PAR VOTRE CAPTURE -->
+                            {% if project.image_ch02 %}
+                            <img src="{{ project.image_ch02.url }}" alt="Défi technique — {{ project.title }}" class="w-full h-auto" loading="lazy">
+                            {% else %}
                             <div class="aspect-[16/10] flex items-center justify-center p-8 min-h-[400px]">
                                 <div class="text-center">
                                     <svg class="w-20 h-20 text-tus-white/[0.06] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
@@ -204,6 +206,7 @@
                                     <p class="text-tus-white/10 text-xs mt-2 font-mono">1200 × 750 px • Format sombre</p>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -217,9 +220,9 @@
                         </div>
                     </div>
                     <div class="space-y-6 reveal-right" style="transition-delay: 0.15s;">
-                        <p class="text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
-                            {{ project.solution }}
-                        </p>
+                        <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
+                            {{ project.solution|md }}
+                        </div>
                         <!-- Technologies -->
                         {% if project.tech_list %}
                         <div class="pt-4">
@@ -277,9 +280,9 @@
 
             <!-- Narration d'introduction — donne du poids au chapitre -->
             <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
-                <p class="text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
-                    {% if project.strategy %}{{ project.strategy }}{% else %}Chaque projet nécessite une méthodologie adaptée. Pour {{ project.title }}, nous avons déployé un processus en trois phases pour garantir un résultat aligné sur les objectifs.{% endif %}
-                </p>
+                <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
+                    {% if project.strategy %}{{ project.strategy|md }}{% else %}Chaque projet nécessite une méthodologie adaptée. Pour {{ project.title }}, nous avons déployé un processus en trois phases pour garantir un résultat aligné sur les objectifs.{% endif %}
+                </div>
             </div>
 
             <!-- Timeline verticale immersive — 3 phases -->
@@ -365,7 +368,7 @@
             </div>
             {% endif %}
 
-            <!-- Capture architecture — full-width -->
+            <!-- Capture architecture Ch.03 — full-width -->
             <div class="mt-20 reveal-scale" style="transition-delay: 0.25s;">
                 <div class="relative group">
                     <div class="absolute -inset-4 bg-gradient-to-r from-tus-blue/10 via-cyan-500/10 to-tus-green/10 rounded-3xl blur-3xl opacity-40 group-hover:opacity-70 transition-opacity duration-700"></div>
@@ -386,7 +389,9 @@
                                 <span>Python</span>
                             </div>
                         </div>
-                        <!-- PLACEHOLDER CAPTURE CODE ARCHITECTURE — REMPLACER CE BLOC -->
+                        {% if project.image_ch03 %}
+                        <img src="{{ project.image_ch03.url }}" alt="Stratégie — {{ project.title }}" class="w-full h-auto" loading="lazy">
+                        {% else %}
                         <div class="aspect-[21/9] flex items-center justify-center p-12 min-h-[350px]">
                             <div class="text-center">
                                 <svg class="w-24 h-24 text-tus-white/[0.04] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.75" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
@@ -394,6 +399,7 @@
                                 <p class="text-tus-white/[0.06] font-mono text-xs mt-2">1920 × 820 px recommandé • Format sombre</p>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -430,9 +436,9 @@
                         <h2 class="text-3xl md:text-4xl font-display font-bold">Résultat</h2>
                     </div>
                 </div>
-                <p class="text-xl text-tus-white/70 max-w-3xl mx-auto leading-relaxed font-light reveal" style="transition-delay: 0.1s;">
-                    {{ project.result }}
-                </p>
+                <div class="prose-chapter text-xl text-tus-white/70 max-w-3xl mx-auto leading-relaxed font-light reveal" style="transition-delay: 0.1s;">
+                    {{ project.result|md }}
+                </div>
             </div>
 
             <!-- Résultat capture — full-width hero image -->
@@ -453,7 +459,10 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- PLACEHOLDER CAPTURE RÉSULTAT — REMPLACER CE BLOC PAR UNE <img> -->
+                        {% if project.image_ch04 %}
+                        <img src="{{ project.image_ch04.url }}" alt="Résultat — {{ project.title }}" class="w-full h-auto" loading="lazy">
+                        {% else %}
+                        <!-- PLACEHOLDER CAPTURE RÉSULTAT -->
                         <div class="aspect-[16/9] flex items-center justify-center p-12 min-h-[500px]">
                             <div class="text-center">
                                 <svg class="w-28 h-28 text-tus-white/[0.04] mx-auto mb-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.75" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -461,6 +470,7 @@
                                 <p class="text-tus-white/[0.06] text-sm mt-2">1920 × 1080 px recommandé</p>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
