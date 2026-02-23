@@ -278,31 +278,91 @@
                 </div>
             </div>
 
+            {# ── Paragraphe d'introduction (optionnel, champ strategy TinyMCE) ── #}
             {% if project.strategy %}
-            <!-- Contenu dynamique — rempli depuis l'admin -->
-            <div class="max-w-3xl reveal" style="transition-delay: 0.1s;">
+            <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
                 <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
                     {{ project.strategy|safe_html }}
                 </div>
             </div>
-            {% else %}
-            <!-- Contenu par défaut — timeline 3 phases -->
+            {% endif %}
+
+            {# ── Timeline des phases : BDD si renseignées, sinon défaut ── #}
+            {% with phases=project.strategy_phases.all %}
+            {% if phases %}
+            {# Intro par défaut si pas de texte strategy #}
+            {% if not project.strategy %}
             <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
                 <p class="text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
-                    Chaque projet nécessite une méthodologie adaptée. Pour {{ project.title }}, nous avons déployé un processus en trois phases pour garantir un résultat aligné sur les objectifs.
+                    Chaque projet nécessite une méthodologie adaptée. Pour {{ project.client_name|default:project.title }}, nous avons déployé un processus en {{ phases|length }} phase{{ phases|length|pluralize }} pour garantir un résultat aligné sur les objectifs.
                 </p>
             </div>
+            {% endif %}
 
-            <!-- Timeline verticale immersive — 3 phases -->
+            <!-- Timeline dynamique depuis l'admin -->
             <div class="relative ml-4 md:ml-8">
-                <!-- Ligne verticale connectrice -->
                 <div class="absolute left-4 top-0 bottom-0 w-px">
                     <div class="w-full h-full bg-gradient-to-b from-tus-blue/40 via-tus-blue/20 to-tus-green/30 strategy-timeline-line"></div>
                 </div>
+                {% for phase in phases %}
+                <div class="relative pl-16 {% if not forloop.last %}pb-20{% endif %} reveal-left" style="transition-delay: {{ forloop.counter0|add:"1" }}50ms;">
+                    <div class="absolute left-0 top-2 w-9 h-9 rounded-full {% if forloop.last %}bg-tus-green/15 border-2 border-tus-green/40{% else %}bg-tus-blue/15 border-2 border-tus-blue/40{% endif %} flex items-center justify-center backdrop-blur-sm">
+                        <span class="{% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %} text-xs font-bold">{{ forloop.counter|stringformat:"02d" }}</span>
+                    </div>
+                    <div class="relative p-8 rounded-2xl border border-tus-white/10 bg-tus-white/[0.02] hover:border-{% if forloop.last %}tus-green{% else %}tus-blue{% endif %}/25 hover:bg-tus-white/[0.04] transition-all duration-500 group">
+                        <div class="flex items-start gap-5">
+                            <div class="w-12 h-12 rounded-xl {% if forloop.last %}bg-tus-green/10 group-hover:bg-tus-green/20{% else %}bg-tus-blue/10 group-hover:bg-tus-blue/20{% endif %} flex items-center justify-center flex-shrink-0 transition-colors duration-300">
+                                {% if phase.icon == 'search' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                {% elif phase.icon == 'architecture' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                {% elif phase.icon == 'deploy' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                {% elif phase.icon == 'code' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                                {% elif phase.icon == 'design' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                                {% elif phase.icon == 'database' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                                {% elif phase.icon == 'security' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                {% elif phase.icon == 'performance' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                {% elif phase.icon == 'test' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                {% elif phase.icon == 'meeting' %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                {% else %}
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <span class="{% if forloop.last %}text-tus-green/60{% else %}text-tus-blue/60{% endif %} text-xs font-semibold uppercase tracking-wider">{{ phase.phase_label }}</span>
+                                <h3 class="text-xl font-display font-bold mt-1 mb-3">{{ phase.title }}</h3>
+                                <p class="text-tus-white/60 leading-relaxed">{{ phase.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
 
+            {% else %}
+            {# Aucune phase en BDD et pas de texte strategy → timeline par défaut #}
+            {% if not project.strategy %}
+            <!-- Contenu par défaut — timeline 3 phases -->
+            <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
+                <p class="text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
+                    Chaque projet nécessite une méthodologie adaptée. Pour {{ project.client_name|default:project.title }}, nous avons déployé un processus en trois phases pour garantir un résultat aligné sur les objectifs.
+                </p>
+            </div>
+
+            <div class="relative ml-4 md:ml-8">
+                <div class="absolute left-4 top-0 bottom-0 w-px">
+                    <div class="w-full h-full bg-gradient-to-b from-tus-blue/40 via-tus-blue/20 to-tus-green/30 strategy-timeline-line"></div>
+                </div>
                 <!-- Phase 1 — Analyse -->
                 <div class="relative pl-16 pb-20 reveal-left" style="transition-delay: 0.15s;">
-                    <!-- Connecteur circulaire -->
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full bg-tus-blue/15 border-2 border-tus-blue/40 flex items-center justify-center backdrop-blur-sm">
                         <span class="text-tus-blue text-xs font-bold">01</span>
                     </div>
@@ -319,7 +379,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Phase 2 — Architecture -->
                 <div class="relative pl-16 pb-20 reveal-left" style="transition-delay: 0.3s;">
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full bg-tus-blue/15 border-2 border-tus-blue/40 flex items-center justify-center backdrop-blur-sm">
@@ -338,7 +397,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Phase 3 — Déploiement -->
                 <div class="relative pl-16 reveal-left" style="transition-delay: 0.45s;">
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full bg-tus-green/15 border-2 border-tus-green/40 flex items-center justify-center backdrop-blur-sm">
@@ -359,6 +417,8 @@
                 </div>
             </div>
             {% endif %}
+            {% endif %}
+            {% endwith %}
 
             <!-- Stack technique reprise ici si pas déjà affichée en Ch.02 -->
             {% if project.tech_list %}

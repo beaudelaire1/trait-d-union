@@ -37,3 +37,6 @@ class ProjectDetailView(DetailView):
 
     model = Project
     template_name: str = 'portfolio/project_detail.html'
+
+    def get_queryset(self) -> QuerySet[Project]:
+        return super().get_queryset().prefetch_related('strategy_phases', 'images')

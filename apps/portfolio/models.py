@@ -86,3 +86,57 @@ class ProjectImage(models.Model):
 
     def __str__(self) -> str:
         return f"{self.project.title} image {self.order}"
+
+
+class StrategyPhaseIcon(models.TextChoices):
+    """Icônes prédéfinies pour les phases de stratégie."""
+
+    SEARCH = 'search', '🔍 Analyse / Audit'
+    ARCHITECTURE = 'architecture', '📦 Architecture / Conception'
+    DEPLOY = 'deploy', '✦ Déploiement / Livraison'
+    CODE = 'code', '💻 Code / Développement'
+    DESIGN = 'design', '🎨 Design / UX'
+    DATABASE = 'database', '🗄️ Base de données'
+    SECURITY = 'security', '🔒 Sécurité'
+    PERFORMANCE = 'performance', '⚡ Performance'
+    TEST = 'test', '✅ Tests / QA'
+    MEETING = 'meeting', '🤝 Échange / Cadrage'
+
+
+class StrategyPhase(models.Model):
+    """Phase de stratégie pour le Ch.03 d'un projet portfolio."""
+
+    project = models.ForeignKey(
+        Project,
+        related_name='strategy_phases',
+        on_delete=models.CASCADE,
+    )
+    phase_label = models.CharField(
+        max_length=100,
+        help_text="Ex : Phase d'audit, Phase de conception, Phase de livraison",
+    )
+    title = models.CharField(
+        max_length=200,
+        help_text='Ex : Analyse & Exploration, Architecture & Prototypage',
+    )
+    description = models.TextField(
+        help_text='Description de cette phase (2-3 phrases).',
+    )
+    icon = models.CharField(
+        max_length=20,
+        choices=StrategyPhaseIcon.choices,
+        default=StrategyPhaseIcon.SEARCH,
+        help_text='Icône affichée à côté de la phase.',
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        help_text="Ordre d'affichage (0 = premier).",
+    )
+
+    class Meta:
+        ordering = ['order']
+        verbose_name = 'Phase de stratégie'
+        verbose_name_plural = 'Phases de stratégie'
+
+    def __str__(self) -> str:
+        return f"{self.project.title} — {self.phase_label}: {self.title}"

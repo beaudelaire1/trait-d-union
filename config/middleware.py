@@ -82,7 +82,7 @@ class CacheControlMiddleware(MiddlewareMixin):
         content_type = response.get('Content-Type', '')
 
         # Admin/private pages: never cache
-        if request.path.startswith(('/tus-gestion-secure/', '/espace-client/', '/accounts/')):
+        if request.path.startswith(('/tus-gestion-secure/', '/ecosysteme-tus/', '/accounts/')):
             response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
             return response
 

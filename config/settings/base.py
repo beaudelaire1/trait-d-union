@@ -377,7 +377,7 @@ ACCOUNT_FORMS = {
 }
 
 # Redirections
-LOGIN_REDIRECT_URL = '/espace-client/'
+LOGIN_REDIRECT_URL = '/ecosysteme-tus/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
 # ── TinyMCE ──────────────────────────────────────────────────────

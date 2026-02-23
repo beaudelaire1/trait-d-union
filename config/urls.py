@@ -31,7 +31,7 @@ urlpatterns = [
     path('devis/', include('apps.devis.urls')),
     path('factures/', include('apps.factures.urls')),
     # Client portal (Phase 4)
-    path('espace-client/', include('apps.clients.urls')),
+    path('ecosysteme-tus/', include('apps.clients.urls')),
     path('accounts/', include('allauth.urls')),
     # TinyMCE
     path('tinymce/', include('tinymce.urls')),

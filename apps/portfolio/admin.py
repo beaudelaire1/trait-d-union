@@ -1,12 +1,23 @@
 """Admin pour le portfolio."""
 from django.contrib import admin
-from .models import Project, ProjectImage
+from .models import Project, ProjectImage, StrategyPhase
 from .forms import ProjectAdminForm
 
 
 class ProjectImageInline(admin.TabularInline):
     model = ProjectImage
     extra = 1
+
+
+class StrategyPhaseInline(admin.TabularInline):
+    model = StrategyPhase
+    extra = 0
+    min_num = 0
+    max_num = 10
+    fields = ('order', 'phase_label', 'title', 'description', 'icon')
+    ordering = ('order',)
+    verbose_name = 'Phase de stratégie'
+    verbose_name_plural = 'Ch.03 — Phases de stratégie (timeline)'
 
 
 @admin.register(Project)
@@ -18,7 +29,7 @@ class ProjectAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     list_editable = ('is_featured', 'is_published')
     ordering = ('-created_at',)
-    inlines = [ProjectImageInline]
+    inlines = [StrategyPhaseInline, ProjectImageInline]
     
     fieldsets = (
         ('Identité du projet', {
@@ -33,7 +44,12 @@ class ProjectAdmin(admin.ModelAdmin):
             'fields': ('solution', 'image_ch02')
         }),
         ('Ch.03 — Stratégie (Approche)', {
-            'description': 'Méthodologie et processus. Laissez vide = texte par défaut. Markdown : **gras**, *italique*, - liste à puces',
+            'description': (
+                '<strong>Paragraphe d\'intro</strong> optionnel. '
+                'Les <strong>phases (timeline)</strong> se gèrent dans la section '
+                '« Phases de stratégie » plus bas. '
+                'Si aucune phase n\'est ajoutée, une timeline par défaut (3 phases) est affichée.'
+            ),
             'fields': ('strategy', 'image_ch03')
         }),
         ('Ch.04 — Résultat (Impact)', {

@@ -12,8 +12,8 @@ Disallow: /media/devis/
 Disallow: /media/factures/
 Disallow: /media/leads/
 
-# Bloquer l'espace client (authentification requise)
-Disallow: /espace-client/
+# Bloquer l'écosystème client (authentification requise)
+Disallow: /ecosysteme-tus/
 Disallow: /accounts/
 
 # Crawl-delay pour éviter la surcharge
