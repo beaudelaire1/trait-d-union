@@ -278,11 +278,19 @@
                 </div>
             </div>
 
-            <!-- Narration d'introduction — donne du poids au chapitre -->
-            <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
+            {% if project.strategy %}
+            <!-- Contenu dynamique — rempli depuis l'admin -->
+            <div class="max-w-3xl reveal" style="transition-delay: 0.1s;">
                 <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
-                    {% if project.strategy %}{{ project.strategy|md }}{% else %}Chaque projet nécessite une méthodologie adaptée. Pour {{ project.title }}, nous avons déployé un processus en trois phases pour garantir un résultat aligné sur les objectifs.{% endif %}
+                    {{ project.strategy|md }}
                 </div>
+            </div>
+            {% else %}
+            <!-- Contenu par défaut — timeline 3 phases -->
+            <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
+                <p class="text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
+                    Chaque projet nécessite une méthodologie adaptée. Pour {{ project.title }}, nous avons déployé un processus en trois phases pour garantir un résultat aligné sur les objectifs.
+                </p>
             </div>
 
             <!-- Timeline verticale immersive — 3 phases -->
@@ -350,6 +358,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
 
             <!-- Stack technique reprise ici si pas déjà affichée en Ch.02 -->
             {% if project.tech_list %}
