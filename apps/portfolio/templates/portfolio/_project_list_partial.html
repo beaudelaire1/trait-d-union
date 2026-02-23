@@ -1,8 +1,8 @@
 {% if projects %}
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 stagger-children">
     {% for project in projects %}
     <a href="{{ project.get_absolute_url|default:'#' }}" 
-       class="project-card group block relative rounded-2xl overflow-hidden bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 hover:border-tus-blue/50 hover:shadow-[0_0_40px_rgba(11,45,255,0.2)] transition-all duration-500">
+       class="project-card group block relative rounded-2xl overflow-hidden bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 hover:border-tus-blue/50 hover:shadow-[0_0_40px_rgba(11,45,255,0.2)] transition-all duration-500 card-tilt reveal">
         
         {% if project.thumbnail %}
         <!-- Projet avec image -->

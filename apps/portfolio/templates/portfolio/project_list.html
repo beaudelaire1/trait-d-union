@@ -10,23 +10,24 @@
 <div class="min-h-screen py-20 px-6 relative overflow-hidden">
     <!-- Arrière-plan avec effets lumineux -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden">
-        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-tus-blue/15 to-tus-green/10 rounded-full blur-[150px]"></div>
-        <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-tus-green/10 to-tus-blue/10 rounded-full blur-[120px]"></div>
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-tus-blue/15 to-tus-green/10 rounded-full blur-[150px] parallax-slow" data-speed="0.12"></div>
+        <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-tus-green/10 to-tus-blue/10 rounded-full blur-[120px] parallax-slow" data-speed="0.08"></div>
     </div>
 
     <div class="max-w-7xl mx-auto relative z-10">
         <!-- Header -->
-        <div class="text-center mb-16 animate-fade-in">
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6">
+        <div class="text-center mb-16">
+            <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue text-sm font-medium mb-6 reveal">Nos réalisations</span>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold mb-6 reveal-clip" style="transition-delay: 0.1s;">
                 Nos <span class="text-tus-blue">réalisations</span>
             </h1>
-            <p class="text-tus-white/70 max-w-2xl mx-auto text-lg">
+            <p class="text-tus-white/70 max-w-2xl mx-auto text-lg reveal" style="transition-delay: 0.2s;">
                 Découvrez nos projets les plus récents. Chaque création est unique, pensée et développée sur mesure pour nos clients.
             </p>
         </div>
 
         <!-- Filtres -->
-        <div class="flex flex-wrap justify-center gap-3 mb-12 animate-slide-up">
+        <div class="flex flex-wrap justify-center gap-3 mb-12 stagger-children">
             <button hx-get="?" hx-target="#project-list" hx-push-url="true"
                     class="px-6 py-3 rounded-full bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 text-tus-white font-medium hover:bg-tus-blue hover:border-tus-blue hover:scale-105 active:scale-95 transition-all duration-300">
                 <span class="flex items-center gap-2">
@@ -60,7 +61,7 @@
         </div>
 
         <!-- Compteur de projets -->
-        <div class="text-center mb-8">
+        <div class="text-center mb-8 reveal-scale" style="transition-delay: 0.15s;">
             <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-tus-white/5 border border-tus-white/10 text-sm text-tus-white/60">
                 <span class="w-2 h-2 rounded-full bg-tus-green animate-pulse"></span>
                 {{ projects.count }} projet{{ projects.count|pluralize }} disponible{{ projects.count|pluralize }}

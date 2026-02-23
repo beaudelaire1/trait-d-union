@@ -99,9 +99,9 @@
                         'body': ['Inter', 'system-ui', 'sans-serif'],
                     },
                     animation: {
-                        'fade-in': 'fadeIn 0.6s ease-out forwards',
-                        'slide-up': 'slideUp 0.8s ease-out forwards',
-                        'slide-in-right': 'slideInRight 0.6s ease-out forwards',
+                        'fade-in': 'fadeIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards',
+                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards',
+                        'slide-in-right': 'slideInRight 0.7s cubic-bezier(0.16,1,0.3,1) forwards',
                         'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
                         'marquee': 'marquee 20s linear infinite',
                         'gradient-shift': 'gradientShift 3s ease-in-out infinite',
@@ -109,16 +109,16 @@
                     },
                     keyframes: {
                         fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
+                            '0%': { opacity: '0', filter: 'blur(8px)' },
+                            '100%': { opacity: '1', filter: 'blur(0)' },
                         },
                         slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(30px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                            '0%': { opacity: '0', transform: 'translateY(40px)', filter: 'blur(8px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)', filter: 'blur(0)' },
                         },
                         slideInRight: {
-                            '0%': { opacity: '0', transform: 'translateX(-20px)' },
-                            '100%': { opacity: '1', transform: 'translateX(0)' },
+                            '0%': { opacity: '0', transform: 'translateX(-30px)', filter: 'blur(6px)' },
+                            '100%': { opacity: '1', transform: 'translateX(0)', filter: 'blur(0)' },
                         },
                         pulseGlow: {
                             '0%, 100%': { boxShadow: '0 0 20px rgba(11,45,255,0.3)' },
@@ -136,6 +136,15 @@
                             '0%': { transform: 'translateX(100%)' },
                             '100%': { transform: 'translateX(-100%)' },
                         },
+                    },
+                    transitionDuration: {
+                        'micro': '150ms',
+                        'reveal': '800ms',
+                        'modal': '220ms',
+                    },
+                    transitionTimingFunction: {
+                        'standard': 'cubic-bezier(0.4, 0, 0.2, 1)',
+                        'enter': 'cubic-bezier(0.16, 1, 0.3, 1)',
                     },
                 }
             }
@@ -184,10 +193,10 @@
         
         /* Transitions personnalisées pour le contenu principal */
         ::view-transition-old(main-content) {
-            animation: slide-out-left 0.3s ease-in-out forwards;
+            animation: slide-out-left 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         ::view-transition-new(main-content) {
-            animation: slide-in-right 0.3s ease-in-out forwards;
+            animation: slide-in-right 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         
         /* Navbar reste fixe pendant les transitions */
@@ -217,14 +226,15 @@
            ============================================ */
         /* Boutons avec feedback tactile */
         .btn-primary {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 40px rgba(11, 45, 255, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(11, 45, 255, 0.3);
         }
         .btn-primary:active {
             transform: translateY(0) scale(0.98);
+            transition-duration: 80ms;
         }
         
         /* Links avec underline animé */
@@ -239,7 +249,7 @@
             width: 0;
             height: 2px;
             background: linear-gradient(90deg, #0B2DFF, #00D4FF);
-            transition: width 0.3s ease;
+            transition: width 150ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         .link-animated:hover::after {
             width: 100%;
@@ -247,11 +257,13 @@
         
         /* Cards avec effet de profondeur */
         .card-interactive {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+                       border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+                       box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         .card-interactive:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
         }
         
         /* ============================================
@@ -496,9 +508,33 @@
     {% include 'partials/footer.html' %}
     <!-- Alpine.js for micro-interactions -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Lenis — premium smooth scroll (~5KB) -->
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
     <!-- HTMX with View Transitions support -->
     <script src="https://unpkg.com/htmx.org@2.0.0"></script>
     <script>
+        // ============================================
+        // LENIS — Buttery smooth scroll
+        // ============================================
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: 'vertical',
+            gestureOrientation: 'vertical',
+            smoothWheel: true,
+            wheelMultiplier: 0.8,
+            touchMultiplier: 1.5,
+        });
+
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // Pause Lenis on modals / overlays
+        window.lenisInstance = lenis;
+
         // ============================================
         // HTMX Configuration - Simplified
         // ============================================
@@ -551,22 +587,89 @@
         });
 
         // ============================================
-        // APPLE-LIKE SCROLL REVEAL
+        // IMMERSIVE SCROLL REVEAL SYSTEM
         // ============================================
-        const revealElements = document.querySelectorAll('.reveal, .reveal-scale, .reveal-left, .reveal-right');
+        // Generic reveals (.reveal, .reveal-scale, .reveal-left, .reveal-right, .reveal-rotate, .reveal-clip)
+        const revealElements = document.querySelectorAll('.reveal, .reveal-scale, .reveal-left, .reveal-right, .reveal-rotate, .reveal-clip');
         
         const revealObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
+                    const delay = entry.target.style.transitionDelay || entry.target.style.animationDelay || '0s';
+                    const ms = parseFloat(delay) * 1000;
+                    setTimeout(() => entry.target.classList.add('active'), ms);
+                    revealObserver.unobserve(entry.target);
                 }
             });
         }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            threshold: 0.08,
+            rootMargin: '0px 0px -60px 0px'
         });
 
         revealElements.forEach(el => revealObserver.observe(el));
+
+        // Stagger children containers
+        const staggerElements = document.querySelectorAll('.stagger-children');
+        const staggerObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // Apply stagger delay to each child
+                    Array.from(entry.target.children).forEach((child, i) => {
+                        child.style.transitionDelay = `${i * 0.12}s`;
+                    });
+                    staggerObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        staggerElements.forEach(el => staggerObserver.observe(el));
+
+        // ============================================
+        // METHOD PAGE — Timeline Step-by-Step Reveal 
+        // ============================================
+        const methodSteps = document.querySelectorAll('.method-step');
+        const timelineProgress = document.getElementById('timeline-progress');
+        
+        if (methodSteps.length > 0) {
+            // Timeline progress bar driven by scroll
+            if (timelineProgress) {
+                const timeline = document.getElementById('method-timeline');
+                window.addEventListener('scroll', () => {
+                    if (!timeline) return;
+                    const rect = timeline.getBoundingClientRect();
+                    const totalHeight = rect.height;
+                    const scrolled = Math.max(0, -rect.top + window.innerHeight * 0.5);
+                    const progress = Math.min(1, scrolled / totalHeight);
+                    timelineProgress.style.transform = `scaleY(${progress})`;
+                    timelineProgress.style.transformOrigin = 'top';
+                }, { passive: true });
+            }
+            
+            // Each step reveals individually
+            const stepObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const step = entry.target;
+                        const number = step.querySelector('.step-number');
+                        const content = step.querySelector('.step-reveal');
+                        
+                        // 1) Number pops in
+                        if (number) {
+                            setTimeout(() => number.classList.add('active'), 100);
+                        }
+                        // 2) Content slides in after number
+                        if (content) {
+                            setTimeout(() => content.classList.add('active'), 350);
+                        }
+                        
+                        stepObserver.unobserve(step);
+                    }
+                });
+            }, { threshold: 0.2, rootMargin: '0px 0px -80px 0px' });
+            
+            methodSteps.forEach(step => stepObserver.observe(step));
+        }
 
         // ============================================
         // NAVBAR SCROLL EFFECT
@@ -587,9 +690,12 @@
         }, { passive: true });
 
         // ============================================
-        // CUSTOM CURSOR (Desktop only)
+        // IMMERSIVE CUSTOM CURSOR — hides OS cursor
         // ============================================
-        if (window.matchMedia('(hover: hover)').matches) {
+        if (window.matchMedia('(hover: hover) and (min-width: 1024px)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            // Hide OS cursor globally
+            document.documentElement.classList.add('has-custom-cursor');
+            
             const cursorDot = document.createElement('div');
             const cursorRing = document.createElement('div');
             cursorDot.className = 'cursor-dot';
@@ -597,33 +703,113 @@
             document.body.appendChild(cursorDot);
             document.body.appendChild(cursorRing);
 
-            let mouseX = 0, mouseY = 0;
-            let ringX = 0, ringY = 0;
+            let mouseX = -100, mouseY = -100;
+            let ringX = -100, ringY = -100;
+            let isVisible = false;
 
             document.addEventListener('mousemove', (e) => {
                 mouseX = e.clientX;
                 mouseY = e.clientY;
                 cursorDot.style.left = mouseX + 'px';
                 cursorDot.style.top = mouseY + 'px';
+                if (!isVisible) {
+                    cursorDot.style.opacity = '1';
+                    cursorRing.style.opacity = '1';
+                    isVisible = true;
+                }
             });
 
-            // Smooth ring follow
+            // Hide cursor when leaving the window
+            document.addEventListener('mouseleave', () => {
+                cursorDot.style.opacity = '0';
+                cursorRing.style.opacity = '0';
+                isVisible = false;
+            });
+
+            // Smooth ring follow with lerp
             function animateRing() {
-                ringX += (mouseX - ringX) * 0.15;
-                ringY += (mouseY - ringY) * 0.15;
+                ringX += (mouseX - ringX) * 0.12;
+                ringY += (mouseY - ringY) * 0.12;
                 cursorRing.style.left = ringX + 'px';
                 cursorRing.style.top = ringY + 'px';
                 requestAnimationFrame(animateRing);
             }
             animateRing();
 
-            // Hover effect on interactive elements
-            const hoverTargets = document.querySelectorAll('a, button, .card-premium, .bento-item, input, textarea, select');
-            hoverTargets.forEach(el => {
-                el.addEventListener('mouseenter', () => cursorRing.classList.add('hover'));
-                el.addEventListener('mouseleave', () => cursorRing.classList.remove('hover'));
+            // Click feedback
+            document.addEventListener('mousedown', () => {
+                cursorDot.classList.add('clicking');
+                cursorRing.classList.add('clicking');
             });
+            document.addEventListener('mouseup', () => {
+                cursorDot.classList.remove('clicking');
+                cursorRing.classList.remove('clicking');
+            });
+
+            // Dynamic hover states
+            function addCursorHovers() {
+                // Standard interactive elements → ring grows
+                document.querySelectorAll('a, button, .card-premium, .bento-item, input, textarea, select, .card-interactive, .faq-item').forEach(el => {
+                    el.addEventListener('mouseenter', () => {
+                        cursorRing.classList.remove('hover-text');
+                        cursorRing.classList.add('hover');
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        cursorRing.classList.remove('hover', 'hover-text');
+                    });
+                });
+                // Portfolio/case-study cards → ring becomes "Voir" button
+                document.querySelectorAll('[data-cursor="view"], .portfolio-card, .case-study-card').forEach(el => {
+                    el.addEventListener('mouseenter', () => {
+                        cursorRing.classList.remove('hover');
+                        cursorRing.classList.add('hover-text');
+                    });
+                    el.addEventListener('mouseleave', () => {
+                        cursorRing.classList.remove('hover-text');
+                    });
+                });
+            }
+            addCursorHovers();
+            
+            // Re-bind after HTMX swaps
+            document.body.addEventListener('htmx:afterSwap', addCursorHovers);
         }
+
+        // ============================================
+        // HTMX AFTERSWAP — Re-init animations on dynamic content
+        // ============================================
+        document.body.addEventListener('htmx:afterSettle', function(evt) {
+            const target = evt.detail.target || document.body;
+            // Re-observe reveal elements inside swapped content
+            target.querySelectorAll('.reveal, .reveal-scale, .reveal-left, .reveal-right, .reveal-rotate, .reveal-clip').forEach(el => {
+                if (!el.classList.contains('active')) {
+                    revealObserver.observe(el);
+                }
+            });
+            // Re-observe stagger containers
+            target.querySelectorAll('.stagger-children').forEach(el => {
+                if (!el.classList.contains('active')) {
+                    staggerObserver.observe(el);
+                }
+            });
+            // Re-bind card tilt
+            target.querySelectorAll('.card-tilt').forEach(card => {
+                if (!card.dataset.tiltBound) {
+                    card.dataset.tiltBound = 'true';
+                    card.addEventListener('mousemove', function(e) {
+                        const rect = card.getBoundingClientRect();
+                        const x = (e.clientX - rect.left) / rect.width;
+                        const y = (e.clientY - rect.top) / rect.height;
+                        const rotateX = (0.5 - y) * 8;
+                        const rotateY = (x - 0.5) * 8;
+                        card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    });
+                    card.addEventListener('mouseleave', function() {
+                        card.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
+                    });
+                }
+            });
+        });
 
         // ============================================
         // BENTO CARD MOUSE GLOW EFFECT
@@ -635,6 +821,44 @@
                 const y = ((e.clientY - rect.top) / rect.height) * 100;
                 card.style.setProperty('--mouse-x', x + '%');
                 card.style.setProperty('--mouse-y', y + '%');
+            });
+        });
+
+        // ============================================
+        // PARALLAX — Subtle depth on background blobs
+        // ============================================
+        const parallaxElements = document.querySelectorAll('.parallax-slow');
+        if (parallaxElements.length > 0 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            let ticking = false;
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(() => {
+                        const scrollY = window.pageYOffset;
+                        parallaxElements.forEach(el => {
+                            const speed = parseFloat(el.dataset.speed) || 0.3;
+                            el.style.transform = `translateY(${scrollY * speed}px)`;
+                        });
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+        }
+
+        // ============================================
+        // CARD 3D TILT EFFECT — Premium hover
+        // ============================================
+        document.querySelectorAll('.card-tilt').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = (e.clientX - rect.left) / rect.width;
+                const y = (e.clientY - rect.top) / rect.height;
+                const tiltX = (0.5 - y) * 8;  // max 4deg
+                const tiltY = (x - 0.5) * 8;
+                card.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(4px)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(800px) rotateX(0) rotateY(0) translateZ(0)';
             });
         });
 

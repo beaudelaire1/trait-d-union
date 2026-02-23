@@ -7,25 +7,25 @@
 <section class="min-h-screen bg-tus-black py-20 relative overflow-hidden">
     <!-- Background effects -->
     <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-tus-blue/15 to-tus-green/10 rounded-full blur-[150px]"></div>
-        <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-tus-green/10 to-tus-blue/10 rounded-full blur-[120px]"></div>
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-tus-blue/15 to-tus-green/10 rounded-full blur-[150px] parallax-slow" data-speed="0.12"></div>
+        <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-tus-green/10 to-tus-blue/10 rounded-full blur-[120px] parallax-slow" data-speed="0.08"></div>
     </div>
     
     <div class="max-w-3xl mx-auto px-6 relative z-10">
         <!-- Header -->
         <div class="text-center mb-12">
-            <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue text-sm font-medium mb-6">Devis gratuit</span>
-            <h1 class="font-display text-4xl md:text-5xl font-bold text-tus-white mb-4">
+            <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue text-sm font-medium mb-6 reveal">Devis gratuit</span>
+            <h1 class="font-display text-4xl md:text-5xl font-bold text-tus-white mb-4 reveal-clip" style="transition-delay: 0.1s;">
                 Demander un <span class="text-tus-blue">devis</span>
             </h1>
-            <p class="text-tus-white/70 text-lg max-w-xl mx-auto">
+            <p class="text-tus-white/70 text-lg max-w-xl mx-auto reveal" style="transition-delay: 0.2s;">
                 Décrivez votre projet et recevez une estimation personnalisée sous 24h.
             </p>
         </div>
 
         <!-- Form Card -->
-        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 md:p-12">
-            <form method="post" enctype="multipart/form-data" class="space-y-6">
+        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 md:p-12 reveal-scale" style="transition-delay: 0.15s;">
+            <form method="post" enctype="multipart/form-data" class="space-y-6 stagger-children">
                 {% csrf_token %}
                 
                 <!-- Contact Info -->

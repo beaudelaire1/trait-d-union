@@ -8,13 +8,13 @@
         <div class="absolute -top-40 -right-40 w-[500px] h-[500px] bg-tus-blue/10 rounded-full blur-[140px]"></div>
     </div>
     <div class="max-w-7xl mx-auto relative z-10">
-        <div class="text-center mb-12 animate-fade-in">
+        <div class="text-center mb-12 reveal">
             <h1 class="text-4xl md:text-5xl font-display font-bold mb-4">Chroniques <span class="text-tus-blue">TUS</span></h1>
             <p class="text-tus-white/70">Articles courts et points de vue sur nos pratiques.</p>
         </div>
 
         {% if page_obj %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-slide-up">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 reveal">
             {% for a in page_obj %}
             <a href="{{ a.get_absolute_url }}" class="group block rounded-2xl overflow-hidden bg-tus-white/5 border border-tus-white/10 hover:border-tus-blue/40 transition-all">
                 <div class="h-40 bg-tus-white/5 flex items-center justify-center">

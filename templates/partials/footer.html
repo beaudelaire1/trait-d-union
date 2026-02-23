@@ -1,6 +1,9 @@
-<footer class="mt-20 border-t border-stroke-dark">
+<footer class="mt-20 border-t border-stroke-dark relative">
+    <!-- Divider lumineux au-dessus du footer -->
+    <div class="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-transparent via-tus-blue/30 to-transparent"></div>
+    
     <div class="max-w-7xl mx-auto px-6 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-10 stagger-children">
             <!-- Logo -->
             <div class="md:col-span-2">
                 <svg height="32" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" class="mb-4">
@@ -68,7 +71,7 @@
             </div>
         </div>
         
-        <div class="mt-12 pt-6 border-t border-stroke-dark flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-tus-white/60">
+        <div class="mt-12 pt-6 border-t border-stroke-dark flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-tus-white/60 reveal">
             <p>&copy; {% now "Y" %} Trait d'Union Studio. Tous droits réservés.</p>
             <p class="font-display text-tus-white/60">« Quand l'élégance se conçoit, la performance se déploie. »</p>
         </div>

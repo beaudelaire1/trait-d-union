@@ -20,10 +20,19 @@ module.exports = {
         'display': ['Space Grotesk', 'system-ui', 'sans-serif'],
         'body': ['Inter', 'system-ui', 'sans-serif'],
       },
+      transitionDuration: {
+        'micro': '150ms',
+        'reveal': '250ms',
+        'modal': '200ms',
+      },
+      transitionTimingFunction: {
+        'standard': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'entrance': 'cubic-bezier(0.0, 0, 0.2, 1)',
+      },
       animation: {
-        'fade-in': 'fadeIn 0.6s ease-out forwards',
-        'slide-up': 'slideUp 0.8s ease-out forwards',
-        'slide-in-right': 'slideInRight 0.6s ease-out forwards',
+        'fade-in': 'fadeIn 0.25s cubic-bezier(0.0, 0, 0.2, 1) forwards',
+        'slide-up': 'slideUp 0.25s cubic-bezier(0.0, 0, 0.2, 1) forwards',
+        'slide-in-right': 'slideInRight 0.25s cubic-bezier(0.0, 0, 0.2, 1) forwards',
         'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
         'marquee': 'marquee 20s linear infinite',
         'gradient-shift': 'gradientShift 3s ease-in-out infinite',
@@ -36,11 +45,11 @@ module.exports = {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         slideInRight: {
-          '0%': { opacity: '0', transform: 'translateX(-20px)' },
+          '0%': { opacity: '0', transform: 'translateX(-12px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         pulseGlow: {

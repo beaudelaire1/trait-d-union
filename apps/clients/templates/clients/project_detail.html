@@ -41,7 +41,7 @@
                         <span class="status-dot status-{{ project.status }}"></span>
                         {{ project.get_status_display }}
                     </div>
-                    <h1 class="animate-fade-in">{{ project.name }}</h1>
+                    <h1 class="reveal">{{ project.name }}</h1>
                     <p class="project-description">{{ project.description|default:"Votre projet est entre de bonnes mains." }}</p>
                     
                     {% if project.estimated_delivery %}

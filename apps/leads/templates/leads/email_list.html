@@ -13,7 +13,7 @@
 
     <div class="relative max-w-6xl mx-auto">
         <!-- Header -->
-        <div class="mb-8 animate-fade-in flex flex-col md:flex-row md:items-center md:justify-between">
+        <div class="mb-8 reveal flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
                 <h1 class="text-4xl md:text-5xl font-display font-bold text-tus-white mb-3">
                     📬 Mes emails
@@ -32,7 +32,7 @@
 
         {% if emails %}
         <!-- Emails grid -->
-        <div class="grid gap-4 animate-slide-up">
+        <div class="grid gap-4 reveal">
             {% for email in emails %}
             <a href="{% url 'leads:email_detail' email.pk %}" class="group bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-6 hover:bg-tus-white/[0.07] hover:border-tus-blue/30 transition-all duration-300">
                 <div class="flex items-start justify-between">
@@ -95,7 +95,7 @@
         
         {% else %}
         <!-- Empty state -->
-        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-12 text-center animate-slide-up">
+        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-12 text-center reveal">
             <div class="text-6xl mb-4">📭</div>
             <h3 class="text-tus-white font-display font-semibold text-2xl mb-2">
                 Aucun email pour le moment

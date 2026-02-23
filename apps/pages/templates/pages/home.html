@@ -12,7 +12,7 @@
 <section class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
     <!-- Background gradient -->
     <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/5 via-transparent to-transparent"></div>
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-tus-blue/10 rounded-full blur-[150px] pointer-events-none"></div>
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-tus-blue/10 rounded-full blur-[150px] pointer-events-none parallax-slow" data-speed="0.15"></div>
     
     <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
         <!-- Accent décoratif -->
@@ -20,26 +20,22 @@
             <div class="w-20 h-1.5 bg-gradient-to-r from-tus-blue via-cyan-400 to-tus-white/50 rounded-full"></div>
         </div>
         
-        <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6 reveal" style="animation-delay: 0.1s;">
-            <span class="block text-tus-white/60 text-3xl md:text-4xl mb-4">Studio d'architecture digitale en Guyane</span>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-6 reveal-clip" style="transition-delay: 0.15s;">
+            <span class="block text-tus-white/60 text-3xl md:text-4xl mb-4">Architecture digitale</span>
             Créons votre<br>
             <span class="text-gradient-animated">plateforme</span>
         </h1>
         
-        <p class="text-xl md:text-2xl text-tus-white/70 max-w-2xl mx-auto mb-4 reveal" style="animation-delay: 0.2s;">
-            « Quand l'élégance se conçoit, la performance se déploie. »
+        <p class="text-xl md:text-2xl text-tus-white/70 max-w-2xl mx-auto mb-8 reveal" style="transition-delay: 0.3s;">
+            Des outils métiers sur-mesure pour les entreprises d'Outre-mer.
         </p>
         
-        <p class="text-lg text-tus-white/60 max-w-3xl mx-auto mb-12 reveal" style="animation-delay: 0.3s;">
-            Studio d'architecture digitale basé à <strong class="text-tus-white/70">Cayenne, Guyane française</strong>, au service des entreprises des Outre-mer (Martinique, Guadeloupe).
-        </p>
-        
-        <div class="flex flex-col sm:flex-row gap-6 justify-center reveal" style="animation-delay: 0.4s;">
+        <div class="flex flex-col sm:flex-row gap-6 justify-center reveal" style="transition-delay: 0.45s;">
             <!-- Bouton principal ULTRA premium -->
             {% include 'partials/btn_cta_primary.html' with url='/contact/' text='Démarrer un projet' %}
             <!-- Bouton secondaire -->
-            <a href="/portfolio/" class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-500 hover:scale-[1.02] border border-tus-white/20 hover:border-tus-blue/50 hover:bg-tus-blue/10">
-                <span class="relative z-10 font-display font-bold text-lg text-tus-white/90 group-hover:text-tus-white transition-colors">Voir nos réalisations</span>
+            <a href="/portfolio/" class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-micro ease-standard hover:scale-[0.98] active:scale-95 border border-tus-white/20 hover:border-tus-blue/50 hover:bg-tus-blue/10">
+                <span class="relative z-10 font-display font-bold text-lg text-tus-white/90 group-hover:text-tus-white transition-colors duration-micro ease-standard">Voir les projets</span>
             </a>
         </div>
     </div>
@@ -67,7 +63,7 @@
                     </svg>
                 </div>
             </div>
-            <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal" style="animation-delay: 0.05s;">
+            <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal" style="transition-delay: 0.05s;">
                 <div>
                     <p class="text-sm uppercase tracking-wider text-tus-white/50">Pilotage</p>
                     <p class="text-lg font-display font-semibold text-tus-white">Écosystème TUS intégré</p>
@@ -78,7 +74,7 @@
                     </svg>
                 </div>
             </div>
-            <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal" style="animation-delay: 0.1s;">
+            <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal" style="transition-delay: 0.1s;">
                 <div>
                     <p class="text-sm uppercase tracking-wider text-tus-white/50">Ancrage</p>
                     <p class="text-lg font-display font-semibold text-tus-white">Guyane, Antilles</p>
@@ -97,12 +93,12 @@
 <section class="py-20 relative">
     <div class="max-w-6xl mx-auto px-6">
         <div class="text-center mb-20">
-            <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Nos expertises</span>
+            <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Expertises</span>
             <h2 class="text-4xl md:text-6xl font-display font-bold reveal">
-                Des solutions <span class="text-tus-blue">sur-mesure</span>
+                Solutions <span class="text-tus-blue">sur-mesure</span>
             </h2>
             <p class="text-tus-white/60 mt-6 max-w-2xl mx-auto text-lg reveal">
-                Une approche sur-mesure pour chaque projet. Architecture propriétaire, intégrité absolue.
+                Architecture propriétaire. Intégrité absolue.
             </p>
             <!-- Standard TUS Badge -->
             <div class="mt-8 reveal">
@@ -145,59 +141,59 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             
             <!-- Card 1 - Design UI/UX -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.1s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.1s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
                     <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3l2.5 5 5.5.8-4 3.8.9 5.4-4.9-2.6-4.9 2.6.9-5.4-4-3.8 5.5-.8L12 3z"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">Design UI/UX</h3>
-                <p class="text-tus-white/60 leading-relaxed">Interfaces métier intuitives, épurées des fonctions inutiles pour une prise en main immédiate.</p>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">Design UI/UX</h3>
+                <p class="text-tus-white/60 leading-relaxed">Interfaces intuitives. Prise en main immédiate.</p>
             </div>
             
             <!-- Card 2 - Développement -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.15s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.15s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
                     <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 3L4 14h6l-1 7 9-11h-6l1-7z"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">Architecture Digitale</h3>
-                <p class="text-tus-white/60 leading-relaxed">Architecture propriétaire haute performance. Zéro dépendance aux solutions génériques.</p>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">Architecture Digitale</h3>
+                <p class="text-tus-white/60 leading-relaxed">Haute performance. Zéro dépendance générique.</p>
             </div>
             
             <!-- Card 3 - E-commerce -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.2s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.2s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
                     <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 4h2l2.4 9.5a2 2 0 002 1.5h7.2a2 2 0 002-1.5L20 7H6"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 20a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">E-commerce Sécurisé</h3>
-                <p class="text-tus-white/60 leading-relaxed">Boutiques robustes avec intégration paiement sécurisée et tunnel de conversion optimisé.</p>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">E-commerce Sécurisé</h3>
+                <p class="text-tus-white/60 leading-relaxed">Boutiques robustes. Tunnel de conversion optimisé.</p>
             </div>
             
             <!-- Card 4 - SEO -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.3s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.3s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
                     <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 19h16M6 16l4-4 3 3 5-7"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">Référencement Natif</h3>
-                <p class="text-tus-white/60 leading-relaxed">SEO intégré dès la conception. Structure propriétaire pensée pour les moteurs, performances garanties.</p>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">Référencement Natif</h3>
+                <p class="text-tus-white/60 leading-relaxed">SEO intégré. Structure pensée pour les moteurs.</p>
             </div>
             
             <!-- Card 5 - Maintenance -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 transition-all duration-500 reveal" style="animation-delay: 0.4s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.4s;">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
                     <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.7 6.3a4 4 0 01-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4z"/>
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors">Support Technique</h3>
-                <p class="text-tus-white/60 leading-relaxed">Maintenance proactive, évolutions continues et support réactif. Interlocuteur humain dédié.</p>
+                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">Support Technique</h3>
+                <p class="text-tus-white/60 leading-relaxed">Maintenance proactive. Interlocuteur dédié.</p>
             </div>
         </div>
     </div>
@@ -209,42 +205,42 @@
     <div class="max-w-6xl mx-auto px-6 relative z-10">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-                <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Etude de cas</span>
-                <h2 class="text-3xl md:text-5xl font-display font-bold mb-6 reveal">
+                <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal-left">Etude de cas</span>
+                <h2 class="text-3xl md:text-5xl font-display font-bold mb-6 reveal-left">
                     Une architecture qui structure le business
                 </h2>
                 <p class="text-lg text-tus-white/70 mb-8 reveal">
-                    Nous concevons des plateformes qui fluidifient les operations, clarifient les decisions et reduisent le bruit. Pas une vitrine, un outil de pilotage.
+                    Des plateformes qui fluidifient les opérations. Pas une vitrine, un outil de pilotage.
                 </p>
                 <div class="space-y-4 reveal">
                     <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                         <p class="text-sm uppercase tracking-wider text-tus-white/50">Contexte</p>
-                        <p class="text-tus-white/80">Process internes disperses, informations critiques eparpillees.</p>
+                        <p class="text-tus-white/80">Process dispersés. Informations éparpillées.</p>
                     </div>
                     <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                         <p class="text-sm uppercase tracking-wider text-tus-white/50">Approche</p>
-                        <p class="text-tus-white/80">Suite digitale sur mesure, parcours client et back-office unifies.</p>
+                        <p class="text-tus-white/80">Suite digitale sur-mesure. Parcours unifiés.</p>
                     </div>
                     <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                         <p class="text-sm uppercase tracking-wider text-tus-white/50">Impact</p>
-                        <p class="text-tus-white/80">Pilotage centralise, decisions plus rapides, experience client plus claire.</p>
+                        <p class="text-tus-white/80">Pilotage centralisé. Décisions rapides.</p>
                     </div>
                 </div>
-                <a href="/portfolio/" class="mt-8 inline-flex items-center gap-2 text-tus-blue hover:text-cyan-400 font-semibold transition-colors reveal">
-                    Voir les etudes de cas
+                <a href="/portfolio/" class="mt-8 inline-flex items-center gap-2 text-tus-blue hover:text-cyan-400 font-semibold transition-colors duration-micro ease-standard reveal">
+                    Voir les études de cas
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                     </svg>
                 </a>
             </div>
-            <div class="reveal">
-                <div class="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-8 shadow-2xl">
+            <div class="reveal-right">
+                <div class="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-8 shadow-2xl hover:border-tus-blue/30 transition-colors duration-micro ease-standard card-tilt">
                     <div class="flex items-center justify-between mb-6">
-                        <p class="text-sm uppercase tracking-wider text-tus-white/50">Cas recent</p>
+                        <p class="text-sm uppercase tracking-wider text-tus-white/50">Cas récent</p>
                         <span class="px-3 py-1 rounded-full bg-tus-blue/10 text-tus-blue text-xs font-semibold">Client confidentiel</span>
                     </div>
                     <h3 class="text-2xl font-display font-bold mb-4">Plateforme de pilotage multi-sites</h3>
-                    <p class="text-tus-white/60 mb-6">Une suite digitale pour harmoniser le suivi des projets, la validation des livrables et la facturation.</p>
+                    <p class="text-tus-white/60 mb-6">Suite digitale pour harmoniser le suivi, la validation et la facturation.</p>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="rounded-xl bg-white/[0.03] border border-white/10 p-4">
                             <p class="text-xs uppercase tracking-wider text-tus-white/50">Livrable clé</p>
@@ -265,19 +261,19 @@
 <section class="py-24 relative overflow-hidden">
     <!-- Background effects -->
     <div class="absolute inset-0 bg-gradient-to-r from-tus-blue/10 via-tus-green/5 to-tus-blue/5"></div>
-    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-tus-blue/15 to-tus-green/10 rounded-full blur-[120px]"></div>
+    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-tus-blue/15 to-tus-green/10 rounded-full blur-[120px] parallax-slow" data-speed="0.1"></div>
     
     <div class="max-w-6xl mx-auto px-6 relative z-10">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
             <!-- Content -->
             <div class="order-2 lg:order-1">
-                <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Portail de Pilotage</span>
-                <h2 class="text-3xl md:text-5xl font-display font-bold mb-6 reveal">
+                <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal-left">Portail de Pilotage</span>
+                <h2 class="text-3xl md:text-5xl font-display font-bold mb-6 reveal-left">
                     Plus qu'un site,<br>
                     <span class="text-tus-blue">une suite logicielle</span>
                 </h2>
                 <p class="text-lg text-tus-white/70 mb-8 reveal">
-                    Suivez vos devis, validez vos étapes, retrouvez vos factures et gérez vos documents sur votre <strong class="text-tus-white">Écosystème TUS sécurisé</strong>.
+                    Suivez vos devis, validez vos étapes et gérez vos documents sur votre <strong class="text-tus-white">Écosystème TUS sécurisé</strong>.
                 </p>
                 
                 <!-- Features list -->
@@ -287,8 +283,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                         <div>
-                            <p class="font-semibold text-tus-white">Suivi projet en temps réel</p>
-                            <p class="text-sm text-tus-white/60">Visualisez chaque étape, progression et délais de votre projet</p>
+                            <p class="font-semibold text-tus-white">Suivi temps réel</p>
+                            <p class="text-sm text-tus-white/60">Visualisez chaque étape de votre projet.</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3 reveal">
@@ -297,7 +293,7 @@
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Tableau de bord unifié</p>
-                            <p class="text-sm text-tus-white/60">Tous vos projets, devis et factures centralisés</p>
+                            <p class="text-sm text-tus-white/60">Projets, devis et factures centralisés.</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3 reveal">
@@ -306,7 +302,7 @@
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Transparence radicale</p>
-                            <p class="text-sm text-tus-white/60">Historique complet des échanges et validations</p>
+                            <p class="text-sm text-tus-white/60">Historique complet des échanges.</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3 reveal">
@@ -315,21 +311,21 @@
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Sécurité renforcée</p>
-                            <p class="text-sm text-tus-white/60">Accès privé, données chiffrées, conformité RGPD</p>
+                            <p class="text-sm text-tus-white/60">Accès privé, données chiffrées.</p>
                         </div>
                     </li>
                 </ul>
                 
-                <a href="{% url 'clients:dashboard' %}" class="group inline-flex items-center gap-2 text-tus-blue hover:text-cyan-400 font-semibold transition-colors reveal">
+                <a href="{% url 'clients:dashboard' %}" class="group inline-flex items-center gap-2 text-tus-blue hover:text-cyan-400 font-semibold transition-colors duration-micro ease-standard reveal">
                     Accéder à votre Écosystème TUS
-                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-micro ease-standard" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                     </svg>
                 </a>
             </div>
             
             <!-- Visual Mock-up -->
-            <div class="order-1 lg:order-2 reveal">
+            <div class="order-1 lg:order-2 reveal-right">
                 <div class="relative">
                     <!-- Browser Frame -->
                     <div class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] overflow-hidden shadow-2xl">
@@ -447,20 +443,20 @@
     
     <div class="max-w-6xl mx-auto px-6 relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div class="text-center group reveal" style="animation-delay: 0.1s;">
-                <div class="text-6xl md:text-7xl font-display font-bold text-tus-blue mb-3 group-hover:scale-110 transition-transform duration-300">
+            <div class="text-center group reveal" style="transition-delay: 0.1s;">
+                <div class="text-6xl md:text-7xl font-display font-bold text-tus-blue mb-3 group-hover:scale-105 transition-transform duration-micro">
                     <span class="counter" data-target="100" data-suffix="%">0%</span>
                 </div>
                 <p class="text-tus-white/70 text-sm uppercase tracking-wider">Projets livrés dans les délais</p>
             </div>
-            <div class="text-center group reveal" style="animation-delay: 0.2s;">
-                <div class="text-6xl md:text-7xl font-display font-bold text-tus-blue mb-3 group-hover:scale-110 transition-transform duration-300">
+            <div class="text-center group reveal" style="transition-delay: 0.2s;">
+                <div class="text-6xl md:text-7xl font-display font-bold text-tus-blue mb-3 group-hover:scale-105 transition-transform duration-micro">
                     <span class="counter" data-target="2" data-suffix="">0</span>
                 </div>
                 <p class="text-tus-white/70 text-sm uppercase tracking-wider">Projets réalisés</p>
             </div>
-            <div class="text-center group reveal flex flex-col justify-center items-center" style="animation-delay: 0.3s;">
-                <div class="mb-3 group-hover:scale-110 transition-transform duration-300 flex justify-center">
+            <div class="text-center group reveal flex flex-col justify-center items-center" style="transition-delay: 0.3s;">
+                <div class="mb-3 group-hover:scale-105 transition-transform duration-micro flex justify-center">
                     <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-tus-blue/30 bg-tus-blue/10">
                         <svg class="w-6 h-6 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/>
@@ -488,86 +484,86 @@
                 Engagements de <span class="text-tus-green">transparence</span>
             </h2>
             <p class="text-tus-white/60 mt-6 max-w-2xl mx-auto reveal">
-                Nous ne gonflons pas nos chiffres. Chaque affirmation est vérifiable, chaque réalisation est consultable.
+                Chaque affirmation est vérifiable. Chaque réalisation est consultable.
             </p>
         </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Engagement 1 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 transition-all duration-300 reveal" style="animation-delay: 0.1s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.1s;">
+                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Chiffres réels uniquement</h3>
+                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Chiffres réels</h3>
                 <p class="text-tus-white/60 text-sm leading-relaxed">
-                    Certifiés et auditables. Nos véritables résultats, mis à jour régulièrement.
+                    Certifiés et auditables. Mis à jour régulièrement.
                 </p>
             </div>
             
             <!-- Engagement 2 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 transition-all duration-300 reveal" style="animation-delay: 0.15s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.15s;">
+                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                     </svg>
                 </div>
-                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Portfolio avec liens actifs</h3>
+                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Portfolio actif</h3>
                 <p class="text-tus-white/60 text-sm leading-relaxed">
-                    Chaque projet présenté est consultable en ligne. Pas de maquettes, pas de promesses vides.
+                    Projets consultables en ligne. Pas de maquettes.
                 </p>
             </div>
             
             <!-- Engagement 3 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 transition-all duration-300 reveal" style="animation-delay: 0.2s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.2s;">
+                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                     </svg>
                 </div>
                 <h3 class="text-lg font-display font-bold text-tus-white mb-2">Code source livré</h3>
                 <p class="text-tus-white/60 text-sm leading-relaxed">
-                    Votre code vous appartient. Livraison complète, documentation incluse, zéro dépendance à notre studio.
+                    Votre code vous appartient. Zéro dépendance.
                 </p>
             </div>
             
             <!-- Engagement 4 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 transition-all duration-300 reveal" style="animation-delay: 0.25s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.25s;">
+                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                     </svg>
                 </div>
-                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Devis détaillés ligne par ligne</h3>
+                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Devis détaillés</h3>
                 <p class="text-tus-white/60 text-sm leading-relaxed">
-                    Chaque prestation est décomposée. Vous savez exactement ce que vous payez, sans surprise.
+                    Prestations décomposées. Sans surprise.
                 </p>
             </div>
             
             <!-- Engagement 5 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 transition-all duration-300 reveal" style="animation-delay: 0.3s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.3s;">
+                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
                 </div>
-                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Délais réalistes annoncés</h3>
+                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Délais réalistes</h3>
                 <p class="text-tus-white/60 text-sm leading-relaxed">
-                    Pas de promesses de "site en 48h". Des délais honnêtes pour un travail de qualité professionnelle.
+                    Délais honnêtes pour un travail professionnel.
                 </p>
             </div>
             
             <!-- Engagement 6 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 transition-all duration-300 reveal" style="animation-delay: 0.35s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.35s;">
+                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                     </svg>
                 </div>
                 <h3 class="text-lg font-display font-bold text-tus-white mb-2">Communication directe</h3>
                 <p class="text-tus-white/60 text-sm leading-relaxed">
-                    Support technique réactif avec interlocuteur humain dédié.
+                    Support réactif. Interlocuteur dédié.
                 </p>
             </div>
         </div>
@@ -598,45 +594,45 @@
                 Notre <span class="text-tus-blue">référentiel</span> de qualité
             </h2>
             <p class="text-tus-white/60 mt-6 max-w-xl mx-auto reveal">
-                Des principes clairs, assumes, et tenus projet apres projet.
+                Des principes clairs, assumés, et tenus projet après projet.
             </p>
         </div>
         
         <!-- FAQ Items (HTMX) -->
-        <div class="space-y-4">
+        <div class="space-y-4 stagger-children">
             <!-- FAQ 1 - Sur mesure -->
-            <div class="faq-item open rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal" style="animation-delay: 0.1s;">
+            <div class="faq-item open rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard" style="transition-delay: 0.1s;">
                 <button hx-on:click="this.closest('.faq-item').classList.toggle('open')" 
-                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-colors">
+                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
                     <span class="text-lg font-semibold text-tus-white pr-4">Pourquoi une architecture sur mesure ?</span>
-                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0 transition-transform duration-micro ease-standard" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-                <div class="faq-content">
+                <div class="faq-content transition-all duration-modal ease-standard">
                     <div class="px-6 pb-6">
                         <div class="pt-2 border-t border-white/5">
                             <p class="text-tus-white/70 leading-relaxed mb-4">
-                                <strong class="text-tus-white">Stabilité, performance, maîtrise.</strong> Nous construisons des architectures adaptées à vos flux réels, évolutives et maintenables sur le long terme.
+                                <strong class="text-tus-white">Stabilité, performance, maîtrise.</strong> Des architectures adaptées à vos flux réels, évolutives et maintenables.
                             </p>
                             <ul class="space-y-2 text-sm text-tus-white/60">
                                 <li class="flex items-start gap-2">
                                     <svg class="w-4 h-4 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
-                                    <span>Socle propre et documenté, sans dette technique superflue</span>
+                                    <span>Socle propre, sans dette technique</span>
                                 </li>
                                 <li class="flex items-start gap-2">
                                     <svg class="w-4 h-4 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
-                                    <span>Architecture stable, testée et évolutive</span>
+                                    <span>Architecture stable et évolutive</span>
                                 </li>
                                 <li class="flex items-start gap-2">
                                     <svg class="w-4 h-4 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                     </svg>
-                                    <span>Code auditable, propriétaire et transmissible</span>
+                                    <span>Code auditable et propriétaire</span>
                                 </li>
                             </ul>
                         </div>
@@ -645,15 +641,15 @@
             </div>
             
             <!-- FAQ 2 - Suivi -->
-            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal" style="animation-delay: 0.15s;">
+            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard" style="transition-delay: 0.15s;">
                 <button hx-on:click="this.closest('.faq-item').classList.toggle('open')" 
-                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-colors">
+                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
                     <span class="text-lg font-semibold text-tus-white pr-4">Comment se passe le suivi de projet ?</span>
-                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0 transition-transform duration-micro ease-standard" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-                <div class="faq-content">
+                <div class="faq-content transition-all duration-modal ease-standard">
                     <div class="px-6 pb-6">
                         <div class="pt-2 border-t border-white/5">
                             <p class="text-tus-white/70 leading-relaxed mb-4">
@@ -676,7 +672,7 @@
                                     <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                                     </svg>
-                                    <span class="text-sm text-tus-white/80">Factures accessibles en ligne</span>
+                                    <span class="text-sm text-tus-white/80">Factures accessibles</span>
                                 </div>
                                 <div class="flex items-center gap-2 p-3 rounded-lg bg-tus-blue/5 border border-tus-blue/10">
                                     <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -691,23 +687,23 @@
             </div>
             
             <!-- FAQ 3 - Autonomie -->
-            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal" style="animation-delay: 0.2s;">
+            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard" style="transition-delay: 0.2s;">
                 <button hx-on:click="this.closest('.faq-item').classList.toggle('open')" 
-                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-colors">
+                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
                     <span class="text-lg font-semibold text-tus-white pr-4">Serai-je autonome pour gérer mon site ?</span>
-                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0 transition-transform duration-micro ease-standard" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-                <div class="faq-content">
+                <div class="faq-content transition-all duration-modal ease-standard">
                     <div class="px-6 pb-6">
                         <div class="pt-2 border-t border-white/5">
                             <p class="text-tus-white/70 leading-relaxed mb-4">
-                                <strong class="text-tus-white">Autonomie totale.</strong> Nous concevons des interfaces sur-mesure, purgées des options techniques inutiles qui vous font perdre du temps.
+                                <strong class="text-tus-white">Autonomie totale.</strong> Interfaces sur-mesure, purgées des options inutiles.
                             </p>
                             <div class="p-4 rounded-xl bg-gradient-to-r from-tus-blue/10 to-transparent border border-tus-blue/20">
                                 <p class="text-sm text-tus-white/80 italic">
-                                    "Vous éditez votre contenu comme vous écrivez un email. Pas de code, pas de jargon, juste votre métier."
+                                    "Éditez votre contenu comme un email. Pas de jargon, juste votre métier."
                                 </p>
                             </div>
                         </div>
@@ -716,19 +712,19 @@
             </div>
             
             <!-- FAQ 4 - Délais -->
-            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal" style="animation-delay: 0.25s;">
+            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard" style="transition-delay: 0.25s;">
                 <button hx-on:click="this.closest('.faq-item').classList.toggle('open')" 
-                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-colors">
+                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
                     <span class="text-lg font-semibold text-tus-white pr-4">Quels sont vos délais de réalisation ?</span>
-                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0 transition-transform duration-micro ease-standard" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                     </svg>
                 </button>
-                <div class="faq-content">
+                <div class="faq-content transition-all duration-modal ease-standard">
                     <div class="px-6 pb-6">
                         <div class="pt-2 border-t border-white/5">
                             <p class="text-tus-white/70 leading-relaxed mb-4">
-                                Chaque projet est unique, mais voici nos références habituelles :
+                                Chaque projet est unique. Voici nos références :
                             </p>
                             <div class="space-y-3">
                                 <div class="flex justify-between items-center p-3 rounded-lg bg-white/[0.03]">

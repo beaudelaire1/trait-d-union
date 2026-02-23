@@ -5,18 +5,19 @@
     <!-- Arrière-plan avec effets lumineux -->
     <div class="absolute inset-0 pointer-events-none">
         <!-- Blob bleu-vert en haut à gauche -->
-        <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-tus-blue/20 to-tus-green/10 rounded-full blur-[150px]"></div>
+        <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-tus-blue/20 to-tus-green/10 rounded-full blur-[150px] parallax-slow" data-speed="0.12"></div>
         <!-- Blob vert-bleu en bas à droite -->
-        <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-gradient-to-tl from-tus-green/10 to-tus-blue/15 rounded-full blur-[120px]"></div>
+        <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-gradient-to-tl from-tus-green/10 to-tus-blue/15 rounded-full blur-[120px] parallax-slow" data-speed="0.08"></div>
         <!-- Blob subtil au centre -->
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-gradient-to-r from-tus-blue/5 via-tus-green/5 to-tus-blue/5 rounded-full blur-[100px]"></div>
     </div>
 
     <div class="max-w-4xl mx-auto relative z-10">
         <!-- Header -->
-        <div class="text-center mb-12 animate-fade-in">
-            <h1 class="text-4xl md:text-5xl font-display font-bold mb-4">Parlons de votre <span class="text-tus-blue">projet</span></h1>
-            <p class="text-tus-white/70 max-w-xl mx-auto">Décrivez-nous votre vision. Nous transformons vos idées en expériences digitales d'exception.</p>
+        <div class="text-center mb-12">
+            <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue text-sm font-medium mb-4 reveal">Contactez-nous</span>
+            <h1 class="text-4xl md:text-5xl font-display font-bold mb-4 reveal-clip" style="transition-delay: 0.1s;">Parlons de votre <span class="text-tus-blue">projet</span></h1>
+            <p class="text-tus-white/70 max-w-xl mx-auto reveal" style="transition-delay: 0.2s;">Décrivez-nous votre vision. Nous transformons vos idées en expériences digitales d’exception.</p>
         </div>
 
         <!-- Bande fixe avec dégradé animé et texte défilant premium -->
@@ -44,7 +45,7 @@
         </div>
         
         <!-- Formulaire Glassmorphism -->
-        <div class="relative rounded-b-2xl p-8 md:p-12 animate-slide-up overflow-hidden">
+        <div class="relative rounded-b-2xl p-8 md:p-12 reveal-scale overflow-hidden" style="transition-delay: 0.15s;">
             <!-- Fond glass -->
             <div class="absolute inset-0 bg-tus-white/[0.03] backdrop-blur-xl"></div>
             <!-- Bordure dégradée subtile -->
@@ -54,7 +55,7 @@
             <!-- Lueur interne subtile -->
             <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/[0.02] to-transparent"></div>
             
-            <form method="post" enctype="multipart/form-data" class="space-y-6 relative z-10">
+            <form method="post" enctype="multipart/form-data" class="space-y-6 relative z-10 stagger-children">
             {% csrf_token %}
             {{ form.non_field_errors }}
             
@@ -167,7 +168,7 @@
             {% endif %}
 
             <!-- Submit -->
-            <div class="relative group">
+            <div class="relative group reveal-scale">
                 <!-- Glow externe -->
                 <div class="absolute -inset-1 bg-gradient-to-r from-tus-blue via-[#2D5BFF] to-tus-blue rounded-2xl opacity-50 blur-lg group-hover:opacity-80 transition-all duration-500"></div>
                 <button type="submit" id="submit-btn"
