@@ -305,7 +305,7 @@
                     <div class="w-full h-full bg-gradient-to-b from-tus-blue/40 via-tus-blue/20 to-tus-green/30 strategy-timeline-line"></div>
                 </div>
                 {% for phase in phases %}
-                <div class="relative pl-16 {% if not forloop.last %}pb-20{% endif %} reveal-left" style="transition-delay: {{ forloop.counter0|add:"1" }}50ms;">
+                <div class="relative pl-16 {% if not forloop.last %}pb-20{% endif %} reveal-left" style="transition-delay: 0.{{ forloop.counter0|add:"1" }}5s;">
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full {% if forloop.last %}bg-tus-green/15 border-2 border-tus-green/40{% else %}bg-tus-blue/15 border-2 border-tus-blue/40{% endif %} flex items-center justify-center backdrop-blur-sm">
                         <span class="{% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %} text-xs font-bold">{{ forloop.counter|stringformat:"02d" }}</span>
                     </div>
