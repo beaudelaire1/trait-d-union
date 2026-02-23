@@ -21,11 +21,27 @@ class ProjectAdmin(admin.ModelAdmin):
     inlines = [ProjectImageInline]
     
     fieldsets = (
-        (None, {
+        ('Identité du projet', {
             'fields': ('title', 'slug', 'project_type', 'client_name')
         }),
-        ('Contenu', {
-            'fields': ('objective', 'solution', 'result', 'technologies')
+        ('Ch.01 — Pourquoi (Objectif)', {
+            'description': 'Contexte du projet : pourquoi le client a fait appel à nous, quel était le besoin.',
+            'fields': ('objective',)
+        }),
+        ('Ch.02 — Défi technique (Solution)', {
+            'description': 'Le problème technique à résoudre et la solution conçue.',
+            'fields': ('solution',)
+        }),
+        ('Ch.03 — Stratégie (Approche)', {
+            'description': 'Méthodologie déployée, processus en phases, choix d\'architecture. Laissez vide pour afficher le texte par défaut.',
+            'fields': ('strategy',)
+        }),
+        ('Ch.04 — Résultat (Impact)', {
+            'description': 'Résultat final, impact mesurable, livrables.',
+            'fields': ('result',)
+        }),
+        ('Stack technique', {
+            'fields': ('technologies',)
         }),
         ('Médias', {
             'fields': ('thumbnail', 'url')

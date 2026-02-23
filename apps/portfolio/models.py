@@ -7,9 +7,9 @@ from django.db import models
 class ProjectType(models.TextChoices):
     """Types of projects for filtering."""
 
-    VITRINE = 'vitrine', 'Site Vitrine'
-    COMMERCE = 'commerce', 'E‑commerce'
-    SYSTEME = 'systeme', 'Plateforme / Mini‑ERP'
+    SITE = 'site', 'Site'
+    COMMERCE = 'commerce', 'Commerce'
+    OUTILS = 'outils', 'Outils métiers'
 
 
 class Project(models.Model):
@@ -19,9 +19,10 @@ class Project(models.Model):
     slug = models.SlugField(max_length=200, unique=True)
     project_type = models.CharField(max_length=20, choices=ProjectType.choices)
     client_name = models.CharField(max_length=200, blank=True)
-    objective = models.TextField()
-    solution = models.TextField()
-    result = models.TextField()
+    objective = models.TextField(help_text="Ch.01 — Pourquoi : contexte et objectif du projet")
+    solution = models.TextField(help_text="Ch.02 — Défi technique : problème résolu et approche")
+    strategy = models.TextField(blank=True, default='', help_text="Ch.03 — Stratégie : méthodologie et processus déployés")
+    result = models.TextField(help_text="Ch.04 — Résultat : impact et livrables")
     technologies = models.JSONField(default=list, blank=True)
     thumbnail = models.ImageField(upload_to='portfolio/thumbnails/', blank=True, null=True)
     url = models.URLField(blank=True)

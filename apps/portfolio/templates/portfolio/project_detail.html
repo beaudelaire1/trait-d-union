@@ -278,7 +278,7 @@
             <!-- Narration d'introduction — donne du poids au chapitre -->
             <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
                 <p class="text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
-                    Chaque projet nécessite une méthodologie adaptée. Pour {{ project.title }}, nous avons déployé un processus en trois phases pour garantir un résultat aligné sur les objectifs.
+                    {% if project.strategy %}{{ project.strategy }}{% else %}Chaque projet nécessite une méthodologie adaptée. Pour {{ project.title }}, nous avons déployé un processus en trois phases pour garantir un résultat aligné sur les objectifs.{% endif %}
                 </p>
             </div>
 
