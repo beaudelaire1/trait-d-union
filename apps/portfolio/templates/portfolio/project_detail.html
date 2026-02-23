@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static portfolio_tags %}
-{% block title %}Projet Web {{ project.title }} - {{ project.get_category_display }} - Trait d'Union Studio{% endblock %}
-{% block meta_description %}{{ project.objective|truncatewords:30 }} - Réalisation de site web et application en Guyane et Antilles par Trait d'Union Studio.{% endblock %}
+{% block title %}Projet Web {{ project.title }} - {{ project.get_project_type_display }} - Trait d'Union Studio{% endblock %}
+{% block meta_description %}{{ project.objective|plain_text|truncatewords:30 }} - Réalisation de site web et application en Guyane et Antilles par Trait d'Union Studio.{% endblock %}
 
 {% block content %}
 <!-- Scroll Progress Bar -->

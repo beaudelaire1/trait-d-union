@@ -1,6 +1,8 @@
 """Template filters for the portfolio app."""
 from __future__ import annotations
 
+import html as html_module
+
 import bleach
 from django import template
 from django.utils.safestring import mark_safe
@@ -37,6 +39,21 @@ def safe_html_filter(value: str) -> str:
         strip=True,
     )
     return mark_safe(clean)
+
+
+@register.filter(name="plain_text")
+def plain_text_filter(value: str) -> str:
+    """Strip ALL HTML tags and decode entities → plain unicode text.
+
+    Usage: {{ project.objective|plain_text|truncatewords:20 }}
+    Idéal pour les meta descriptions, alt text, et aperçus de cards.
+    """
+    if not value:
+        return ""
+    # 1. Strip all tags (bleach with empty tag list)
+    stripped = bleach.clean(value, tags=[], strip=True)
+    # 2. Decode HTML entities (&eacute; → é, &amp; → &, etc.)
+    return html_module.unescape(stripped)
 
 
 # Keep backward-compat alias for any template still using |md
