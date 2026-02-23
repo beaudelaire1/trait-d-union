@@ -30,6 +30,6 @@ sentry-sdk[django]>=1.39.0
 # Paiements Stripe
 stripe>=8.0.0
 
-# Markdown pour le contenu portfolio
-markdown>=3.5
+# TinyMCE éditeur rich-text admin portfolio
+django-tinymce>=4.0
 bleach>=6.0

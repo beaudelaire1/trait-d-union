@@ -118,7 +118,7 @@
             <!-- Narration — pleine largeur, immersive -->
             <div class="space-y-8 reveal" style="transition-delay: 0.15s;">
                 <div class="prose-chapter text-2xl md:text-3xl text-tus-white/85 leading-[1.5] font-light narrative-text">
-                    {{ project.objective|md }}
+                    {{ project.objective|safe_html }}
                 </div>
             </div>
 
@@ -221,7 +221,7 @@
                     </div>
                     <div class="space-y-6 reveal-right" style="transition-delay: 0.15s;">
                         <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
-                            {{ project.solution|md }}
+                            {{ project.solution|safe_html }}
                         </div>
                         <!-- Technologies -->
                         {% if project.tech_list %}
@@ -282,7 +282,7 @@
             <!-- Contenu dynamique — rempli depuis l'admin -->
             <div class="max-w-3xl reveal" style="transition-delay: 0.1s;">
                 <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
-                    {{ project.strategy|md }}
+                    {{ project.strategy|safe_html }}
                 </div>
             </div>
             {% else %}
@@ -446,7 +446,7 @@
                     </div>
                 </div>
                 <div class="prose-chapter text-xl text-tus-white/70 max-w-3xl mx-auto leading-relaxed font-light reveal" style="transition-delay: 0.1s;">
-                    {{ project.result|md }}
+                    {{ project.result|safe_html }}
                 </div>
             </div>
 

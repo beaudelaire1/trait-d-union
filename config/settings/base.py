@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.sites',
     'django_htmx',
+    'tinymce',
     # allauth
     'allauth',
     'allauth.account',
@@ -377,4 +378,25 @@ ACCOUNT_FORMS = {
 # Redirections
 LOGIN_REDIRECT_URL = '/espace-client/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+
+# ── TinyMCE ──────────────────────────────────────────────────────
+TINYMCE_DEFAULT_CONFIG = {
+    'theme': 'silver',
+    'height': 360,
+    'menubar': False,
+    'plugins': 'lists link autolink',
+    'toolbar': (
+        'undo redo | bold italic underline | '
+        'bullist numlist | link | removeformat'
+    ),
+    'content_css': 'default',
+    'branding': False,
+    'statusbar': False,
+    'valid_elements': (
+        'p,br,strong/b,em/i,u,'
+        'ul,ol,li,'
+        'a[href|title|target],'
+        'h3,h4,h5,blockquote,code,hr'
+    ),
+}
 LOGIN_URL = '/accounts/login/'

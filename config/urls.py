@@ -32,6 +32,8 @@ urlpatterns = [
     # Client portal (Phase 4)
     path('espace-client/', include('apps.clients.urls')),
     path('accounts/', include('allauth.urls')),
+    # TinyMCE
+    path('tinymce/', include('tinymce.urls')),
     # SEO
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
