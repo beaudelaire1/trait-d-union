@@ -256,11 +256,15 @@
     // before the browser constructs the form data (disabled controls are excluded).
     document.querySelectorAll('#emailForm button[type="submit"]').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            var hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = this.name;
-            hidden.value = '1';
-            document.getElementById('emailForm').appendChild(hidden);
+            var form = document.getElementById('emailForm');
+            var existing = form.querySelector('input[name="' + this.name + '"][type="hidden"]');
+            if (!existing) {
+                var hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = this.name;
+                hidden.value = '1';
+                form.appendChild(hidden);
+            }
         });
     });
 
