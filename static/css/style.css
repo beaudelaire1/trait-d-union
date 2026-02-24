@@ -1288,6 +1288,9 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
    PROSE CHAPTER — Markdown rendered content
    Override Tailwind CDN preflight resets
    ============================================ */
+.prose-chapter {
+    font-weight: 300;
+}
 .prose-chapter p {
     display: block !important;
     margin-bottom: 1em;

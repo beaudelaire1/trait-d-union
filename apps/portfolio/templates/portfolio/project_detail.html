@@ -117,7 +117,7 @@
 
             <!-- Narration — pleine largeur, immersive -->
             <div class="space-y-8 reveal" style="transition-delay: 0.15s;">
-                <div class="prose-chapter text-2xl md:text-3xl text-tus-white/85 leading-[1.5] font-light narrative-text">
+                <div class="prose-chapter text-2xl md:text-3xl text-tus-white/85 leading-[1.5] narrative-text">
                     {{ project.objective|safe_html }}
                 </div>
             </div>
@@ -220,7 +220,7 @@
                         </div>
                     </div>
                     <div class="space-y-6 reveal-right" style="transition-delay: 0.15s;">
-                        <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
+                        <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed narrative-text">
                             {{ project.solution|safe_html }}
                         </div>
                         <!-- Technologies -->
@@ -281,7 +281,7 @@
             {# ── Paragraphe d'introduction (optionnel, champ strategy TinyMCE) ── #}
             {% if project.strategy %}
             <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
-                <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed font-light narrative-text">
+                <div class="prose-chapter text-xl md:text-2xl text-tus-white/80 leading-relaxed narrative-text">
                     {{ project.strategy|safe_html }}
                 </div>
             </div>
@@ -505,7 +505,7 @@
                         <h2 class="text-3xl md:text-4xl font-display font-bold">Résultat</h2>
                     </div>
                 </div>
-                <div class="prose-chapter text-xl text-tus-white/70 max-w-3xl mx-auto leading-relaxed font-light reveal" style="transition-delay: 0.1s;">
+                <div class="prose-chapter text-xl text-tus-white/70 max-w-3xl mx-auto leading-relaxed reveal" style="transition-delay: 0.1s;">
                     {{ project.result|safe_html }}
                 </div>
             </div>
