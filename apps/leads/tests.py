@@ -2,14 +2,18 @@
 import pytest
 import requests
 from unittest.mock import patch, MagicMock
+from django.contrib.auth import get_user_model
 from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 from django.core import mail
 
 from apps.leads.models import Lead, ProjectTypeChoice, BudgetRange
+from apps.leads.email_models import EmailComposition
 from apps.leads.forms import ContactForm
 from apps.leads.services import EmailService
 from apps.leads.views import verify_recaptcha
+
+User = get_user_model()
 
 
 class VerifyRecaptchaTest(TestCase):
@@ -231,3 +235,47 @@ class ContactSuccessViewTest(TestCase):
         response = self.client.get(reverse('leads:success'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'leads/success.html')
+
+
+class EmailComposeViewTest(TestCase):
+    """Test the email compose view send/draft logic."""
+
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(
+            username='staffuser',
+            password='testpass123',
+            is_staff=True,
+        )
+        self.client.login(username='staffuser', password='testpass123')
+        self.url = reverse('admin_emails:email_compose')
+
+    @patch('apps.leads.email_views.EmailComposeView._send_email', return_value=True)
+    def test_send_button_creates_sent_email(self, mock_send):
+        """Test that including 'send' in POST data marks the email as sent."""
+        data = {
+            'to_emails': 'test@example.com',
+            'subject': 'Test subject',
+            'body_html': '<p>Hello</p>',
+            'send': '1',
+        }
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 302)
+        email = EmailComposition.objects.latest('created_at')
+        self.assertFalse(email.is_draft)
+        self.assertIsNotNone(email.sent_at)
+        mock_send.assert_called_once()
+
+    def test_draft_button_creates_draft_email(self):
+        """Test that omitting 'send' from POST data saves as draft."""
+        data = {
+            'to_emails': 'test@example.com',
+            'subject': 'Draft subject',
+            'body_html': '<p>Draft</p>',
+            'draft': '1',
+        }
+        response = self.client.post(self.url, data=data)
+        self.assertEqual(response.status_code, 302)
+        email = EmailComposition.objects.latest('created_at')
+        self.assertTrue(email.is_draft)
+        self.assertIsNone(email.sent_at)

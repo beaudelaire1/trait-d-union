@@ -250,5 +250,25 @@
         field.classList.toggle('hidden');
         this.textContent = field.classList.contains('hidden') ? '+ Ajouter BCC' : '- Masquer BCC';
     });
+
+    // Fix: preserve submit button name via hidden input so it is not lost
+    // when the global form-validation script in base.html disables the button
+    // before the browser constructs the form data (disabled controls are excluded).
+    document.querySelectorAll('#emailForm button[type="submit"]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = this.name;
+            hidden.value = '1';
+            document.getElementById('emailForm').appendChild(hidden);
+        });
+    });
+
+    // Ensure TinyMCE content is synced to the textarea before submission
+    document.getElementById('emailForm').addEventListener('submit', function() {
+        if (typeof tinymce !== 'undefined') {
+            tinymce.triggerSave();
+        }
+    });
 </script>
 {% endblock %}
