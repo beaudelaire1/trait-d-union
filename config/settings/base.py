@@ -390,7 +390,14 @@ TINYMCE_DEFAULT_CONFIG = {
         'undo redo | bold italic underline | '
         'bullist numlist | link | removeformat'
     ),
-    'content_css': 'default',
+    'content_style': (
+        "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap');"
+        "body { font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.7; "
+        "color: #222; letter-spacing: -0.005em; }"
+        "strong, b { font-weight: 700; }"
+        "ul, ol { padding-left: 1.5em; margin: 0.8em 0; }"
+        "li { margin-bottom: 0.3em; }"
+    ),
     'branding': False,
     'statusbar': False,
     'valid_elements': (

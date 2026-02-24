@@ -30,7 +30,7 @@
 }
 
 .font-space {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 #navbar {
@@ -71,18 +71,41 @@ html {
 }
 
 body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'DM Sans', system-ui, sans-serif;
     background-color: var(--tus-black);
     color: var(--tus-white);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-weight: 400;
+    letter-spacing: -0.01em;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+}
+
+h1 {
+    font-weight: 800;
+    letter-spacing: -0.035em;
+}
+
+h2 {
+    font-weight: 700;
+    letter-spacing: -0.03em;
+}
+
+h3 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.015em;
 }
 
 /* ============================================
@@ -101,8 +124,9 @@ a {
     color: var(--tus-white);
     padding: 0.875rem 2rem;
     border-radius: 9999px;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 600;
+    letter-spacing: -0.01em;
     transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -125,8 +149,9 @@ a {
     padding: 0.875rem 2rem;
     border: 1px solid var(--stroke-dark);
     border-radius: 9999px;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 600;
+    letter-spacing: -0.01em;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -182,7 +207,7 @@ a {
    Form Inputs Premium
    ============================================ */
 input, select, textarea {
-    font-family: 'Inter', sans-serif;
+    font-family: 'DM Sans', sans-serif;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -563,6 +588,371 @@ select {
 }
 
 /* ============================================
+   ULTRA-PREMIUM PORTFOLIO SYSTEM
+   Senior-level design craft
+   ============================================ */
+
+/* --- Film Grain Texture Overlay --- */
+.grain-overlay::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9990;
+    pointer-events: none;
+    opacity: 0.028;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 256px 256px;
+}
+
+/* --- Custom Scrollbar --- */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(11, 45, 255, 0.25);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(11, 45, 255, 0.45);
+}
+
+/* --- Hero Mouse-Following Glow --- */
+.hero-glow-cursor {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(11,45,255,0.08) 0%, rgba(11,45,255,0.03) 35%, transparent 70%);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: left 0.8s cubic-bezier(0.16, 1, 0.3, 1), top 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
+    will-change: left, top;
+    opacity: 0;
+    z-index: 1;
+}
+.hero-glow-cursor.visible {
+    opacity: 1;
+}
+
+/* --- Premium Scroll Indicator --- */
+.scroll-capsule {
+    width: 28px;
+    height: 48px;
+    border: 1.5px solid rgba(246,247,251,0.15);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+}
+.scroll-capsule::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    height: 10px;
+    background: linear-gradient(180deg, rgba(11,45,255,0.8), rgba(11,45,255,0.2));
+    border-radius: 2px;
+    animation: scrollPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes scrollPulse {
+    0%, 100% { top: 8px; opacity: 1; height: 10px; }
+    50% { top: 26px; opacity: 0.3; height: 6px; }
+}
+
+/* --- Gradient Shimmer on Text --- */
+.text-shimmer {
+    background: linear-gradient(
+        120deg,
+        rgba(246,247,251,0.04) 0%,
+        rgba(246,247,251,0.08) 30%,
+        rgba(11,45,255,0.12) 50%,
+        rgba(246,247,251,0.08) 70%,
+        rgba(246,247,251,0.04) 100%
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shimmerSlide 8s ease-in-out infinite;
+}
+@keyframes shimmerSlide {
+    0%, 100% { background-position: 300% center; }
+    50% { background-position: 0% center; }
+}
+
+/* --- Chapter Accent Bar --- */
+.chapter-accent {
+    width: 3px;
+    height: 0;
+    background: linear-gradient(180deg, var(--accent, rgba(11,45,255,0.8)), transparent);
+    border-radius: 2px;
+    transition: height 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+}
+.reveal-left.active .chapter-accent,
+.reveal-right.active .chapter-accent,
+.reveal.active .chapter-accent {
+    height: 64px;
+}
+
+/* --- Code Editor Scanline --- */
+.code-scanline {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 2;
+}
+.code-scanline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(11,45,255,0.15), transparent);
+    box-shadow: 0 0 20px 4px rgba(11,45,255,0.06);
+    animation: scanline 6s ease-in-out infinite;
+    opacity: 0;
+}
+.group:hover .code-scanline::after {
+    opacity: 1;
+}
+@keyframes scanline {
+    0% { top: -2px; }
+    100% { top: 100%; }
+}
+
+/* --- Gallery Tilt Effect --- */
+.gallery-tilt {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+.gallery-tilt:hover {
+    box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 0 40px rgba(11,45,255,0.08);
+}
+
+/* --- Glassmorphism Cards --- */
+.glass-card {
+    background: rgba(246,247,251,0.02);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(246,247,251,0.08);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.5s ease, box-shadow 0.5s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(11,45,255,0.2), transparent 40%, transparent 60%, rgba(34,197,94,0.15));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+.glass-card:hover::before {
+    opacity: 1;
+}
+.glass-card:hover {
+    border-color: rgba(11,45,255,0.15);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(11,45,255,0.06);
+    transform: translateY(-4px);
+}
+
+/* --- Glass Card Light Leak --- */
+.glass-card-glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 30%, rgba(11,45,255,0.06), transparent 50%);
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+}
+.glass-card:hover .glass-card-glow {
+    opacity: 1;
+}
+
+/* --- Magnetic CTA Wrapper --- */
+.magnetic-wrap {
+    display: inline-flex;
+    perspective: 500px;
+}
+.magnetic-wrap > * {
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- Enhanced Hero Decorative Line --- */
+.hero-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(11,45,255,0.4), rgba(34,197,94,0.3), transparent);
+    opacity: 0;
+    transform: scaleX(0);
+    transition: opacity 1s ease 0.5s, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.5s;
+}
+.hero-rule.active {
+    opacity: 1;
+    transform: scaleX(1);
+}
+
+/* --- Success Glow for Ch.04 --- */
+.success-glow {
+    position: absolute;
+    inset: -100px;
+    background: radial-gradient(ellipse at center, rgba(34,197,94,0.06) 0%, transparent 65%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+}
+.narrative-chapter[data-chapter="4"] .success-glow.visible {
+    opacity: 1;
+}
+
+/* --- Timeline Pulse Dots --- */
+.timeline-pulse {
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    opacity: 0;
+    animation: timelinePulse 2.5s ease-out infinite;
+}
+@keyframes timelinePulse {
+    0% { transform: scale(1); opacity: 0.5; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* --- Dual Spark (second spark from right) --- */
+.suspense-divider .divider-spark-right {
+    opacity: 0;
+    right: 0;
+    left: auto;
+}
+.suspense-divider.active .divider-spark-right {
+    animation: spark-traverse-right 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.8s forwards;
+}
+@keyframes spark-traverse-right {
+    0% { opacity: 0; right: 5%; filter: blur(2px); }
+    8% { opacity: 1; filter: blur(0); }
+    75% { opacity: 1; filter: blur(0); }
+    100% { opacity: 0; right: 50%; transform: translateY(-50%) scale(0.3); filter: blur(1px); }
+}
+
+/* --- Echo Shockwave (second delayed ring) --- */
+.suspense-divider .divider-echo {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.suspense-divider.active .divider-echo {
+    animation: echo-burst 1s ease-out 2.5s forwards;
+}
+@keyframes echo-burst {
+    0% { opacity: 0.4; width: 0; height: 0; border-width: 1.5px; }
+    40% { opacity: 0.25; }
+    100% { opacity: 0; width: 180px; height: 180px; border-width: 0.5px; }
+}
+
+/* --- Magnetic Field Distortion --- */
+.suspense-divider .divider-field {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 80px;
+    opacity: 0;
+    background: radial-gradient(ellipse, rgba(11,45,255,0.04) 0%, transparent 60%);
+    transition: opacity 1s ease 3s;
+    pointer-events: none;
+}
+.suspense-divider[data-color="green"] .divider-field {
+    background: radial-gradient(ellipse, rgba(34,197,94,0.04) 0%, transparent 60%);
+}
+.suspense-divider.active .divider-field {
+    opacity: 1;
+}
+
+/* --- Divider Label Letter-Spacing Reveal --- */
+.suspense-divider .divider-label span {
+    letter-spacing: 0.8em;
+    transition: letter-spacing 1.5s cubic-bezier(0.16, 1, 0.3, 1) 4s, opacity 1s ease 4.2s, transform 1s cubic-bezier(0.16, 1, 0.3, 1) 4.2s;
+}
+.suspense-divider.active .divider-label span {
+    letter-spacing: 0.35em;
+}
+
+/* --- Image Luminance Border on Hover --- */
+.image-luminance {
+    position: relative;
+}
+.image-luminance::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid transparent;
+    transition: border-color 0.6s ease;
+    pointer-events: none;
+}
+.image-luminance:hover::after {
+    border-color: rgba(11,45,255,0.15);
+}
+
+/* --- Floating Badge --- */
+.badge-float {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+}
+.badge-float:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(11,45,255,0.15);
+}
+
+/* --- Section Fade Edges --- */
+.section-vignette::before,
+.section-vignette::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 120px;
+    pointer-events: none;
+    z-index: 2;
+}
+.section-vignette::before {
+    top: 0;
+    background: linear-gradient(180deg, var(--tus-black), transparent);
+}
+.section-vignette::after {
+    bottom: 0;
+    background: linear-gradient(0deg, var(--tus-black), transparent);
+}
+
+/* --- Premium Number Counter Style --- */
+.number-display {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.06em;
+    background: linear-gradient(180deg, rgba(246,247,251,0.06) 0%, rgba(246,247,251,0.02) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 30px rgba(11,45,255,0.05));
+}
+
+/* ============================================
    APPLE-LIKE SCROLL REVEAL
    ============================================ */
 /* ---- MOTION TOKENS v2 — Premium / Visible ----
@@ -800,7 +1190,7 @@ html.has-custom-cursor * {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 12px;
     font-weight: 600;
     color: var(--tus-white);
@@ -1112,6 +1502,7 @@ html.lenis, html.lenis body {
 #scroll-progress {
     transition: none;
     pointer-events: none;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
 
@@ -1123,128 +1514,275 @@ html.lenis, html.lenis body {
 }
 
 /* ============================================
-   CHAPTER DIVIDERS — Suspense cinematic effect
+   CHAPTER DIVIDERS — Suspense cinématique VIVANT
+   5 actes : silence → étincelle → traversée → impact → révélation
    ============================================ */
 
-/* --- Initial hidden states --- */
+/* --- Acte 0 : Tout est invisible, tension silencieuse --- */
 .suspense-divider .divider-track {
     transform: scaleX(0);
     transition: transform 1.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.suspense-divider .divider-glow-line {
+.suspense-divider .divider-spark {
     opacity: 0;
-    transform: scaleX(0);
-    transition: opacity 0.8s ease 0.6s, transform 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s;
+    left: 0;
 }
 
-.suspense-divider .divider-particle {
-    left: -2%;
+.suspense-divider .divider-shockwave {
     opacity: 0;
-    transition: none;
+    width: 0;
+    height: 0;
 }
 
-.suspense-divider .divider-pulse {
+.suspense-divider .divider-glow {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+}
+
+.suspense-divider .divider-orb {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0);
-    transition: opacity 0.4s ease 2.2s, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s;
 }
 
-.suspense-divider .divider-ring {
-    transform: scale(1);
+.suspense-divider .divider-line-left,
+.suspense-divider .divider-line-right {
+    width: 0;
+}
+
+.suspense-divider .divider-sparks {
+    opacity: 0;
+}
+
+.suspense-divider .divider-sparks .spark {
     opacity: 0;
 }
 
 .suspense-divider .divider-label {
     opacity: 0;
-    transform: translate(-50%, 0) translateY(8px);
-    transition: opacity 0.6s ease 2.6s, transform 0.6s ease 2.6s;
+    transform: translate(-50%, 0) translateY(15px);
+    transition: opacity 1s ease 4.2s, transform 1s cubic-bezier(0.16, 1, 0.3, 1) 4.2s;
 }
 
-/* --- Active / revealed states --- */
+/* --- Acte 1 : Track apparaît doucement (0→1.6s) --- */
 .suspense-divider.active .divider-track {
     transform: scaleX(1);
 }
 
-.suspense-divider.active .divider-glow-line {
+/* --- Acte 2 : Spark traverse de gauche au centre (0.8→2.2s) --- */
+.suspense-divider.active .divider-spark {
+    animation: spark-traverse 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.8s forwards;
+}
+
+/* --- Acte 3 : Impact au centre — shockwave + glow + orb (2.2s) --- */
+.suspense-divider.active .divider-shockwave {
+    animation: shockwave-burst 0.8s ease-out 2.2s forwards;
+}
+
+.suspense-divider.active .divider-glow {
+    animation: glow-ignite 1.4s cubic-bezier(0.16, 1, 0.3, 1) 2.2s forwards,
+               glow-breathe 4s ease-in-out 3.6s infinite;
+}
+
+.suspense-divider.active .divider-orb {
+    animation: orb-materialize 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.4s forwards,
+               orb-heartbeat 3s ease-in-out 3.2s infinite;
+}
+
+/* --- Acte 3b : Étincelles à l'impact (2.3s) --- */
+.suspense-divider.active .divider-sparks {
     opacity: 1;
-    transform: scaleX(1);
+    animation: sparks-burst 0.6s ease-out 2.3s forwards;
 }
 
-.suspense-divider.active .divider-particle {
-    opacity: 1;
-    animation: divider-traverse 1.8s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+.suspense-divider.active .divider-sparks .spark:nth-child(1) {
+    animation: spark-fly 0.7s ease-out 2.3s forwards;
+    --spark-x: -18px;
+    --spark-y: -22px;
+}
+.suspense-divider.active .divider-sparks .spark:nth-child(2) {
+    animation: spark-fly 0.6s ease-out 2.35s forwards;
+    --spark-x: 22px;
+    --spark-y: -16px;
+}
+.suspense-divider.active .divider-sparks .spark:nth-child(3) {
+    animation: spark-fly 0.8s ease-out 2.28s forwards;
+    --spark-x: -12px;
+    --spark-y: 20px;
+}
+.suspense-divider.active .divider-sparks .spark:nth-child(4) {
+    animation: spark-fly 0.5s ease-out 2.32s forwards;
+    --spark-x: 16px;
+    --spark-y: 18px;
+}
+.suspense-divider.active .divider-sparks .spark:nth-child(5) {
+    animation: spark-fly 0.65s ease-out 2.26s forwards;
+    --spark-x: -8px;
+    --spark-y: -26px;
 }
 
-.suspense-divider.active .divider-pulse {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
+/* --- Acte 4 : Lignes d'énergie s'étendent (2.8s) --- */
+.suspense-divider.active .divider-line-left,
+.suspense-divider.active .divider-line-right {
+    animation: line-extend 2s cubic-bezier(0.16, 1, 0.3, 1) 2.8s forwards;
 }
 
-.suspense-divider.active .divider-ring {
-    animation: divider-ripple 1.5s ease-out 2.4s forwards;
-}
-
+/* --- Acte 5 : Label final (4.2s) --- */
 .suspense-divider.active .divider-label {
     opacity: 1;
     transform: translate(-50%, 0) translateY(0);
 }
 
-/* --- Keyframes --- */
-@keyframes divider-traverse {
+/* ============================================
+   KEYFRAMES — L'âme de l'animation
+   ============================================ */
+
+/* Particule qui traverse la scène */
+@keyframes spark-traverse {
     0% {
-        left: -2%;
         opacity: 0;
+        left: 5%;
+        filter: blur(2px);
     }
-    5% {
+    8% {
         opacity: 1;
+        filter: blur(0);
     }
-    45% {
+    75% {
         opacity: 1;
+        filter: blur(0);
+    }
+    100% {
+        opacity: 0;
+        left: 50%;
+        transform: translateY(-50%) scale(0.3);
+        filter: blur(1px);
+    }
+}
+
+/* Onde de choc à l'impact */
+@keyframes shockwave-burst {
+    0% {
+        opacity: 0.7;
+        width: 0;
+        height: 0;
+        border-width: 2px;
     }
     50% {
-        left: 50%;
-        opacity: 1;
-        transform: translateY(-50%) scale(1.8);
-    }
-    55% {
-        transform: translateY(-50%) scale(1);
-        opacity: 0.8;
-    }
-    95% {
-        opacity: 1;
+        opacity: 0.4;
+        border-width: 1px;
     }
     100% {
-        left: 102%;
         opacity: 0;
-        transform: translateY(-50%) scale(0.5);
+        width: 120px;
+        height: 120px;
+        border-width: 0.5px;
     }
 }
 
-@keyframes divider-ripple {
+/* Halo qui prend vie */
+@keyframes glow-ignite {
     0% {
-        transform: scale(1);
-        opacity: 0.6;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2);
+    }
+    60% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(1.15);
     }
     100% {
-        transform: scale(6);
-        opacity: 0;
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
     }
 }
 
-/* Perpetual glow pulse after reveal */
-.suspense-divider.active .divider-pulse > div:first-child {
-    animation: divider-breathe 3s ease-in-out 2.8s infinite;
+/* Halo qui respire — organique, pas mécanique */
+@keyframes glow-breathe {
+    0%, 100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    30% {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) scale(1.08);
+    }
+    70% {
+        opacity: 0.85;
+        transform: translate(-50%, -50%) scale(0.95);
+    }
 }
 
-@keyframes divider-breathe {
-    0%, 100% {
-        transform: scale(1);
+/* Orbe qui se matérialise avec un léger rebond */
+@keyframes orb-materialize {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0);
+        filter: brightness(3);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.4);
+        filter: brightness(2);
+    }
+    75% {
+        transform: translate(-50%, -50%) scale(0.85);
+        filter: brightness(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
         filter: brightness(1);
     }
+}
+
+/* Battement de cœur de l'orbe — asymétrique, organique */
+@keyframes orb-heartbeat {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        filter: brightness(1);
+    }
+    15% {
+        transform: translate(-50%, -50%) scale(1.5);
+        filter: brightness(1.6);
+    }
+    25% {
+        transform: translate(-50%, -50%) scale(0.9);
+        filter: brightness(0.95);
+    }
+    35% {
+        transform: translate(-50%, -50%) scale(1.25);
+        filter: brightness(1.3);
+    }
     50% {
-        transform: scale(1.3);
-        filter: brightness(1.4);
+        transform: translate(-50%, -50%) scale(1);
+        filter: brightness(1);
+    }
+}
+
+/* Étincelle individuelle qui s'envole */
+@keyframes spark-fly {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--spark-x), var(--spark-y)) scale(0);
+    }
+}
+
+/* Lignes qui s'étendent avec de l'élan */
+@keyframes line-extend {
+    0% {
+        width: 0;
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+    100% {
+        width: 42%;
+        opacity: 1;
     }
 }
 
@@ -1260,7 +1798,7 @@ html.lenis, html.lenis body {
 .reveal-left.is-visible ~ .reveal-left .strategy-timeline-line,
 section[data-chapter="3"].is-visible .strategy-timeline-line,
 .strategy-timeline-line {
-    /* Line will grow with scroll via the observer already in base.html */
+    transform: scaleY(0);
 }
 
 section[data-chapter="3"] .reveal-left.is-visible .strategy-timeline-line {
@@ -1281,15 +1819,23 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
    NARRATIVE TEXT EFFECTS
    ============================================ */
 .narrative-text {
-    line-height: 1.65;
+    line-height: 1.7;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 300;
+    letter-spacing: -0.005em;
 }
 
 /* ============================================
-   PROSE CHAPTER — Markdown rendered content
+   PROSE CHAPTER — Rich HTML content from TinyMCE
    Override Tailwind CDN preflight resets
+   Premium typography hierarchy
    ============================================ */
 .prose-chapter {
-    font-weight: 300;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.75;
+    letter-spacing: -0.005em;
+    text-rendering: optimizeLegibility;
 }
 .prose-chapter p {
     display: block !important;
@@ -1312,58 +1858,79 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
 }
 .prose-chapter li {
     display: list-item !important;
-    margin-bottom: 0.4em;
-    line-height: 1.6;
+    margin-bottom: 0.5em;
+    line-height: 1.75;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.88);
+}
+.prose-chapter li::marker {
+    color: rgba(11, 45, 255, 0.6);
 }
 .prose-chapter strong,
 .prose-chapter b {
     font-weight: 700 !important;
-    color: rgba(255, 255, 255, 0.95);
+    color: #F6F7FB;
+    letter-spacing: -0.01em;
 }
 .prose-chapter em,
 .prose-chapter i {
     font-style: italic !important;
+    color: rgba(255, 255, 255, 0.92);
 }
 .prose-chapter u {
     text-decoration: underline !important;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(11, 45, 255, 0.4);
 }
 .prose-chapter blockquote {
     display: block !important;
-    border-left: 3px solid rgba(56, 189, 248, 0.4);
-    padding-left: 1.2em;
-    margin: 1.2em 0;
-    color: rgba(255, 255, 255, 0.6);
+    border-left: 3px solid rgba(11, 45, 255, 0.5);
+    padding-left: 1.5em;
+    margin: 1.5em 0;
+    color: rgba(255, 255, 255, 0.75);
     font-style: italic;
+    font-weight: 400;
 }
 .prose-chapter h3 {
     display: block !important;
-    font-size: 1.25em;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 1.3em;
     font-weight: 700 !important;
-    margin: 1.5em 0 0.5em;
-    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: -0.02em;
+    margin: 1.8em 0 0.6em;
+    color: rgba(255, 255, 255, 0.95);
 }
 .prose-chapter h4 {
     display: block !important;
-    font-size: 1.1em;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-size: 1.15em;
     font-weight: 600 !important;
-    margin: 1.2em 0 0.4em;
-    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: -0.015em;
+    margin: 1.4em 0 0.5em;
+    color: rgba(255, 255, 255, 0.9);
 }
 .prose-chapter h5 {
     display: block !important;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     font-size: 1em;
     font-weight: 600 !important;
-    margin: 1em 0 0.3em;
-    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: -0.01em;
+    margin: 1.2em 0 0.4em;
+    color: rgba(255, 255, 255, 0.85);
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.05em;
 }
 .prose-chapter a {
-    color: rgb(56, 189, 248);
+    color: rgba(11, 45, 255, 0.9);
     text-decoration: underline !important;
-    text-underline-offset: 2px;
-    transition: color 0.3s;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(11, 45, 255, 0.3);
+    transition: color 0.3s, text-decoration-color 0.3s;
 }
 .prose-chapter a:hover {
-    color: rgb(96, 220, 255);
+    color: rgba(77, 111, 255, 1);
+    text-decoration-color: rgba(77, 111, 255, 0.6);
 }
 .prose-chapter br {
     display: block !important;
@@ -1509,15 +2076,39 @@ button[type="submit"] {
     .parallax-slow {
         animation: none !important;
     }
-    .suspense-divider .divider-particle {
+    .suspense-divider .divider-spark,
+    .suspense-divider .divider-spark-right,
+    .suspense-divider .divider-shockwave,
+    .suspense-divider .divider-echo,
+    .suspense-divider .divider-orb,
+    .suspense-divider .divider-glow,
+    .suspense-divider .divider-sparks,
+    .suspense-divider .divider-line-left,
+    .suspense-divider .divider-line-right {
         animation: none !important;
+        transition: none !important;
     }
-    .suspense-divider .divider-ring {
-        animation: none !important;
-    }
-    .card-tilt::after {
+    .suspense-divider.active .divider-track { transform: scaleX(1); }
+    .suspense-divider.active .divider-orb { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    .suspense-divider.active .divider-glow { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    .suspense-divider.active .divider-field { opacity: 1; }
+    .suspense-divider.active .divider-line-left,
+    .suspense-divider.active .divider-line-right { width: 42%; opacity: 1; }
+    .suspense-divider.active .divider-label { opacity: 1; transform: translate(-50%,0); }
+    .suspense-divider.active .divider-label span { letter-spacing: 0.35em; }
+    .card-tilt::after,
+    .glass-card::before {
         display: none;
     }
+    .text-shimmer { animation: none !important; }
+    .chapter-accent { height: 64px !important; transition: none !important; }
+    .timeline-pulse { animation: none !important; display: none; }
+    .code-scanline::after { animation: none !important; }
+    .scroll-capsule::before { animation: none !important; }
+    .grain-overlay::after { display: none; }
+    .hero-glow-cursor { display: none !important; }
+    .gallery-tilt { transform: none !important; }
+    .success-glow { opacity: 1 !important; transition: none !important; }
     [id="main-content"],
     main,
     .min-h-screen {

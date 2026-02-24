@@ -17,8 +17,9 @@ module.exports = {
         'stroke-dark': 'rgba(246,247,251,0.10)',
       },
       fontFamily: {
-        'display': ['Space Grotesk', 'system-ui', 'sans-serif'],
-        'body': ['Inter', 'system-ui', 'sans-serif'],
+        'display': ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        'body': ['DM Sans', 'system-ui', 'sans-serif'],
+        'mono': ['JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       transitionDuration: {
         'micro': '150ms',

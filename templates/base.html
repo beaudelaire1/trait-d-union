@@ -78,7 +78,7 @@
     <!-- Preload fonts for better LCP -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -95,8 +95,9 @@
                         'stroke-dark': 'rgba(246,247,251,0.10)',
                     },
                     fontFamily: {
-                        'display': ['Space Grotesk', 'system-ui', 'sans-serif'],
-                        'body': ['Inter', 'system-ui', 'sans-serif'],
+                        'display': ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                        'body': ['DM Sans', 'system-ui', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'ui-monospace', 'monospace'],
                     },
                     animation: {
                         'fade-in': 'fadeIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards',
@@ -607,6 +608,20 @@
         });
 
         revealElements.forEach(el => revealObserver.observe(el));
+
+        // Suspense dividers — cinematic reveal with .active class
+        const suspenseDividers = document.querySelectorAll('.suspense-divider');
+        if (suspenseDividers.length > 0) {
+            const dividerObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        dividerObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3, rootMargin: '0px 0px -80px 0px' });
+            suspenseDividers.forEach(d => dividerObserver.observe(d));
+        }
 
         // Stagger children containers
         const staggerElements = document.querySelectorAll('.stagger-children');
