@@ -10,41 +10,62 @@ from apps.devis.application.validate_quote_usecase import provision_client_accou
 logger = logging.getLogger(__name__)
 
 
+# Statuts déclenchant l'onboarding client automatique.
+# ACCEPTED = validation par le client (code OTP / e-signature)
+# VALIDATED = validation administrative (back-office)
+_ONBOARDING_STATUSES = frozenset({
+    Quote.QuoteStatus.ACCEPTED,
+    Quote.QuoteStatus.VALIDATED,
+})
+
+
 @receiver(post_save, sender=Quote)
-def auto_provision_client_on_quote_validated(sender, instance: Quote, update_fields, **kwargs):
-    """Signal TUS FLOW : quand un devis passe en VALIDATED, créer le compte client.
-    
-    Trigger : Quote.status change to VALIDATED
+def auto_provision_client_on_quote_accepted_or_validated(
+    sender, instance: Quote, update_fields, **kwargs
+):
+    """Signal TUS FLOW : quand un devis passe en ACCEPTED ou VALIDATED,
+    créer automatiquement le compte client.
+
+    Trigger :
+        - ACCEPTED : le client a validé via code OTP (e-signature)
+        - VALIDATED : un admin a validé depuis le back-office
+
     Effet : créer User + ClientProfile + envoyer email accueil + forcer changement pwd
     """
-    # Skip during tests
     if getattr(settings, 'TESTING', False):
         return
-    
-    # Vérifier que le changement concerne le statut
-    if update_fields is None or 'status' in update_fields:
-        # Vérifier le nouveau statut
-        if instance.status == Quote.QuoteStatus.VALIDATED:
-            try:
-                result = provision_client_account(instance)
-                
-                if result.is_new:
-                    logger.info(
-                        f"Auto-onboarding client : {result.user.email}",
-                        extra={'quote_pk': instance.pk, 'user_pk': result.user.pk}
-                    )
-                else:
-                    logger.info(
-                        f"Compte client existant, skip création : {result.user.email}",
-                        extra={'quote_pk': instance.pk}
-                    )
-                
-            except Exception as e:
-                # Log l'erreur mais ne bloque pas la validation du devis
-                logger.exception(
-                    f"Erreur auto-onboarding devis {instance.number}: {e}",
-                    extra={'quote_pk': instance.pk}
-                )
+
+    if update_fields is not None and 'status' not in update_fields:
+        return
+
+    if instance.status not in _ONBOARDING_STATUSES:
+        return
+
+    try:
+        result = provision_client_account(instance)
+
+        if result.is_new:
+            logger.info(
+                "Auto-onboarding client : %s (devis %s, status=%s)",
+                result.user.email,
+                instance.number,
+                instance.status,
+                extra={'quote_pk': instance.pk, 'user_pk': result.user.pk},
+            )
+        else:
+            logger.info(
+                "Compte client existant, skip création : %s (devis %s)",
+                result.user.email,
+                instance.number,
+                extra={'quote_pk': instance.pk},
+            )
+    except Exception:
+        logger.exception(
+            "Erreur auto-onboarding devis %s (status=%s)",
+            instance.number,
+            instance.status,
+            extra={'quote_pk': instance.pk},
+        )
 
 
 @receiver(post_save, sender=Quote)

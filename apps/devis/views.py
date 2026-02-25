@@ -21,6 +21,7 @@ from .forms import QuoteValidationCodeForm
 from apps.devis.application.quote_validation import (
     QuoteNotValidatableError,
     QuoteValidationExpiredError,
+    QuoteValidationRateLimitError,
     confirm_quote_validation_code,
     start_quote_validation,
 )
@@ -168,6 +169,15 @@ def quote_validate_start(request, token: str):
     except QuoteNotValidatableError:
         messages.error(request, "Ce devis ne peut pas être validé dans son état actuel.")
         return render(request, "devis/quote_unavailable.html", {"quote": quote})
+    except QuoteValidationRateLimitError:
+        messages.info(request, "Un code vient d'être envoyé. Vérifiez vos emails ou patientez 1 minute.")
+        # Trouver la validation active pour rediriger quand même
+        from apps.devis.application.quote_validation import get_pending_validation_for_quote
+        try:
+            pending = get_pending_validation_for_quote(quote)
+            return redirect("devis:quote_validate_code", token=pending.token)
+        except Exception:
+            return render(request, "devis/quote_unavailable.html", {"quote": quote})
     return redirect("devis:quote_validate_code", token=res.validation.token)
 
 
@@ -185,7 +195,11 @@ def quote_validate_code(request, token: str):
         form = QuoteValidationCodeForm(request.POST)
         if form.is_valid():
             try:
-                ok = confirm_quote_validation_code(validation=validation, submitted_code=form.cleaned_data["code"])
+                ok = confirm_quote_validation_code(
+                    validation=validation,
+                    submitted_code=form.cleaned_data["code"],
+                    request=request,
+                )
             except QuoteValidationExpiredError:
                 ok = False
                 messages.error(request, "Ce code a expiré. Merci de relancer une validation.")
