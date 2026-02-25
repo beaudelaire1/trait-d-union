@@ -67,7 +67,9 @@ INSTALLED_APPS = [
     'apps.chroniques',
     'apps.clients',
     'apps.messaging',
+    'apps.audit',
     'services',
+    'django_q',
 ]
 
 # Django Sites framework
@@ -89,6 +91,7 @@ MIDDLEWARE = [
     'config.middleware.RateLimitMiddleware',
     'config.middleware.SecurityHeadersMiddleware',
     'config.middleware.CacheControlMiddleware',
+    'config.middleware_force_password.ForcePasswordChangeMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -164,12 +167,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ==============================================================================
 # EMAIL CONFIGURATION
 # ==============================================================================
-# Backend par défaut (console en dev)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
 # Brevo (ex-Sendinblue) API pour les emails transactionnels
-# En production, utiliser l'API Brevo plutôt que SMTP (plus fiable sur Render)
 BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
+
+# Si BREVO_API_KEY est défini, utiliser le backend API REST Brevo (pas de SMTP).
+# Sinon, fallback console en dev.
+if BREVO_API_KEY:
+    EMAIL_BACKEND = 'core.services.brevo_backend.BrevoEmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Configuration expéditeur
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'contact@traitdunion.it')
@@ -178,9 +184,30 @@ DEFAULT_FROM_NAME = os.environ.get('DEFAULT_FROM_NAME', "Trait d'Union Studio")
 # Email admin pour les notifications internes
 ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.it')
 
-# Email pour les notifications de tâches async (Celery) et alertes critiques
+# Email pour les notifications de tâches async et alertes critiques
 # Si non défini, utilise ADMIN_EMAIL comme fallback
 TASK_NOTIFICATION_EMAIL = os.environ.get('TASK_NOTIFICATION_EMAIL', os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.it'))
+
+# ==============================================================================
+# DJANGO-Q2 : Tâches asynchrones (emails, PDF, notifications)
+# ==============================================================================
+# Utilise la base de données comme broker (pas besoin de Redis).
+# Lancer le worker avec : python manage.py qcluster
+Q_CLUSTER = {
+    'name': 'TUS',
+    'workers': int(os.environ.get('Q_WORKERS', 2)),
+    'recycle': 500,
+    'timeout': 120,           # secondes max par tâche
+    'retry': 180,             # retry si tâche échoue
+    'compress': True,
+    'save_limit': 250,        # garder les 250 derniers résultats
+    'queue_limit': 500,
+    'cpu_affinity': 1,
+    'label': 'Tâches TUS',
+    'orm': 'default',         # broker = base de données (ORM)
+    'catch_up': False,        # ne pas rattraper les schedules ratés
+    'ack_failures': True,
+}
 
 # reCAPTCHA v2 checkbox settings
 # Obtenez vos clés sur https://www.google.com/recaptcha/admin

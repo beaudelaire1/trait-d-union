@@ -293,7 +293,7 @@ h1, h2, h3, h4, h5, h6,
     border: 1px solid var(--tus-border) !important;
     border-radius: var(--tus-radius-lg) !important;
     box-shadow: var(--tus-shadow-sm);
-    overflow: hidden;
+    overflow: visible;
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -1077,7 +1077,7 @@ textarea:focus-visible,
     background: var(--tus-surface-1) !important;
     border: 1px solid var(--tus-border) !important;
     border-radius: var(--tus-radius-lg) !important;
-    overflow: hidden;
+    overflow: visible;
     margin-bottom: 16px;
 }
 
@@ -1185,6 +1185,87 @@ form.is-submitting {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+}
+
+/* ── Scroll horizontal global admin ──────────────────────────────────── */
+
+/* Le wrapper principal du formulaire change-form doit permettre le débordement */
+#content-main,
+.change-form,
+#changelist {
+    overflow-x: auto !important;
+}
+
+/*
+ * Inlines tabular : forcer un conteneur scrollable autour de la table.
+ * Jazzmin enveloppe les inlines dans .card > .card-body > .inline-group > .tabular
+ * On cible chaque couche pour s'assurer qu'aucune ne coupe le contenu.
+ */
+.inline-group {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+.inline-group .tabular,
+.inline-group .tabular.inline-related,
+.tabular.inline-related {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+}
+
+/* La table elle-même : largeur min pour garantir le scroll */
+.inline-group table,
+.inline-related table,
+.tabular table,
+#result_list,
+#changelist table {
+    min-width: 900px;
+    width: max-content;
+}
+
+/* Cellules des inlines : empêcher le wrapping excessif */
+.inline-group table th,
+.inline-group table td {
+    white-space: nowrap;
+    min-width: 120px;
+}
+
+/* Le champ description mérite plus d'espace */
+.inline-group table td .vTextField,
+.inline-group table td input[type="text"],
+.inline-group table td select {
+    min-width: 180px;
+}
+
+/* Card-body parent : ne doit pas bloquer l'overflow */
+.card-body {
+    overflow-x: visible !important;
+}
+
+/* Modules admin classiques */
+.module {
+    overflow-x: auto !important;
+}
+
+/* Scrollbar visible et stylée dans les inlines */
+.inline-group::-webkit-scrollbar,
+.tabular::-webkit-scrollbar {
+    height: 8px;
+}
+.inline-group::-webkit-scrollbar-track,
+.tabular::-webkit-scrollbar-track {
+    background: var(--tus-surface-2);
+    border-radius: 4px;
+}
+.inline-group::-webkit-scrollbar-thumb,
+.tabular::-webkit-scrollbar-thumb {
+    background: var(--tus-blue-soft);
+    border-radius: 4px;
+}
+.inline-group::-webkit-scrollbar-thumb:hover,
+.tabular::-webkit-scrollbar-thumb:hover {
+    background: var(--tus-blue);
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────── */

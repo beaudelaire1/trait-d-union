@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    TRAIT D'UNION STUDIO — Admin Premium JS
-   Raccourcis clavier · Animations · UX premium
+   Raccourcis clavier · Navigation bidirectionnelle · Animations · UX premium
    ═══════════════════════════════════════════════════════════════════════════ */
 
 (function () {
@@ -26,6 +26,29 @@
         var toggleBtn = document.getElementById('toggle-admin-filters');
         if (toggleBtn) {
             toggleBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+        }
+    }
+
+    /* ── Navigation clavier bidirectionnelle (Tab / Shift+Tab) ────────── */
+    
+    function getAllFocusableElements() {
+        /**Retourne tous les éléments focusables du document dans l'ordre DOM.*/
+        var selector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"]), a[href]';
+        var focusable = Array.from(document.querySelectorAll(selector));
+        
+        // Filtrer les éléments réellement visibles et accessibles
+        return focusable.filter(function(el) {
+            return el.offsetParent !== null && !el.disabled;
+        });
+    }
+    
+    function focusPreviousFocusable() {
+        /**Focus l'élément focusable précédent (pour Shift+Tab).*/
+        var focusable = getAllFocusableElements();
+        var currentIdx = focusable.indexOf(document.activeElement);
+        var prevIdx = currentIdx > 0 ? currentIdx - 1 : focusable.length - 1;
+        if (focusable[prevIdx]) {
+            focusable[prevIdx].focus();
         }
     }
 
@@ -58,6 +81,12 @@
             if (filterPanel && window.innerWidth <= 1024) {
                 filterPanel.style.display = 'none';
             }
+        }
+        
+        // Shift+Tab → focus previous element (FIX KEYBOARD_NAV_ONEWAY)
+        if (event.shiftKey && event.key === 'Tab') {
+            event.preventDefault();
+            focusPreviousFocusable();
         }
     });
 

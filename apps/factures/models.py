@@ -101,6 +101,32 @@ class Invoice(models.Model):
     )
     # Date du dernier paiement
     paid_at = models.DateTimeField(null=True, blank=True)
+    
+    # ===========================================
+    # Audit trail paiement
+    # ===========================================
+    paid_by = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='invoices_marked_paid',
+        verbose_name="Marquée payée par",
+        help_text="Utilisateur qui a marqué la facture comme payée"
+    )
+    payment_proof = models.FileField(
+        upload_to='factures/proofs/',
+        blank=True,
+        null=True,
+        verbose_name="Preuve de paiement",
+        help_text="Document/reçu de paiement (virement, chèque, etc.)"
+    )
+    payment_audit_trail = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name="Audit trail paiement",
+        help_text="Métadonnées : {ip, user_agent, timestamp, comment, etc.}"
+    )
 
     # ===========================================
     # PHASE 4.3 : Relances automatiques (Dunning)

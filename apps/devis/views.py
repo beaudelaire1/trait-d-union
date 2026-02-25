@@ -17,7 +17,6 @@ from services.models import Service
 from .forms import QuoteRequestForm, QuoteAdminForm
 from .models import QuoteRequest, Quote, QuoteRequestPhoto, QuoteValidation
 from .services import create_invoice_from_quote
-from .email_service import send_quote_email
 from .forms import QuoteValidationCodeForm
 from apps.devis.application.quote_validation import (
     QuoteNotValidatableError,
@@ -40,6 +39,9 @@ def public_devis(request):
             for f in files:
                 photo = QuoteRequestPhoto.objects.create(image=f)
                 qr.photos.add(photo)
+            # Notification async (client + admin)
+            from core.tasks import async_notify_quote_request
+            async_notify_quote_request(qr.pk)
             messages.success(request, "Votre demande de devis a bien été envoyée.")
             return redirect("devis:quote_success")
     else:
@@ -88,8 +90,9 @@ def admin_quote_edit(request, pk):
             elif action == "send_email":
                 if not quote.pdf:
                     quote.generate_pdf(attach=True)
-                send_quote_email(quote, request=request)
-                messages.success(request, "Email envoyé.")
+                from core.tasks import async_send_quote_email
+                async_send_quote_email(quote.pk)
+                messages.success(request, "Email en cours d'envoi.")
             elif action == "convert_invoice":
                 result = create_invoice_from_quote(quote)
                 invoice = result.invoice

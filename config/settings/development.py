@@ -84,7 +84,12 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
     MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_CLOUD_NAME}/'
 
 # Email configuration (auto)
-if os.environ.get('EMAIL_HOST'):
+# Priorité : BREVO_API_KEY (API REST Brevo) > EMAIL_HOST (SMTP custom) > console
+_brevo_key = os.environ.get('BREVO_API_KEY', '')
+if _brevo_key:
+    # Brevo configuré → API REST pour tous les emails Django (pas de SMTP)
+    EMAIL_BACKEND = 'core.services.brevo_backend.BrevoEmailBackend'
+elif os.environ.get('EMAIL_HOST'):
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = os.environ.get('EMAIL_HOST')
     EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))

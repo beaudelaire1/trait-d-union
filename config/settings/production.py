@@ -161,23 +161,16 @@ else:
     }
 
 # ==============================================================================
-# EMAIL (Brevo API - recommandé pour Render)
+# EMAIL (Brevo API REST — recommandé pour Render)
 # ==============================================================================
 # Brevo est préféré sur Render car :
 # - L'API REST évite les problèmes de firewall SMTP
 # - Meilleur tracking et délivrabilité
 # - Offre gratuite généreuse (300 emails/jour)
 
-# La clé API Brevo est déjà configurée dans base.py via BREVO_API_KEY
-
-# Fallback SMTP si besoin (non recommandé sur Render)
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp-relay.brevo.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+# Le backend API REST est configuré dans base.py via BREVO_API_KEY
+# → core.services.brevo_backend.BrevoEmailBackend
+# Aucune surcharge SMTP nécessaire ici.
 
 # ==============================================================================
 # CACHING (Redis via Render)

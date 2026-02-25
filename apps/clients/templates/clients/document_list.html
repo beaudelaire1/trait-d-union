@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="client-portal" x-data="{ sidebarOpen: true }">
+<div class="client-portal" x-data="{ sidebarOpen: true, activeFilter: 'all' }">
     {% include 'clients/partials/sidebar.html' %}
 
     <!-- Main Content -->
@@ -36,6 +36,36 @@
 
         <div class="client-content">
             {% if documents %}
+            
+            <!-- Filtres par type -->
+            <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+                <button @click="activeFilter = 'all'" 
+                        :class="activeFilter === 'all' ? 'btn-filter-active' : 'btn-filter'"
+                        class="btn-filter">
+                    📁 Tous
+                </button>
+                <button @click="activeFilter = 'devis'" 
+                        :class="activeFilter === 'devis' ? 'btn-filter-active' : 'btn-filter'"
+                        class="btn-filter">
+                    💰 Devis
+                </button>
+                <button @click="activeFilter = 'facture'" 
+                        :class="activeFilter === 'facture' ? 'btn-filter-active' : 'btn-filter'"
+                        class="btn-filter">
+                    🧾 Factures
+                </button>
+                <button @click="activeFilter = 'contract'" 
+                        :class="activeFilter === 'contract' ? 'btn-filter-active' : 'btn-filter'"
+                        class="btn-filter">
+                    📝 Contrats
+                </button>
+                <button @click="activeFilter = 'other'" 
+                        :class="activeFilter === 'other' ? 'btn-filter-active' : 'btn-filter'"
+                        class="btn-filter">
+                    📎 Autres
+                </button>
+            </div>
+            
             <div class="data-table-card">
                 <div class="table-responsive">
                     <table class="data-table">
@@ -50,11 +80,26 @@
                         </thead>
                         <tbody>
                             {% for doc in documents %}
-                            <tr>
+                            <tr x-show="activeFilter === 'all' || activeFilter === '{{ doc.document_type }}'"
+                                x-transition>
                                 <td>
                                     <div class="doc-cell">
                                         <span class="doc-icon">
-                                            {% if doc.is_image %}
+                                            {% if doc.document_type == 'devis' %}
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B2DFF" stroke-width="2">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            </svg>
+                                            {% elif doc.document_type == 'facture' %}
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                            </svg>
+                                            {% elif doc.is_image %}
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#60A5FA" stroke-width="2">
                                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
@@ -76,7 +121,15 @@
                                     </div>
                                 </td>
                                 <td>
+                                    {% if doc.document_type == 'devis' %}
+                                    <span class="doc-type-badge" style="background:rgba(11,45,255,0.15); color:#4D6FFF;">{{ doc.get_document_type_display }}</span>
+                                    {% elif doc.document_type == 'facture' %}
+                                    <span class="doc-type-badge" style="background:rgba(34,197,94,0.15); color:#4ADE80;">{{ doc.get_document_type_display }}</span>
+                                    {% elif doc.document_type == 'contract' %}
+                                    <span class="doc-type-badge" style="background:rgba(245,158,11,0.15); color:#FCD34D;">{{ doc.get_document_type_display }}</span>
+                                    {% else %}
                                     <span class="doc-type">{{ doc.get_document_type_display }}</span>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     {% if doc.project %}
@@ -112,7 +165,7 @@
                     </svg>
                 </div>
                 <h2>Aucun document</h2>
-                <p>Uploadez vos fichiers (logos, cahiers des charges, assets...) pour les partager avec nous.</p>
+                <p>Vos devis, factures et fichiers partagés apparaîtront ici.</p>
                 <a href="{% url 'clients:upload_document' %}" class="btn-primary">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>

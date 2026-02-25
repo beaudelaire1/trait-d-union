@@ -2,10 +2,16 @@
 
 This module provides the ClientProfile model which extends the User model
 to store client-specific information and preferences.
+
+TUS FLOW UPGRADE: Includes WorkflowTemplate and MilestoneTemplate for scalable
+milestone management.
 """
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+
+# Import workflow models
+from .models_workflow import WorkflowTemplate, MilestoneTemplate
 
 
 class ClientProfile(models.Model):
@@ -53,6 +59,12 @@ class ClientProfile(models.Model):
     email_notifications = models.BooleanField(
         "Notifications par email",
         default=True
+    )
+    must_change_password = models.BooleanField(
+        "Doit changer le mot de passe",
+        default=False,
+        help_text="Activé automatiquement lors de la création du compte. "
+                  "Désactivé après le premier changement de mot de passe."
     )
     
     class Meta:
@@ -190,6 +202,17 @@ class Project(models.Model):
         verbose_name="Devis associé"
     )
     
+    # TUS FLOW UPGRADE : Workflow Template
+    workflow_template = models.ForeignKey(
+        'clients.WorkflowTemplate',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='projects',
+        verbose_name="Template de workflow",
+        help_text="Template utilisé pour générer les jalons"
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -209,6 +232,54 @@ class Project(models.Model):
     def is_active(self):
         """Check if project is active (not delivered)."""
         return self.status not in [ProjectStatus.DELIVERED, ProjectStatus.MAINTENANCE]
+    
+    # TUS FLOW UPGRADE : Méthodes workflow
+    
+    def generate_milestones_from_template(self, workflow_template=None, start_date=None):
+        """Génère tous les jalons depuis un WorkflowTemplate.
+        
+        Args:
+            workflow_template: Instance de WorkflowTemplate (utilise self.workflow_template si None)
+            start_date: Date de début du premier jalon (optionnel)
+        
+        Returns:
+            Liste des ProjectMilestone créées
+        """
+        from datetime import timedelta
+        from django.utils import timezone
+        
+        if workflow_template is None:
+            workflow_template = self.workflow_template
+        
+        if workflow_template is None:
+            raise ValueError("Aucun workflow_template défini pour ce projet")
+        
+        if start_date is None:
+            start_date = self.start_date or timezone.now().date()
+        
+        milestones = []
+        current_date = start_date
+        
+        for milestone_tpl in workflow_template.milestone_templates.all().order_by('order'):
+            milestone = milestone_tpl.instantiate_for_project(
+                project=self,
+                start_date=current_date
+            )
+            milestones.append(milestone)
+            
+            # Date de début du prochain jalon = date d'échéance du précédent
+            current_date = milestone.due_date
+        
+        return milestones
+    
+    def reset_milestones(self):
+        """Supprime tous les jalons du projet (utile avant régénération)."""
+        self.milestones.all().delete()
+    
+    def regenerate_milestones(self, workflow_template=None, start_date=None):
+        """Supprime et régénère tous les jalons."""
+        self.reset_milestones()
+        return self.generate_milestones_from_template(workflow_template, start_date)
 
 
 class ProjectMilestone(models.Model):
@@ -253,6 +324,47 @@ class ProjectMilestone(models.Model):
         default=0
     )
     
+    # ===== Enrichissement pour TUS FLOW =====
+    responsible = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='milestones_responsible',
+        verbose_name="Responsable",
+        help_text="Personne responsable de ce jalon"
+    )
+    
+    checklist = models.JSONField(
+        "Checklist",
+        default=list,
+        blank=True,
+        help_text="Checklist JSON : [{id, text, checked, completed_by, completed_at}]"
+    )
+    
+    validation_comment = models.TextField(
+        "Commentaire de validation",
+        blank=True,
+        help_text="Commentaire optionnel lors de la validation"
+    )
+    
+    validated_by = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='milestones_validated',
+        verbose_name="Validé par",
+        help_text="Utilisateur qui a validé le jalon"
+    )
+    
+    validated_at = models.DateTimeField(
+        "Validé le",
+        null=True,
+        blank=True,
+        help_text="Date et heure de validation du jalon"
+    )
+    
     class Meta:
         verbose_name = "Jalon"
         verbose_name_plural = "Jalons"
@@ -266,6 +378,30 @@ class ProjectMilestone(models.Model):
         self.status = 'completed'
         self.completed_at = timezone.now()
         self.save()
+    
+    def mark_validated(self, user=None, comment=""):
+        """Valider le jalon : atomique (1 action)."""
+        self.validated_by = user
+        self.validated_at = timezone.now()
+        self.validation_comment = comment
+        self.status = 'completed'
+        self.completed_at = timezone.now()
+        self.save()
+        
+        # Log audit
+        from apps.audit.models import AuditLog
+        AuditLog.log_action(
+            action_type=AuditLog.ActionType.MILESTONE_VALIDATED,
+            actor=user,
+            content_type='clients.ProjectMilestone',
+            object_id=self.pk,
+            description=f"Jalon '{self.title}' validé",
+            metadata={
+                'milestone_id': self.pk,
+                'project_id': self.project.pk,
+                'comment': comment,
+            }
+        )
 
 
 class ProjectActivity(models.Model):
@@ -416,6 +552,8 @@ class ClientDocument(models.Model):
         ('logo', '🎨 Logo'),
         ('asset', '📦 Asset'),
         ('contract', '📝 Contrat'),
+        ('devis', '💰 Devis'),
+        ('facture', '🧾 Facture'),
         ('other', '📎 Autre'),
     ]
     

@@ -6,7 +6,8 @@ directement depuis la liste dans l'admin et de visualiser les attributs
 principaux (numéro, devis associé, montant, date).
 """
 
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.core.files.base import ContentFile
 from django import forms
@@ -15,6 +16,7 @@ from django.urls import reverse
 
 from .models import Invoice, InvoiceItem
 from .services import PremiumEmailService
+from apps.clients.models import ClientDocument, ClientNotification
 
 
 class InvoiceAdminForm(forms.ModelForm):
@@ -39,7 +41,12 @@ class InvoiceAdmin(admin.ModelAdmin):
     list_filter = ("status", "issue_date")
     search_fields = ("number", "quote__client__full_name")
     readonly_fields = ("total_ht", "tva", "total_ttc", "issue_date", "created_at")
-    actions = ["generate_pdfs", "send_invoices"]
+    actions = [
+        "generate_pdfs",
+        "send_invoices",
+        "generate_pdfs_and_publish",
+        "send_invoices_and_publish",
+    ]
 
     class InvoiceItemInline(admin.TabularInline):
         model = InvoiceItem
@@ -75,6 +82,17 @@ class InvoiceAdmin(admin.ModelAdmin):
         self.message_user(request, f"{count} facture(s) convertie(s) en PDF.")
     generate_pdfs.short_description = "Générer les PDF pour les factures sélectionnées"
 
+    @admin.action(description="📄 Générer les PDF et publier sur portail")
+    def generate_pdfs_and_publish(self, request, queryset):
+        published = 0
+        for invoice in queryset:
+            invoice.compute_totals()
+            invoice.generate_pdf(attach=True)
+            invoice.save()
+            if publish_invoice_to_portal(invoice, request):
+                published += 1
+        self.message_user(request, f"PDF générés. {published} publié(s) sur le portail.", level=messages.SUCCESS)
+
     def pdf_link(self, obj: Invoice) -> str:
         """Retourne un lien vers la vue download si un PDF existe."""
         if obj.pdf:
@@ -99,3 +117,68 @@ class InvoiceAdmin(admin.ModelAdmin):
                 continue
         self.message_user(request, f"{count} facture(s) envoyée(s) par e‑mail.")
     send_invoices.short_description = "Envoyer les factures sélectionnées par e‑mail"
+
+    @admin.action(description="📧 Envoyer les factures et publier sur portail")
+    def send_invoices_and_publish(self, request, queryset):
+        published = 0
+        email_service = PremiumEmailService()
+        for invoice in queryset:
+            invoice.compute_totals()
+            invoice.generate_pdf(attach=True)
+            try:
+                email_service.send_invoice_notification(invoice)
+                if publish_invoice_to_portal(invoice, request):
+                    published += 1
+            except Exception:
+                continue
+        self.message_user(request, f"Factures envoyées. {published} publié(s) sur le portail.", level=messages.SUCCESS)
+
+
+def publish_invoice_to_portal(invoice: Invoice, request=None) -> bool:
+    """Publie le PDF de facture dans le portail client (ClientDocument + notification)."""
+    try:
+        if not invoice.client or not invoice.client.email:
+            if request:
+                messages.warning(
+                    request,
+                    "Portail: client ou email manquant sur la facture",
+                )
+            return False
+
+        user = User.objects.filter(email__iexact=invoice.client.email).first()
+        client_profile = getattr(user, "client_profile", None) if user else None
+        if not client_profile:
+            if request:
+                messages.warning(
+                    request,
+                    f"Portail: aucun client trouvé pour {invoice.client.email}",
+                )
+            return False
+
+        if not invoice.pdf:
+            invoice.generate_pdf(attach=True)
+
+        title = f"Facture {invoice.number or invoice.id}"
+        doc, created = ClientDocument.objects.get_or_create(
+            client=client_profile,
+            title=title,
+            defaults={
+                "document_type": "facture",
+                "file": invoice.pdf,
+                "notes": "Facture publiée depuis l'admin",
+            },
+        )
+        if not created:
+            doc.file = invoice.pdf
+            doc.save(update_fields=["file"])
+
+        ClientNotification.objects.create(
+            client=client_profile,
+            notification_type="invoice",
+            title=title,
+            message="Nouvelle facture disponible dans votre portail client.",
+            related_url="/account/documents/",
+        )
+        return True
+    except Exception:
+        return False

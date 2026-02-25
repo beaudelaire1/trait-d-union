@@ -129,6 +129,7 @@ class Quote(models.Model):
     class QuoteStatus(models.TextChoices):
         DRAFT = "draft", _("Brouillon")
         SENT = "sent", _("Envoyé")
+        VALIDATED = "validated", _("Validé")
         ACCEPTED = "accepted", _("Accepté")
         REJECTED = "rejected", _("Refusé")
         INVOICED = "invoiced", _("Facturé")
@@ -200,6 +201,32 @@ class Quote(models.Model):
         null=True,
         help_text="Informations d'audit de la signature"
     )
+    
+    # ===========================================
+    # Validation du devis (audit trail)
+    # ===========================================
+    validated_by = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='quotes_validated',
+        verbose_name=_("Validé par"),
+        help_text="Utilisateur qui a validé le devis"
+    )
+    validated_at = models.DateTimeField(
+        _("Validé le"),
+        null=True,
+        blank=True,
+        help_text="Date et heure de validation"
+    )
+    validated_audit_trail = models.JSONField(
+        _("Audit trail validation"),
+        default=dict,
+        blank=True,
+        help_text="Métadonnées : {ip, user_agent, timestamp, comment, etc.}"
+    )
+    
     # Stripe Checkout Session ID (acompte)
     stripe_checkout_session_id = models.CharField(
         max_length=255,
