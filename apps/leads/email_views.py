@@ -261,8 +261,7 @@ class BulkEmailView(View):
         })
     
     def post(self, request: HttpRequest) -> HttpResponse:
-        import time
-        from core.services.email_backends import brevo_service
+        from django_q.tasks import async_task
         
         # Récupérer les données du formulaire
         emails_raw = request.POST.get('emails', '')
@@ -300,58 +299,26 @@ class BulkEmailView(View):
             'site_url': site_url,
         })
         
-        # Envoyer les emails un par un
-        success_count = 0
-        failed_emails = []
-        
-        for i, recipient in enumerate(emails):
-            try:
-                result = brevo_service.send_email(
-                    to_email=recipient,
-                    subject=subject,
-                    html_content=html_body,
-                    tags=['bulk-email', 'prospection']
-                )
-                
-                if result.get('success'):
-                    success_count += 1
-                    logger.info(f"[{i+1}/{len(emails)}] Email envoyé à {recipient}")
-                else:
-                    failed_emails.append(recipient)
-                    logger.error(f"[{i+1}/{len(emails)}] Échec envoi à {recipient}: {result.get('error')}")
-                
-                # Délai entre chaque envoi pour éviter les limites de taux
-                if i < len(emails) - 1 and delay_seconds > 0:
-                    time.sleep(delay_seconds)
-                    
-            except Exception as e:
-                failed_emails.append(recipient)
-                logger.error(f"Erreur envoi à {recipient}: {e}")
-        
-        # Enregistrer la campagne dans EmailComposition pour historique
-        EmailComposition.objects.create(
-            to_emails=', '.join(emails[:10]) + (f'... (+{len(emails)-10})' if len(emails) > 10 else ''),
-            subject=f"[BULK x{len(emails)}] {subject}",
-            body_html=body_html,
-            template_id=template_id if template_id else None,
-            is_draft=False,
-            sent_at=timezone.now(),
-            created_by=request.user,
+        # Dispatcher l'envoi en arrière-plan via Django-Q2
+        async_task(
+            'apps.leads.tasks.send_bulk_emails_task',
+            emails=emails,
+            subject=subject,
+            html_body=html_body,
+            delay_seconds=delay_seconds,
+            body_html_raw=body_html,
+            template_id=template_id,
+            user_id=request.user.pk,
+            task_name=f'bulk_email_{len(emails)}_{timezone.now():%Y%m%d_%H%M}',
         )
         
-        # Messages de feedback
-        if success_count == len(emails):
-            messages.success(request, f"✅ {success_count} emails envoyés avec succès !")
-        elif success_count > 0:
-            messages.warning(
-                request, 
-                f"⚠️ {success_count}/{len(emails)} emails envoyés. "
-                f"Échecs: {', '.join(failed_emails[:5])}{'...' if len(failed_emails) > 5 else ''}"
-            )
-        else:
-            messages.error(request, f"❌ Échec de l'envoi. Vérifiez la configuration Brevo.")
+        messages.success(
+            request,
+            f"✅ Envoi de {len(emails)} emails lancé en arrière-plan. "
+            f"Suivez la progression dans l'admin Django-Q."
+        )
         
         try:
             return redirect('admin_emails:email_list')
-        except:
+        except Exception:
             return redirect('leads:email_list')

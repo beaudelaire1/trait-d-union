@@ -194,3 +194,42 @@ class ClientRequestForm(forms.Form):
             'accept': '.pdf,.doc,.docx,.png,.jpg,.jpeg,.zip'
         })
     )
+
+
+class NewClientRequestForm(forms.Form):
+    """Formulaire validé pour les nouvelles demandes client (QuoteRequest)."""
+
+    phone = forms.CharField(
+        label="Téléphone",
+        max_length=50,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': '+33 6 12 34 56 78'
+        })
+    )
+    address = forms.CharField(
+        label="Adresse",
+        max_length=255,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'Votre adresse'
+        })
+    )
+    message = forms.CharField(
+        label="Description de votre besoin",
+        widget=forms.Textarea(attrs={
+            'class': 'form-input',
+            'rows': 5,
+            'placeholder': 'Décrivez votre projet…'
+        })
+    )
+    preferred_date = forms.DateField(
+        label="Date souhaitée (optionnel)",
+        required=False,
+        widget=forms.DateInput(attrs={
+            'class': 'form-input',
+            'type': 'date'
+        })
+    )

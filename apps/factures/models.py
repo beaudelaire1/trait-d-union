@@ -40,7 +40,7 @@ class Invoice(models.Model):
         DRAFT = "draft", _("Brouillon")
         REFACTURATION = "refacturation", _("Refacturation")
         AVOIR = "avoir", _("Avoir")
-        DEMO = "demo", _("Devis")
+        DEMO = "demo", _("Démonstration")
         SENT = "sent", _("Envoyée")
         PAID = "paid", _("Payée")
         PARTIAL = "partial", _("Partiellement payée")
@@ -242,7 +242,7 @@ class InvoiceItem(models.Model):
     """Ligne de facture."""
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="invoice_items")
     description = models.CharField(max_length=255, blank=True)
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("1.00"))
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
     tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal("0.00"))
 
@@ -255,7 +255,7 @@ class InvoiceItem(models.Model):
 
     @property
     def total_ht(self) -> Decimal:
-        return (self.unit_price * Decimal(self.quantity)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        return (self.unit_price * self.quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     @property
     def total_tva(self) -> Decimal:

@@ -128,3 +128,8 @@ class CampaignRecipient(models.Model):
     opened_at = models.DateTimeField(null=True, blank=True)
     clicked_at = models.DateTimeField(null=True, blank=True)
     replied_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ['campaign', 'prospect']
+        verbose_name = 'Destinataire de campagne'
+        verbose_name_plural = 'Destinataires de campagne'

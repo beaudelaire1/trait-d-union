@@ -113,9 +113,9 @@ class KnowledgeArticle(models.Model):
         super().save(*args, **kwargs)
     
     def increment_views(self):
-        """Incrémenter le compteur de vues."""
-        self.views_count += 1
-        self.save(update_fields=['views_count'])
+        """Incrémenter le compteur de vues (atomique, sans race condition)."""
+        from django.db.models import F
+        type(self).objects.filter(pk=self.pk).update(views_count=F('views_count') + 1)
     
     def mark_helpful(self):
         """Marquer l'article comme utile."""

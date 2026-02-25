@@ -55,6 +55,23 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
         response.setdefault('X-Frame-Options', 'SAMEORIGIN')
         response.setdefault('X-Content-Type-Options', 'nosniff')
         response.setdefault('Referrer-Policy', 'same-origin')
+
+        # Permissions-Policy (anciennement Feature-Policy)
+        # Lit la config PERMISSIONS_POLICY depuis settings si elle existe
+        from django.conf import settings
+        permissions = getattr(settings, 'PERMISSIONS_POLICY', None)
+        if permissions and 'Permissions-Policy' not in response:
+            directives = []
+            for feature, origins in permissions.items():
+                if not origins:
+                    directives.append(f'{feature}=()')
+                elif origins == ['self']:
+                    directives.append(f'{feature}=(self)')
+                else:
+                    allowed = ' '.join(f'"{o}"' for o in origins)
+                    directives.append(f'{feature}=({allowed})')
+            response['Permissions-Policy'] = ', '.join(directives)
+
         return response
 
 

@@ -332,20 +332,27 @@ class NewClientRequestView(ClientRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         """Handle new request submission."""
         from apps.devis.models import QuoteRequest
-        
+        from .forms import NewClientRequestForm
+
         profile = request.user.client_profile
-        
+        form = NewClientRequestForm(request.POST)
+
+        if not form.is_valid():
+            messages.error(request, 'Veuillez corriger les erreurs du formulaire.')
+            context = self.get_context_data(**kwargs)
+            context['form'] = form
+            return self.render_to_response(context)
+
         # Create quote request with pre-filled client data
-        quote_request = QuoteRequest.objects.create(
+        QuoteRequest.objects.create(
             client_name=request.user.get_full_name() or request.user.username,
             email=request.user.email,
-            phone=profile.phone or request.POST.get('phone', ''),
-            address=profile.address or request.POST.get('address', ''),
-            message=request.POST.get('message', ''),
-            preferred_date=request.POST.get('preferred_date') or None,
+            phone=profile.phone or form.cleaned_data.get('phone', ''),
+            address=profile.address or form.cleaned_data.get('address', ''),
+            message=form.cleaned_data['message'],
+            preferred_date=form.cleaned_data.get('preferred_date') or None,
         )
-        
-        # Create notification for admin
+
         messages.success(
             request, 
             'Votre demande a été envoyée avec succès ! Notre équipe vous recontactera sous 24h.'

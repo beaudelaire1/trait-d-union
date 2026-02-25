@@ -3,6 +3,7 @@ from __future__ import annotations
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -23,7 +24,7 @@ class Article(models.Model):
     )
 
     is_published = models.BooleanField("Publié", default=True)
-    publish_date = models.DateTimeField("Date de publication", auto_now_add=True)
+    publish_date = models.DateTimeField("Date de publication", default=timezone.now)
     updated_at = models.DateTimeField("Mise à jour", auto_now=True)
 
     class Meta:
