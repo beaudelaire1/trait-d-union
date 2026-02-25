@@ -5,10 +5,18 @@ from django.db import migrations, connection
 
 def drop_industry_if_exists(apps, schema_editor):
     """Drop the orphan 'industry' column only if it exists."""
+    vendor = connection.vendor  # 'sqlite', 'postgresql', etc.
     with connection.cursor() as cursor:
-        # SQLite: check pragma table_info
-        cursor.execute("PRAGMA table_info(clients_clientprofile);")
-        columns = [row[1] for row in cursor.fetchall()]
+        if vendor == 'sqlite':
+            cursor.execute("PRAGMA table_info(clients_clientprofile);")
+            columns = [row[1] for row in cursor.fetchall()]
+        else:
+            # PostgreSQL / MySQL
+            cursor.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_name = 'clients_clientprofile';"
+            )
+            columns = [row[0] for row in cursor.fetchall()]
         if 'industry' in columns:
             cursor.execute('ALTER TABLE clients_clientprofile DROP COLUMN industry;')
 
