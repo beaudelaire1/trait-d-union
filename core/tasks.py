@@ -189,51 +189,19 @@ def _task_send_quote_email(quote_id: int):
 
 
 def _task_send_quote_pdf_email(quote_id: int):
-    """Worker : génère le PDF et envoie le devis."""
+    """Worker : génère le PDF et envoie le devis.
+
+    Délègue à send_quote_email (email_service.py) qui gère
+    correctement les URLs (SITE_URL), le PDF, et l'envoi Brevo.
+    """
+    from apps.devis.email_service import send_quote_email
     from apps.devis.models import Quote
-    from core.services.pdf_generator import render_quote_pdf
-    from django.core.mail import EmailMessage
-    from django.template.loader import render_to_string
-    from django.conf import settings
 
     quote = Quote.objects.select_related('client').prefetch_related('quote_items').get(pk=quote_id)
-
-    try:
-        quote.compute_totals()
-    except Exception:
-        pass
-
-    pdf_res = render_quote_pdf(quote)
-
-    context = {
-        'quote': quote,
-        'branding': getattr(settings, 'INVOICE_BRANDING', {}) or {},
-        'cta_url': (
-            getattr(settings, 'SITE_URL', '').rstrip('/') + f'/devis/{quote.pk}/'
-            if getattr(settings, 'SITE_URL', None) else None
-        ),
-    }
-    html = render_to_string('emails/new_quote_pdf.html', context)
-
-    to_email = getattr(quote.client, 'email', None) or getattr(quote, 'email', None)
-    if not to_email:
-        return
-
-    email = EmailMessage(
-        subject=f'Votre devis {quote.number}',
-        body=html,
-        to=[to_email],
-        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', None),
-    )
-    email.content_subtype = 'html'
-    email.attach(pdf_res.filename, pdf_res.content, 'application/pdf')
-
-    admin_email = getattr(settings, 'TASK_NOTIFICATION_EMAIL', None)
-    if admin_email:
-        email.bcc = [admin_email]
-
-    email.send(fail_silently=False)
-    logger.info(f"[ASYNC] PDF devis {quote.number} envoyé à {to_email}")
+    if not quote.pdf:
+        quote.generate_pdf(attach=True)
+    send_quote_email(quote)
+    logger.info(f"[ASYNC] PDF devis {quote.number} envoyé par email")
 
 
 def _task_notify_quote_request(quote_request_id: int):

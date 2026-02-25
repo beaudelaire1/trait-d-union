@@ -41,7 +41,12 @@ def _base_url(request=None) -> str:
     Toujours utiliser SITE_URL pour éviter les liens localhost
     derrière un reverse-proxy (Render, Nginx, etc.).
     """
-    return str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+    url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+    # Sécurité : ne jamais envoyer un lien localhost/127.0.0.1 par email
+    if 'localhost' in url or '127.0.0.1' in url or '0.0.0.0' in url:
+        logger.warning(f"SITE_URL contient localhost ({url!r}), fallback sur https://traitdunion.it")
+        url = 'https://traitdunion.it'
+    return url
 
 
 def _send_via_brevo(

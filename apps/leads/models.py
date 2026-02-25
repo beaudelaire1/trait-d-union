@@ -19,6 +19,14 @@ class BudgetRange(models.TextChoices):
     DISCUSS = 'discuss', 'À discuter'
 
 
+class LeadStatus(models.TextChoices):
+    NEW = 'new', '🆕 Nouveau'
+    CONTACTED = 'contacted', '📧 Contacté'
+    QUALIFIED = 'qualified', '✅ Qualifié'
+    CONVERTED = 'converted', '🎉 Converti'
+    LOST = 'lost', '❌ Perdu'
+
+
 class Lead(models.Model):
     """Represents a contact request from the website."""
 
@@ -34,8 +42,29 @@ class Lead(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     is_processed = models.BooleanField(default=False)
 
+    # --- Suivi pipeline ---
+    status = models.CharField(
+        "Statut", max_length=20,
+        choices=LeadStatus.choices, default=LeadStatus.NEW,
+    )
+    converted_to_client = models.ForeignKey(
+        'clients.ClientProfile',
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='converted_leads',
+        verbose_name="Client converti",
+    )
+    converted_at = models.DateTimeField("Date de conversion", null=True, blank=True)
+    notes = models.TextField("Notes internes", blank=True)
+
     class Meta:
         ordering = ['-created_at']
+        verbose_name = "Lead"
+        verbose_name_plural = "Leads"
 
     def __str__(self) -> str:
         return f"{self.name} – {self.project_type}"
+
+    @property
+    def is_converted(self) -> bool:
+        return self.converted_to_client_id is not None
