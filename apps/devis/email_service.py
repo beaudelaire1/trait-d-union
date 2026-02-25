@@ -36,13 +36,12 @@ def _get_email_backend() -> str:
 
 
 def _base_url(request=None) -> str:
-    """Return the base URL for absolute links in emails."""
-    if request is not None:
-        try:
-            return request.build_absolute_uri('/').rstrip('/')
-        except Exception:
-            pass
-    return str(getattr(settings, 'SITE_URL', 'http://localhost:8000')).rstrip('/')
+    """Return the base URL for absolute links in emails.
+
+    Toujours utiliser SITE_URL pour éviter les liens localhost
+    derrière un reverse-proxy (Render, Nginx, etc.).
+    """
+    return str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
 
 
 def _send_via_brevo(

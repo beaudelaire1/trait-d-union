@@ -245,7 +245,7 @@ def _task_notify_quote_request(quote_request_id: int):
 
     qr = QuoteRequest.objects.get(pk=quote_request_id)
     branding = getattr(settings, 'INVOICE_BRANDING', {}) or {}
-    site_url = getattr(settings, 'SITE_URL', 'http://localhost:8000').rstrip('/')
+    site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it').rstrip('/')
 
     # 1) Email client
     if qr.email:
