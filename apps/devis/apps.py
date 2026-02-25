@@ -19,7 +19,4 @@ class DevisConfig(AppConfig):
     verbose_name = "Devis"
 
     def ready(self) -> None:
-        try:
-            from . import signals  # noqa: F401
-        except Exception:
-            pass
+        from . import signals  # noqa: F401

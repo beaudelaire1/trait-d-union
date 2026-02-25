@@ -5,7 +5,6 @@ from allauth.account.signals import user_logged_in as allauth_user_logged_in
 import logging
 
 from .models import Quote
-from core.services.notification_service import notification_service
 from apps.devis.application.validate_quote_usecase import provision_client_account
 
 logger = logging.getLogger(__name__)
@@ -50,38 +49,7 @@ def auto_provision_client_on_quote_validated(sender, instance: Quote, update_fie
 
 @receiver(post_save, sender=Quote)
 def handle_quote_validation(sender, instance, created, **kwargs):
-    """
-    Handle automatic client account creation when quote is validated (accepted).
-    DEPRECATED : remplacé par auto_provision_client_on_quote_validated (VALIDATED status)
-    """
-    # Skip during tests unless explicitly enabled
-    if getattr(settings, 'TESTING', True):
-        return
-        
-    # Only trigger on status change to ACCEPTED, not on creation
-    if created:
-        return
-        
-    # Check if quote was just accepted (old behavior, kept for backward compat)
-    if instance.status == Quote.QuoteStatus.ACCEPTED:
-        from accounts.services import ClientAccountCreationService
-        from core.services.email_service import EmailService
-        
-        try:
-            # Create client account if it doesn't exist
-            user, was_created = ClientAccountCreationService.create_from_quote_validation(instance)
-            
-            if was_created:
-                # Send invitation email for new accounts
-                EmailService.send_client_invitation(user, instance)
-            
-            # Send notification about quote validation
-            notification_service.notify_quote_validation(instance)
-                
-        except Exception as e:
-            # Log error but don't break the quote validation process
-            logger.error(f"Failed to create client account for quote {instance.pk}: {e}")
-
+    pass
 
 @receiver(post_save, sender=Quote)
 def send_quote_with_pdf(sender, instance, created, **kwargs):
@@ -105,7 +73,10 @@ def send_quote_with_pdf(sender, instance, created, **kwargs):
         logger.error(f"Erreur lors de l'envoi automatique du devis {instance.pk}: {e}")
 
 
+from django.contrib.auth.signals import user_logged_in as django_user_logged_in
+
 @receiver(allauth_user_logged_in)
+@receiver(django_user_logged_in)
 def force_password_change_on_login(sender, request, user, **kwargs):
     """Signal : à la première connexion, forcer changement de mot de passe.
     

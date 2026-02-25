@@ -152,7 +152,7 @@ def send_welcome_email(
         context_label: Libellé optionnel (ex: "Devis DEV-2026-042")
     """
     site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it')
-    login_url = f"{site_url}/account/login/"
+    login_url = f"{site_url}/accounts/login/"
     first_name = user.first_name or user.username
     from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@traitdunion.it')
 
