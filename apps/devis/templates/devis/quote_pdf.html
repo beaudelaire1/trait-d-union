@@ -663,6 +663,56 @@
             </div>
         </div>
         
+        {% if validation_info %}
+        <!-- VALIDATION OTP -->
+        <div class="validation-section" style="
+            margin: 24px 0 16px;
+            padding: 16px 20px;
+            border: 2px solid #0B2DFF;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(11,45,255,0.04), rgba(11,45,255,0.08));
+            page-break-inside: avoid;
+        ">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                <div style="
+                    width: 28px; height: 28px; border-radius: 50%;
+                    background: #0B2DFF; display: flex; align-items: center; justify-content: center;
+                ">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </div>
+                <h4 style="margin: 0; font-size: 13px; font-weight: 700; color: #0B2DFF; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Devis validé par code OTP
+                </h4>
+            </div>
+            <table style="width: 100%; font-size: 11px; color: #2d3748; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 4px 0; font-weight: 600; width: 160px;">Date de validation :</td>
+                    <td style="padding: 4px 0;">{{ validation_info.confirmed_at|date:"d/m/Y à H:i" }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 4px 0; font-weight: 600;">Validé par :</td>
+                    <td style="padding: 4px 0;">{{ validation_info.validated_by }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 4px 0; font-weight: 600;">Jeton de validation :</td>
+                    <td style="padding: 4px 0; font-family: 'Courier New', monospace; font-size: 10px; letter-spacing: 0.3px;">{{ validation_info.token }}</td>
+                </tr>
+                {% if validation_info.audit_trail.ip %}
+                <tr>
+                    <td style="padding: 4px 0; font-weight: 600;">Adresse IP :</td>
+                    <td style="padding: 4px 0;">{{ validation_info.audit_trail.ip }}</td>
+                </tr>
+                {% endif %}
+            </table>
+            <p style="margin: 10px 0 0; font-size: 9px; color: #718096; font-style: italic;">
+                Ce devis a été validé électroniquement via un code de vérification à usage unique (OTP).
+                Ce document fait foi de l'acceptation du client.
+            </p>
+        </div>
+        {% endif %}
+        
         <!-- CONDITIONS -->
         <div class="conditions-section">
             <div class="conditions-box">

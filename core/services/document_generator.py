@@ -131,6 +131,25 @@ class DocumentGenerator:
                 'has_signature_image': bool(quote.signature_image),
             }
         
+        # Préparer les informations de validation OTP si le devis a été validé
+        validation_info = None
+        if quote.validated_at:
+            from apps.devis.models import QuoteValidation
+            # Chercher le jeton de validation confirmé
+            confirmed_validation = (
+                QuoteValidation.objects
+                .filter(quote=quote, confirmed_at__isnull=False)
+                .order_by('-confirmed_at')
+                .first()
+            )
+            validation_info = {
+                'validated_at': quote.validated_at,
+                'validated_by': str(quote.validated_by) if quote.validated_by else 'N/A',
+                'token': confirmed_validation.token if confirmed_validation else 'N/A',
+                'confirmed_at': confirmed_validation.confirmed_at if confirmed_validation else quote.validated_at,
+                'audit_trail': quote.validated_audit_trail or {},
+            }
+        
         # Préparer le contexte
         context = {
             'quote': quote,
@@ -138,6 +157,7 @@ class DocumentGenerator:
             'items': list(quote.quote_items.all()) if hasattr(quote, 'quote_items') else [],
             'total_lettres': quote.amount_letter() if hasattr(quote, 'amount_letter') else None,
             'signature_info': signature_info,
+            'validation_info': validation_info,
         }
         
         # Render le template

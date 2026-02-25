@@ -8,16 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="client-portal" x-data="{ sidebarOpen: true }">
-    <!-- Mobile Toggle -->
-    <button @click="sidebarOpen = !sidebarOpen" class="sidebar-toggle" aria-label="Menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-    </button>
-
+<div class="client-portal" x-data="{ sidebarOpen: window.innerWidth > 1024 }">
     {% include 'clients/partials/sidebar.html' %}
 
     <!-- Main Content -->
@@ -193,23 +184,6 @@
    ======================================== */
 .client-sidebar.collapsed { width: var(--sidebar-collapsed); }
 
-.sidebar-toggle {
-    display: none;
-    position: fixed;
-    top: 90px;
-    left: 10px;
-    z-index: 50;
-    width: 44px;
-    height: 44px;
-    background: var(--client-surface);
-    border: 1px solid var(--client-border);
-    border-radius: 10px;
-    color: var(--client-text);
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-}
-
 .sidebar-header:hover .collapse-btn svg { transition: transform 0.3s ease; }
 .client-main.expanded { margin-left: var(--sidebar-collapsed); max-width: calc(100vw - var(--sidebar-collapsed)); }
 
@@ -247,7 +221,6 @@
 }
 
 @media (max-width: 768px) {
-    .sidebar-toggle { display: flex; }
     }
 </style>
 {% endblock %}

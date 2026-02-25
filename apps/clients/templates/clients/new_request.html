@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="client-portal" x-data="{ sidebarOpen: true }">
+<div class="client-portal" x-data="{ sidebarOpen: window.innerWidth > 1024 }">
     {% include 'clients/partials/sidebar.html' %}
     
     <main class="client-main" :class="{ 'expanded': !sidebarOpen }">

@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="client-portal" x-data="{ sidebarOpen: true, showNotifications: false }">
+<div class="client-portal" x-data="{ sidebarOpen: window.innerWidth > 1024, showNotifications: false }">
     <!-- Sidebar Toggle (Mobile) -->
     <button @click="sidebarOpen = !sidebarOpen" 
             class="sidebar-toggle"
@@ -626,28 +626,6 @@
 </div>
 
 <style>
-.sidebar-toggle {
-    display: none;
-    position: fixed;
-    top: 90px;
-    left: 10px;
-    z-index: 50;
-    width: 44px;
-    height: 44px;
-    background: var(--client-surface);
-    border: 1px solid var(--client-border);
-    border-radius: 10px;
-    color: var(--client-text);
-    cursor: pointer;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.sidebar-toggle:hover {
-    background: var(--client-surface-hover);
-    border-color: var(--client-blue);
-}
 
 .sidebar-header:hover .collapse-btn svg {
     transition: transform 0.3s ease;
