@@ -3,14 +3,14 @@ from __future__ import annotations
 
 import html as html_module
 
-import bleach
+import nh3
 from django import template
 from django.utils.safestring import mark_safe
 
 register = template.Library()
 
 # Tags HTML autorisés en sortie (whitelist stricte)
-ALLOWED_TAGS = [
+ALLOWED_TAGS = {
     "p", "br",
     "strong", "b", "em", "i", "u",
     "ul", "ol", "li",
@@ -18,9 +18,9 @@ ALLOWED_TAGS = [
     "blockquote",
     "a",
     "code", "hr",
-]
+}
 ALLOWED_ATTRIBUTES = {
-    "a": ["href", "title", "target"],
+    "a": {"href", "title", "target"},
 }
 
 
@@ -32,11 +32,10 @@ def safe_html_filter(value: str) -> str:
     """
     if not value:
         return ""
-    clean = bleach.clean(
+    clean = nh3.clean(
         value,
         tags=ALLOWED_TAGS,
         attributes=ALLOWED_ATTRIBUTES,
-        strip=True,
     )
     return mark_safe(clean)
 
@@ -50,8 +49,8 @@ def plain_text_filter(value: str) -> str:
     """
     if not value:
         return ""
-    # 1. Strip all tags (bleach with empty tag list)
-    stripped = bleach.clean(value, tags=[], strip=True)
+    # 1. Strip all tags (nh3 with empty tag set)
+    stripped = nh3.clean(value, tags=set())
     # 2. Decode HTML entities (&eacute; → é, &amp; → &, etc.)
     return html_module.unescape(stripped)
 

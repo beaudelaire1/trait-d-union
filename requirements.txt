@@ -1,7 +1,6 @@
 Django>=5.0,<6.0
 django-htmx>=1.17.0
 django-allauth>=0.61.0
-django-extensions>=3.2.0
 django-jazzmin==3.0.1
 Pillow>=9.0
 requests>=2.28.0
@@ -32,7 +31,7 @@ stripe>=8.0.0
 
 # TinyMCE éditeur rich-text admin portfolio
 django-tinymce>=4.0
-bleach>=6.0
+nh3>=0.2.14
 
 # Tâches asynchrones (emails, PDF, etc.)
 django-q2>=1.6.0

@@ -61,6 +61,9 @@ class Lead(models.Model):
         ordering = ['-created_at']
         verbose_name = "Lead"
         verbose_name_plural = "Leads"
+        indexes = [
+            models.Index(fields=['status'], name='idx_lead_status'),
+        ]
 
     def __str__(self) -> str:
         return f"{self.name} – {self.project_type}"

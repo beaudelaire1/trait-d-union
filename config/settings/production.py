@@ -24,8 +24,6 @@ ALLOWED_HOSTS = [
     'traitdunion.it',
     'www.traitdunion.it',
     '.onrender.com',
-    'localhost',
-    '127.0.0.1',
 ]
 
 # CSRF trusted origins - DOIT inclure le scheme https://
@@ -46,7 +44,7 @@ SECURE_HSTS_PRELOAD = True
 
 # Headers de sécurité supplémentaires
 SECURE_CONTENT_TYPE_NOSNIFF = True  # X-Content-Type-Options: nosniff
-SECURE_BROWSER_XSS_FILTER = True  # X-XSS-Protection (navigateurs anciens)
+# SECURE_BROWSER_XSS_FILTER obsolète — les navigateurs modernes l'ignorent
 X_FRAME_OPTIONS = 'DENY'  # Protection clickjacking
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
@@ -108,7 +106,8 @@ IS_BUILDING = 'collectstatic' in sys.argv
 
 if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY):
     if not IS_BUILDING:
-        print(f"✅ Cloudinary configuration found")
+        import logging as _log
+        _log.getLogger('config.settings').info('Cloudinary configuration found')
     
     # Configuration Cloudinary
     INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
@@ -144,9 +143,11 @@ if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY):
 else:
     # Mode Build ou Config manquante
     if IS_BUILDING:
-        print("ℹ️  Build mode detected: Skipping detailed Cloudinary checks (expected).")
+        import logging as _log
+        _log.getLogger('config.settings').info('Build mode detected: Skipping Cloudinary checks')
     else:
-        print("❌ CLOUDINARY ENV VARS MISSING! External media storage will NOT work.")
+        import logging as _log
+        _log.getLogger('config.settings').warning('CLOUDINARY ENV VARS MISSING! External media storage will NOT work.')
     
     # Configuration minimale pour le build
     # IMPORTANT: On utilise CompressedStaticFilesStorage (SANS manifest) pour éviter

@@ -61,6 +61,9 @@ class Client(models.Model):
         ordering = ["-created_at"]
         verbose_name = _("client")
         verbose_name_plural = _("clients")
+        indexes = [
+            models.Index(fields=['email'], name='idx_devis_client_email'),
+        ]
 
     def __str__(self) -> str:
         return self.full_name
@@ -262,6 +265,15 @@ class Quote(models.Model):
         help_text="Révisions illimitées incluses"
     )
 
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = _("devis")
+        verbose_name_plural = _("devis")
+        indexes = [
+            models.Index(fields=['status'], name='idx_quote_status'),
+            models.Index(fields=['issue_date'], name='idx_quote_issue_date'),
+        ]
+
     def amount_letter(self):
         """Montant TTC en toutes lettres (affiché sur le PDF devis)."""
         return f"{_num2words_fr(self.total_ttc).title()} euros"
@@ -343,10 +355,6 @@ class Quote(models.Model):
         self.tva = total_tva
         self.total_ttc = total_ht + total_tva
         self.save(update_fields=["total_ht", "tva", "total_ttc"])
-
-    def amount_letter(self):
-        """Montant TTC en toutes lettres (pour le PDF premium)."""
-        return f"{_num2words_fr(self.total_ttc).title()} euros"
 
     def generate_pdf(self, attach: bool = True) -> bytes:
         """Génère un PDF premium pour ce devis via WeasyPrint.
@@ -544,68 +552,4 @@ class QuoteValidation(models.Model):
         self.save(update_fields=["attempts"])
         return False
 
-# === Hexagonal‑friendly signaux pour les emails de devis ===
-from django.conf import settings
-from django.core.mail import send_mail
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-
-
-def _guess_quote_email(quote):
-    """Détecte de manière défensive l'email de contact client."""
-    for attr in ("email", "client_email", "contact_email"):
-        value = getattr(quote, attr, None)
-        if value:
-            return value
-    client = getattr(quote, "client", None)
-    if client is not None:
-        for attr in ("email", "contact_email"):
-            value = getattr(client, attr, None)
-            if value:
-                return value
-    return None
-
-
-@receiver(post_save, sender=Quote)
-def send_quote_created_email(sender, instance: "Quote", created: bool, **kwargs):
-    """Envoi d'un email simple lorsqu'un devis est créé.
-
-    - Email au client (si adresse détectée)
-    - Email de notification à l'adresse par défaut du projet
-    """
-    # Désactivé : le projet utilise désormais un email premium envoyé
-    # explicitement (admin action / workflow). On évite les emails "en vrac".
-    return
-
-    subject = f"Votre demande de devis NetExpress n°{instance.pk}"
-    body = (
-        "Bonjour,\n\n"
-        "Votre demande de devis a bien été enregistrée par NetExpress.\n"
-        "Nous reviendrons vers vous avec une proposition détaillée dans les meilleurs délais.\n\n"
-        "Ceci est un email automatique, merci de ne pas y répondre."
-    )
-
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", None) or "no-reply@example.com"
-    to_email = _guess_quote_email(instance)
-
-    # Email client
-    if to_email:
-        try:
-            send_mail(subject, body, from_email, [to_email], fail_silently=True)
-        except Exception:
-            # On reste silencieux pour ne pas casser le flux applicatif
-            pass
-
-    # Notification interne
-    internal_email = getattr(settings, "NETEXPRESS_DEVIS_NOTIFICATION", None)
-    if internal_email:
-        try:
-            send_mail(
-                f"[NetExpress] Nouveau devis #{instance.pk}",
-                f"Un nouveau devis vient d'être créé (ID: {instance.pk}).",
-                from_email,
-                [internal_email],
-                fail_silently=True,
-            )
-        except Exception:
-            pass
+# === Hexagonal-friendly : code legacy désactivé (nettoyé) ===

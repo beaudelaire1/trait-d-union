@@ -151,7 +151,10 @@ class Invoice(models.Model):
 
     class Meta:
         ordering = ["-issue_date", "-number"]
-        indexes = [models.Index(fields=["number", "issue_date"])]
+        indexes = [
+            models.Index(fields=["number", "issue_date"]),
+            models.Index(fields=['status'], name='idx_invoice_status'),
+        ]
         verbose_name = _("facture")
         verbose_name_plural = _("factures")
 

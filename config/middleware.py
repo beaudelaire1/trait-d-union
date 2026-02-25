@@ -55,7 +55,6 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
         response.setdefault('X-Frame-Options', 'SAMEORIGIN')
         response.setdefault('X-Content-Type-Options', 'nosniff')
         response.setdefault('Referrer-Policy', 'same-origin')
-        response.setdefault('X-XSS-Protection', '1; mode=block')
         return response
 
 

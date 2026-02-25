@@ -129,6 +129,9 @@ class ClientNotification(models.Model):
         verbose_name = "Notification"
         verbose_name_plural = "Notifications"
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['client', 'read'], name='idx_notif_client_read'),
+        ]
     
     def __str__(self):
         return f"{self.title} - {self.client}"
@@ -220,6 +223,9 @@ class Project(models.Model):
         verbose_name = "Projet"
         verbose_name_plural = "Projets"
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status'], name='idx_project_status'),
+        ]
     
     def __str__(self):
         return f"{self.name} - {self.client}"

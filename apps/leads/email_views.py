@@ -179,6 +179,7 @@ class EmailDetailView(LoginRequiredMixin, StaffRequiredMixin, DetailView):
         return EmailComposition.objects.filter(created_by=self.request.user)
 
 
+@method_decorator(staff_member_required, name='dispatch')
 class EmailTemplateAPIView(View):
     """API endpoint to get template content via AJAX."""
     

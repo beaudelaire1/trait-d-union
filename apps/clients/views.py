@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
 from django.contrib import messages
 from django.urls import reverse_lazy
-from django.http import JsonResponse, FileResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 from django.core.files.storage import default_storage
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 
@@ -375,6 +375,23 @@ def add_project_comment(request, project_id):
     if request.method == 'POST':
         message = request.POST.get('message', '').strip()
         attachment = request.FILES.get('attachment')
+        
+        # Validation du fichier joint
+        if attachment:
+            import os
+            max_size = 10 * 1024 * 1024  # 10 Mo
+            allowed_ext = {'.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg', '.zip', '.svg'}
+            ext = os.path.splitext(attachment.name)[1].lower()
+            if attachment.size > max_size:
+                if request.headers.get('HX-Request'):
+                    return HttpResponse('Fichier trop volumineux (max 10 Mo)', status=400)
+                messages.error(request, 'Fichier trop volumineux (max 10 Mo).')
+                return redirect('clients:project_detail', pk=project.pk)
+            if ext not in allowed_ext:
+                if request.headers.get('HX-Request'):
+                    return HttpResponse(f'Type de fichier non autorisé ({ext})', status=400)
+                messages.error(request, f'Type de fichier non autorisé ({ext}).')
+                return redirect('clients:project_detail', pk=project.pk)
         
         if message or attachment:
             comment = ProjectComment.objects.create(

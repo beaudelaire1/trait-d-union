@@ -27,12 +27,17 @@ def notify_quote_created(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Quote)
-def notify_quote_accepted(sender, instance, **kwargs):
-    """Send notification when a quote is accepted."""
+def notify_quote_accepted(sender, instance, created, **kwargs):
+    """Send notification when a quote is accepted (only once)."""
+    if created:
+        return  # Skip on creation
     if instance.status == 'accepted' and instance.signed_at:
         try:
             profile = ClientProfile.objects.filter(user__email=instance.client.email).first()
-            if profile:
+            if profile and not ClientNotification.objects.filter(
+                client=profile, notification_type='quote',
+                title='Devis accepté', related_url=f'/ecosysteme-tus/devis/{instance.pk}/'
+            ).exists():
                 ClientNotification.objects.create(
                     client=profile,
                     notification_type='quote',
@@ -65,13 +70,18 @@ def notify_invoice_created(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=Invoice)
-def notify_invoice_paid(sender, instance, **kwargs):
-    """Send notification when an invoice is paid."""
+def notify_invoice_paid(sender, instance, created, **kwargs):
+    """Send notification when an invoice is paid (only once)."""
+    if created:
+        return  # Skip on creation
     if instance.status == 'paid' and instance.paid_at:
         try:
             if instance.quote:
                 profile = ClientProfile.objects.filter(user__email=instance.quote.client.email).first()
-                if profile:
+                if profile and not ClientNotification.objects.filter(
+                    client=profile, notification_type='invoice',
+                    title='Paiement reçu', related_url=f'/ecosysteme-tus/factures/{instance.pk}/'
+                ).exists():
                     ClientNotification.objects.create(
                         client=profile,
                         notification_type='invoice',

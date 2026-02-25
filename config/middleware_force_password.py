@@ -19,7 +19,7 @@ class ForcePasswordChangeMiddleware(MiddlewareMixin):
 
     # URLs exemptées du blocage (préfixes)
     EXEMPT_PREFIXES = [
-        '/admin/',
+        '/tus-gestion-secure/',
         '/api/',
         '/static/',
         '/media/',

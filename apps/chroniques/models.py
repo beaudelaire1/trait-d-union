@@ -30,6 +30,9 @@ class Article(models.Model):
         ordering = ["-publish_date"]
         verbose_name = "Article"
         verbose_name_plural = "Articles"
+        indexes = [
+            models.Index(fields=['is_published', 'publish_date'], name='idx_article_pub'),
+        ]
 
     def __str__(self) -> str:
         return self.title

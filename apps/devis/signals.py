@@ -48,16 +48,12 @@ def auto_provision_client_on_quote_validated(sender, instance: Quote, update_fie
 
 
 @receiver(post_save, sender=Quote)
-def handle_quote_validation(sender, instance, created, **kwargs):
-    pass
-
-@receiver(post_save, sender=Quote)
 def send_quote_with_pdf(sender, instance, created, **kwargs):
     """
     Envoi automatique du devis au client par e-mail avec le PDF joint.
     """
     # Skip email sending during tests
-    if hasattr(settings, 'TESTING') or 'test' in str(settings.DATABASES['default']['NAME']):
+    if getattr(settings, 'TESTING', False):
         return
         
     if not created:

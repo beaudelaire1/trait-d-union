@@ -82,6 +82,10 @@ class ClientProfileForm(forms.ModelForm):
 class DocumentUploadForm(forms.ModelForm):
     """Form for uploading documents."""
     
+    # Limites de sécurité
+    MAX_FILE_SIZE_MB = 10
+    ALLOWED_EXTENSIONS = {'.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg', '.zip', '.svg', '.ai', '.psd'}
+    
     class Meta:
         model = ClientDocument
         fields = ['title', 'document_type', 'file', 'notes']
@@ -103,6 +107,27 @@ class DocumentUploadForm(forms.ModelForm):
                 'placeholder': 'Notes additionnelles (optionnel)'
             }),
         }
+
+    def clean_file(self):
+        """Valide le type et la taille du fichier uploadé."""
+        import os
+        uploaded = self.cleaned_data.get('file')
+        if not uploaded:
+            return uploaded
+        # Vérifier la taille
+        max_bytes = self.MAX_FILE_SIZE_MB * 1024 * 1024
+        if uploaded.size > max_bytes:
+            raise forms.ValidationError(
+                f"Le fichier dépasse la taille maximale de {self.MAX_FILE_SIZE_MB} Mo."
+            )
+        # Vérifier l'extension
+        ext = os.path.splitext(uploaded.name)[1].lower()
+        if ext not in self.ALLOWED_EXTENSIONS:
+            raise forms.ValidationError(
+                f"Type de fichier non autorisé ({ext}). "
+                f"Extensions acceptées : {', '.join(sorted(self.ALLOWED_EXTENSIONS))}"
+            )
+        return uploaded
 
 
 class ClientRequestForm(forms.Form):

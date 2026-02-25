@@ -26,7 +26,7 @@ def _is_postgres_available(port=5432):
         result = sock.connect_ex(('localhost', port))
         sock.close()
         return result == 0
-    except:
+    except (OSError, socket.error):
         return False
 
 # Essayer d'abord le port Docker (5432), puis le port local (5433)
@@ -47,9 +47,9 @@ elif _is_postgres_available(5433):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'tus_db',
-            'USER': 'postgres',
-            'PASSWORD': 'Vilme1479*',
+            'NAME': os.environ.get('DB_NAME', 'tus_db'),
+            'USER': os.environ.get('DB_USER', 'postgres'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
             'HOST': 'localhost',
             'PORT': '5433',
         }

@@ -41,6 +41,11 @@ RUN mkdir -p /app/staticfiles /app/media
 # Collecter les fichiers statiques (StaticFilesStorage en prod, pas de manifest strict)
 RUN python manage.py collectstatic --noinput --clear
 
+# Créer un utilisateur non-root pour la sécurité
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser \
+    && chown -R appuser:appgroup /app
+USER appuser
+
 # Port
 EXPOSE ${PORT}
 
