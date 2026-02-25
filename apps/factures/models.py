@@ -22,12 +22,9 @@ from django.core.files.base import ContentFile
 # =========================
 
 def _num2words_fr(v: Decimal) -> str:
-    """Import tardif de .utils.num2words_fr, repli numérique FR si absent."""
-    try:
-        from .utils import num2words_fr as _n2w
-        return _n2w(v)
-    except Exception:
-        return str(v).replace(".", ",")
+    """Montant en toutes lettres (FR). Délègue à core.utils."""
+    from core.utils import num2words_fr
+    return num2words_fr(v)
 
 
 # =========================
@@ -182,25 +179,33 @@ class Invoice(models.Model):
         Assignation automatique du numéro de facture, du jeton public,
         et du client depuis le devis si non renseigné.
         """
+        import logging
         import secrets
+
+        logger = logging.getLogger(__name__)
 
         # Remplir le client depuis le devis si manquant
         if not self.client_id and self.quote_id:
             try:
                 self.client = self.quote.client
-            except Exception:
-                pass
-        
-        # Générer un jeton public unique
+            except (AttributeError, ValueError) as exc:
+                logger.warning(
+                    "Invoice %s: impossible de résoudre le client depuis le devis: %s",
+                    self.pk or '(new)', exc,
+                )
+
+        # Générer un jeton public unique (max 10 tentatives)
         if not self.public_token:
-            while True:
+            for _ in range(10):
                 token = secrets.token_urlsafe(32)
                 if not Invoice.objects.filter(public_token=token).exists():
                     self.public_token = token
                     break
-        
+            else:
+                raise RuntimeError("Impossible de générer un token public unique après 10 tentatives")
+
         if not self.pk and not self.number:
-            year = self.issue_date.year if getattr(self, "issue_date", None) else date.today().year
+            year = self.issue_date.year if self.issue_date else date.today().year
             prefix = f"FAC-{year}-"
             from django.db import transaction
             with transaction.atomic():
@@ -212,11 +217,11 @@ class Invoice(models.Model):
                     .last()
                 )
                 counter = 0
-                if last:
+                if last and last.number:
                     try:
-                        counter = int(str(last.number).split("-")[-1])
-                    except Exception:
-                        counter = 0
+                        counter = int(last.number.rsplit("-", 1)[-1])
+                    except (ValueError, IndexError):
+                        counter = Invoice.objects.filter(number__startswith=prefix).count()
                 self.number = f"{prefix}{counter + 1:03d}"
         super().save(*args, **kwargs)
 

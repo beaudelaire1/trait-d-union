@@ -118,9 +118,9 @@ class KnowledgeArticle(models.Model):
         type(self).objects.filter(pk=self.pk).update(views_count=F('views_count') + 1)
     
     def mark_helpful(self):
-        """Marquer l'article comme utile."""
-        self.helpful_count += 1
-        self.save(update_fields=['helpful_count'])
+        """Marquer l'article comme utile (atomique, sans race condition)."""
+        from django.db.models import F
+        type(self).objects.filter(pk=self.pk).update(helpful_count=F('helpful_count') + 1)
 
 
 class ArticleTag(models.Model):

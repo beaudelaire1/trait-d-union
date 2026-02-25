@@ -271,11 +271,18 @@ class BulkEmailView(View):
         delay_seconds = float(request.POST.get('delay', 1))  # Délai entre chaque envoi
         
         # Nettoyer et parser les emails
+        from django.core.validators import validate_email
+        from django.core.exceptions import ValidationError
+
         emails = []
         for line in emails_raw.replace(',', '\n').replace(';', '\n').split('\n'):
             email = line.strip()
-            if email and '@' in email:
-                emails.append(email)
+            if email:
+                try:
+                    validate_email(email)
+                    emails.append(email)
+                except ValidationError:
+                    pass  # Ignorer les adresses invalides
         
         # Supprimer les doublons tout en préservant l'ordre
         emails = list(dict.fromkeys(emails))

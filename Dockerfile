@@ -9,9 +9,11 @@ FROM python:3.11-bookworm
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.production \
-    PORT=8000 \
-    DJANGO_SECRET_KEY=dummy-build-key-not-used-in-production \
-    DATABASE_URL=sqlite:///dummy.db
+    PORT=8000
+
+# Build-time only args (non persistants dans l'image finale)
+ARG DJANGO_SECRET_KEY=build-only-placeholder
+ARG DATABASE_URL=sqlite:///dummy.db
 
 WORKDIR /app
 
@@ -38,8 +40,9 @@ COPY . .
 # Créer les répertoires
 RUN mkdir -p /app/staticfiles /app/media
 
-# Collecter les fichiers statiques (StaticFilesStorage en prod, pas de manifest strict)
-RUN python manage.py collectstatic --noinput --clear
+# Collecter les fichiers statiques (ARGs disponibles au build-time uniquement)
+RUN DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY} DATABASE_URL=${DATABASE_URL} \
+    python manage.py collectstatic --noinput --clear
 
 # Créer un utilisateur non-root pour la sécurité (avec home dir pour pip/cache)
 RUN addgroup --system appgroup \

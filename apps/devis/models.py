@@ -32,18 +32,9 @@ from typing import List
 
 
 def _num2words_fr(v: Decimal) -> str:
-    """Convertit un montant en toutes lettres (fr).
-
-    Utilise num2words (dépendance déjà présente dans requirements/dev.txt).
-    En cas d'absence de la lib, renvoie une valeur simple.
-    """
-    try:
-        from num2words import num2words
-        # num2words gère les décimales avec to='currency' mais on préfère
-        # une sortie simple : "cent vingt-trois".
-        return num2words(v, lang='fr')
-    except Exception:
-        return str(v)
+    """Montant en toutes lettres (FR). Délègue à core.utils."""
+    from core.utils import num2words_fr
+    return num2words_fr(v)
 
 
 class Client(models.Model):

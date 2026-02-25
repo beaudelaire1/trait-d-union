@@ -17,6 +17,7 @@ import logging
 from decimal import Decimal
 from typing import Optional, Dict, Any
 from django.conf import settings
+from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
@@ -287,13 +288,34 @@ class StripePaymentService:
             # Vérifier si paiement partiel
             is_partial = metadata.get('is_partial', 'false') == 'true'
 
+            # Récupérer le montant effectivement payé depuis Stripe
+            amount_paid_cents = session.get('amount_total', 0)
+            amount_paid = Decimal(str(amount_paid_cents)) / 100 if amount_paid_cents else invoice.total_ttc
+
             if is_partial:
                 invoice.status = Invoice.InvoiceStatus.PARTIAL
+                invoice.amount_paid = (invoice.amount_paid or Decimal('0')) + amount_paid
             else:
                 invoice.status = Invoice.InvoiceStatus.PAID
+                invoice.amount_paid = invoice.total_ttc
 
-            invoice.save(update_fields=['status'])
-            logger.info(f"Facture {invoice.number} marquée comme {'PARTIEL' if is_partial else 'PAYÉE'}")
+            invoice.paid_at = timezone.now()
+            invoice.paid_by = 'stripe'
+
+            # Audit trail
+            trail = invoice.payment_audit_trail or {}
+            trail[f'stripe_{timezone.now().isoformat()}'] = {
+                'session_id': session.get('id'),
+                'amount_cents': amount_paid_cents,
+                'is_partial': is_partial,
+            }
+            invoice.payment_audit_trail = trail
+
+            invoice.save(update_fields=[
+                'status', 'amount_paid', 'paid_at', 'paid_by',
+                'payment_audit_trail',
+            ])
+            logger.info(f"Facture {invoice.number} marquée comme {'PARTIEL' if is_partial else 'PAYÉE'} — {amount_paid}€")
 
             # Envoyer email de confirmation (async)
             from core.tasks import async_send_payment_confirmation

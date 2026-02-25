@@ -14,11 +14,11 @@ echo "=========================================="
 echo "🚀 TRAIT D'UNION STUDIO - Build Script"
 echo "=========================================="
 
-# 1. Installer les dépendances Python (skip si déjà fait dans Docker build)
+# 1. Installer les dépendances Python
 echo ""
 echo "📦 Installation des dépendances..."
-pip install --upgrade pip 2>/dev/null || true
-pip install -r requirements.txt 2>/dev/null || echo "⚠️  pip install skipped (deps already in Docker image)"
+pip install --upgrade pip
+pip install -r requirements.txt
 
 # 2. Collecter les fichiers statiques
 echo ""

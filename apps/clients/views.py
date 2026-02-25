@@ -45,7 +45,7 @@ class ClientRequiredMixin(LoginRequiredMixin):
             ).count()
             
             context['pending_invoices_count'] = Invoice.objects.filter(
-                quote__client__email=self.request.user.email,
+                client__email=self.request.user.email,
                 status__in=['sent', 'overdue']
             ).count()
         
@@ -299,7 +299,7 @@ class InvoiceListView(ClientRequiredMixin, ListView):
     def get_queryset(self):
         from apps.factures.models import Invoice
         return Invoice.objects.filter(
-            quote__client__email=self.request.user.email
+            client__email=self.request.user.email
         ).order_by('-created_at')
 
 

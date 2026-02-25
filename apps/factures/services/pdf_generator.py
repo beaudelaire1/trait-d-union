@@ -29,12 +29,9 @@ from django.core.files.base import ContentFile
 
 
 def _num2words_fr(v: Decimal) -> str:
-    """Import tardif de .utils.num2words_fr, repli numérique FR si absent."""
-    try:
-        from ..utils import num2words_fr as _n2w  # type: ignore
-        return _n2w(v)
-    except Exception:
-        return str(v).replace(".", ",")
+    """Montant en toutes lettres (FR). Délègue à core.utils."""
+    from core.utils import num2words_fr
+    return num2words_fr(v)
 
 
 def _money(value: Decimal) -> str:
