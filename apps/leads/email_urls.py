@@ -1,4 +1,9 @@
-"""URL configuration for email composition (admin area)."""
+"""URL configuration for email composition (admin area).
+
+All views are wrapped with staff_member_required at URL level
+to enforce authentication even if a view forgets the decorator.
+"""
+from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import path
 
 from .email_views import (
@@ -10,13 +15,19 @@ from .email_views import (
     BulkEmailView,
 )
 
+
+def _staff(view_class):
+    """Wrap a CBV with staff_member_required at URL level."""
+    return staff_member_required(view_class.as_view())
+
+
 app_name = 'admin_emails'
 
 urlpatterns = [
-    path('', EmailListView.as_view(), name='email_list'),
-    path('compose/', EmailComposeView.as_view(), name='email_compose'),
-    path('bulk/', BulkEmailView.as_view(), name='bulk_email'),
-    path('<int:pk>/', EmailDetailView.as_view(), name='email_detail'),
-    path('<int:pk>/send/', SendEmailView.as_view(), name='email_send'),
-    path('api/templates/<int:pk>/', EmailTemplateAPIView.as_view(), name='template_api'),
+    path('', _staff(EmailListView), name='email_list'),
+    path('compose/', _staff(EmailComposeView), name='email_compose'),
+    path('bulk/', _staff(BulkEmailView), name='bulk_email'),
+    path('<int:pk>/', _staff(EmailDetailView), name='email_detail'),
+    path('<int:pk>/send/', _staff(SendEmailView), name='email_send'),
+    path('api/templates/<int:pk>/', _staff(EmailTemplateAPIView), name='template_api'),
 ]

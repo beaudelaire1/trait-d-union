@@ -92,10 +92,9 @@ class BrevoEmailService:
             logger.warning("Brevo non configuré, email non envoyé: %s", subject)
             # Fallback vers la console en dev
             if settings.DEBUG:
-                print(f"\n{'='*60}")
-                print(f"[DEV EMAIL] To: {to_email}")
-                print(f"[DEV EMAIL] Subject: {subject}")
-                print(f"{'='*60}\n")
+                logger.debug(
+                    "[DEV EMAIL] To: %s | Subject: %s", to_email, subject
+                )
                 return {'success': True, 'message_id': 'dev-mode', 'fallback': True}
             return {'success': False, 'error': 'Brevo non configuré'}
 

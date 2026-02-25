@@ -43,12 +43,33 @@ class RateLimitMiddleware(MiddlewareMixin):
 
 
 class SecurityHeadersMiddleware(MiddlewareMixin):
-    """Middleware that adds security-related HTTP headers."""
+    """Middleware that adds security-related HTTP headers including CSP."""
+
+    # Content-Security-Policy directives.
+    # Kept as a class attribute for easy override in tests / settings.
+    CSP_DIRECTIVES = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com "
+        "https://www.googletagmanager.com https://www.google-analytics.com "
+        "https://challenges.cloudflare.com https://www.google.com https://www.gstatic.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; "
+        "font-src 'self' https://fonts.gstatic.com data:; "
+        "img-src 'self' data: blob: https://res.cloudinary.com https://www.google-analytics.com https://*.stripe.com; "
+        "connect-src 'self' https://www.google-analytics.com https://challenges.cloudflare.com https://api.stripe.com; "
+        "frame-src https://challenges.cloudflare.com https://www.google.com https://js.stripe.com; "
+        "object-src 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self' https://checkout.stripe.com"
+    )
 
     def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
         response.setdefault('X-Frame-Options', 'SAMEORIGIN')
         response.setdefault('X-Content-Type-Options', 'nosniff')
-        response.setdefault('Referrer-Policy', 'same-origin')
+        response.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
+
+        # Content-Security-Policy
+        if 'Content-Security-Policy' not in response:
+            response['Content-Security-Policy'] = self.CSP_DIRECTIVES
 
         # Permissions-Policy (anciennement Feature-Policy)
         from django.conf import settings

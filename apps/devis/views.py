@@ -117,6 +117,7 @@ def service_info(request, pk):
     })
 
 @staff_member_required
+@require_POST
 def admin_generate_quote_pdf(request, pk):
     quote = get_object_or_404(Quote, pk=pk)
 

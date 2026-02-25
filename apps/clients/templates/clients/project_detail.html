@@ -214,7 +214,7 @@
                 {% for doc in documents %}
                 <a href="{{ doc.file.url }}" target="_blank" class="doc-card glass-card">
                     <div class="doc-preview">
-                        {% if doc.is_image %}<img src="{{ doc.file.url }}" alt="{{ doc.title }}">
+                        {% if doc.is_image %}<img src="{{ doc.file.url }}" alt="{{ doc.title }}" loading="lazy">
                         {% else %}<span class="doc-ext">.{{ doc.file_extension }}</span>{% endif %}
                     </div>
                     <div class="doc-info">

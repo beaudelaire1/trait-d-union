@@ -1,7 +1,7 @@
 <nav id="navbar" class="px-6 py-4 border-b border-stroke-dark/50 backdrop-blur-xl bg-tus-black/70 fixed top-0 left-0 right-0 z-50 transition-all duration-150">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
         <!-- Logo SVG -->
-        <a href="/" class="group link-animated" id="navbar-logo">
+        <a href="{% url 'pages:home' %}" class="group link-animated" id="navbar-logo">
             <svg height="36" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d'Union Studio">
                 <defs>
                     <linearGradient id="tusGradNav" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
@@ -19,17 +19,17 @@
         <!-- Navigation Desktop -->
         <ul class="hidden md:flex items-center gap-8 text-sm font-medium">
             <li>
-                <a href="/services/" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
+                <a href="{% url 'pages:services' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
                     Services
                 </a>
             </li>
             <li>
-                <a href="/portfolio/" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
+                <a href="{% url 'portfolio:list' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
                     Portfolio
                 </a>
             </li>
             <li>
-                <a href="/method/" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
+                <a href="{% url 'pages:method' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
                     Méthode
                 </a>
             </li>
@@ -57,7 +57,7 @@
             </li>
             {% endif %}
             <li>
-                <a href="/contact/" class="btn-primary btn-magnetic bg-tus-blue px-5 py-2.5 rounded-full font-semibold">
+                <a href="{% url 'leads:contact' %}" class="btn-primary btn-magnetic bg-tus-blue px-5 py-2.5 rounded-full font-semibold">
                     Contact
                 </a>
             </li>
@@ -79,13 +79,13 @@
     <!-- Mobile Menu Overlay -->
     <div id="mobile-menu" class="mobile-menu-overlay fixed top-0 left-0 right-0 bottom-0 z-[60] md:hidden transform translate-x-full transition-transform duration-200 ease-out flex flex-col items-center justify-start pt-32">
         <div class="flex flex-col items-center gap-8 text-center px-6 pb-12 w-full">
-            <a href="/services/" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
+            <a href="{% url 'pages:services' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
                 Services
             </a>
-            <a href="/portfolio/" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
+            <a href="{% url 'portfolio:list' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
                 Portfolio
             </a>
-            <a href="/method/" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
+            <a href="{% url 'pages:method' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
                 Méthode
             </a>
             <a href="{% url 'chroniques:list' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
@@ -105,7 +105,7 @@
                 Déconnexion
             </a>
             {% endif %}
-            <a href="/contact/" class="mt-6 bg-tus-blue px-8 py-4 rounded-full text-xl font-semibold text-white hover:bg-tus-blue/80 transition-colors">
+            <a href="{% url 'leads:contact' %}" class="mt-6 bg-tus-blue px-8 py-4 rounded-full text-xl font-semibold text-white hover:bg-tus-blue/80 transition-colors">
                 Contact
             </a>
         </div>

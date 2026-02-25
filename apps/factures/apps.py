@@ -19,7 +19,5 @@ class FacturesConfig(AppConfig):
     verbose_name = "Factures"
 
     def ready(self) -> None:
-        try:
-            from . import signals  # noqa: F401
-        except Exception:
-            pass
+        # Signaux de notification gérés dans apps/clients/signals.py
+        pass

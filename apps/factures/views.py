@@ -3,18 +3,15 @@ Vues pour la gestion des factures.
 Rationalisation : retrait de la couche expérimentale hexcore pour revenir à une approche Django pure.
 """
 
-import json
 import logging
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import FileResponse, Http404, HttpResponse, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
-from django.utils import timezone
 
 from apps.devis.models import Quote
 from .models import Invoice
@@ -23,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 @staff_member_required
+@require_POST
 def create_invoice(request, quote_id: int):
     """
     Crée une facture à partir d'un devis existant.
@@ -78,7 +76,7 @@ def archive(request):
     """
     Archive des factures.
     """
-    invoices = Invoice.objects.all().order_by("-issue_date", "-number")
+    invoices = Invoice.objects.select_related('client', 'quote__client').order_by("-issue_date", "-number")
     return render(request, "factures/archive.html", {"invoices": invoices})
 
 

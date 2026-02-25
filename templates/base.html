@@ -42,34 +42,49 @@
     <meta name="twitter:description" content="{% block twitter_description %}Studio d'architecture digitale en Guyane (Cayenne, Kourou, Saint-Laurent), Martinique et Guadeloupe. Création de sites internet et plateformes sur mesure.{% endblock %}">
     <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}{% endblock %}">
     
-    <!-- Google Analytics (G4) avec consentement RGPD -->
+    <!-- Google Analytics (G4) — chargé dynamiquement après consentement RGPD -->
     {% if not debug %}
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VNHN8BQGMJ"></script>
     <script>
+        // GA4 n'est PAS chargé ici. Il sera injecté dynamiquement par le
+        // cookie consent (applyPreferences) uniquement si l'utilisateur
+        // a consenti aux cookies analytiques.
+        window._tusGA4ID = 'G-VNHN8BQGMJ';
+
+        // Fonctions globales disponibles avant/après chargement de gtag
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        
-        // Configuration avec anonymisation IP et respect RGPD
-        gtag('config', 'G-VNHN8BQGMJ', {
-            'anonymize_ip': true,
-            'cookie_flags': 'SameSite=None;Secure',
-            'cookie_domain': 'traitdunion.it',
-            'cookie_expires': 63072000  // 2 ans
-        });
-        
-        // Événements custom pour tracking conversions
+
+        // trackEvent est toujours disponible (no-op si GA non chargé)
         function trackEvent(category, action, label) {
-            gtag('event', action, {
-                'event_category': category,
-                'event_label': label
+            if (window._tusGALoaded) {
+                gtag('event', action, {
+                    'event_category': category,
+                    'event_label': label
+                });
+            }
+        }
+
+        // Fonction appelée par le cookie consent pour charger GA
+        window._tusLoadGA = function() {
+            if (window._tusGALoaded) return;
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtag/js?id=' + window._tusGA4ID;
+            document.head.appendChild(s);
+            gtag('js', new Date());
+            gtag('config', window._tusGA4ID, {
+                'anonymize_ip': true,
+                'cookie_flags': 'SameSite=None;Secure',
+                'cookie_domain': 'traitdunion.it',
+                'cookie_expires': 63072000
             });
-        }
-        
-        // Tracking conversion contact
-        if (window.location.pathname === '/contact/' && document.referrer.includes('traitdunion.it')) {
-            gtag('event', 'page_view_contact_form');
-        }
+            window._tusGALoaded = true;
+
+            // Tracking conversion contact (post-load)
+            if (window.location.pathname === '/contact/' && document.referrer.includes('traitdunion.it')) {
+                gtag('event', 'page_view_contact_form');
+            }
+        };
     </script>
     {% endif %}
     
@@ -79,78 +94,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'tus-black': '#07080A',
-                        'tus-white': '#F6F7FB',
-                        'tus-blue': '#0B2DFF',
-                        'tus-green': '#22C55E',
-                        'tus-green-light': '#4ADE80',
-                        'surface-dark': '#0D1016',
-                        'stroke-dark': 'rgba(246,247,251,0.10)',
-                    },
-                    fontFamily: {
-                        'display': ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-                        'body': ['DM Sans', 'system-ui', 'sans-serif'],
-                        'mono': ['JetBrains Mono', 'ui-monospace', 'monospace'],
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards',
-                        'slide-up': 'slideUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards',
-                        'slide-in-right': 'slideInRight 0.7s cubic-bezier(0.16,1,0.3,1) forwards',
-                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
-                        'marquee': 'marquee 20s linear infinite',
-                        'gradient-shift': 'gradientShift 3s ease-in-out infinite',
-                        'text-scroll': 'textScroll 18s linear infinite',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', filter: 'blur(8px)' },
-                            '100%': { opacity: '1', filter: 'blur(0)' },
-                        },
-                        slideUp: {
-                            '0%': { opacity: '0', transform: 'translateY(40px)', filter: 'blur(8px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)', filter: 'blur(0)' },
-                        },
-                        slideInRight: {
-                            '0%': { opacity: '0', transform: 'translateX(-30px)', filter: 'blur(6px)' },
-                            '100%': { opacity: '1', transform: 'translateX(0)', filter: 'blur(0)' },
-                        },
-                        pulseGlow: {
-                            '0%, 100%': { boxShadow: '0 0 20px rgba(11,45,255,0.3)' },
-                            '50%': { boxShadow: '0 0 40px rgba(11,45,255,0.6)' },
-                        },
-                        marquee: {
-                            '0%': { transform: 'translateX(0%)' },
-                            '100%': { transform: 'translateX(-50%)' },
-                        },
-                        gradientShift: {
-                            '0%, 100%': { backgroundPosition: '0% 50%' },
-                            '50%': { backgroundPosition: '100% 50%' },
-                        },
-                        textScroll: {
-                            '0%': { transform: 'translateX(100%)' },
-                            '100%': { transform: 'translateX(-100%)' },
-                        },
-                    },
-                    transitionDuration: {
-                        'micro': '150ms',
-                        'reveal': '800ms',
-                        'modal': '220ms',
-                    },
-                    transitionTimingFunction: {
-                        'standard': 'cubic-bezier(0.4, 0, 0.2, 1)',
-                        'enter': 'cubic-bezier(0.16, 1, 0.3, 1)',
-                    },
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind CSS (compilé) -->
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
         /* Fix pour les options de select sur fond sombre */
@@ -502,17 +447,19 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-tus-black text-tus-white font-body antialiased">
+    <!-- Skip to main content — WCAG 2.4.1 (Level A) -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-tus-blue focus:text-tus-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold focus:outline-none focus:ring-2 focus:ring-tus-white">Aller au contenu principal</a>
     {% include 'partials/navbar.html' %}
-    <main class="min-h-screen main-view-transition">
+    <main id="main-content" class="min-h-screen main-view-transition">
         {% block content %}{% endblock %}
     </main>
     {% include 'partials/footer.html' %}
     <!-- Alpine.js for micro-interactions -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
     <!-- Lenis — premium smooth scroll (~5KB) -->
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
     <!-- HTMX with View Transitions support -->
-    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.0/dist/htmx.min.js"></script>
     <script>
         // ============================================
         // LENIS — Buttery smooth scroll

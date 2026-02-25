@@ -6,15 +6,12 @@ factures/models.py — Version rationalisée
 ✔ Génération de PDF via InvoicePdfService (WeasyPrint)
 ✔ Relation vers les devis pour conversion facile
 """
-import os
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import date
-from typing import List, Optional
+from typing import List
 
-from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.files.base import ContentFile
 
 
 # =========================

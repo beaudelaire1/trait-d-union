@@ -13,6 +13,7 @@ module.exports = {
         'tus-blue': '#0B2DFF',
         'tus-blue-a11y': '#4D6FFF', /* WCAG AA sur fond noir (4.6:1) */
         'tus-green': '#22C55E',
+        'tus-green-light': '#4ADE80',
         'surface-dark': '#0D1016',
         'stroke-dark': 'rgba(246,247,251,0.10)',
       },
@@ -23,17 +24,17 @@ module.exports = {
       },
       transitionDuration: {
         'micro': '150ms',
-        'reveal': '250ms',
-        'modal': '200ms',
+        'reveal': '800ms',
+        'modal': '220ms',
       },
       transitionTimingFunction: {
         'standard': 'cubic-bezier(0.4, 0, 0.2, 1)',
-        'entrance': 'cubic-bezier(0.0, 0, 0.2, 1)',
+        'enter': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.25s cubic-bezier(0.0, 0, 0.2, 1) forwards',
-        'slide-up': 'slideUp 0.25s cubic-bezier(0.0, 0, 0.2, 1) forwards',
-        'slide-in-right': 'slideInRight 0.25s cubic-bezier(0.0, 0, 0.2, 1) forwards',
+        'fade-in': 'fadeIn 0.7s cubic-bezier(0.16,1,0.3,1) forwards',
+        'slide-up': 'slideUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards',
+        'slide-in-right': 'slideInRight 0.7s cubic-bezier(0.16,1,0.3,1) forwards',
         'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
         'marquee': 'marquee 20s linear infinite',
         'gradient-shift': 'gradientShift 3s ease-in-out infinite',
@@ -42,16 +43,16 @@ module.exports = {
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
+          '0%': { opacity: '0', filter: 'blur(8px)' },
+          '100%': { opacity: '1', filter: 'blur(0)' },
         },
         slideUp: {
-          '0%': { opacity: '0', transform: 'translateY(12px)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
+          '0%': { opacity: '0', transform: 'translateY(40px)', filter: 'blur(8px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)', filter: 'blur(0)' },
         },
         slideInRight: {
-          '0%': { opacity: '0', transform: 'translateX(-12px)' },
-          '100%': { opacity: '1', transform: 'translateX(0)' },
+          '0%': { opacity: '0', transform: 'translateX(-30px)', filter: 'blur(6px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)', filter: 'blur(0)' },
         },
         pulseGlow: {
           '0%, 100%': { boxShadow: '0 0 20px rgba(11,45,255,0.3)' },
@@ -66,7 +67,7 @@ module.exports = {
           '50%': { backgroundPosition: '100% 50%' },
         },
         textScroll: {
-          '0%': { transform: 'translateX(100vw)' },
+          '0%': { transform: 'translateX(100%)' },
           '100%': { transform: 'translateX(-100%)' },
         },
         tvTicker: {

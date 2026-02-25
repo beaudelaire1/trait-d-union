@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}{{ article.title }} — Chroniques TUS{% endblock %}
 {% block meta_description %}{{ article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
+{% block og_title %}{{ article.title }} — Chroniques TUS{% endblock %}
+{% block og_description %}{{ article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
+{% block og_image %}{% if article.cover_image %}{{ article.cover_image.url }}{% endif %}{% endblock %}
+{% block twitter_title %}{{ article.title }} — Chroniques TUS{% endblock %}
+{% block twitter_description %}{{ article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
+{% block twitter_image %}{% if article.cover_image %}{{ article.cover_image.url }}{% endif %}{% endblock %}
 
 {% block content %}
 <div class="min-h-screen py-20 px-6 relative overflow-hidden">
@@ -21,7 +27,7 @@
 
         {% if article.cover_image %}
         <div class="rounded-2xl overflow-hidden border border-tus-white/10 mb-8 aspect-video bg-tus-white/5">
-            <img src="{{ article.cover_image.url }}" alt="{{ article.title }}" class="w-full h-full object-cover">
+            <img src="{{ article.cover_image.url }}" alt="{{ article.title }}" class="w-full h-full object-cover" fetchpriority="high">
         </div>
         {% endif %}
 

@@ -2,6 +2,12 @@
 {% load static portfolio_tags %}
 {% block title %}Projet Web {{ project.title }} - {{ project.get_project_type_display }} - Trait d'Union Studio{% endblock %}
 {% block meta_description %}{{ project.objective|plain_text|truncatewords:30 }} - Réalisation de site web et application en Guyane et Antilles par Trait d'Union Studio.{% endblock %}
+{% block og_title %}{{ project.title }} — {{ project.get_project_type_display }}{% endblock %}
+{% block og_description %}{{ project.objective|plain_text|truncatewords:30 }}{% endblock %}
+{% block og_image %}{% if project.thumbnail %}{{ project.thumbnail.url }}{% endif %}{% endblock %}
+{% block twitter_title %}{{ project.title }} — {{ project.get_project_type_display }}{% endblock %}
+{% block twitter_description %}{{ project.objective|plain_text|truncatewords:30 }}{% endblock %}
+{% block twitter_image %}{% if project.thumbnail %}{{ project.thumbnail.url }}{% endif %}{% endblock %}
 
 {% block content %}
 <!-- Scroll Progress Bar -->

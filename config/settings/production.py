@@ -89,8 +89,8 @@ else:
 # WhiteNoise doit être après SecurityMiddleware
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-# Utiliser StaticFilesStorage simple et fiable
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+# Cache statique : 1 an (les fichiers changent au redéploiement)
+WHITENOISE_MAX_AGE = 31536000  # 365 jours
 
 # ==============================================================================
 # MEDIA FILES (Cloudinary - recommandé pour simplicité)
@@ -123,13 +123,13 @@ if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY):
         CLOUDINARY_STORAGE = {}
     
     # Configuration moderne Django 5+
-    # IMPORTANT: Utiliser StaticFilesStorage (pas CompressedManifest qui est trop strict et cherche les .map)
+    # CompressedStaticFilesStorage = gzip + brotli, sans manifest (évite .map errors)
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.StaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
     

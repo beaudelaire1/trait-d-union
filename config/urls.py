@@ -47,5 +47,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Error handlers
+handler403 = 'apps.pages.views.permission_denied'
 handler404 = 'apps.pages.views.page_not_found'
 handler500 = 'apps.pages.views.server_error'

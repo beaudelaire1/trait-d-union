@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.template.loader import render_to_string
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse_lazy, reverse, NoReverseMatch
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, DetailView
@@ -40,7 +40,7 @@ class EmailComposeView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
         # Try admin_emails first, fallback to leads
         try:
             return reverse('admin_emails:email_list')
-        except:
+        except NoReverseMatch:
             return reverse('leads:email_list')
     
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -246,7 +246,7 @@ class SendEmailView(View):
         
         try:
             return redirect('admin_emails:email_list')
-        except:
+        except NoReverseMatch:
             return redirect('leads:email_list')
 
 

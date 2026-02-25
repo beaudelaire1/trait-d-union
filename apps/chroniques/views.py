@@ -8,7 +8,7 @@ from .models import Article
 
 def article_list(request):
     try:
-        qs = Article.objects.filter(is_published=True).order_by("-publish_date")
+        qs = Article.objects.select_related('author').filter(is_published=True).order_by("-publish_date")
         paginator = Paginator(qs, 9)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)

@@ -200,11 +200,13 @@
         }
     }
     
-    // Appliquer les préférences (ex: charger Google Analytics si accepté)
+    // Appliquer les préférences (charger GA dynamiquement si accepté)
     function applyPreferences(consent) {
         if (consent.analytics) {
-            // Charger les scripts analytiques ici si nécessaire
-            // Exemple: window.dataLayer = window.dataLayer || [];
+            // Charger Google Analytics dynamiquement (RGPD compliant)
+            if (typeof window._tusLoadGA === 'function') {
+                window._tusLoadGA();
+            }
             console.log('📊 Cookies analytiques activés');
         } else {
             console.log('📊 Cookies analytiques désactivés');

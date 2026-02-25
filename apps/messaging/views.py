@@ -208,7 +208,9 @@ def quick_send_email(request, pk):
 @staff_member_required
 def campaign_list(request):
     """List all email campaigns."""
-    campaigns = EmailCampaign.objects.annotate(
+    campaigns = EmailCampaign.objects.select_related(
+        'template', 'created_by'
+    ).annotate(
         recipient_count=Count('recipients')
     ).all()
     

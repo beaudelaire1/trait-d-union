@@ -34,10 +34,10 @@
             <div>
                 <h4 class="font-display font-semibold mb-4 text-tus-white">Navigation</h4>
                 <ul class="space-y-2 text-sm text-tus-white/60">
-                    <li><a href="/services/" class="hover:text-tus-blue transition-colors">Services</a></li>
-                    <li><a href="/portfolio/" class="hover:text-tus-blue transition-colors">Portfolio</a></li>
-                    <li><a href="/method/" class="hover:text-tus-blue transition-colors">Méthode</a></li>
-                    <li><a href="/contact/" class="hover:text-tus-blue transition-colors">Contact</a></li>
+                    <li><a href="{% url 'pages:services' %}" class="hover:text-tus-blue transition-colors">Services</a></li>
+                    <li><a href="{% url 'portfolio:list' %}" class="hover:text-tus-blue transition-colors">Portfolio</a></li>
+                    <li><a href="{% url 'pages:method' %}" class="hover:text-tus-blue transition-colors">Méthode</a></li>
+                    <li><a href="{% url 'leads:contact' %}" class="hover:text-tus-blue transition-colors">Contact</a></li>
                 </ul>
             </div>
 

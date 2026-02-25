@@ -19,7 +19,7 @@
             <a href="{{ a.get_absolute_url }}" class="group block rounded-2xl overflow-hidden bg-tus-white/5 border border-tus-white/10 hover:border-tus-blue/40 transition-all">
                 <div class="h-40 bg-tus-white/5 flex items-center justify-center">
                     {% if a.cover_image %}
-                    <img src="{{ a.cover_image.url }}" alt="{{ a.title }}" class="w-full h-full object-cover">
+                    <img src="{{ a.cover_image.url }}" alt="{{ a.title }}" class="w-full h-full object-cover" loading="lazy">
                     {% else %}
                     <div class="w-16 h-16 rounded-xl bg-tus-blue/20 flex items-center justify-center">
                         <svg class="w-8 h-8 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -21,7 +21,7 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
         
         # Charger les services depuis la base de données
-        services_qs = Service.objects.filter(is_active=True, is_featured=True)[:4]
+        services_qs = Service.objects.select_related('category').filter(is_active=True, is_featured=True)[:4]
         context['services'] = [
             {
                 'title': service.name,
@@ -63,3 +63,8 @@ def page_not_found(request: HttpRequest, exception: Exception) -> HttpResponse:
 def server_error(request: HttpRequest) -> HttpResponse:
     """Custom 500 page handler."""
     return render(request, 'errors/500.html', status=500)
+
+
+def permission_denied(request: HttpRequest, exception: Exception) -> HttpResponse:
+    """Custom 403 page handler."""
+    return render(request, 'errors/403.html', status=403)

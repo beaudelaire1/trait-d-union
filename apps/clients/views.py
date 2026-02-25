@@ -240,7 +240,7 @@ class DocumentListView(ClientRequiredMixin, ListView):
     context_object_name = 'documents'
     
     def get_queryset(self):
-        return self.request.user.client_profile.documents.all()
+        return self.request.user.client_profile.documents.select_related('project').all()
 
 
 @login_required
@@ -286,9 +286,10 @@ class QuoteListView(ClientRequiredMixin, ListView):
     
     def get_queryset(self):
         from apps.devis.models import Quote
+        profile = self.request.user.client_profile
         return Quote.objects.filter(
-            client__email=self.request.user.email
-        ).order_by('-created_at')
+            client__email=profile.user.email
+        ).select_related('client').order_by('-created_at')
 
 
 class InvoiceListView(ClientRequiredMixin, ListView):
@@ -298,9 +299,10 @@ class InvoiceListView(ClientRequiredMixin, ListView):
     
     def get_queryset(self):
         from apps.factures.models import Invoice
+        profile = self.request.user.client_profile
         return Invoice.objects.filter(
-            client__email=self.request.user.email
-        ).order_by('-created_at')
+            client__email=profile.user.email
+        ).select_related('client').order_by('-created_at')
 
 
 class NewClientRequestView(ClientRequiredMixin, TemplateView):
@@ -525,7 +527,8 @@ def quote_detail(request, pk):
     """Display quote detail for client."""
     from apps.devis.models import Quote
     
-    quote = get_object_or_404(Quote, pk=pk, client__email=request.user.email)
+    profile = request.user.client_profile
+    quote = get_object_or_404(Quote, pk=pk, client__email=profile.user.email)
     
     return render(request, 'clients/quote_detail.html', {
         'quote': quote,
@@ -539,7 +542,8 @@ def quote_pdf_download(request, pk):
     from django.http import HttpResponse
     from core.services.document_generator import DocumentGenerator
     
-    quote = get_object_or_404(Quote, pk=pk, client__email=request.user.email)
+    profile = request.user.client_profile
+    quote = get_object_or_404(Quote, pk=pk, client__email=profile.user.email)
     
     # Toujours générer à la volée (filesystem éphémère sur Render)
     try:
@@ -560,7 +564,8 @@ def quote_pdf_view(request, pk):
     from django.http import HttpResponse
     from core.services.document_generator import DocumentGenerator
 
-    quote = get_object_or_404(Quote, pk=pk, client__email=request.user.email)
+    profile = request.user.client_profile
+    quote = get_object_or_404(Quote, pk=pk, client__email=profile.user.email)
 
     # Toujours générer à la volée (filesystem éphémère sur Render)
     try:
@@ -589,10 +594,11 @@ def invoice_detail(request, pk):
     """Display invoice detail for client."""
     from apps.factures.models import Invoice
     
+    profile = request.user.client_profile
     invoice = get_object_or_404(
         Invoice,
         pk=pk,
-        quote__client__email=request.user.email
+        quote__client__email=profile.user.email
     )
     
     return render(request, 'clients/invoice_detail.html', {
@@ -605,10 +611,11 @@ def invoice_pdf_download(request, pk):
     """Download invoice PDF."""
     from apps.factures.models import Invoice
     
+    profile = request.user.client_profile
     invoice = get_object_or_404(
         Invoice,
         pk=pk,
-        quote__client__email=request.user.email
+        quote__client__email=profile.user.email
     )
     
     if invoice.pdf:
