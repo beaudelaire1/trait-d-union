@@ -615,12 +615,12 @@
             
             <div class="party client">
                 <div class="party-label">Facturé à</div>
-                <div class="party-name">{% if invoice.quote.client.company %}{{ invoice.quote.client.company }}{% else %}{{ invoice.quote.client.full_name }}{% endif %}</div>
+                <div class="party-name">{% if invoice.client.company %}{{ invoice.client.company }}{% else %}{{ invoice.client.full_name }}{% endif %}</div>
                 <div class="party-details">
-                    {% if invoice.quote.client.company and invoice.quote.client.full_name %}{{ invoice.quote.client.full_name }}<br>{% endif %}
-                    {% if invoice.quote.client.address_line %}{{ invoice.quote.client.address_line }}<br>{% endif %}
-                    {% if invoice.quote.client.zip_code or invoice.quote.client.city %}{{ invoice.quote.client.zip_code }} {{ invoice.quote.client.city }}<br>{% endif %}
-                    {{ invoice.quote.client.email }}{% if invoice.quote.client.phone %}<br>{{ invoice.quote.client.phone }}{% endif %}
+                    {% if invoice.client.company and invoice.client.full_name %}{{ invoice.client.full_name }}<br>{% endif %}
+                    {% if invoice.client.address_line %}{{ invoice.client.address_line }}<br>{% endif %}
+                    {% if invoice.client.zip_code or invoice.client.city %}{{ invoice.client.zip_code }} {{ invoice.client.city }}<br>{% endif %}
+                    {{ invoice.client.email }}{% if invoice.client.phone %}<br>{{ invoice.client.phone }}{% endif %}
                 </div>
             </div>
         </div>

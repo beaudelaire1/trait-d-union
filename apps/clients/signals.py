@@ -56,7 +56,11 @@ def notify_invoice_created(sender, instance, created, **kwargs):
         try:
             # Find client via quote
             if instance.quote:
-                profile = ClientProfile.objects.filter(user__email=instance.quote.client.email).first()
+                client_obj = instance.client or (instance.quote.client if instance.quote else None)
+                if client_obj:
+                    profile = ClientProfile.objects.filter(user__email=client_obj.email).first()
+                else:
+                    profile = None
                 if profile:
                     ClientNotification.objects.create(
                         client=profile,
@@ -76,8 +80,9 @@ def notify_invoice_paid(sender, instance, created, **kwargs):
         return  # Skip on creation
     if instance.status == 'paid' and instance.paid_at:
         try:
-            if instance.quote:
-                profile = ClientProfile.objects.filter(user__email=instance.quote.client.email).first()
+            client_obj = instance.client or (instance.quote.client if instance.quote else None)
+            if client_obj:
+                profile = ClientProfile.objects.filter(user__email=client_obj.email).first()
                 if profile and not ClientNotification.objects.filter(
                     client=profile, notification_type='invoice',
                     title='Paiement reçu', related_url=f'/ecosysteme-tus/factures/{instance.pk}/'

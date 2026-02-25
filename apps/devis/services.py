@@ -81,9 +81,10 @@ def create_invoice_from_quote(quote: Union[int, Quote]) -> InvoiceCreationResult
         # On recharge les valeurs calculées en base
         q.refresh_from_db(fields=["total_ht", "tva", "total_ttc"])
 
-    # Créer la facture
+    # Créer la facture avec FK client direct
     invoice = Invoice.objects.create(
         quote=q,
+        client=q.client,
         issue_date=date.today(),
         total_ht=q.total_ht,
         tva=q.tva,
@@ -99,13 +100,10 @@ def create_invoice_from_quote(quote: Union[int, Quote]) -> InvoiceCreationResult
         description = item.description or (
             item.service.title if item.service else ""
         )
-        # InvoiceItem.quantity est un entier ; on arrondit la quantité
-        # du devis à l'entier le plus proche.
-        quantity_int = int(round(Decimal(item.quantity)))
         InvoiceItem.objects.create(
             invoice=invoice,
             description=description,
-            quantity=quantity_int,
+            quantity=item.quantity,
             unit_price=item.unit_price,
             tax_rate=item.tax_rate,
         )

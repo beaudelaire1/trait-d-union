@@ -246,24 +246,58 @@ class Quote(models.Model):
     # Date de paiement de l'acompte
     deposit_paid_at = models.DateTimeField(null=True, blank=True)
 
-    # Champs additionnels pour les options du service
-    included_support_months = models.IntegerField(
-        default=0,
-        help_text="Nombre de mois de support inclus"
-    )
-    installment_plan = models.CharField(
-        max_length=20,
+    # Options de service consolidées (anciennement 4 champs séparés)
+    service_options = models.JSONField(
+        _("Options de service"),
+        default=dict,
         blank=True,
-        help_text="Plan d'échelonnement (ex: '3x', '12x')"
+        help_text=(
+            "Options additionnelles du devis : "
+            "included_support_months, installment_plan, "
+            "money_back_guarantee, unlimited_revisions"
+        ),
     )
-    money_back_guarantee = models.BooleanField(
-        default=False,
-        help_text="Condition de remboursement"
-    )
-    unlimited_revisions = models.BooleanField(
-        default=False,
-        help_text="Révisions illimitées incluses"
-    )
+
+    # Propriétés de compatibilité pour les champs migrés vers service_options
+    @property
+    def included_support_months(self) -> int:
+        return (self.service_options or {}).get('included_support_months', 0)
+
+    @included_support_months.setter
+    def included_support_months(self, value: int):
+        if not self.service_options:
+            self.service_options = {}
+        self.service_options['included_support_months'] = value
+
+    @property
+    def installment_plan(self) -> str:
+        return (self.service_options or {}).get('installment_plan', '')
+
+    @installment_plan.setter
+    def installment_plan(self, value: str):
+        if not self.service_options:
+            self.service_options = {}
+        self.service_options['installment_plan'] = value
+
+    @property
+    def money_back_guarantee(self) -> bool:
+        return (self.service_options or {}).get('money_back_guarantee', False)
+
+    @money_back_guarantee.setter
+    def money_back_guarantee(self, value: bool):
+        if not self.service_options:
+            self.service_options = {}
+        self.service_options['money_back_guarantee'] = value
+
+    @property
+    def unlimited_revisions(self) -> bool:
+        return (self.service_options or {}).get('unlimited_revisions', False)
+
+    @unlimited_revisions.setter
+    def unlimited_revisions(self, value: bool):
+        if not self.service_options:
+            self.service_options = {}
+        self.service_options['unlimited_revisions'] = value
 
     class Meta:
         ordering = ['-created_at']

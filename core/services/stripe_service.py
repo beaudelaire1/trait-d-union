@@ -153,10 +153,11 @@ class StripePaymentService:
         amount_ttc = partial_amount if partial_amount else invoice.total_ttc
         amount_cents = int(amount_ttc * 100)
 
-        # Récupérer l'email du client via le devis lié
+        # Récupérer l'email du client (FK directe, fallback via devis)
         client_email = ""
-        if invoice.quote and invoice.quote.client:
-            client_email = invoice.quote.client.email
+        client_obj = invoice.client or (invoice.quote.client if invoice.quote else None)
+        if client_obj:
+            client_email = client_obj.email
 
         metadata = {
             'type': 'invoice_payment',

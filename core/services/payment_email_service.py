@@ -50,7 +50,7 @@ def send_invoice_payment_confirmation_email(invoice, is_partial=False):
         context = {
             'invoice': invoice,
             'is_partial': is_partial,
-            'client_name': invoice.quote.client.full_name if invoice.quote else 'Client',
+            'client_name': (invoice.client or (invoice.quote.client if invoice.quote else None) or type('_', (), {'full_name': 'Client'})).full_name,
             'invoice_number': invoice.number,
             'amount': invoice.amount_paid,
             'remaining_balance': remaining_balance,
@@ -84,7 +84,8 @@ Cordialement,
 L'équipe Trait d'Union Studio
             """
         
-        email_to = invoice.quote.client.email if invoice.quote else settings.ADMIN_EMAIL
+        client_obj = invoice.client or (invoice.quote.client if invoice.quote else None)
+        email_to = client_obj.email if client_obj else settings.ADMIN_EMAIL
         
         email = EmailMultiAlternatives(
             subject=subject,

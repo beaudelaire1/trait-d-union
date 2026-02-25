@@ -383,7 +383,7 @@ class PDFInvoiceGenerator:
             c.drawString(cx + 4 * mm, y - 6 * mm, "Client")
             c.setFont(font_main, 11)
             yy = y - 11 * mm
-            cli = self.quote.client if self.quote else None  # type: ignore
+            cli = self.client or (self.quote.client if self.quote else None)  # type: ignore
             if cli:
                 c.drawString(cx + 4 * mm, yy, _safe_get(cli, "full_name", "Client"))  # type: ignore
                 yy -= LINE_H_TEXT

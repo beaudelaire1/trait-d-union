@@ -48,6 +48,15 @@ class Invoice(models.Model):
 
     # Référence en chaîne => évite tout import circulaire
     quote = models.ForeignKey("devis.Quote", on_delete=models.SET_NULL, null=True, blank=True, related_name="invoices")
+    client = models.ForeignKey(
+        "devis.Client",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="invoices",
+        verbose_name=_("Client"),
+        help_text="Client facturé (rempli auto depuis le devis).",
+    )
     command_ref = models.CharField(max_length=100, blank=True, help_text="Référence bon de commande client.")
 
     number = models.CharField(
@@ -170,9 +179,17 @@ class Invoice(models.Model):
 
     def save(self, *args, **kwargs) -> None:
         """
-        Assignation automatique du numéro de facture et du jeton public.
+        Assignation automatique du numéro de facture, du jeton public,
+        et du client depuis le devis si non renseigné.
         """
         import secrets
+
+        # Remplir le client depuis le devis si manquant
+        if not self.client_id and self.quote_id:
+            try:
+                self.client = self.quote.client
+            except Exception:
+                pass
         
         # Générer un jeton public unique
         if not self.public_token:
