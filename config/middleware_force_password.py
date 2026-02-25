@@ -5,65 +5,78 @@ from django.utils.deprecation import MiddlewareMixin
 
 
 class ForcePasswordChangeMiddleware(MiddlewareMixin):
-    """Redirection vers /account/change-password/ si le client doit changer son mot de passe.
-    
-    Utilise `request.session['must_change_password']` pour décider.
-    Après un POST réussi sur change-password, le flag est retiré de la session
-    ET du profil client (must_change_password = False).
+    """Redirige OBLIGATOIREMENT vers /accounts/password/change/ si le client
+    doit changer son mot de passe.
+
+    Le client ne peut accéder à AUCUNE page du site tant qu'il n'a pas
+    changé son mot de passe. Seules les pages exemptées (changement de
+    mot de passe, logout, admin, static, media) sont accessibles.
+
+    Utilise `request.session['must_change_password']` (posé au login
+    via le signal allauth). Le flag est retiré après un POST réussi
+    sur la page de changement de mot de passe.
     """
-    
-    EXEMPT_URLS = [
-        '/account/change-password/',
-        '/account/logout/',
-        '/api/',
+
+    # URLs exemptées du blocage (préfixes)
+    EXEMPT_PREFIXES = [
         '/admin/',
+        '/api/',
         '/static/',
         '/media/',
     ]
-    
+
+    def _get_change_password_url(self):
+        """URL résolue dynamiquement via reverse (allauth)."""
+        try:
+            return reverse('account_change_password')
+        except Exception:
+            return '/accounts/password/change/'
+
     def process_request(self, request):
-        """Rediriger vers change-password si nécessaire."""
-        
-        # Vérifier si l'utilisateur est authentifié
+        # Utilisateur non authentifié → rien à faire
         if not request.user.is_authenticated:
             return None
-        
-        # Vérifier si le chemin est dans les exemptions
-        for exempt_url in self.EXEMPT_URLS:
-            if request.path.startswith(exempt_url):
+
+        # Pas de flag → rien à faire
+        if not request.session.get('must_change_password', False):
+            return None
+
+        # Vérifier les préfixes exemptés (admin, static, etc.)
+        for prefix in self.EXEMPT_PREFIXES:
+            if request.path.startswith(prefix):
                 return None
-        
-        # Vérifier le flag en session
-        if request.session.get('must_change_password', False):
-            redirect_url = reverse('account_change_password')
-            if request.path != redirect_url:
-                return redirect(redirect_url)
-        
-        return None
-    
+
+        change_url = self._get_change_password_url()
+        logout_url = reverse('account_logout')
+
+        # Autoriser la page de changement de mot de passe et le logout
+        if request.path in (change_url, logout_url):
+            return None
+
+        # TOUT LE RESTE est bloqué → redirection forcée
+        return redirect(change_url)
+
     def process_response(self, request, response):
-        """Après un changement de mot de passe réussi, retirer le flag."""
-        change_password_url = reverse('account_change_password')
-        
+        """Après un changement de mot de passe réussi (POST + 302), retirer le flag."""
+        change_url = self._get_change_password_url()
+
         if (
             request.method == 'POST'
-            and request.path == change_password_url
-            and response.status_code in (200, 302)
+            and request.path == change_url
+            and response.status_code == 302
             and request.session.get('must_change_password', False)
         ):
-            # Vérifier que c'est une redirection (succès allauth)
-            if response.status_code == 302:
-                # Retirer le flag de la session
-                request.session.pop('must_change_password', None)
-                request.session.pop('must_change_password_reason', None)
-                
-                # Retirer le flag persistant du profil client
-                try:
-                    profile = request.user.client_profile
-                    if profile.must_change_password:
-                        profile.must_change_password = False
-                        profile.save(update_fields=['must_change_password'])
-                except (AttributeError, Exception):
-                    pass
-        
+            # Succès : retirer le flag session
+            request.session.pop('must_change_password', None)
+            request.session.pop('must_change_password_reason', None)
+
+            # Retirer le flag persistant du profil client
+            try:
+                profile = request.user.client_profile
+                if profile.must_change_password:
+                    profile.must_change_password = False
+                    profile.save(update_fields=['must_change_password'])
+            except (AttributeError, Exception):
+                pass
+
         return response
