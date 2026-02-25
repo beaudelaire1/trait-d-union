@@ -36,6 +36,10 @@ class HomeView(TemplateView):
         from apps.pages.models import Testimonial
         context['testimonials'] = Testimonial.objects.filter(is_published=True)[:3]
         
+        # Compteur dynamique de projets portfolio
+        from apps.portfolio.models import Project
+        context['portfolio_count'] = Project.objects.filter(is_published=True).count()
+        
         return context
 
 
