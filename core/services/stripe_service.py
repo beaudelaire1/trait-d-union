@@ -300,7 +300,9 @@ class StripePaymentService:
                 invoice.amount_paid = invoice.total_ttc
 
             invoice.paid_at = timezone.now()
-            invoice.paid_by = 'stripe'
+            # paid_by is a ForeignKey(User) — set None for Stripe automatic payments
+            # Payment method is recorded in the audit trail below
+            invoice.paid_by = None
 
             # Audit trail
             trail = invoice.payment_audit_trail or {}
@@ -308,6 +310,7 @@ class StripePaymentService:
                 'session_id': session.get('id'),
                 'amount_cents': amount_paid_cents,
                 'is_partial': is_partial,
+                'payment_method': 'stripe',
             }
             invoice.payment_audit_trail = trail
 

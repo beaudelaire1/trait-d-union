@@ -118,6 +118,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.captcha_settings',
+                'core.context_processors.breadcrumbs',
             ],
         },
     },
@@ -227,6 +228,11 @@ try:
     TURNSTILE_FALLBACK_TIMEOUT_MS = int(os.environ.get('TURNSTILE_FALLBACK_TIMEOUT_MS', '2500') or 2500)
 except (TypeError, ValueError):
     TURNSTILE_FALLBACK_TIMEOUT_MS = 2500
+
+# ==============================================================================
+# GOOGLE ANALYTICS 4
+# ==============================================================================
+GA4_MEASUREMENT_ID = os.environ.get('GA4_MEASUREMENT_ID', 'G-VNHN8BQGMJ')
 
 # ==============================================================================
 # PHASE 3 : STRIPE PAYMENT CONFIGURATION

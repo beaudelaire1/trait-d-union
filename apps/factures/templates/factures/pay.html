@@ -39,7 +39,7 @@
         <!-- Header -->
         <div class="text-center mb-10">
             <h1 class="font-display text-3xl md:text-4xl font-bold text-tus-white mb-2">
-                Régler votre <span class="text-tus-blue">facture</span>
+                Régler votre <span class="text-tus-blue-a11y">facture</span>
             </h1>
             <p class="text-tus-white/60">
                 Facture n° <strong class="text-tus-white">{{ invoice.number }}</strong>
@@ -50,7 +50,7 @@
         <!-- Détails de la facture -->
         <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-6 md:p-8 mb-8">
             <h2 class="font-display text-xl font-semibold text-tus-white mb-6 flex items-center gap-2">
-                <svg class="w-6 h-6 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                 </svg>
                 Détails de la facture
@@ -81,7 +81,7 @@
                 </div>
                 <div class="flex justify-between font-display text-xl font-bold text-tus-white pt-2 border-t border-tus-white/10">
                     <span>Total TTC</span>
-                    <span class="text-tus-blue">{{ invoice.total_ttc|floatformat:2 }} €</span>
+                    <span class="text-tus-blue-a11y">{{ invoice.total_ttc|floatformat:2 }} €</span>
                 </div>
                 
                 {% if invoice.amount_paid > 0 %}
@@ -89,7 +89,7 @@
                     <span>Déjà payé</span>
                     <span>- {{ invoice.amount_paid|floatformat:2 }} €</span>
                 </div>
-                <div class="flex justify-between font-display text-xl font-bold text-tus-blue pt-2 border-t border-tus-white/10">
+                <div class="flex justify-between font-display text-xl font-bold text-tus-blue-a11y pt-2 border-t border-tus-white/10">
                     <span>Reste à payer</span>
                     <span>{{ remaining|floatformat:2 }} €</span>
                 </div>

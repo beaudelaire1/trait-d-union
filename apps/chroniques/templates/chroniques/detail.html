@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+
 {% block title %}{{ article.title }} — Chroniques TUS{% endblock %}
 {% block meta_description %}{{ article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
 {% block og_title %}{{ article.title }} — Chroniques TUS{% endblock %}
@@ -8,13 +10,56 @@
 {% block twitter_description %}{{ article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
 {% block twitter_image %}{% if article.cover_image %}{{ article.cover_image.url }}{% endif %}{% endblock %}
 
+{% block extra_head %}
+<!-- Article Schema.org for SEO (Google Rich Cards, Google News, Google Discover) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{{ article.title|escapejs }}",
+  "description": "{{ article.excerpt|default:article.title|truncatewords:30|escapejs }}",
+  {% if article.cover_image %}
+  "image": {
+    "@type": "ImageObject",
+    "url": "{{ request.scheme }}://{{ request.get_host }}{{ article.cover_image.url }}",
+    "width": 1200,
+    "height": 630
+  },
+  {% endif %}
+  "datePublished": "{{ article.publish_date|date:'c' }}",
+  "dateModified": "{{ article.updated_at|date:'c' }}",
+  "author": {
+    "@type": {% if article.author %}"Person"{% else %}"Organization"{% endif %},
+    "name": "{% if article.author %}{{ article.author.get_full_name|default:article.author.username }}{% else %}Trait d'Union Studio{% endif %}"{% if not article.author %},
+    "url": "{{ request.scheme }}://{{ request.get_host }}/"{% endif %}
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Trait d'Union Studio",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/tus-logo.svg' %}",
+      "width": 600,
+      "height": 60
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ request.build_absolute_uri }}"
+  },
+  "articleSection": "{% if article.category %}{{ article.category.name|escapejs }}{% else %}Développement Web{% endif %}",
+  "keywords": "développement web, Guyane, Cayenne, {{ article.title|escapejs }}"
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen py-20 px-6 relative overflow-hidden">
     <div class="absolute inset-0 pointer-events-none">
         <div class="absolute -top-40 -left-40 w-[500px] h-[500px] bg-tus-blue/10 rounded-full blur-[140px]"></div>
     </div>
     <div class="max-w-4xl mx-auto relative z-10">
-        <a href="{% url 'chroniques:list' %}" class="inline-flex items-center gap-2 text-tus-blue hover:underline mb-6">
+        <a href="{% url 'chroniques:list' %}" class="inline-flex items-center gap-2 text-tus-blue-a11y hover:underline mb-6">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l-4 4m0 0l-4 4m4-4h14"/></svg>
             Retour aux Chroniques
         </a>

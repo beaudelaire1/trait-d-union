@@ -65,7 +65,7 @@
                     {% for recipient in recipients %}
                     <tr class="hover:bg-tus-white/5">
                         <td class="px-6 py-4">
-                            <a href="{% url 'messaging:prospect_detail' recipient.prospect.pk %}" class="text-tus-white hover:text-tus-blue">
+                            <a href="{% url 'messaging:prospect_detail' recipient.prospect.pk %}" class="text-tus-white hover:text-tus-blue-a11y">
                                 {{ recipient.prospect.contact_name }}
                             </a>
                         </td>

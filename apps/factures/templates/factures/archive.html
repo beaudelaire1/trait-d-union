@@ -15,7 +15,7 @@
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h1 class="font-display text-3xl font-bold text-tus-white">
-                    Archive des <span class="text-tus-blue">factures</span>
+                    Archive des <span class="text-tus-blue-a11y">factures</span>
                 </h1>
                 <p class="text-tus-white/60 mt-1">{{ invoices.count }} facture{{ invoices.count|pluralize }}</p>
             </div>
@@ -70,7 +70,7 @@
                                         Payée
                                     </span>
                                 {% elif invoice.status == 'sent' %}
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-tus-blue/20 text-tus-blue">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-tus-blue/20 text-tus-blue-a11y">
                                         Envoyée
                                     </span>
                                 {% elif invoice.status == 'overdue' %}
@@ -86,7 +86,7 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     <a href="{% url 'factures:download' pk=invoice.pk %}" 
-                                       class="p-2 text-tus-white/60 hover:text-tus-blue hover:bg-tus-blue/10 rounded-lg transition-colors"
+                                       class="p-2 text-tus-white/60 hover:text-tus-blue-a11y hover:bg-tus-blue/10 rounded-lg transition-colors"
                                        title="Télécharger PDF">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -113,7 +113,7 @@
                 </svg>
                 <p class="text-tus-white/60 text-lg">Aucune facture pour l'instant</p>
                 <a href="/tus-gestion-secure/factures/invoice/add/" 
-                   class="inline-flex items-center gap-2 mt-4 text-tus-blue font-medium hover:underline">
+                   class="inline-flex items-center gap-2 mt-4 text-tus-blue-a11y font-medium hover:underline">
                     Créer votre première facture
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>

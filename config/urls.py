@@ -7,6 +7,7 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 
 from config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap
+from apps.pages.healthz import healthz
 
 
 # Sitemap configuration
@@ -38,6 +39,8 @@ urlpatterns = [
     # SEO
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
+    # Health check (Docker + uptime monitoring)
+    path('healthz/', healthz, name='healthz'),
 ]
 
 # Servir les fichiers statiques et média en développement

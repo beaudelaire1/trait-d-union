@@ -11,6 +11,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('services/', ServicesView.as_view(), name='services'),
     path('method/', MethodView.as_view(), name='method'),
+    path('faq/', TemplateView.as_view(template_name='pages/faq.html'), name='faq'),
     path('mentions-legales/', TemplateView.as_view(template_name='pages/mentions_legales.html'), name='mentions_legales'),
     path('confidentialite/', TemplateView.as_view(template_name='pages/confidentialite.html'), name='confidentialite'),
     path('cgv/', TemplateView.as_view(template_name='pages/cgv.html'), name='cgv'),

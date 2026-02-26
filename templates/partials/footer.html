@@ -1,79 +1,97 @@
-<footer class="mt-20 border-t border-stroke-dark relative">
+<footer role="contentinfo" class="mt-20 border-t border-stroke-dark relative">
     <!-- Divider lumineux au-dessus du footer -->
-    <div class="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-transparent via-tus-blue/30 to-transparent"></div>
-    
+    <div class="absolute -top-px left-0 right-0 h-px bg-gradient-to-r from-transparent via-tus-blue/30 to-transparent">
+    </div>
+
     <div class="max-w-7xl mx-auto px-6 py-12">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-10 stagger-children">
             <!-- Logo -->
             <div class="md:col-span-2">
-                <svg height="32" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" class="mb-4">
+                <svg height="32" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" class="mb-4"
+                    aria-hidden="true">
                     <defs>
                         <linearGradient id="tusGradFooter" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
-                            <stop offset="0" stop-color="#0B2DFF"/>
-                            <stop offset="0.62" stop-color="#2D5BFF"/>
-                            <stop offset="1" stop-color="#F6F7FB"/>
+                            <stop offset="0" stop-color="#0B2DFF" />
+                            <stop offset="0.62" stop-color="#2D5BFF" />
+                            <stop offset="1" stop-color="#F6F7FB" />
                         </linearGradient>
                     </defs>
-                    <text x="0" y="54" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="44" font-weight="800" letter-spacing="0.5" fill="#F6F7FB">TRAIT D'UNION</text>
-                    <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradFooter)"/>
-                    <text x="0" y="106" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+                    <text x="0" y="54" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="44"
+                        font-weight="800" letter-spacing="0.5" fill="#F6F7FB">TRAIT D'UNION</text>
+                    <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradFooter)" />
+                    <text x="0" y="106" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="22"
+                        font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
                 </svg>
-                <p class="text-tus-white/60 text-sm max-w-sm">
+                <p class="text-tus-white/70 text-sm max-w-sm">
                     Studio d'architecture digitale basé à Cayenne, opérant sur l'ensemble des Outre-mer.
                 </p>
-                <div class="mt-4 flex items-center gap-2 text-sm text-tus-white/60">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <div class="mt-4 flex items-center gap-2 text-sm text-tus-white/70">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <span>Guyane · Martinique · Guadeloupe · Réunion</span>
                 </div>
             </div>
-            
+
             <!-- Navigation -->
             <div>
                 <h4 class="font-display font-semibold mb-4 text-tus-white">Navigation</h4>
-                <ul class="space-y-2 text-sm text-tus-white/60">
-                    <li><a href="{% url 'pages:services' %}" class="hover:text-tus-blue transition-colors">Services</a></li>
-                    <li><a href="{% url 'portfolio:list' %}" class="hover:text-tus-blue transition-colors">Portfolio</a></li>
-                    <li><a href="{% url 'pages:method' %}" class="hover:text-tus-blue transition-colors">Méthode</a></li>
-                    <li><a href="{% url 'leads:contact' %}" class="hover:text-tus-blue transition-colors">Contact</a></li>
+                <ul class="space-y-2 text-sm text-tus-white/70">
+                        <li><a href="{% url 'pages:services' %}"
+                            class="hover:text-tus-blue-a11y transition-colors text-tus-white/80">Services</a></li>
+                        <li><a href="{% url 'portfolio:list' %}"
+                            class="hover:text-tus-blue-a11y transition-colors text-tus-white/80">Portfolio</a></li>
+                        <li><a href="{% url 'pages:method' %}"
+                            class="hover:text-tus-blue-a11y transition-colors text-tus-white/80">Méthode</a></li>
+                        <li><a href="{% url 'leads:contact' %}"
+                            class="hover:text-tus-blue-a11y transition-colors text-tus-white/80">Contact</a></li>
                 </ul>
             </div>
 
             <!-- Contact / Adresse -->
             <div>
                 <h4 class="font-display font-semibold mb-4 text-tus-white">Contact</h4>
-                <ul class="space-y-2 text-sm text-tus-white/60">
+                <ul class="space-y-2 text-sm text-tus-white/70">
                     <li class="leading-relaxed">
                         258 Av Justin Catayée<br>
                         Rte de la Madeleine<br>
                         97300 Cayenne, Guyane
                     </li>
-                    <li><a href="tel:+594695358041" class="hover:text-tus-blue transition-colors">+594 695 35 80 41</a></li>
-                    <li>{% include 'partials/contact_email.html' with link_style="hover:text-tus-blue transition-colors" %}</li>
+                    <li><a href="tel:+594695358041" class="hover:text-tus-blue-a11y transition-colors">+594 695 35 80
+                            41</a></li>
+                    <li>{% include 'partials/contact_email.html' with link_style="hover:text-tus-blue-a11y
+                        transition-colors" %}</li>
                 </ul>
             </div>
-            
+
             <!-- Légal -->
             <div>
                 <h4 class="font-display font-semibold mb-4 text-tus-white">Légal</h4>
-                <ul class="space-y-2 text-sm text-tus-white/60">
+                <ul class="space-y-2 text-sm text-tus-white/70">
                     <li>SIRET : 908 264 112 00016</li>
-                    <li><a href="{% url 'pages:legal' %}" class="hover:text-tus-blue transition-colors">Mentions légales</a></li>
-                    <li><a href="{% url 'pages:legal' %}#privacy" class="hover:text-tus-blue transition-colors">Politique de confidentialité</a></li>
+                    <li><a href="{% url 'pages:legal' %}" class="hover:text-tus-blue-a11y transition-colors">Mentions
+                            légales</a></li>
+                    <li><a href="{% url 'pages:legal' %}#privacy"
+                            class="hover:text-tus-blue-a11y transition-colors">Politique de confidentialité</a></li>
                     <li>
-                        <button onclick="openCookieSettings()" class="hover:text-tus-blue transition-colors text-left">
+                        <button onclick="openCookieSettings()"
+                            class="hover:text-tus-blue-a11y transition-colors text-left"
+                            aria-label="Gérer les préférences cookies">
                             🍪 Gérer les cookies
                         </button>
                     </li>
                 </ul>
             </div>
         </div>
-        
-        <div class="mt-12 pt-6 border-t border-stroke-dark flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-tus-white/60 reveal">
+
+        <div
+            class="mt-12 pt-6 border-t border-stroke-dark flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-tus-white/70 reveal">
             <p>&copy; {% now "Y" %} Trait d'Union Studio. Tous droits réservés.</p>
-            <p class="font-display text-tus-white/60 tracking-widest text-xs uppercase">www.traitdunion.it — [i]nformation & [t]echnologie</p>
+            <p class="font-display text-tus-white/70 tracking-widest text-xs uppercase">www.traitdunion.it —
+                [i]nformation & [t]echnologie</p>
         </div>
     </div>
 </footer>

@@ -101,7 +101,7 @@
                     <tr class="hover:bg-tus-white/5 transition">
                         <td class="px-6 py-4">
                             <div>
-                                <a href="{% url 'messaging:prospect_detail' prospect.pk %}" class="text-tus-white font-medium hover:text-tus-blue">
+                                <a href="{% url 'messaging:prospect_detail' prospect.pk %}" class="text-tus-white font-medium hover:text-tus-blue-a11y">
                                     {{ prospect.contact_name }}
                                 </a>
                                 <p class="text-sm text-tus-white/60">{{ prospect.email }}</p>
@@ -134,7 +134,7 @@
                             <div class="flex justify-end space-x-2">
                                 <button hx-post="{% url 'messaging:quick_send_email' prospect.pk %}"
                                         hx-swap="outerHTML"
-                                        class="p-2 text-tus-white/60 hover:text-tus-blue hover:bg-tus-blue/10 rounded-lg transition"
+                                        class="p-2 text-tus-white/60 hover:text-tus-blue-a11y hover:bg-tus-blue/10 rounded-lg transition"
                                         title="Envoyer email de prospection">
                                     📧
                                 </button>
@@ -150,7 +150,7 @@
                     <tr>
                         <td colspan="7" class="px-6 py-12 text-center text-tus-white/60">
                             <p class="text-lg mb-2">Aucun prospect trouvé</p>
-                            <a href="{% url 'messaging:prospect_create' %}" class="text-tus-blue hover:underline">
+                            <a href="{% url 'messaging:prospect_create' %}" class="text-tus-blue-a11y hover:underline">
                                 Créer votre premier prospect →
                             </a>
                         </td>

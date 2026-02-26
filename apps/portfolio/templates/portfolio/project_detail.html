@@ -61,7 +61,7 @@
 
             <!-- Badge type -->
             <div class="reveal" style="transition-delay: 0.1s;">
-                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue text-sm font-medium border border-tus-blue/20 mb-8 badge-float">
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue-a11y text-sm font-medium border border-tus-blue/20 mb-8 badge-float">
                     {% if project.project_type == 'vitrine' %}
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 012 2v1a2 2 0 002 2v.667a2.5 2.5 0 01-.629 1.658l-.318.319A4 4 0 0114 17h-.5a2 2 0 01-2-2 2 2 0 00-2-2H8.5a2 2 0 01-1.768-1.06L5.572 9.416A2 2 0 014.332 8.027z"/></svg>
                     {% elif project.project_type == 'commerce' %}
@@ -85,16 +85,16 @@
             <div class="flex flex-wrap items-center gap-8 text-tus-white/50 text-lg reveal" style="transition-delay: 0.4s;">
                 {% if project.client_name %}
                 <span class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-tus-blue/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+                    <svg class="w-5 h-5 text-tus-blue-a11y/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
                     {{ project.client_name }}
                 </span>
                 {% endif %}
                 <span class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-tus-blue/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <svg class="w-5 h-5 text-tus-blue-a11y/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     {{ project.created_at|date:"F Y" }}
                 </span>
                 <span class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-tus-blue/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                    <svg class="w-5 h-5 text-tus-blue-a11y/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                     {{ project.get_project_type_display }}
                 </span>
             </div>
@@ -126,7 +126,7 @@
                         <div class="chapter-accent absolute -left-6 top-4" style="--accent: rgba(11,45,255,0.6)"></div>
                     </div>
                     <div class="mt-4 lg:mt-6">
-                        <span class="text-tus-blue text-[11px] font-semibold uppercase tracking-[0.3em] block mb-3">Chapitre</span>
+                        <span class="text-tus-blue-a11y text-[11px] font-semibold uppercase tracking-[0.3em] block mb-3">Chapitre</span>
                         <h2 class="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold leading-[1.05] tracking-tight">Pourquoi</h2>
                     </div>
                 </div>
@@ -144,7 +144,7 @@
                     <div class="mt-14 reveal-right" style="transition-delay: 0.3s;">
                         <div class="inline-flex items-center gap-4 p-5 rounded-2xl border border-tus-white/10 bg-tus-white/[0.02] hover:border-tus-blue/20 transition-all duration-500">
                             <div class="w-12 h-12 rounded-xl bg-tus-blue/10 flex items-center justify-center flex-shrink-0">
-                                <svg class="w-6 h-6 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+                                <svg class="w-6 h-6 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
                             </div>
                             <div>
                                 <p class="text-xs text-tus-white/50 uppercase tracking-wider">Client</p>
@@ -254,10 +254,10 @@
                 <div class="order-1 lg:order-2">
                     <div class="flex items-center gap-6 mb-8 reveal-right">
                         <div class="relative">
-                            <span class="text-8xl lg:text-9xl font-display font-bold text-tus-blue/8 select-none leading-none number-display text-shimmer">02</span>
+                            <span class="text-8xl lg:text-9xl font-display font-bold text-tus-blue-a11y/8 select-none leading-none number-display text-shimmer">02</span>
                         </div>
                         <div>
-                            <span class="text-tus-blue text-sm font-semibold uppercase tracking-[0.15em] block">Chapitre</span>
+                            <span class="text-tus-blue-a11y text-sm font-semibold uppercase tracking-[0.15em] block">Chapitre</span>
                             <h2 class="text-3xl md:text-4xl font-display font-bold">Défi technique</h2>
                         </div>
                     </div>
@@ -271,7 +271,7 @@
                             <p class="text-xs text-tus-white/40 uppercase tracking-wider mb-3">Stack technique</p>
                             <div class="flex flex-wrap gap-2">
                                 {% for tech in project.tech_list %}
-                                <span class="px-3 py-1.5 bg-tus-white/[0.04] backdrop-blur-sm text-tus-white/70 text-sm rounded-lg border border-tus-white/10 hover:border-tus-blue/30 hover:text-tus-blue transition-all duration-300">
+                                <span class="px-3 py-1.5 bg-tus-white/[0.04] backdrop-blur-sm text-tus-white/70 text-sm rounded-lg border border-tus-white/10 hover:border-tus-blue/30 hover:text-tus-blue-a11y transition-all duration-300">
                                     {{ tech }}
                                 </span>
                                 {% endfor %}
@@ -326,11 +326,11 @@
             <!-- Header — aligné à gauche comme Ch.01 pour plus d'impact -->
             <div class="flex items-center gap-6 mb-16 reveal-left">
                 <div class="relative">
-                    <span class="text-8xl lg:text-9xl font-display font-bold text-tus-blue/8 select-none leading-none parallax-num number-display text-shimmer" data-speed="0.05">03</span>
+                    <span class="text-8xl lg:text-9xl font-display font-bold text-tus-blue-a11y/8 select-none leading-none parallax-num number-display text-shimmer" data-speed="0.05">03</span>
                     <div class="chapter-accent absolute -left-4 top-2" style="--accent: rgba(11,45,255,0.5)"></div>
                 </div>
                 <div>
-                    <span class="text-tus-blue text-sm font-semibold uppercase tracking-[0.2em] block mb-1">Chapitre</span>
+                    <span class="text-tus-blue-a11y text-sm font-semibold uppercase tracking-[0.2em] block mb-1">Chapitre</span>
                     <h2 class="text-4xl md:text-5xl font-display font-bold">Notre approche</h2>
                 </div>
             </div>
@@ -364,38 +364,38 @@
                 {% for phase in phases %}
                 <div class="relative pl-16 {% if not forloop.last %}pb-20{% endif %} reveal-left" style="transition-delay: 0.{{ forloop.counter0|add:"1" }}5s;">
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full {% if forloop.last %}bg-tus-green/15 border-2 border-tus-green/40{% else %}bg-tus-blue/15 border-2 border-tus-blue/40{% endif %} flex items-center justify-center backdrop-blur-sm">
-                        <span class="{% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %} text-xs font-bold">{{ forloop.counter|stringformat:"02d" }}</span>
-                        <div class="timeline-pulse {% if forloop.last %}text-tus-green/30{% else %}text-tus-blue/30{% endif %}"></div>
+                        <span class="{% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %} text-xs font-bold">{{ forloop.counter|stringformat:"02d" }}</span>
+                        <div class="timeline-pulse {% if forloop.last %}text-tus-green/30{% else %}text-tus-blue-a11y/30{% endif %}"></div>
                     </div>
                     <div class="relative p-8 rounded-2xl border border-tus-white/10 bg-tus-white/[0.02] hover:border-{% if forloop.last %}tus-green{% else %}tus-blue{% endif %}/25 hover:bg-tus-white/[0.04] transition-all duration-500 group">
                         <div class="flex items-start gap-5">
                             <div class="w-12 h-12 rounded-xl {% if forloop.last %}bg-tus-green/10 group-hover:bg-tus-green/20{% else %}bg-tus-blue/10 group-hover:bg-tus-blue/20{% endif %} flex items-center justify-center flex-shrink-0 transition-colors duration-300">
                                 {% if phase.icon == 'search' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                 {% elif phase.icon == 'architecture' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                                 {% elif phase.icon == 'deploy' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                                 {% elif phase.icon == 'code' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
                                 {% elif phase.icon == 'design' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
                                 {% elif phase.icon == 'database' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
                                 {% elif phase.icon == 'security' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                 {% elif phase.icon == 'performance' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                 {% elif phase.icon == 'test' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 {% elif phase.icon == 'meeting' %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 {% else %}
-                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                 {% endif %}
                             </div>
                             <div>
-                                <span class="{% if forloop.last %}text-tus-green/60{% else %}text-tus-blue/60{% endif %} text-xs font-semibold uppercase tracking-wider">{{ phase.phase_label }}</span>
+                                <span class="{% if forloop.last %}text-tus-green/60{% else %}text-tus-blue-a11y/60{% endif %} text-xs font-semibold uppercase tracking-wider">{{ phase.phase_label }}</span>
                                 <h3 class="text-xl font-display font-bold mt-1 mb-3">{{ phase.title }}</h3>
                                 <p class="text-tus-white/60 leading-relaxed">{{ phase.description }}</p>
                             </div>
@@ -422,16 +422,16 @@
                 <!-- Phase 1 — Analyse -->
                 <div class="relative pl-16 pb-20 reveal-left" style="transition-delay: 0.15s;">
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full bg-tus-blue/15 border-2 border-tus-blue/40 flex items-center justify-center backdrop-blur-sm">
-                        <span class="text-tus-blue text-xs font-bold">01</span>
-                        <div class="timeline-pulse text-tus-blue/30"></div>
+                        <span class="text-tus-blue-a11y text-xs font-bold">01</span>
+                        <div class="timeline-pulse text-tus-blue-a11y/30"></div>
                     </div>
                     <div class="relative p-8 rounded-2xl border border-tus-white/10 bg-tus-white/[0.02] hover:border-tus-blue/25 hover:bg-tus-white/[0.04] transition-all duration-500 group">
                         <div class="flex items-start gap-5">
                             <div class="w-12 h-12 rounded-xl bg-tus-blue/10 flex items-center justify-center flex-shrink-0 group-hover:bg-tus-blue/20 transition-colors duration-300">
-                                <svg class="w-6 h-6 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <svg class="w-6 h-6 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             </div>
                             <div>
-                                <span class="text-tus-blue/60 text-xs font-semibold uppercase tracking-wider">Phase d'audit</span>
+                                <span class="text-tus-blue-a11y/60 text-xs font-semibold uppercase tracking-wider">Phase d'audit</span>
                                 <h3 class="text-xl font-display font-bold mt-1 mb-3">Analyse & Exploration</h3>
                                 <p class="text-tus-white/60 leading-relaxed">Compréhension approfondie du contexte métier, étude des flux existants, identification des points de friction et définition des objectifs de performance.</p>
                             </div>
@@ -441,16 +441,16 @@
                 <!-- Phase 2 — Architecture -->
                 <div class="relative pl-16 pb-20 reveal-left" style="transition-delay: 0.3s;">
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full bg-tus-blue/15 border-2 border-tus-blue/40 flex items-center justify-center backdrop-blur-sm">
-                        <span class="text-tus-blue text-xs font-bold">02</span>
-                        <div class="timeline-pulse text-tus-blue/30"></div>
+                        <span class="text-tus-blue-a11y text-xs font-bold">02</span>
+                        <div class="timeline-pulse text-tus-blue-a11y/30"></div>
                     </div>
                     <div class="relative p-8 rounded-2xl border border-tus-white/10 bg-tus-white/[0.02] hover:border-tus-blue/25 hover:bg-tus-white/[0.04] transition-all duration-500 group">
                         <div class="flex items-start gap-5">
                             <div class="w-12 h-12 rounded-xl bg-tus-blue/10 flex items-center justify-center flex-shrink-0 group-hover:bg-tus-blue/20 transition-colors duration-300">
-                                <svg class="w-6 h-6 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                <svg class="w-6 h-6 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                             </div>
                             <div>
-                                <span class="text-tus-blue/60 text-xs font-semibold uppercase tracking-wider">Phase de conception</span>
+                                <span class="text-tus-blue-a11y/60 text-xs font-semibold uppercase tracking-wider">Phase de conception</span>
                                 <h3 class="text-xl font-display font-bold mt-1 mb-3">Architecture & Prototypage</h3>
                                 <p class="text-tus-white/60 leading-relaxed">Conception de l'infrastructure technique sur-mesure, sans dépendance à des outils génériques. Prototypage fonctionnel et validation avec le client.</p>
                             </div>
@@ -490,7 +490,7 @@
                 </div>
                 <div class="flex flex-wrap gap-3 stagger-children">
                     {% for tech in project.tech_list %}
-                    <span class="px-4 py-2 bg-tus-white/[0.03] backdrop-blur-sm text-tus-white/60 text-sm font-medium rounded-xl border border-tus-white/10 hover:border-tus-blue/30 hover:text-tus-blue hover:bg-tus-blue/5 transition-all duration-300">
+                    <span class="px-4 py-2 bg-tus-white/[0.03] backdrop-blur-sm text-tus-white/60 text-sm font-medium rounded-xl border border-tus-white/10 hover:border-tus-blue/30 hover:text-tus-blue-a11y hover:bg-tus-blue/5 transition-all duration-300">
                         {{ tech }}
                     </span>
                     {% endfor %}
@@ -652,7 +652,7 @@
         <div class="absolute inset-0 bg-gradient-to-b from-transparent via-tus-blue/[0.03] to-transparent"></div>
         <div class="max-w-7xl mx-auto px-6 relative z-10">
             <div class="text-center mb-16 reveal">
-                <span class="text-tus-blue text-sm font-semibold uppercase tracking-[0.15em] block mb-2">Galerie</span>
+                <span class="text-tus-blue-a11y text-sm font-semibold uppercase tracking-[0.15em] block mb-2">Galerie</span>
                 <h2 class="text-3xl md:text-4xl font-display font-bold">Captures du projet</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 stagger-children">
@@ -686,7 +686,7 @@
                     <div class="glass-card-glow"></div>
                     <div class="flex items-center gap-3 mb-6 relative z-10">
                         <div class="w-10 h-10 rounded-xl bg-tus-blue/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                         </div>
                         <h3 class="text-lg font-display font-bold">Fiche projet</h3>
                     </div>
@@ -708,7 +708,7 @@
                         {% if project.url %}
                         <div class="flex justify-between items-center">
                             <span class="text-tus-white/40">URL</span>
-                            <a href="{{ project.url }}" target="_blank" rel="noopener" class="text-tus-blue hover:underline truncate ml-4 max-w-[180px]">{{ project.url|truncatechars:30 }}</a>
+                            <a href="{{ project.url }}" target="_blank" rel="noopener" class="text-tus-blue-a11y hover:underline truncate ml-4 max-w-[180px]">{{ project.url|truncatechars:30 }}</a>
                         </div>
                         {% endif %}
                     </div>
@@ -720,13 +720,13 @@
                     <div class="glass-card-glow"></div>
                     <div class="flex items-center gap-3 mb-6 relative z-10">
                         <div class="w-10 h-10 rounded-xl bg-tus-blue/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                            <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
                         </div>
                         <h3 class="text-lg font-display font-bold">Technologies</h3>
                     </div>
                     <div class="flex flex-wrap gap-2 relative z-10">
                         {% for tech in project.tech_list %}
-                        <span class="px-3 py-1.5 bg-tus-blue/10 text-tus-blue text-sm rounded-lg border border-tus-blue/20 hover:bg-tus-blue/20 transition-colors duration-300">{{ tech }}</span>
+                        <span class="px-3 py-1.5 bg-tus-blue/10 text-tus-blue-a11y text-sm rounded-lg border border-tus-blue/20 hover:bg-tus-blue/20 transition-colors duration-300">{{ tech }}</span>
                         {% endfor %}
                     </div>
                 </div>
@@ -738,7 +738,7 @@
                     <div class="relative p-8 rounded-2xl glass-card border-tus-blue/30 bg-gradient-to-br from-tus-blue/10 to-tus-blue/[0.03] text-center">
                         <div class="glass-card-glow"></div>
                         <div class="w-14 h-14 mx-auto mb-5 rounded-2xl bg-tus-blue/20 flex items-center justify-center">
-                            <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                            <svg class="w-7 h-7 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                         </div>
                         <p class="text-tus-white/80 mb-5 font-light relative z-10">Un projet similaire en tête ?</p>
                         <div class="magnetic-wrap relative z-10">
@@ -767,7 +767,7 @@
                 <span class="font-medium">Retour au portfolio</span>
             </a>
             <a href="{% url 'leads:contact' %}" 
-               class="inline-flex items-center gap-2 text-tus-blue hover:text-cyan-400 font-semibold transition-colors">
+               class="inline-flex items-center gap-2 text-tus-blue-a11y hover:text-cyan-400 font-semibold transition-colors">
                 Démarrer un projet
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
             </a>

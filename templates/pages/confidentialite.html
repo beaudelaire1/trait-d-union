@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
 {% block title %}Politique de Confidentialité - Trait d'Union Studio{% endblock %}
+{% block meta_description %}Politique de confidentialité de Trait d'Union Studio : collecte, utilisation et protection
+de vos données personnelles. Droits RGPD, cookies et sécurité.{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-16 max-w-4xl">
     <h1 class="text-4xl font-bold mb-8">Politique de Confidentialité</h1>
-    
+
     <div class="prose prose-lg max-w-none">
         <p class="text-gray-600 mb-8">Dernière mise à jour : {{ "now"|date:"d/m/Y" }}</p>
 
@@ -38,7 +40,8 @@
                 Nous ne vendons ni ne louons vos données personnelles. Nous pouvons les partager avec :
             </p>
             <ul class="list-disc ml-6 mb-4">
-                <li><strong>Prestataires techniques</strong> : hébergement (Render), stockage (Cloudinary), emails (Brevo)</li>
+                <li><strong>Prestataires techniques</strong> : hébergement (Render), stockage (Cloudinary), emails
+                    (Brevo)</li>
                 <li><strong>Paiements</strong> : Stripe (paiements sécurisés)</li>
                 <li><strong>Obligations légales</strong> : autorités compétentes si requis par la loi</li>
             </ul>
@@ -47,7 +50,8 @@
         <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">4. Conservation des données</h2>
             <p>
-                Nous conservons vos données pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées, 
+                Nous conservons vos données pendant la durée nécessaire aux finalités pour lesquelles elles ont été
+                collectées,
                 et conformément aux obligations légales (3 ans pour les prospects, 10 ans pour la comptabilité).
             </p>
         </section>
@@ -63,7 +67,7 @@
                 <li><strong>Droit à la portabilité</strong> : récupérer vos données dans un format structuré</li>
             </ul>
             <p>
-                Pour exercer ces droits, contactez-nous à : 
+                Pour exercer ces droits, contactez-nous à :
                 {% include 'partials/contact_email.html' with link_style="text-blue-600 hover:underline" %}
             </p>
         </section>
@@ -71,7 +75,7 @@
         <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">6. Sécurité</h2>
             <p>
-                Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données 
+                Nous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données
                 contre tout accès non autorisé, perte ou destruction.
             </p>
         </section>
@@ -79,7 +83,8 @@
         <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">7. Cookies</h2>
             <p>
-                Nous utilisons des cookies essentiels au fonctionnement du site et des cookies d'analyse (Google Analytics). 
+                Nous utilisons des cookies essentiels au fonctionnement du site et des cookies d'analyse (Google
+                Analytics).
                 Vous pouvez les désactiver dans les paramètres de votre navigateur.
             </p>
         </section>
@@ -87,7 +92,7 @@
         <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">8. Contact</h2>
             <p>
-                Pour toute question concernant cette politique : 
+                Pour toute question concernant cette politique :
                 {% include 'partials/contact_email.html' with link_style="text-blue-600 hover:underline" %}
             </p>
         </section>

@@ -12,24 +12,49 @@ class RateLimitMiddleware(MiddlewareMixin):
     """Rate limiting via Django cache backend (multi-process safe).
 
     Utilise le cache Django (Redis en prod, LocMem en dev) pour compter
-    les soumissions POST sur /contact/ par IP dans une fenêtre glissante.
+    les soumissions POST par IP dans une fenêtre glissante.
     Compatible multi-workers gunicorn.
+
+    Routes protégées :
+    - /contact/          → 5 req/heure (anti-spam formulaire)
+    - /accounts/login/   → 10 req/heure (anti brute-force)
+    - /accounts/signup/  → 5 req/heure (anti création de masse)
     """
 
-    RATE_LIMIT: int = 5
-    WINDOW_SECONDS: int = 3600
+    # (path_prefix, max_requests, window_seconds)
+    RATE_LIMITS: list[tuple[str, int, int]] = [
+        ('/contact/', 5, 3600),
+        ('/accounts/login/', 10, 3600),
+        ('/accounts/signup/', 5, 3600),
+    ]
 
     def process_request(self, request: HttpRequest) -> None | HttpResponse:
-        if not request.path.startswith('/contact/') or request.method != 'POST':
+        if request.method != 'POST':
             return None
 
+        for path_prefix, max_requests, window_seconds in self.RATE_LIMITS:
+            if request.path.startswith(path_prefix):
+                return self._check_rate(request, path_prefix, max_requests, window_seconds)
+
+        return None
+
+    def _check_rate(
+        self,
+        request: HttpRequest,
+        path_prefix: str,
+        max_requests: int,
+        window_seconds: int,
+    ) -> None | HttpResponse:
+        """Check and enforce rate limit for a given route."""
         ip = request.META.get('REMOTE_ADDR', '')
-        cache_key = f"ratelimit:contact:{ip}"
+        # Normalise le path prefix pour la clé cache (ex: "contact", "login")
+        route_key = path_prefix.strip('/').replace('/', '_')
+        cache_key = f"ratelimit:{route_key}:{ip}"
 
         current = cache.get(cache_key, 0)
-        if current >= self.RATE_LIMIT:
+        if current >= max_requests:
             response = HttpResponse('Too Many Requests', status=429)
-            response['Retry-After'] = str(self.WINDOW_SECONDS)
+            response['Retry-After'] = str(window_seconds)
             return response
 
         # incr() est atomique dans les backends Redis/memcached
@@ -37,7 +62,7 @@ class RateLimitMiddleware(MiddlewareMixin):
             cache.incr(cache_key)
         except ValueError:
             # Clé n'existe pas encore → la créer avec TTL
-            cache.set(cache_key, 1, self.WINDOW_SECONDS)
+            cache.set(cache_key, 1, window_seconds)
 
         return None
 

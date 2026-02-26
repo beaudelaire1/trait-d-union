@@ -41,7 +41,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-tus-white/60 text-sm">Email</p>
-                            <a href="mailto:{{ prospect.email }}" class="text-tus-blue hover:underline">{{ prospect.email }}</a>
+                            <a href="mailto:{{ prospect.email }}" class="text-tus-blue-a11y hover:underline">{{ prospect.email }}</a>
                         </div>
                         <div>
                             <p class="text-tus-white/60 text-sm">Téléphone</p>
@@ -50,7 +50,7 @@
                         <div>
                             <p class="text-tus-white/60 text-sm">Site web</p>
                             {% if prospect.website %}
-                            <a href="{{ prospect.website }}" target="_blank" class="text-tus-blue hover:underline">{{ prospect.website }}</a>
+                            <a href="{{ prospect.website }}" target="_blank" class="text-tus-blue-a11y hover:underline">{{ prospect.website }}</a>
                             {% else %}
                             <p class="text-tus-white">-</p>
                             {% endif %}
@@ -176,7 +176,7 @@
                     <h3 class="text-lg font-semibold text-tus-white mb-4">Tags</h3>
                     <div class="flex flex-wrap gap-2">
                         {% for tag in prospect.tag_list %}
-                        <span class="px-3 py-1 bg-tus-blue/20 text-tus-blue rounded-full text-sm">{{ tag }}</span>
+                        <span class="px-3 py-1 bg-tus-blue/20 text-tus-blue-a11y rounded-full text-sm">{{ tag }}</span>
                         {% endfor %}
                     </div>
                 </div>

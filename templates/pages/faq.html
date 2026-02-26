@@ -1,0 +1,414 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ — Questions Fréquentes | Trait d'Union Studio{% endblock %}
+
+{% block meta_description %}Réponses aux questions fréquentes sur la création de sites internet en Guyane, Martinique et Guadeloupe. Tarifs, délais, technologies, maintenance.{% endblock %}
+
+{% block meta_keywords %}FAQ, questions fréquentes, création site Guyane, prix site internet Cayenne, délais développement, Martinique, Guadeloupe, Trait d'Union Studio{% endblock %}
+
+{% block extra_head %}
+<!-- FAQ Schema.org for Google Rich Snippets (Featured Snippet Position #0) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Combien coûte la création d'un site internet en Guyane ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le coût d'un site internet en Guyane varie selon la complexité : site vitrine (3000-6000€), e-commerce (8000-15000€), plateforme métier sur mesure (15000€+). Nous proposons des devis personnalisés adaptés à votre projet et budget."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quel est le délai de création d'un site web à Cayenne ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Un site vitrine nécessite 3 à 6 semaines, un site e-commerce 6 à 12 semaines, et une plateforme métier 3 à 6 mois. Ces délais incluent la conception, le développement, les tests et la mise en ligne."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Travaillez-vous avec des clients en Martinique et Guadeloupe ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, nous travaillons dans toute la région Caraïbes : Guyane française, Martinique, Guadeloupe, Saint-Martin, Saint-Barthélemy. Nos projets sont gérés 100% en ligne avec des réunions visio régulières."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quelle est votre expertise technique ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nous maîtrisons Django, React, Tailwind CSS, PostgreSQL, Stripe, et les meilleures pratiques SEO. Notre stack garantit des sites performants, sécurisés et scalables."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Proposez-vous la maintenance et l'hébergement ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, nous proposons des forfaits maintenance (à partir de 150€/mois) incluant mises à jour sécurité, sauvegardes quotidiennes, monitoring 24/7 et support technique prioritaire. Hébergement sur serveurs européens rapides et fiables."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Comment optimisez-vous le référencement SEO local ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nous optimisons chaque site pour le SEO local Guyane et Antilles : mots-clés géolocalisés (Cayenne, Kourou, Fort-de-France, Pointe-à-Pitre), Google My Business, backlinks locaux, et contenu ciblé pour votre région."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Acceptez-vous les paiements échelonnés ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui, nous proposons des paiements échelonnés : 30% acompte à la signature, 40% à mi-projet, 30% à la livraison. Paiement sécurisé par carte bancaire ou virement."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Quels sont vos horaires et comment vous contacter ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nous sommes disponibles du lundi au vendredi, 9h-18h (heure Guyane). Contact : +594 695 35 80 41 ou contact@traitdunion.it. Réponse sous 24h garantie."
+      }
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative pt-32 pb-20 px-4 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/5 to-transparent"></div>
+    
+    <div class="max-w-4xl mx-auto relative z-10">
+        <h1 class="font-display text-5xl md:text-6xl font-bold text-tus-white mb-6">
+            Questions Fréquentes
+        </h1>
+        <p class="text-xl text-tus-white/80 mb-8">
+            Tout ce que vous devez savoir sur la création de sites web en Guyane, Martinique et Guadeloupe.
+        </p>
+        
+        <!-- CTA -->
+        <div class="flex flex-wrap gap-4 mb-12">
+            <a href="{% url 'leads:contact' %}" 
+               class="inline-flex items-center gap-2 px-6 py-3 bg-tus-blue-a11y text-tus-white font-semibold rounded-lg hover:bg-tus-blue-dark transition-colors">
+                <span>Demander un devis gratuit</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </a>
+            <a href="tel:+594695358041" 
+               class="inline-flex items-center gap-2 px-6 py-3 bg-surface-dark text-tus-white font-semibold rounded-lg border border-stroke-dark hover:border-tus-blue-a11y transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                </svg>
+                <span>+594 695 35 80 41</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Accordion Section -->
+<section class="py-20 px-4">
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- FAQ Items -->
+        <div class="space-y-4" x-data="{ activeTab: null }">
+            
+            <!-- Question 1 -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 1 ? null : 1"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Combien coûte la création d'un site internet en Guyane ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 1 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 1" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Le coût d'un site internet en Guyane varie selon la complexité du projet :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li><strong class="text-tus-white">Site vitrine :</strong> 3000€ à 6000€ (5-10 pages, design sur mesure)</li>
+                        <li><strong class="text-tus-white">Site e-commerce :</strong> 8000€ à 15000€ (boutique en ligne, paiements Stripe/PayPal)</li>
+                        <li><strong class="text-tus-white">Plateforme métier sur mesure :</strong> 15000€+ (fonctionnalités avancées, API, intégrations)</li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        Nous proposons des devis personnalisés adaptés à votre projet et budget. 
+                        <a href="{% url 'leads:contact' %}" class="text-tus-blue-a11y hover:underline ml-1">Demander un devis gratuit →</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 2 ? null : 2"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Quel est le délai de création d'un site web à Cayenne ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 2 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 2" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Les délais varient selon le type de projet et sa complexité :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li><strong class="text-tus-white">Site vitrine :</strong> 3 à 6 semaines</li>
+                        <li><strong class="text-tus-white">Site e-commerce :</strong> 6 à 12 semaines</li>
+                        <li><strong class="text-tus-white">Plateforme métier :</strong> 3 à 6 mois</li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        Ces délais incluent la conception UI/UX, le développement, les tests qualité et la mise en ligne complète avec formation.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 3 ? null : 3"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Travaillez-vous avec des clients en Martinique et Guadeloupe ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 3 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 3" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Absolument ! Nous travaillons dans toute la région Caraïbes :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li>Guyane française (Cayenne, Kourou, Saint-Laurent-du-Maroni)</li>
+                        <li>Martinique (Fort-de-France, Le Lamentin, Schoelcher)</li>
+                        <li>Guadeloupe (Pointe-à-Pitre, Les Abymes, Baie-Mahault)</li>
+                        <li>Saint-Martin, Saint-Barthélemy</li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        Nos projets sont gérés 100% en ligne avec des réunions visio régulières, un partage d'écran pour les validations, et une communication fluide via Slack ou WhatsApp.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 4 ? null : 4"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Quelle est votre expertise technique ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 4 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 4" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Notre stack technique garantit des sites performants, sécurisés et scalables :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li><strong class="text-tus-white">Backend :</strong> Django 5.0, Python 3.11, PostgreSQL</li>
+                        <li><strong class="text-tus-white">Frontend :</strong> Tailwind CSS 3.4, HTMX 2.0, Alpine.js</li>
+                        <li><strong class="text-tus-white">Infrastructure :</strong> Render.com (Europe), Cloudinary (médias), Stripe (paiements)</li>
+                        <li><strong class="text-tus-white">SEO :</strong> JSON-LD Schema.org, sitemap XML, Core Web Vitals optimisés</li>
+                        <li><strong class="text-tus-white">Sécurité :</strong> HTTPS, CSP headers, RGPD compliant, backups automatiques</li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        Nous suivons les meilleures pratiques de l'industrie (OWASP, WCAG 2.1 AA, Google PageSpeed).
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 5 ? null : 5"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Proposez-vous la maintenance et l'hébergement ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 5 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 5" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Oui, nous proposons plusieurs forfaits maintenance adaptés à vos besoins :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li><strong class="text-tus-white">Essential (150€/mois) :</strong> Mises à jour sécurité, sauvegardes hebdomadaires, support email</li>
+                        <li><strong class="text-tus-white">Pro (300€/mois) :</strong> Monitoring 24/7, sauvegardes quotidiennes, support prioritaire, 2h modifications/mois</li>
+                        <li><strong class="text-tus-white">Premium (500€/mois) :</strong> Tout Pro + optimisations mensuelles, rapports analytics, 5h modifications/mois</li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        Hébergement sur serveurs européens rapides (Frankfurt) avec 99.9% uptime garanti, CDN Cloudflare activé.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 6 ? null : 6"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Comment optimisez-vous le référencement SEO local ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 6 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 6" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Nous optimisons chaque site pour dominer le SEO local Guyane et Antilles :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li><strong class="text-tus-white">Mots-clés géolocalisés :</strong> Cayenne, Kourou, Fort-de-France, Pointe-à-Pitre intégrés naturellement</li>
+                        <li><strong class="text-tus-white">Google My Business :</strong> Configuration complète avec photos, horaires, avis clients</li>
+                        <li><strong class="text-tus-white">Schema.org LocalBusiness :</strong> Données structurées pour apparaître dans Google Maps</li>
+                        <li><strong class="text-tus-white">Backlinks locaux :</strong> Annuaires Guyane/Antilles, partenaires régionaux, presse locale</li>
+                        <li><strong class="text-tus-white">Contenu ciblé :</strong> Articles de blog sur l'actualité locale, guides métiers régionaux</li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        Objectif : Position #1-3 sur Google pour vos mots-clés métiers + ville en 3-6 mois.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 7 ? null : 7"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Acceptez-vous les paiements échelonnés ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 7 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 7" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Oui, nous proposons des paiements échelonnés pour faciliter votre investissement :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li><strong class="text-tus-white">30% acompte</strong> à la signature du devis (réservation du projet)</li>
+                        <li><strong class="text-tus-white">40% à mi-projet</strong> après validation des maquettes et développement 50%</li>
+                        <li><strong class="text-tus-white">30% à la livraison</strong> finale après tests et mise en ligne</li>
+                    </ul>
+                    <p class="text-tus-white/70 mb-4">
+                        Paiement sécurisé par carte bancaire (Stripe) ou virement SEPA. Factures conformes aux normes comptables françaises.
+                    </p>
+                    <p class="text-tus-white/70">
+                        Pour les projets >15000€, nous pouvons envisager un étalement jusqu'à 4 versements.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 8 ? null : 8"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Quels sont vos horaires et comment vous contacter ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 8 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 8" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Nous sommes disponibles pour répondre à vos questions :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li><strong class="text-tus-white">Horaires :</strong> Lundi au vendredi, 9h-18h (heure Guyane GMT-3)</li>
+                        <li><strong class="text-tus-white">Téléphone :</strong> <a href="tel:+594695358041" class="text-tus-blue-a11y hover:underline">+594 695 35 80 41</a></li>
+                        <li><strong class="text-tus-white">Email :</strong> <a href="mailto:contact@traitdunion.it" class="text-tus-blue-a11y hover:underline">contact@traitdunion.it</a></li>
+                        <li><strong class="text-tus-white">Formulaire :</strong> <a href="{% url 'leads:contact' %}" class="text-tus-blue-a11y hover:underline">Page contact →</a></li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        ⚡ <strong class="text-tus-white">Réponse sous 24h garantie</strong> (jours ouvrés). Pour les urgences techniques de nos clients en maintenance, support 24/7 disponible.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CTA Bottom -->
+        <div class="mt-16 text-center">
+            <p class="text-lg text-tus-white/80 mb-6">
+                Vous avez une autre question ? N'hésitez pas à nous contacter !
+            </p>
+            <a href="{% url 'leads:contact' %}" 
+               class="inline-flex items-center gap-2 px-8 py-4 bg-tus-blue-a11y text-tus-white text-lg font-semibold rounded-lg hover:bg-tus-blue-dark transition-colors">
+                <span>Poser votre question</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                </svg>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+<!-- Related Links -->
+<section class="py-16 px-4 bg-surface-dark/50">
+    <div class="max-w-6xl mx-auto">
+        <h2 class="font-display text-3xl font-bold text-tus-white mb-8 text-center">
+            En savoir plus
+        </h2>
+        <div class="grid md:grid-cols-3 gap-6">
+            <a href="{% url 'pages:services' %}" class="group p-6 bg-surface-dark rounded-lg border border-stroke-dark hover:border-tus-blue-a11y transition-colors">
+                <h3 class="font-display text-xl font-semibold text-tus-white mb-2 group-hover:text-tus-blue-a11y transition-colors">
+                    Nos Services
+                </h3>
+                <p class="text-tus-white/70">
+                    Découvrez notre offre complète : sites vitrines, e-commerce, applications métier.
+                </p>
+            </a>
+            <a href="{% url 'pages:methode' %}" class="group p-6 bg-surface-dark rounded-lg border border-stroke-dark hover:border-tus-blue-a11y transition-colors">
+                <h3 class="font-display text-xl font-semibold text-tus-white mb-2 group-hover:text-tus-blue-a11y transition-colors">
+                    Notre Méthode
+                </h3>
+                <p class="text-tus-white/70">
+                    Comment nous garantissons la réussite de votre projet en 5 étapes.
+                </p>
+            </a>
+            <a href="{% url 'portfolio:index' %}" class="group p-6 bg-surface-dark rounded-lg border border-stroke-dark hover:border-tus-blue-a11y transition-colors">
+                <h3 class="font-display text-xl font-semibold text-tus-white mb-2 group-hover:text-tus-blue-a11y transition-colors">
+                    Portfolio
+                </h3>
+                <p class="text-tus-white/70">
+                    Nos réalisations pour des clients en Guyane, Martinique et Guadeloupe.
+                </p>
+            </a>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

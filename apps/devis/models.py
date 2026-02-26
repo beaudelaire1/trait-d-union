@@ -311,12 +311,14 @@ class Quote(models.Model):
         from django.db import transaction
         
         if not self.public_token:
-            # Generate unique public token
-            while True:
+            # Generate unique public token (max 10 attempts to avoid infinite loop)
+            for _ in range(10):
                 token = secrets.token_urlsafe(32)
                 if not Quote.objects.filter(public_token=token).exists():
                     self.public_token = token
                     break
+            else:
+                raise RuntimeError("Impossible de générer un token public unique après 10 tentatives")
         
         # Attribution d'un numéro de devis si nécessaire : DEV-AAAA-XXX
         # Use atomic transaction with select_for_update to avoid race conditions
@@ -555,6 +557,7 @@ class QuoteValidation(models.Model):
 
     def verify(self, submitted_code: str, *, max_attempts: int = 5) -> bool:
         """Valide le code : True si OK (et marque confirmed_at)."""
+        import hmac
         from django.utils import timezone
 
         if self.is_confirmed:
@@ -569,7 +572,11 @@ class QuoteValidation(models.Model):
             return False
 
         self.attempts += 1
-        ok = submitted_code.strip() == (self.code or "").strip()
+        # Timing-safe comparison to prevent side-channel attacks
+        ok = hmac.compare_digest(
+            submitted_code.strip().encode('utf-8'),
+            (self.code or "").strip().encode('utf-8'),
+        )
         if ok:
             self.confirmed_at = timezone.now()
             self.save(update_fields=["attempts", "confirmed_at"])

@@ -41,7 +41,7 @@
                         {% for prospect in prospects %}
                         <label class="flex items-center space-x-3 py-2 hover:bg-tus-white/5 px-2 rounded cursor-pointer">
                             <input type="checkbox" name="prospects" value="{{ prospect.pk }}" 
-                                   class="w-4 h-4 rounded border-tus-white/30 bg-tus-black text-tus-blue focus:ring-tus-blue">
+                                   class="w-4 h-4 rounded border-tus-white/30 bg-tus-black text-tus-blue-a11y focus:ring-tus-blue">
                             <div class="flex-1">
                                 <span class="text-tus-white">{{ prospect.contact_name }}</span>
                                 {% if prospect.company_name %}

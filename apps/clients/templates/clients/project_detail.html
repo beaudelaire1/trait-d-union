@@ -101,7 +101,7 @@
                             </svg>
                         </div>
                         <div>
-                            <h2>Étape <span class="text-tus-blue">{{ milestone_progress.current_step }}</span> sur {{ milestone_progress.total }}</h2>
+                            <h2>Étape <span class="text-tus-blue-a11y">{{ milestone_progress.current_step }}</span> sur {{ milestone_progress.total }}</h2>
                             {% if milestone_progress.current_milestone %}
                             <p class="current-task">{{ milestone_progress.current_milestone.title }}</p>
                             {% endif %}
@@ -495,7 +495,7 @@
     font-weight: 700;
     margin: 0 0 0.25rem;
 }
-.text-tus-blue { color: var(--tus-blue); }
+.text-tus-blue-a11y { color: var(--tus-blue); }
 .text-tus-green { color: var(--tus-green); }
 .current-task {
     font-size: 0.9rem;

@@ -50,7 +50,6 @@ create_test_*.py
 
 # Node modules (regenerate with npm install)
 node_modules/
-package-lock.json
 
 # Virtual environments
 venv*/

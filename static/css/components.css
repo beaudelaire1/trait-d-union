@@ -1,0 +1,407 @@
+/* ==============================================================================
+/*
+ * Accessibilité motrice :
+ * Ne pas masquer le curseur natif OS pour les utilisateurs ayant un handicap moteur.
+ * Si custom-cursor est utilisé, prévoir une option pour désactiver ou revenir au curseur natif.
+ */
+   COMPONENTS.CSS — Trait d'Union Studio
+   ==============================================================================
+   Extracted from base.html inline <style> block for:
+   - Better cacheability (immutable static file)
+   - Elimination of unsafe-inline in CSP
+   - Maintainability
+   ============================================================================== */
+
+/* Fix pour les options de select sur fond sombre */
+select option {
+    background-color: #07080A;
+    color: #F6F7FB;
+    padding: 12px;
+}
+
+select option:hover,
+select option:focus,
+select option:checked {
+    background-color: #0B2DFF;
+    color: #F6F7FB;
+}
+
+/* Fix pour les navigateurs WebKit */
+select::-webkit-scrollbar {
+    width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+    background: #0D1016;
+}
+
+select::-webkit-scrollbar-thumb {
+    background: rgba(11, 45, 255, 0.5);
+    border-radius: 4px;
+}
+
+/* ============================================
+   VIEW TRANSITIONS - Apple-like smoothness
+   ============================================ */
+@view-transition {
+    navigation: auto;
+}
+
+/* Transition de la page entière */
+::view-transition-old(root) {
+    animation: fade-out 0.25s ease-out forwards;
+}
+
+::view-transition-new(root) {
+    animation: fade-in 0.35s ease-out forwards;
+}
+
+/* Transitions personnalisées pour le contenu principal */
+::view-transition-old(main-content) {
+    animation: slide-out-left 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+::view-transition-new(main-content) {
+    animation: slide-in-right 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Navbar reste fixe pendant les transitions */
+::view-transition-group(navbar) {
+    animation: none;
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slide-out-left {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+}
+
+@keyframes slide-in-right {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ============================================
+   MICRO-INTERACTIONS
+   ============================================ */
+/* Boutons avec feedback tactile */
+.btn-primary {
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(11, 45, 255, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(0.98);
+    transition-duration: 80ms;
+}
+
+/* Links avec underline animé */
+.link-animated {
+    position: relative;
+}
+
+.link-animated::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #0B2DFF, #00D4FF);
+    transition: width 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link-animated:hover::after {
+    width: 100%;
+}
+
+/* Cards avec effet de profondeur */
+.card-interactive {
+    transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* ============================================
+   ACCESSIBILITÉ CLAVIER - WCAG 2.1 AA
+   ============================================ */
+/* Focus visible moderne pour tous les éléments interactifs */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid #0B2DFF;
+    outline-offset: 2px;
+    border-radius: 6px;
+    transition: outline 0.15s ease;
+}
+
+/* Focus réduit pour liens dans le texte */
+p a:focus-visible,
+li a:focus-visible {
+    outline-width: 2px;
+    outline-offset: 3px;
+}
+
+/* Focus premium pour boutons primaires */
+.btn-primary:focus-visible,
+button[type="submit"]:focus-visible {
+    outline: 3px solid #00D4FF;
+    outline-offset: 4px;
+    box-shadow: 0 0 0 6px rgba(11, 45, 255, 0.15);
+}
+
+/* Focus pour inputs avec style cohérent */
+input[type="text"]:focus-visible,
+input[type="email"]:focus-visible,
+input[type="tel"]:focus-visible,
+input[type="password"]:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #0B2DFF;
+    outline-offset: 0;
+    border-color: #0B2DFF;
+    box-shadow: 0 0 0 3px rgba(11, 45, 255, 0.1);
+}
+
+/* Zones tactiles minimales 44x44px (WCAG 2.5.5) */
+button,
+a[role="button"],
+input[type="submit"],
+input[type="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Exception pour icônes dans boutons (padding interne) */
+button>svg,
+a>svg {
+    pointer-events: none;
+}
+
+/* Smooth scroll */
+html {
+    scroll-behavior: smooth;
+}
+
+/* ============================================
+   LOADING STATES & FEEDBACK VISUEL
+   ============================================ */
+/* Bouton en état de chargement */
+button[disabled],
+button[aria-busy="true"],
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Spinner de chargement */
+button[disabled]::after,
+button[aria-busy="true"]::after,
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(246, 247, 251, 0.3);
+    border-top-color: #F6F7FB;
+    border-radius: 50%;
+    animation: spinner 0.8s linear infinite;
+}
+
+@keyframes spinner {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* ============================================
+   VALIDATION INLINE & MESSAGES
+   ============================================ */
+/* Conteneur de messages (ajouté via JS) */
+.form-message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-top: 8px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideInDown 0.3s ease-out;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-message.success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+
+.form-message.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+}
+
+.form-message.warning {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    color: #fbbf24;
+}
+
+/* États de validation pour inputs */
+input.valid,
+textarea.valid,
+select.valid {
+    border-color: #22c55e !important;
+    background: rgba(34, 197, 94, 0.05);
+}
+
+input.invalid,
+textarea.invalid,
+select.invalid {
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* Icônes de validation (SVG inline) */
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper.has-success::after {
+    content: '✓';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #22c55e;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.input-wrapper.has-error::after {
+    content: '✕';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ef4444;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Labels accessibles avec indicateur requis */
+label.required::after {
+    content: ' *';
+    color: #ef4444;
+    font-weight: bold;
+}
+
+/* Helper text sous les inputs */
+.input-helper {
+    font-size: 0.75rem;
+    color: rgba(246, 247, 251, 0.5);
+    margin-top: 4px;
+    transition: color 0.2s ease;
+}
+
+input:focus+.input-helper,
+textarea:focus+.input-helper {
+    color: rgba(11, 45, 255, 0.8);
+}
+
+/* Annonces pour lecteurs d'écran */
+.sr-only-announce {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    html {
+        scroll-behavior: auto;
+    }
+}

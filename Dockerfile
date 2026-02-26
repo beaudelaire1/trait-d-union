@@ -3,7 +3,7 @@
 # ==============================================================================
 # Image simple basée sur Python Bookworm (miroirs Debian stables)
 
-FROM python:3.11-bookworm
+FROM python:3.12-bookworm
 
 # Variables d'environnement
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -53,6 +53,10 @@ USER appuser
 
 # Port
 EXPOSE ${PORT}
+
+# Health check — vérifie que l'app répond
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT}/healthz/')" || exit 1
 
 # Démarrage - Force les settings de production
 CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.production gunicorn config.wsgi:application --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]

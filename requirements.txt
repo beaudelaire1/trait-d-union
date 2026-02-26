@@ -23,10 +23,10 @@ whitenoise>=6.6.0
 cloudinary>=1.36.0
 django-cloudinary-storage>=0.3.0
 
-# Monitoring Sentry
-sentry-sdk[django]>=1.39.0
+# Monitoring
+sentry-sdk[django]>=1.40.0
 
-# Paiements Stripe
+# Stripe (paiements en ligne)
 stripe>=8.0.0
 
 # TinyMCE éditeur rich-text admin portfolio

@@ -1,6 +1,8 @@
 """View definitions for the static pages of the site."""
 from __future__ import annotations
 
+from typing import Any
+
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -40,6 +42,11 @@ class HomeView(TemplateView):
         from apps.portfolio.models import Project
         context['portfolio_count'] = Project.objects.filter(is_published=True).count()
         
+        # Breadcrumbs SEO (page d'accueil = racine)
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+        ]
+        
         return context
 
 
@@ -48,11 +55,27 @@ class ServicesView(TemplateView):
 
     template_name: str = 'pages/services.html'
 
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Services', 'url': '/services/'},
+        ]
+        return context
+
 
 class MethodView(TemplateView):
     """Methodology page describing the five‑step process."""
 
     template_name: str = 'pages/method.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Méthode', 'url': '/method/'},
+        ]
+        return context
 
 
 def page_not_found(request: HttpRequest, exception: Exception) -> HttpResponse:

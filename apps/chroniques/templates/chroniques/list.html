@@ -9,7 +9,7 @@
     </div>
     <div class="max-w-7xl mx-auto relative z-10">
         <div class="text-center mb-12 reveal">
-            <h1 class="text-4xl md:text-5xl font-display font-bold mb-4">Chroniques <span class="text-tus-blue">TUS</span></h1>
+            <h1 class="text-4xl md:text-5xl font-display font-bold mb-4">Chroniques <span class="text-tus-blue-a11y">TUS</span></h1>
             <p class="text-tus-white/70">Articles courts et points de vue sur nos pratiques.</p>
         </div>
 
@@ -22,14 +22,14 @@
                     <img src="{{ a.cover_image.url }}" alt="{{ a.title }}" class="w-full h-full object-cover" loading="lazy">
                     {% else %}
                     <div class="w-16 h-16 rounded-xl bg-tus-blue/20 flex items-center justify-center">
-                        <svg class="w-8 h-8 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20l9-5-9-5-9 5 9 5zm0-10l9-5-9-5-9 5 9 5z"/>
                         </svg>
                     </div>
                     {% endif %}
                 </div>
                 <div class="p-6">
-                    <h3 class="text-lg font-display font-semibold text-tus-white mb-2 group-hover:text-tus-blue transition-colors">{{ a.title }}</h3>
+                    <h3 class="text-lg font-display font-semibold text-tus-white mb-2 group-hover:text-tus-blue-a11y transition-colors">{{ a.title }}</h3>
                     {% if a.excerpt %}
                     <p class="text-tus-white/60 text-sm line-clamp-3">{{ a.excerpt }}</p>
                     {% endif %}

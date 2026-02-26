@@ -1,10 +1,23 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Création de Site Internet en Guyane : Cayenne, Kourou, Saint-Laurent – Trait d'Union Studio{% endblock %}
+{% block title %}Création de Site Internet en Guyane : Cayenne, Kourou, Saint-Laurent – Trait d'Union Studio
+{%endblock%}
 
-{% block meta_description %}Studio d'architecture digitale en Guyane française. Création de sites internet, e-commerce et plateformes métier sur mesure à Cayenne, Kourou, Saint-Laurent, Matoury, Remire-Montjoly, Martinique et Guadeloupe.{% endblock %}
+{% block meta_description %}Studio d'architecture digitale en Guyane française. Création de sites internet, e-commerce
+et plateformes métier sur mesure à Cayenne, Kourou, Saint-Laurent, Matoury, Remire-Montjoly, Martinique et Guadeloupe.
+{%endblock %}
 
-{% block meta_keywords %}création site internet guyane, développeur web cayenne, site internet kourou, création site web guyane, site e-commerce guyane, architecture digitale guyane, site internet martinique, site internet guadeloupe, développement web outre-mer, création site internet cayenne, studio web guyane{% endblock %}
+{% block meta_keywords %}création site internet guyane, développeur web cayenne, site internet kourou, création site web
+guyane, site e-commerce guyane, architecture digitale guyane, site internet martinique, site internet guadeloupe,
+développement web outre-mer, création site internet cayenne, studio web guyane{% endblock %}
+
+{% block og_title %}Création de Site Internet en Guyane — Trait d'Union Studio{% endblock %}
+{% block og_description %}Studio d'architecture digitale en Guyane. Sites internet, e-commerce et plateformes métier sur
+mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
+{% block twitter_title %}Création de Site Internet en Guyane — Trait d'Union Studio{% endblock %}
+{% block twitter_description %}Studio d'architecture digitale en Guyane. Sites internet, e-commerce et plateformes
+métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
 
 {% block content %}
 
@@ -12,33 +25,37 @@
 <section class="min-h-screen flex items-center justify-center relative overflow-hidden pt-20">
     <!-- Background gradient -->
     <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/5 via-transparent to-transparent"></div>
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-tus-blue/10 rounded-full blur-[150px] pointer-events-none parallax-slow" data-speed="0.15"></div>
-    
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-tus-blue/10 rounded-full blur-[150px] pointer-events-none parallax-slow"
+        data-speed="0.15"></div>
+
     <div class="max-w-6xl mx-auto px-6 text-center relative z-10">
         <!-- Accent décoratif -->
         <div class="mb-8 reveal flex justify-center">
             <div class="w-20 h-1.5 bg-gradient-to-r from-tus-blue via-cyan-400 to-tus-white/50 rounded-full"></div>
         </div>
-        
+
         <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold mb-8 reveal" style="transition-delay: 0.1s;">
             Créons votre<br>
             <span class="text-gradient-animated">plateforme</span>
         </h1>
-        
+
         <p class="text-xl md:text-2xl text-tus-white/70 max-w-2xl mx-auto mb-12 reveal" style="transition-delay: 0.2s;">
             « Quand l'élégance se conçoit, la performance se déploie. »
         </p>
-        
+
         <div class="flex flex-col sm:flex-row gap-6 justify-center reveal" style="transition-delay: 0.3s;">
             <!-- Bouton principal ULTRA premium -->
             {% include 'partials/btn_cta_primary.html' with url='/contact/' text='Démarrer un projet' %}
             <!-- Bouton secondaire -->
-            <a href="/portfolio/" class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-micro ease-standard hover:scale-[0.98] active:scale-95 border border-tus-white/20 hover:border-tus-blue/50 hover:bg-tus-blue/10">
-                <span class="relative z-10 font-display font-bold text-lg text-tus-white/90 group-hover:text-tus-white transition-colors duration-micro ease-standard">Voir nos réalisations</span>
+            <a href="/portfolio/"
+                class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-micro ease-standard hover:scale-[0.98] active:scale-95 border border-tus-white/20 hover:border-tus-blue/50 hover:bg-tus-blue/10 btn-magnetic">
+                <span
+                    class="relative z-10 font-display font-bold text-lg text-tus-white/90 group-hover:text-tus-white transition-colors duration-micro ease-standard">Voir
+                    nos réalisations</span>
             </a>
         </div>
     </div>
-    
+
     <!-- Scroll indicator -->
     <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
         <div class="w-6 h-10 border-2 border-tus-white/30 rounded-full flex justify-center">
@@ -51,36 +68,42 @@
 <section class="py-10 relative">
     <div class="max-w-6xl mx-auto px-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal">
+            <div
+                class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal">
                 <div>
                     <p class="text-sm uppercase tracking-wider text-tus-white/50">Architecture</p>
                     <p class="text-lg font-display font-semibold text-tus-white">Code propriétaire</p>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-tus-blue/15 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
             </div>
-            <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal" style="transition-delay: 0.05s;">
+            <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal"
+                style="transition-delay: 0.05s;">
                 <div>
                     <p class="text-sm uppercase tracking-wider text-tus-white/50">Pilotage</p>
                     <p class="text-lg font-display font-semibold text-tus-white">Écosystème TUS intégré</p>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-tus-green/15 flex items-center justify-center">
                     <svg class="w-5 h-5 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h18v6H3zM3 9h18v12H3z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M3 3h18v6H3zM3 9h18v12H3z" />
                     </svg>
                 </div>
             </div>
-            <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal" style="transition-delay: 0.1s;">
+            <div class="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] px-6 py-4 reveal"
+                style="transition-delay: 0.1s;">
                 <div>
                     <p class="text-sm uppercase tracking-wider text-tus-white/50">Ancrage</p>
                     <p class="text-lg font-display font-semibold text-tus-white">Guyane, Antilles</p>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-tus-blue/15 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/>
+                    <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z" />
                     </svg>
                 </div>
             </div>
@@ -92,9 +115,11 @@
 <section class="py-20 relative">
     <div class="max-w-6xl mx-auto px-6">
         <div class="text-center mb-20">
-            <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Nos expertises</span>
+            <span
+                class="text-tus-blue-a11y font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Nos
+                expertises</span>
             <h2 class="text-4xl md:text-6xl font-display font-bold reveal">
-                Des solutions <span class="text-tus-blue">sur-mesure</span>
+                Des solutions <span class="text-tus-blue-a11y">sur-mesure</span>
             </h2>
             <p class="text-tus-white/60 mt-6 max-w-2xl mx-auto text-lg reveal">
                 Chaque architecture porte l'exigence de votre ambition. Conception propriétaire, intégrité absolue.
@@ -104,21 +129,23 @@
                 {% include 'partials/badge_standard_tus.html' %}
             </div>
         </div>
-        
+
         <!-- Standard TUS Features -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 reveal">
             <div class="flex items-center gap-3 p-4 rounded-xl border border-tus-green/20 bg-tus-green/5">
                 <svg class="w-6 h-6 text-tus-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
                 <div>
-                    <p class="font-semibold text-tus-white text-sm">Accès Portail Client</p>
+                    <p class="font-semibold text-tus-white text-sm">Accès Écosystème TUS</p>
                     <p class="text-xs text-tus-white/60">Suivi temps réel sécurisé</p>
                 </div>
             </div>
             <div class="flex items-center gap-3 p-4 rounded-xl border border-tus-green/20 bg-tus-green/5">
                 <svg class="w-6 h-6 text-tus-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
                 <div>
                     <p class="font-semibold text-tus-white text-sm">Performance Grade A</p>
@@ -127,7 +154,8 @@
             </div>
             <div class="flex items-center gap-3 p-4 rounded-xl border border-tus-green/20 bg-tus-green/5">
                 <svg class="w-6 h-6 text-tus-green flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 <div>
                     <p class="font-semibold text-tus-white text-sm">Sécurité Zero-Plugin</p>
@@ -135,64 +163,95 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Services Grid - Simple & Elegant -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            
+
             <!-- Card 1 - Design UI/UX -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.1s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
-                    <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3l2.5 5 5.5.8-4 3.8.9 5.4-4.9-2.6-4.9 2.6.9-5.4-4-3.8 5.5-.8L12 3z"/>
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.1s;">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
+                    <svg class="w-7 h-7 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M12 3l2.5 5 5.5.8-4 3.8.9 5.4-4.9-2.6-4.9 2.6.9-5.4-4-3.8 5.5-.8L12 3z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">Design UI/UX</h3>
-                <p class="text-tus-white/60 leading-relaxed">Interfaces métier intuitives, épurées des fonctions inutiles pour une prise en main immédiate.</p>
+                <h3
+                    class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue-a11y transition-colors duration-micro ease-standard">
+                    Design UI/UX</h3>
+                <p class="text-tus-white/60 leading-relaxed">Interfaces métier intuitives, épurées des fonctions
+                    inutiles pour une prise en main immédiate.</p>
             </div>
-            
+
             <!-- Card 2 - Développement -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.15s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
-                    <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 3L4 14h6l-1 7 9-11h-6l1-7z"/>
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.15s;">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
+                    <svg class="w-7 h-7 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M13 3L4 14h6l-1 7 9-11h-6l1-7z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">Architecture Digitale</h3>
-                <p class="text-tus-white/60 leading-relaxed">Architecture propriétaire haute performance. Zéro dépendance aux solutions génériques.</p>
+                <h3
+                    class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue-a11y transition-colors duration-micro ease-standard">
+                    Architecture Digitale</h3>
+                <p class="text-tus-white/60 leading-relaxed">Architecture propriétaire haute performance. Zéro
+                    dépendance aux solutions génériques.</p>
             </div>
-            
+
             <!-- Card 3 - E-commerce -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.2s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
-                    <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 4h2l2.4 9.5a2 2 0 002 1.5h7.2a2 2 0 002-1.5L20 7H6"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 20a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/>
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.2s;">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
+                    <svg class="w-7 h-7 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M3 4h2l2.4 9.5a2 2 0 002 1.5h7.2a2 2 0 002-1.5L20 7H6" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M7 20a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">E-commerce Sécurisé</h3>
-                <p class="text-tus-white/60 leading-relaxed">Boutiques robustes avec intégration paiement sécurisée et tunnel de conversion optimisé.</p>
+                <h3
+                    class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue-a11y transition-colors duration-micro ease-standard">
+                    E-commerce Sécurisé</h3>
+                <p class="text-tus-white/60 leading-relaxed">Boutiques robustes avec intégration paiement sécurisée et
+                    tunnel de conversion optimisé.</p>
             </div>
-            
+
             <!-- Card 4 - SEO -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.3s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
-                    <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 19h16M6 16l4-4 3 3 5-7"/>
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.3s;">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
+                    <svg class="w-7 h-7 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 19h16M6 16l4-4 3 3 5-7" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">Référencement Natif</h3>
-                <p class="text-tus-white/60 leading-relaxed">SEO intégré dès la conception. Structure propriétaire pensée pour les moteurs, performances garanties.</p>
+                <h3
+                    class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue-a11y transition-colors duration-micro ease-standard">
+                    Référencement Natif</h3>
+                <p class="text-tus-white/60 leading-relaxed">SEO intégré dès la conception. Structure propriétaire
+                    pensée pour les moteurs, performances garanties.</p>
             </div>
-            
+
             <!-- Card 5 - Maintenance -->
-            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.4s;">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
-                    <svg class="w-7 h-7 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.7 6.3a4 4 0 01-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4z"/>
+            <div class="group p-8 rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.4s;">
+                <div
+                    class="w-14 h-14 rounded-2xl bg-gradient-to-br from-tus-blue/20 to-tus-blue/5 flex items-center justify-center mb-6 transition-transform duration-micro ease-standard">
+                    <svg class="w-7 h-7 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M14.7 6.3a4 4 0 01-5.4 5.4L4 17v3h3l5.3-5.3a4 4 0 015.4-5.4z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue transition-colors duration-micro ease-standard">Support Technique</h3>
-                <p class="text-tus-white/60 leading-relaxed">Maintenance proactive, évolutions continues et support réactif. Interlocuteur humain dédié.</p>
+                <h3
+                    class="text-xl font-display font-bold mb-3 group-hover:text-tus-blue-a11y transition-colors duration-micro ease-standard">
+                    Support Technique</h3>
+                <p class="text-tus-white/60 leading-relaxed">Maintenance proactive, évolutions continues et support
+                    réactif. Interlocuteur humain dédié.</p>
             </div>
         </div>
     </div>
@@ -204,42 +263,55 @@
     <div class="max-w-6xl mx-auto px-6 relative z-10">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-                <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal-left">Etude de cas</span>
+                <span
+                    class="text-tus-blue-a11y font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal-left">Etude
+                    de cas</span>
                 <h2 class="text-3xl md:text-5xl font-display font-bold mb-6 reveal-left">
                     Transition d'un modèle bureautique vieillissant vers une infrastructure logicielle centralisée
                 </h2>
                 <p class="text-lg text-tus-white/70 mb-8 reveal">
-                    Piloter une activité avec des fichiers dispersés finit par créer des angles morts. Notre solution unifie vitrine, commercial et opérationnel dans une seule plateforme — trois portails, zéro friction.
+                    Piloter une activité avec des fichiers dispersés finit par créer des angles morts. Notre solution
+                    unifie vitrine, commercial et opérationnel dans une seule plateforme — trois portails, zéro
+                    friction.
                 </p>
                 <div class="space-y-4 reveal">
                     <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                         <p class="text-sm uppercase tracking-wider text-tus-white/50">Contexte</p>
-                        <p class="text-tus-white/80">Gestion par fichiers, priorités qui se perdent, suivi par relances manuelles.</p>
+                        <p class="text-tus-white/80">Gestion par fichiers, priorités qui se perdent, suivi par relances
+                            manuelles.</p>
                     </div>
                     <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                         <p class="text-sm uppercase tracking-wider text-tus-white/50">Approche</p>
-                        <p class="text-tus-white/80">Plateforme multi-portails (admin, client, ouvrier) orientée parcours : attirer, convertir, structurer, exécuter.</p>
+                        <p class="text-tus-white/80">Plateforme multi-portails (admin, client, ouvrier) orientée
+                            parcours : attirer, convertir, structurer, exécuter.</p>
                     </div>
                     <div class="rounded-xl border border-white/10 bg-white/[0.03] p-4">
                         <p class="text-sm uppercase tracking-wider text-tus-white/50">Impact</p>
-                        <p class="text-tus-white/80">Plus de clarté, moins d'oubli — la gestion devient un levier, pas une charge.</p>
+                        <p class="text-tus-white/80">Plus de clarté, moins d'oubli — la gestion devient un levier, pas
+                            une charge.</p>
                     </div>
                 </div>
-                <a href="/portfolio/" class="mt-8 inline-flex items-center gap-2 text-tus-blue hover:text-cyan-400 font-semibold transition-colors duration-micro ease-standard reveal">
+                <a href="/portfolio/"
+                    class="mt-8 inline-flex items-center gap-2 text-tus-blue-a11y hover:text-cyan-400 font-semibold transition-colors duration-micro ease-standard reveal">
                     Voir les études de cas
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
             </div>
             <div class="reveal-right">
-                <div class="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-8 shadow-2xl hover:border-tus-blue/30 transition-colors duration-micro ease-standard card-tilt">
+                <div
+                    class="rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-8 shadow-2xl hover:border-tus-blue/30 transition-colors duration-micro ease-standard card-tilt">
                     <div class="flex items-center justify-between mb-6">
                         <p class="text-sm uppercase tracking-wider text-tus-white/50">Cas récent</p>
-                        <span class="px-3 py-1 rounded-full bg-tus-blue/10 text-tus-blue text-xs font-semibold">Secteur · Hygiène & Espaces verts</span>
+                        <span
+                            class="px-3 py-1 rounded-full bg-tus-blue/10 text-tus-blue-a11y text-xs font-semibold">Secteur
+                            · Hygiène & Espaces verts</span>
                     </div>
                     <h3 class="text-2xl font-display font-bold mb-4">Plateforme de gestion multi-portails</h3>
-                    <p class="text-tus-white/60 mb-6">Vitrine web, flux commercial (devis → factures) et pilotage opérationnel par tasks — trois espaces, un système unifié.</p>
+                    <p class="text-tus-white/60 mb-6">Vitrine web, flux commercial (devis → factures) et pilotage
+                        opérationnel par tasks — trois espaces, un système unifié.</p>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="rounded-xl bg-white/[0.03] border border-white/10 p-4">
                             <p class="text-xs uppercase tracking-wider text-tus-white/50">Livrable clé</p>
@@ -260,35 +332,44 @@
 <section class="py-24 relative overflow-hidden">
     <!-- Background effects -->
     <div class="absolute inset-0 bg-gradient-to-r from-tus-blue/10 via-tus-green/5 to-tus-blue/5"></div>
-    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-tus-blue/15 to-tus-green/10 rounded-full blur-[120px] parallax-slow" data-speed="0.1"></div>
-    
+    <div class="absolute left-0 top-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-tus-blue/15 to-tus-green/10 rounded-full blur-[120px] parallax-slow"
+        data-speed="0.1"></div>
+
     <div class="max-w-6xl mx-auto px-6 relative z-10">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
             <!-- Content -->
             <div class="order-2 lg:order-1">
-                <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal-left">Portail de Pilotage</span>
+                <span
+                    class="text-tus-blue-a11y font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal-left">Portail
+                    de Pilotage</span>
                 <h2 class="text-3xl md:text-5xl font-display font-bold mb-6 reveal-left">
                     Plus qu'un site,<br>
-                    <span class="text-tus-blue">une suite logicielle</span>
+                    <span class="text-tus-blue-a11y">une suite logicielle</span>
                 </h2>
                 <p class="text-lg text-tus-white/70 mb-8 reveal">
-                    Suivez vos devis, validez vos étapes, retrouvez vos factures et gérez vos documents sur votre <strong class="text-tus-white">Écosystème TUS sécurisé</strong>.
+                    Suivez vos devis, validez vos étapes, retrouvez vos factures et gérez vos documents sur votre
+                    <strong class="text-tus-white">Écosystème TUS sécurisé</strong>.
                 </p>
-                
+
                 <!-- Features list -->
                 <ul class="space-y-4 mb-8">
                     <li class="flex items-start gap-3 reveal">
-                        <svg class="w-6 h-6 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <svg class="w-6 h-6 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Suivi projet en temps réel</p>
-                            <p class="text-sm text-tus-white/60">Visualisez chaque étape, progression et délais de votre projet</p>
+                            <p class="text-sm text-tus-white/60">Visualisez chaque étape, progression et délais de votre
+                                projet</p>
                         </div>
                     </li>
                     <li class="flex items-start gap-3 reveal">
-                        <svg class="w-6 h-6 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <svg class="w-6 h-6 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Tableau de bord unifié</p>
@@ -296,8 +377,10 @@
                         </div>
                     </li>
                     <li class="flex items-start gap-3 reveal">
-                        <svg class="w-6 h-6 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <svg class="w-6 h-6 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Transparence radicale</p>
@@ -305,8 +388,10 @@
                         </div>
                     </li>
                     <li class="flex items-start gap-3 reveal">
-                        <svg class="w-6 h-6 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <svg class="w-6 h-6 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div>
                             <p class="font-semibold text-tus-white">Sécurité renforcée</p>
@@ -314,20 +399,24 @@
                         </div>
                     </li>
                 </ul>
-                
-                <a href="{% url 'clients:dashboard' %}" class="group inline-flex items-center gap-2 text-tus-blue hover:text-cyan-400 font-semibold transition-colors duration-micro ease-standard reveal">
+
+                <a href="{% url 'clients:dashboard' %}"
+                    class="group inline-flex items-center gap-2 text-tus-blue-a11y hover:text-cyan-400 font-semibold transition-colors duration-micro ease-standard reveal">
                     Accéder à votre Écosystème TUS
-                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-micro ease-standard" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-micro ease-standard"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                 </a>
             </div>
-            
+
             <!-- Visual Mock-up -->
             <div class="order-1 lg:order-2 reveal-right">
                 <div class="relative">
                     <!-- Browser Frame -->
-                    <div class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] overflow-hidden shadow-2xl">
+                    <div
+                        class="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] overflow-hidden shadow-2xl">
                         <!-- Browser Header -->
                         <div class="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/[0.03]">
                             <div class="flex gap-1.5">
@@ -336,11 +425,15 @@
                                 <div class="w-3 h-3 rounded-full bg-tus-green/70"></div>
                             </div>
                             <div class="flex-1 ml-4">
-                                <div class="max-w-xs mx-auto px-3 py-1 rounded-md bg-white/5 text-xs text-tus-white/60 text-center">
+                                <div
+                                    class="max-w-xs mx-auto px-3 py-1 rounded-md bg-white/5 text-xs text-tus-white/60 text-center">
                                     <span class="inline-flex items-center gap-2">
-                                        <svg class="w-3.5 h-3.5 text-tus-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11V7a4 4 0 10-8 0v4"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 11h14v8H5z"/>
+                                        <svg class="w-3.5 h-3.5 text-tus-white/60" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M12 11V7a4 4 0 10-8 0v4" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M5 11h14v8H5z" />
                                         </svg>
                                         www.traitdunion.it/ecosysteme-tus
                                     </span>
@@ -353,9 +446,12 @@
                             <div class="p-4 rounded-xl bg-white/[0.03] border border-white/10">
                                 <div class="flex items-center justify-between mb-3">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-tus-blue/30 to-tus-green/20 flex items-center justify-center">
-                                            <svg class="w-4 h-4 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-gradient-to-br from-tus-blue/30 to-tus-green/20 flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-tus-blue-a11y" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                         </div>
                                         <div>
@@ -367,7 +463,9 @@
                                 </div>
                                 <!-- Progress Bar -->
                                 <div class="h-2 bg-white/10 rounded-full overflow-hidden">
-                                    <div class="h-full w-[44%] bg-gradient-to-r from-tus-blue to-tus-green rounded-full"></div>
+                                    <div
+                                        class="h-full w-[44%] bg-gradient-to-r from-tus-blue to-tus-green rounded-full">
+                                    </div>
                                 </div>
                                 <div class="flex justify-between mt-2 text-xs text-tus-white/60">
                                     <span>3 terminées</span>
@@ -377,7 +475,7 @@
                             <!-- Stats Row -->
                             <div class="grid grid-cols-3 gap-3">
                                 <div class="p-3 rounded-xl bg-tus-blue/10 border border-tus-blue/20">
-                                    <p class="text-2xl font-bold text-tus-blue">3</p>
+                                    <p class="text-2xl font-bold text-tus-blue-a11y">3</p>
                                     <p class="text-xs text-tus-white/60">Projets actifs</p>
                                 </div>
                                 <div class="p-3 rounded-xl bg-tus-green/10 border border-tus-green/20">
@@ -391,36 +489,48 @@
                             </div>
                             <!-- Activity -->
                             <div class="space-y-2">
-                                <div class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                                <div
+                                    class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
                                     <div class="w-8 h-8 rounded-full bg-tus-green/20 flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/>
+                                        <svg class="w-4 h-4 text-tus-green" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4" />
                                         </svg>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-tus-white truncate">Jalon "Base de données" terminé</p>
+                                        <p class="text-sm font-medium text-tus-white truncate">Jalon "Base de données"
+                                            terminé</p>
                                         <p class="text-xs text-tus-white/60">Il y a 2 heures</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                                <div
+                                    class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
                                     <div class="w-8 h-8 rounded-full bg-tus-blue/20 flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"/>
+                                        <svg class="w-4 h-4 text-tus-blue-a11y" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M9 12l2 2 4-4" />
                                         </svg>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-tus-white truncate">Devis #2024-042 validé</p>
+                                        <p class="text-sm font-medium text-tus-white truncate">Devis #2024-042 validé
+                                        </p>
                                         <p class="text-xs text-tus-white/60">Il y a 2 heures</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                                <div
+                                    class="flex items-center gap-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
                                     <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                                        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                         </svg>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium text-tus-white truncate">Nouveau document uploadé</p>
+                                        <p class="text-sm font-medium text-tus-white truncate">Nouveau document uploadé
+                                        </p>
                                         <p class="text-xs text-tus-white/60">Hier à 16:30</p>
                                     </div>
                                 </div>
@@ -439,30 +549,36 @@
 <section class="py-24 relative overflow-hidden">
     <!-- Background effect -->
     <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/5 via-transparent to-tus-blue/5"></div>
-    
+
     <div class="max-w-6xl mx-auto px-6 relative z-10">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div class="text-center group reveal" style="transition-delay: 0.1s;">
-                <div class="text-6xl md:text-7xl font-display font-bold text-tus-blue mb-3 group-hover:scale-105 transition-transform duration-micro">
+                <div
+                    class="text-6xl md:text-7xl font-display font-bold text-tus-blue-a11y mb-3 group-hover:scale-105 transition-transform duration-micro">
                     <span class="counter" data-target="100" data-suffix="%">0%</span>
                 </div>
                 <p class="text-tus-white/70 text-sm uppercase tracking-wider">Projets livrés dans les délais</p>
             </div>
             <div class="text-center group reveal" style="transition-delay: 0.2s;">
-                <div class="text-6xl md:text-7xl font-display font-bold text-tus-blue mb-3 group-hover:scale-105 transition-transform duration-micro">
+                <div
+                    class="text-6xl md:text-7xl font-display font-bold text-tus-blue-a11y mb-3 group-hover:scale-105 transition-transform duration-micro">
                     <span class="counter" data-target="{{ portfolio_count|default:2 }}" data-suffix="">0</span>
                 </div>
                 <p class="text-tus-white/70 text-sm uppercase tracking-wider">Projets réalisés</p>
             </div>
-            <div class="text-center group reveal flex flex-col justify-center items-center" style="transition-delay: 0.3s;">
+            <div class="text-center group reveal flex flex-col justify-center items-center"
+                style="transition-delay: 0.3s;">
                 <div class="mb-3 group-hover:scale-105 transition-transform duration-micro flex justify-center">
-                    <div class="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-tus-blue/30 bg-tus-blue/10">
-                        <svg class="w-6 h-6 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z"/>
+                    <div
+                        class="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-tus-blue/30 bg-tus-blue/10">
+                        <svg class="w-6 h-6 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M12 21s7-6.3 7-11a7 7 0 10-14 0c0 4.7 7 11 7 11z" />
                         </svg>
                         <span class="text-lg font-semibold text-tus-white flex items-center gap-2">
-                            Basé en Guyane 
-                            <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f1ec-1f1eb.svg" alt="Drapeau Guyane" class="w-6 h-6 inline-block -mt-0.5" loading="lazy" width="24" height="24">
+                            Basé en Guyane
+                            <img src="{% static 'img/flag-gf.svg' %}" alt="Drapeau Guyane"
+                                class="w-6 h-6 inline-block -mt-0.5" loading="lazy" width="24" height="24">
                         </span>
                     </div>
                 </div>
@@ -475,10 +591,12 @@
 <!-- Section Engagements Transparence -->
 <section class="py-24 relative overflow-hidden">
     <div class="absolute inset-0 bg-gradient-to-b from-transparent via-tus-green/5 to-transparent"></div>
-    
+
     <div class="max-w-6xl mx-auto px-6 relative z-10">
         <div class="text-center mb-16">
-            <span class="text-tus-green font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Notre différence</span>
+            <span
+                class="text-tus-green font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Notre
+                différence</span>
             <h2 class="text-3xl md:text-5xl font-display font-bold reveal">
                 Engagements de <span class="text-tus-green">transparence</span>
             </h2>
@@ -486,13 +604,16 @@
                 Chaque promesse est documentée. Chaque livrable est consultable.
             </p>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Engagement 1 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.1s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.1s;">
+                <div
+                    class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
                 <h3 class="text-lg font-display font-bold text-tus-white mb-2">Métriques certifiées</h3>
@@ -500,12 +621,15 @@
                     Données vérifiables, mises à jour en continu.
                 </p>
             </div>
-            
+
             <!-- Engagement 2 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.15s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.15s;">
+                <div
+                    class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
                 </div>
                 <h3 class="text-lg font-display font-bold text-tus-white mb-2">Portfolio audité</h3>
@@ -513,12 +637,15 @@
                     Chaque réalisation est en ligne, accessible et vérifiable.
                 </p>
             </div>
-            
+
             <!-- Engagement 3 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.2s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.2s;">
+                <div
+                    class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                     </svg>
                 </div>
                 <h3 class="text-lg font-display font-bold text-tus-white mb-2">Propriété intégrale du code</h3>
@@ -526,25 +653,32 @@
                     Code source livré, documenté, sans dépendance au studio.
                 </p>
             </div>
-            
+
             <!-- Engagement 4 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.25s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.25s;">
+                <div
+                    class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                     </svg>
                 </div>
-                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Investissement détaillé ligne par ligne</h3>
+                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Investissement détaillé ligne par ligne
+                </h3>
                 <p class="text-tus-white/60 text-sm leading-relaxed">
                     Chaque prestation est décomposée. Transparence totale sur la ventilation budgétaire.
                 </p>
             </div>
-            
+
             <!-- Engagement 5 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.3s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.3s;">
+                <div
+                    class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
                 <h3 class="text-lg font-display font-bold text-tus-white mb-2">Calendrier tenu</h3>
@@ -552,12 +686,15 @@
                     Des jalons réalistes, calibrés pour un résultat d'excellence.
                 </p>
             </div>
-            
+
             <!-- Engagement 6 -->
-            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal" style="transition-delay: 0.35s;">
-                <div class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
+            <div class="group p-6 rounded-2xl border border-tus-green/20 bg-tus-green/5 hover:bg-tus-green/10 hover:-translate-y-1 transition-all duration-micro ease-standard card-tilt reveal"
+                style="transition-delay: 0.35s;">
+                <div
+                    class="w-12 h-12 rounded-xl bg-tus-green/20 flex items-center justify-center mb-4 transition-transform duration-micro ease-standard">
                     <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                 </div>
                 <h3 class="text-lg font-display font-bold text-tus-white mb-2">Interlocuteur dédié</h3>
@@ -566,12 +703,14 @@
                 </p>
             </div>
         </div>
-        
+
         <!-- Citation de confiance -->
         <div class="mt-12 text-center reveal">
-            <div class="inline-flex items-center gap-3 px-6 py-4 rounded-2xl border border-tus-white/10 bg-tus-white/[0.02]">
-                <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <div
+                class="inline-flex items-center gap-3 px-6 py-4 rounded-2xl border border-tus-white/10 bg-tus-white/[0.02]">
+                <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                        d="M7 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p class="text-tus-white/80 italic">
                     « L'excellence se prouve, elle ne se décrète pas. »
@@ -588,48 +727,58 @@
 <section class="py-24 relative">
     <div class="max-w-4xl mx-auto px-6">
         <div class="text-center mb-16">
-            <span class="text-tus-blue font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Engagements</span>
+            <span
+                class="text-tus-blue-a11y font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Engagements</span>
             <h2 class="text-3xl md:text-5xl font-display font-bold reveal">
-                Ce que nous <span class="text-tus-blue">garantissons</span>
+                Ce que nous <span class="text-tus-blue-a11y">garantissons</span>
             </h2>
             <p class="text-tus-white/60 mt-6 max-w-xl mx-auto reveal">
                 Trois principes non négociables, appliqués à chaque projet.
             </p>
         </div>
-        
+
         <!-- FAQ Items -->
         <div class="space-y-4 stagger-children">
             <!-- FAQ 1 - Architecture propriétaire -->
-            <div class="faq-item open rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard" style="transition-delay: 0.1s;">
-                <button hx-on:click="this.closest('.faq-item').classList.toggle('open')" 
-                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
+            <div class="faq-item open rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard"
+                style="transition-delay: 0.1s;">
+                <button hx-on:click="this.closest('.faq-item').classList.toggle('open')"
+                    class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
                     <span class="text-lg font-semibold text-tus-white pr-4">Architecture propriétaire</span>
-                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0 transition-transform duration-micro ease-standard" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    <svg class="faq-icon w-5 h-5 text-tus-blue-a11y flex-shrink-0 transition-transform duration-micro ease-standard"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
                 <div class="faq-content transition-all duration-modal ease-standard">
                     <div class="px-6 pb-6">
                         <div class="pt-2 border-t border-white/5">
                             <p class="text-tus-white/70 leading-relaxed mb-4">
-                                Chaque infrastructure est conçue pour vos flux réels. Code documenté, auditable, et transmissible — vous en êtes propriétaire.
+                                Chaque infrastructure est conçue pour vos flux réels. Code documenté, auditable, et
+                                transmissible — vous en êtes propriétaire.
                             </p>
                             <ul class="space-y-2 text-sm text-tus-white/60">
                                 <li class="flex items-start gap-2">
-                                    <svg class="w-4 h-4 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    <svg class="w-4 h-4 text-tus-green flex-shrink-0 mt-0.5" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span>Socle technique maîtrisé, sans dette superflue</span>
                                 </li>
                                 <li class="flex items-start gap-2">
-                                    <svg class="w-4 h-4 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    <svg class="w-4 h-4 text-tus-green flex-shrink-0 mt-0.5" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span>Évolutif et maintenable sur le long terme</span>
                                 </li>
                                 <li class="flex items-start gap-2">
-                                    <svg class="w-4 h-4 text-tus-green flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    <svg class="w-4 h-4 text-tus-green flex-shrink-0 mt-0.5" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M5 13l4 4L19 7" />
                                     </svg>
                                     <span>Propriété intégrale du code source</span>
                                 </li>
@@ -638,44 +787,59 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- FAQ 2 - Écosystème de pilotage -->
-            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard" style="transition-delay: 0.15s;">
-                <button hx-on:click="this.closest('.faq-item').classList.toggle('open')" 
-                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
+            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard"
+                style="transition-delay: 0.15s;">
+                <button hx-on:click="this.closest('.faq-item').classList.toggle('open')"
+                    class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
                     <span class="text-lg font-semibold text-tus-white pr-4">Écosystème de pilotage dédié</span>
-                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0 transition-transform duration-micro ease-standard" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    <svg class="faq-icon w-5 h-5 text-tus-blue-a11y flex-shrink-0 transition-transform duration-micro ease-standard"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
                 <div class="faq-content transition-all duration-modal ease-standard">
                     <div class="px-6 pb-6">
                         <div class="pt-2 border-t border-white/5">
                             <p class="text-tus-white/70 leading-relaxed mb-4">
-                                Votre Écosystème TUS centralise l'intégralité du projet : devis, factures, avancement, documents.
+                                Votre Écosystème TUS centralise l'intégralité du projet : devis, factures, avancement,
+                                documents.
                             </p>
                             <div class="grid sm:grid-cols-2 gap-3">
-                                <div class="flex items-center gap-2 p-3 rounded-lg bg-tus-blue/5 border border-tus-blue/10">
-                                    <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                <div
+                                    class="flex items-center gap-2 p-3 rounded-lg bg-tus-blue/5 border border-tus-blue/10">
+                                    <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                     <span class="text-sm text-tus-white/80">Devis détaillés en ligne</span>
                                 </div>
-                                <div class="flex items-center gap-2 p-3 rounded-lg bg-tus-blue/5 border border-tus-blue/10">
-                                    <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <div
+                                    class="flex items-center gap-2 p-3 rounded-lg bg-tus-blue/5 border border-tus-blue/10">
+                                    <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <span class="text-sm text-tus-white/80">Avancement temps réel</span>
                                 </div>
-                                <div class="flex items-center gap-2 p-3 rounded-lg bg-tus-blue/5 border border-tus-blue/10">
-                                    <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                <div
+                                    class="flex items-center gap-2 p-3 rounded-lg bg-tus-blue/5 border border-tus-blue/10">
+                                    <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                                     </svg>
                                     <span class="text-sm text-tus-white/80">Factures accessibles</span>
                                 </div>
-                                <div class="flex items-center gap-2 p-3 rounded-lg bg-tus-blue/5 border border-tus-blue/10">
-                                    <svg class="w-5 h-5 text-tus-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
+                                <div
+                                    class="flex items-center gap-2 p-3 rounded-lg bg-tus-blue/5 border border-tus-blue/10">
+                                    <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
                                     </svg>
                                     <span class="text-sm text-tus-white/80">Documents centralisés</span>
                                 </div>
@@ -684,23 +848,27 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- FAQ 3 - Autonomie de gestion -->
-            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard" style="transition-delay: 0.2s;">
-                <button hx-on:click="this.closest('.faq-item').classList.toggle('open')" 
-                        class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
+            <div class="faq-item rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden reveal transition-all duration-micro ease-standard"
+                style="transition-delay: 0.2s;">
+                <button hx-on:click="this.closest('.faq-item').classList.toggle('open')"
+                    class="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.05] transition-colors duration-micro ease-standard">
                     <span class="text-lg font-semibold text-tus-white pr-4">Autonomie de gestion intégrée</span>
-                    <svg class="faq-icon w-5 h-5 text-tus-blue flex-shrink-0 transition-transform duration-micro ease-standard" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    <svg class="faq-icon w-5 h-5 text-tus-blue-a11y flex-shrink-0 transition-transform duration-micro ease-standard"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
                 <div class="faq-content transition-all duration-modal ease-standard">
                     <div class="px-6 pb-6">
                         <div class="pt-2 border-t border-white/5">
                             <p class="text-tus-white/70 leading-relaxed mb-4">
-                                Chaque interface d'administration est dessinée sur mesure. Vous éditez votre contenu comme vous rédigez un email — sans code, sans jargon.
+                                Chaque interface d'administration est dessinée sur mesure. Vous éditez votre contenu
+                                comme vous rédigez un email — sans code, sans jargon.
                             </p>
-                            <div class="p-4 rounded-xl bg-gradient-to-r from-tus-blue/10 to-transparent border border-tus-blue/20">
+                            <div
+                                class="p-4 rounded-xl bg-gradient-to-r from-tus-blue/10 to-transparent border border-tus-blue/20">
                                 <p class="text-sm text-tus-white/80 italic">
                                     « Un back-office pensé pour votre métier, pas pour un développeur. »
                                 </p>

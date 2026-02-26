@@ -40,14 +40,14 @@ def verify_recaptcha(token: str, remote_ip: str = '') -> bool:
             error_codes = result.get('error-codes', [])
             logger.warning('reCAPTCHA verification failed: %s', error_codes)
             if 'invalid-input-secret' in error_codes or 'bad-request' in error_codes:
-                logger.error('reCAPTCHA: Invalid secret key or malformed request')
-                return True
+                logger.error('reCAPTCHA: Invalid secret key or malformed request — FAIL CLOSED')
             return False
 
         return True
     except requests.RequestException as exc:
-        logger.error('reCAPTCHA API error: %s', exc)
-        return True
+        # FAIL CLOSED: if the API is unreachable, reject the submission
+        logger.error('reCAPTCHA API error (fail-closed): %s', exc)
+        return False
 
 
 def verify_turnstile(token: str, remote_ip: str = '') -> bool:
@@ -78,11 +78,11 @@ def verify_turnstile(token: str, remote_ip: str = '') -> bool:
             error_codes = result.get('error-codes', [])
             logger.warning('Turnstile verification failed: %s', error_codes)
             if 'invalid-input-secret' in error_codes or 'bad-request' in error_codes:
-                logger.error('Turnstile: Invalid secret key or malformed request')
-                return True
+                logger.error('Turnstile: Invalid secret key or malformed request — FAIL CLOSED')
             return False
 
         return True
     except requests.RequestException as exc:
-        logger.error('Turnstile API error: %s', exc)
-        return True
+        # FAIL CLOSED: if the API is unreachable, reject the submission
+        logger.error('Turnstile API error (fail-closed): %s', exc)
+        return False

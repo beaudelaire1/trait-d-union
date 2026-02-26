@@ -1,9 +1,14 @@
 """Sitemap configuration for SEO optimization."""
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
+from django.utils import timezone
+from datetime import datetime, timezone
 
 from apps.portfolio.models import Project
 from apps.chroniques.models import Article
+
+# Date de dernière mise à jour significative du site (à mettre à jour manuellement lors de changements majeurs)
+_SITE_LAST_MODIFIED = datetime(2026, 2, 25, tzinfo=timezone.utc)
 
 
 class StaticViewSitemap(Sitemap):
@@ -24,6 +29,10 @@ class StaticViewSitemap(Sitemap):
     
     def location(self, item):
         return reverse(item)
+    
+    def lastmod(self, item):
+        """Return the last modification date for static pages."""
+        return _SITE_LAST_MODIFIED
     
     def priority(self, item):
         # Priorité maximale pour pages stratégiques SEO Guyane/Outre-Mer

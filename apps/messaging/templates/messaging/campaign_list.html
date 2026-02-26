@@ -32,7 +32,7 @@
             <a href="{% url 'messaging:campaign_detail' campaign.pk %}" 
                class="bg-tus-surface rounded-xl p-6 border border-tus-white/10 hover:border-tus-blue/50 transition group">
                 <div class="flex items-start justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-tus-white group-hover:text-tus-blue transition">
+                    <h3 class="text-lg font-semibold text-tus-white group-hover:text-tus-blue-a11y transition">
                         {{ campaign.name }}
                     </h3>
                     <span class="px-2 py-1 rounded text-xs font-medium
@@ -79,7 +79,7 @@
             {% empty %}
             <div class="col-span-full text-center py-12 bg-tus-surface rounded-xl border border-tus-white/10">
                 <p class="text-tus-white/60 text-lg mb-2">Aucune campagne créée</p>
-                <a href="{% url 'messaging:campaign_create' %}" class="text-tus-blue hover:underline">
+                <a href="{% url 'messaging:campaign_create' %}" class="text-tus-blue-a11y hover:underline">
                     Créer votre première campagne →
                 </a>
             </div>

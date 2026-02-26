@@ -14,7 +14,7 @@
     <div class="relative max-w-4xl mx-auto">
         <!-- Back link -->
         <div class="mb-8 reveal">
-            <a href="{% url 'leads:email_list' %}" class="inline-flex items-center text-tus-white/70 hover:text-tus-blue transition-colors">
+            <a href="{% url 'leads:email_list' %}" class="inline-flex items-center text-tus-white/70 hover:text-tus-blue-a11y transition-colors">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
@@ -83,7 +83,7 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                     </svg>
-                    Template utilisé: <span class="text-tus-blue ml-1">{{ email.template_used }}</span>
+                    Template utilisé: <span class="text-tus-blue-a11y ml-1">{{ email.template_used }}</span>
                 </div>
             </div>
             {% endif %}

@@ -1,4 +1,4 @@
-<nav id="navbar" class="px-6 py-4 border-b border-stroke-dark/50 backdrop-blur-xl bg-tus-black/70 fixed top-0 left-0 right-0 z-50 transition-all duration-150">
+<nav id="navbar" role="navigation" aria-label="Menu principal" class="px-6 py-4 border-b border-stroke-dark/50 backdrop-blur-xl bg-tus-black/70 fixed top-0 left-0 right-0 z-50 transition-all duration-150">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
         <!-- Logo SVG -->
         <a href="{% url 'pages:home' %}" class="group link-animated" id="navbar-logo">
@@ -19,28 +19,28 @@
         <!-- Navigation Desktop -->
         <ul class="hidden md:flex items-center gap-8 text-sm font-medium">
             <li>
-                <a href="{% url 'pages:services' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
+                <a href="{% url 'pages:services' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white/80 transition-colors">
                     Services
                 </a>
             </li>
             <li>
-                <a href="{% url 'portfolio:list' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
+                <a href="{% url 'portfolio:list' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white/80 transition-colors">
                     Portfolio
                 </a>
             </li>
             <li>
-                <a href="{% url 'pages:method' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
+                <a href="{% url 'pages:method' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white/80 transition-colors">
                     Méthode
                 </a>
             </li>
             <li>
-                <a href="{% url 'chroniques:list' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors">
+                <a href="{% url 'chroniques:list' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white/80 transition-colors">
                     Chroniques
                 </a>
             </li>
             <li>
-                <a href="{% url 'clients:dashboard' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white transition-colors flex items-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{% url 'clients:dashboard' %}" class="link-animated relative py-2 text-tus-white/80 hover:text-tus-white/80 transition-colors flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                     Écosystème TUS
@@ -49,7 +49,7 @@
             {% if user.is_authenticated %}
             <li>
                 <a href="{% url 'account_logout' %}" class="link-animated relative py-2 text-red-400/80 hover:text-red-400 transition-colors flex items-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                     </svg>
                     Déconnexion
@@ -66,40 +66,40 @@
         <!-- Mobile menu button -->
         <button class="md:hidden text-tus-white p-2 relative z-[70]" aria-label="Menu" id="mobile-menu-btn" aria-expanded="false">
             <!-- Icône hamburger -->
-            <svg id="menu-icon-open" class="w-6 h-6 transition-all duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg id="menu-icon-open" class="w-6 h-6 transition-all duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
             <!-- Icône fermer (cachée par défaut) -->
-            <svg id="menu-icon-close" class="w-6 h-6 absolute inset-0 m-auto opacity-0 scale-0 transition-all duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg id="menu-icon-close" class="w-6 h-6 absolute inset-0 m-auto opacity-0 scale-0 transition-all duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
         </button>
     </div>
     
     <!-- Mobile Menu Overlay -->
-    <div id="mobile-menu" class="mobile-menu-overlay fixed top-0 left-0 right-0 bottom-0 z-[60] md:hidden transform translate-x-full transition-transform duration-200 ease-out flex flex-col items-center justify-start pt-32">
+    <div id="mobile-menu" class="mobile-menu-overlay fixed top-0 left-0 right-0 bottom-0 z-[60] md:hidden transform translate-x-full opacity-0 transition-all duration-300 ease-out flex flex-col items-center justify-start pt-32">
         <div class="flex flex-col items-center gap-8 text-center px-6 pb-12 w-full">
-            <a href="{% url 'pages:services' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
+            <a href="{% url 'pages:services' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue-a11y transition-colors">
                 Services
             </a>
-            <a href="{% url 'portfolio:list' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
+            <a href="{% url 'portfolio:list' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue-a11y transition-colors">
                 Portfolio
             </a>
-            <a href="{% url 'pages:method' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
+            <a href="{% url 'pages:method' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue-a11y transition-colors">
                 Méthode
             </a>
-            <a href="{% url 'chroniques:list' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors">
+            <a href="{% url 'chroniques:list' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue-a11y transition-colors">
                 Chroniques
             </a>
-            <a href="{% url 'clients:dashboard' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue transition-colors flex items-center gap-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href="{% url 'clients:dashboard' %}" class="text-2xl font-display font-semibold text-tus-white hover:text-tus-blue-a11y transition-colors flex items-center gap-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
                 Écosystème TUS
             </a>
             {% if user.is_authenticated %}
             <a href="{% url 'account_logout' %}" class="text-xl font-display font-semibold text-red-400 hover:text-red-300 transition-colors flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                 </svg>
                 Déconnexion
@@ -128,8 +128,8 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (isOpen) {
                 // Ouvrir le menu
-                mobileMenu.classList.remove('translate-x-full');
-                mobileMenu.classList.add('translate-x-0');
+                mobileMenu.classList.remove('translate-x-full', 'opacity-0');
+                mobileMenu.classList.add('translate-x-0', 'opacity-100');
                 iconOpen.classList.add('opacity-0', 'scale-0');
                 iconClose.classList.remove('opacity-0', 'scale-0');
                 menuBtn.setAttribute('aria-expanded', 'true');
@@ -138,8 +138,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (navbarLogo) navbarLogo.style.opacity = '0';
             } else {
                 // Fermer le menu
-                mobileMenu.classList.add('translate-x-full');
-                mobileMenu.classList.remove('translate-x-0');
+                mobileMenu.classList.add('translate-x-full', 'opacity-0');
+                mobileMenu.classList.remove('translate-x-0', 'opacity-100');
                 iconOpen.classList.remove('opacity-0', 'scale-0');
                 iconClose.classList.add('opacity-0', 'scale-0');
                 menuBtn.setAttribute('aria-expanded', 'false');
@@ -153,8 +153,8 @@ document.addEventListener('DOMContentLoaded', function() {
         mobileMenu.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function() {
                 isOpen = false;
-                mobileMenu.classList.add('translate-x-full');
-                mobileMenu.classList.remove('translate-x-0');
+                mobileMenu.classList.add('translate-x-full', 'opacity-0');
+                mobileMenu.classList.remove('translate-x-0', 'opacity-100');
                 iconOpen.classList.remove('opacity-0', 'scale-0');
                 iconClose.classList.add('opacity-0', 'scale-0');
                 menuBtn.setAttribute('aria-expanded', 'false');

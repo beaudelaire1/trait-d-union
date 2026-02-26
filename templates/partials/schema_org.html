@@ -1,12 +1,14 @@
 {% comment %}
 Schema.org JSON-LD structured data for SEO
-Include in base.html within <head> tag
-{% endcomment %}
+Include in base.html within
 
-{% load static %}
+<head> tag
+    {% endcomment %}
 
-{# Organization Schema - Site-wide #}
-<script type="application/ld+json">
+    {% load static %}
+
+    {# Organization Schema - Site-wide #}
+    <script type="application/ld+json">
 {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
@@ -142,9 +144,23 @@ Include in base.html within <head> tag
 }
 </script>
 
-{# BreadcrumbList Schema #}
-{% block schema_breadcrumb %}{% endblock %}
+    {# WebSite Schema — Sitelinks Search Box #}
+    <script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Trait d'Union Studio",
+    "alternateName": "TUS",
+    "url": "{{ request.scheme }}://{{ request.get_host }}",
+    "inLanguage": "fr-FR",
+    "publisher": {
+        "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization"
+    }
+}
+</script>
 
-{# Page-specific Schema #}
-{% block schema_page %}{% endblock %}
+    {# BreadcrumbList Schema #}
+    {% block schema_breadcrumb %}{% endblock %}
 
+    {# Page-specific Schema #}
+    {% block schema_page %}{% endblock %}

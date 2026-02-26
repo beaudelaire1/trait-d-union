@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 
 {% block title %}Mentions Légales - Trait d'Union Studio{% endblock %}
+{% block meta_description %}Mentions légales de Trait d'Union Studio : éditeur du site, directeur de publication,
+hébergement, propriété intellectuelle et données personnelles.{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-16 max-w-4xl">
     <h1 class="text-4xl font-bold mb-8">Mentions Légales</h1>
-    
+
     <div class="prose prose-lg max-w-none">
         <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">Éditeur du site</h2>
             <p>
                 <strong>Trait d'Union Studio</strong><br>
                 Auto-entrepreneur<br>
-                SIRET : [À COMPLÉTER]<br>
-                Adresse : [À COMPLÉTER]<br>
+                SIRET : 90826411200016<br>
+                Adresse : 258 Avenue Justin Catayée, Route de la Madeleine, 97300 Cayenne, Guyane<br>
                 Email : {% include 'partials/contact_email.html' with link_style="" %}<br>
-                Téléphone : [À COMPLÉTER]
+                Téléphone : +594 695 35 80 41
             </p>
         </section>
 
         <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">Directeur de publication</h2>
-            <p>[NOM DU RESPONSABLE]</p>
+            <p>Vilmé Jean-Noël — Fondateur de Trait d'Union Studio</p>
         </section>
 
         <section class="mb-8">
@@ -30,34 +32,69 @@
                 Ce site est hébergé par <strong>Render</strong><br>
                 525 Brannan Street, Suite 300<br>
                 San Francisco, CA 94107, États-Unis<br>
-                Site web : <a href="https://render.com" target="_blank" class="text-blue-600 hover:underline">https://render.com</a>
+                Site web : <a href="https://render.com" target="_blank"
+                    class="text-blue-600 hover:underline">https://render.com</a>
             </p>
         </section>
 
         <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">Propriété intellectuelle</h2>
             <p>
-                L'ensemble de ce site relève de la législation française et internationale sur le droit d'auteur et la propriété intellectuelle. 
-                Tous les droits de reproduction sont réservés, y compris pour les documents téléchargeables et les représentations iconographiques et photographiques.
+                L'ensemble de ce site relève de la législation française et internationale sur le droit d'auteur et la
+                propriété intellectuelle.
+                Tous les droits de reproduction sont réservés, y compris pour les documents téléchargeables et les
+                représentations iconographiques et photographiques.
             </p>
         </section>
 
         <section class="mb-8">
             <h2 class="text-2xl font-semibold mb-4">Données personnelles</h2>
             <p>
-                Les informations recueillies sur ce site font l'objet d'un traitement informatique destiné à la gestion de la relation client. 
-                Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition aux données vous concernant.
+                Les informations recueillies sur ce site font l'objet d'un traitement informatique destiné à la gestion
+                de la relation client.
+                Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition
+                aux données vous concernant.
             </p>
             <p>
-                Pour exercer ces droits, contactez-nous à : {% include 'partials/contact_email.html' with link_style="text-blue-600 hover:underline" %}
+                Pour exercer ces droits, contactez-nous à : {% include 'partials/contact_email.html' with
+                link_style="text-blue-600 hover:underline" %}
             </p>
         </section>
 
         <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Délégué à la Protection des Données (DPO)</h2>
+            <p>
+                Le responsable du traitement des données personnelles est :<br>
+                <strong>Trait d'Union Studio</strong><br>
+                Contact DPO : {% include 'partials/contact_email.html' with link_style="text-blue-600 hover:underline"
+                %}<br>
+                Vous pouvez contacter notre DPO pour toute question relative à la protection de vos données
+                personnelles.
+            </p>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Durées de conservation des données</h2>
+            <ul class="list-disc list-inside space-y-2">
+                <li><strong>Données de contact (formulaire) :</strong> 3 ans à compter du dernier contact</li>
+                <li><strong>Données clients (facturation) :</strong> 10 ans (obligation légale comptable)</li>
+                <li><strong>Données de navigation (analytics) :</strong> 13 mois maximum</li>
+                <li><strong>Cookies de consentement :</strong> 13 mois (conformité CNIL)</li>
+                <li><strong>Données du portail client :</strong> durée de la relation contractuelle + 3 ans</li>
+            </ul>
+        </section>
+
+        <section class="mb-8" id="cookies">
             <h2 class="text-2xl font-semibold mb-4">Cookies</h2>
             <p>
-                Ce site utilise des cookies essentiels pour son fonctionnement et des outils d'analyse d'audience. 
-                Vous pouvez gérer vos préférences cookies depuis les paramètres de votre navigateur.
+                Ce site utilise des cookies essentiels pour son fonctionnement (session, sécurité CSRF,
+                authentification)
+                et des cookies analytiques optionnels (Google Analytics 4) pour mesurer l'audience.
+                Les cookies analytiques ne sont activés qu'avec votre consentement explicite.
+            </p>
+            <p class="mt-2">
+                Vous pouvez gérer vos préférences à tout moment via le lien « Gérer les cookies » en bas de chaque page.
+                Le consentement est conservé pendant 13 mois conformément aux recommandations de la CNIL.
             </p>
         </section>
     </div>
