@@ -155,3 +155,17 @@ class TestCanonicalDomainMiddleware:
         # so 'traitdunion.it' matches 'TraitDunion.IT'
         response = client.get('/', HTTP_HOST='traitdunion.it')
         assert response.status_code == 200
+
+
+@pytest.mark.django_db
+class TestSitemap:
+    """Test that /sitemap.xml returns valid XML (no 500)."""
+
+    def test_sitemap_returns_xml(self, client):
+        """Sitemap should return 200 with XML content."""
+        # Ensure the django_site table has a valid entry (required by Sites framework)
+        from django.contrib.sites.models import Site
+        Site.objects.update_or_create(pk=1, defaults={'domain': 'testserver', 'name': 'testserver'})
+        response = client.get('/sitemap.xml')
+        assert response.status_code == 200
+        assert b'<?xml' in response.content or b'<urlset' in response.content

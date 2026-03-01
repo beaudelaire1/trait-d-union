@@ -4,11 +4,10 @@ Robust against DB hiccups: if portfolio/chroniques queries fail, we return an
 empty list instead of a 500 to keep the sitemap accessible.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timezone as dt_tz
 
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
-from django.utils import timezone as dj_timezone
 
 from apps.portfolio.models import Project
 from apps.chroniques.models import Article
@@ -16,7 +15,8 @@ from apps.chroniques.models import Article
 logger = logging.getLogger(__name__)
 
 # Date de dernière mise à jour significative du site (à mettre à jour manuellement lors de changements majeurs)
-_SITE_LAST_MODIFIED = datetime(2026, 2, 25, tzinfo=dj_timezone.UTC)
+# Utilise datetime.timezone.utc (stdlib) — compatible Django 5.x ET 6.x
+_SITE_LAST_MODIFIED = datetime(2026, 2, 25, tzinfo=dt_tz.utc)
 
 
 class StaticViewSitemap(Sitemap):
