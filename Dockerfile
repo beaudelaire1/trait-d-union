@@ -31,10 +31,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     DJANGO_SETTINGS_MODULE=config.settings.production \
     PORT=8000
 
-# Build-time only args (non persistants dans l'image finale)
-ARG DJANGO_SECRET_KEY=build-only-collectstatic-not-a-real-secret-do-not-use-in-production-ever
-ARG DATABASE_URL=sqlite:///dummy.db
-
 WORKDIR /app
 
 # Runtime-only system dependencies (WeasyPrint + PostgreSQL client)
@@ -59,8 +55,9 @@ COPY . .
 # Create directories
 RUN mkdir -p /app/staticfiles /app/media
 
-# Collect static files (build-time only)
-RUN DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY} DATABASE_URL=${DATABASE_URL} \
+# Collect static files (build-time only — generate a throwaway secret key)
+RUN DJANGO_SECRET_KEY="$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')" \
+    DATABASE_URL=sqlite:///dummy.db \
     python manage.py collectstatic --noinput --clear
 
 # Create non-root user for security
