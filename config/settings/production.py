@@ -33,7 +33,9 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 # Sécurité HTTPS
-SECURE_SSL_REDIRECT = True
+# SSL redirect is handled by Render's load balancer — do NOT duplicate it here
+# or it causes ERR_TOO_MANY_REDIRECTS (Render terminates SSL then forwards HTTP)
+SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
