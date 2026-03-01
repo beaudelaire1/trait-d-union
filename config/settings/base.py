@@ -34,14 +34,6 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 load_dotenv(BASE_DIR / '.env', override=False)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-_secret = os.environ.get('DJANGO_SECRET_KEY', '')
-if not _secret:
-    raise ImproperlyConfigured(
-        'DJANGO_SECRET_KEY environment variable is required. '
-        'Generate one with: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"'
-    )
-
-# 🛡️ SECURITY: Reject trivially weak secret keys (< 32 chars or known placeholders)
 _WEAK_KEYS = frozenset({
     'dev-local-only',
     'changez-moi',
@@ -52,11 +44,15 @@ _WEAK_KEYS = frozenset({
     'your-secret-key-here',
     'django-insecure',
 })
-if len(_secret) < 50 or _secret.lower().strip() in _WEAK_KEYS:
-    raise ImproperlyConfigured(
-        f'DJANGO_SECRET_KEY is too weak ({len(_secret)} chars). '
-        f'Must be at least 50 characters and not a known placeholder. '
-        f'Generate one with: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"'
+
+_secret = os.environ.get('DJANGO_SECRET_KEY', '')
+if not _secret or len(_secret) < 50 or _secret.lower().strip() in _WEAK_KEYS:
+    from django.core.management.utils import get_random_secret_key
+    _secret = get_random_secret_key()
+    import logging as _logging
+    _logging.getLogger('django.security').warning(
+        'DJANGO_SECRET_KEY absent ou trop faible — clé aléatoire générée automatiquement. '
+        'À ne pas utiliser en production persistante (sessions invalidées à chaque redémarrage).'
     )
 SECRET_KEY = _secret
 
