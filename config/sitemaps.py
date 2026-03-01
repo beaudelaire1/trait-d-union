@@ -1,14 +1,22 @@
-"""Sitemap configuration for SEO optimization."""
+"""Sitemap configuration for SEO optimization.
+
+Robust against DB hiccups: if portfolio/chroniques queries fail, we return an
+empty list instead of a 500 to keep the sitemap accessible.
+"""
+import logging
+from datetime import datetime
+
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
-from django.utils import timezone
-from datetime import datetime, timezone
+from django.utils import timezone as dj_timezone
 
 from apps.portfolio.models import Project
 from apps.chroniques.models import Article
 
+logger = logging.getLogger(__name__)
+
 # Date de dernière mise à jour significative du site (à mettre à jour manuellement lors de changements majeurs)
-_SITE_LAST_MODIFIED = datetime(2026, 2, 25, tzinfo=timezone.utc)
+_SITE_LAST_MODIFIED = datetime(2026, 2, 25, tzinfo=dj_timezone.UTC)
 
 
 class StaticViewSitemap(Sitemap):
@@ -63,7 +71,11 @@ class PortfolioSitemap(Sitemap):
     priority = 0.8
     
     def items(self):
-        return Project.objects.filter(is_published=True)
+        try:
+            return Project.objects.filter(is_published=True)
+        except Exception:
+            logger.exception("Sitemap portfolio generation failed; returning empty list")
+            return []
     
     def lastmod(self, obj):
         return obj.updated_at
@@ -76,7 +88,11 @@ class ChroniquesSitemap(Sitemap):
     priority = 0.7
     
     def items(self):
-        return Article.objects.filter(is_published=True)
+        try:
+            return Article.objects.filter(is_published=True)
+        except Exception:
+            logger.exception("Sitemap chroniques generation failed; returning empty list")
+            return []
     
     def lastmod(self, obj):
         return obj.updated_at
