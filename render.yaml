@@ -19,8 +19,8 @@ services:
     # Pre-deploy command (Docker runtime: buildCommand is ignored, use preDeployCommand)
     preDeployCommand: chmod +x build.sh && ./build.sh
     
-    # Health check
-    healthCheckPath: /
+    # Health check — use dedicated endpoint (exempt from canonical redirect)
+    healthCheckPath: /healthz/
     
     # Headers HTTP — Empêcher le CDN Render de mettre en cache les pages HTML
     headers:

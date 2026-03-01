@@ -237,11 +237,21 @@ class CanonicalDomainMiddleware(MiddlewareMixin):
     - www.traitdunion.it → traitdunion.it (301)
     - trait-d-union.onrender.com → traitdunion.it (301)
 
-    Always uses https:// scheme because Render terminates SSL at the LB.
+    Protection anti-boucle :
+    - Un cookie ``_canonical_ok`` est posé lors du redirect.
+    - Si le cookie est présent sur une requête qui devrait être redirigée,
+      cela signifie que la redirection précédente n'a pas atteint le bon
+      domaine (boucle entre Render/CDN et Django).  On sert la page sans
+      rediriger et on log un warning.
+    - Le cookie est court (max_age=30 s) pour ne pas masquer un vrai besoin
+      de redirection une fois la configuration corrigée.
     """
 
-    # Paths excluded from canonical redirect (health checks, etc.)
-    EXEMPT_PATHS = ('/healthz/',)
+    # Paths excluded from canonical redirect (health checks, static, media)
+    EXEMPT_PREFIXES = ('/healthz/', '/static/', '/media/')
+
+    # Cookie used to detect redirect loops
+    _LOOP_COOKIE = '_canonical_ok'
 
     def process_request(self, request: HttpRequest) -> HttpResponse | None:
         from django.conf import settings
@@ -250,19 +260,50 @@ class CanonicalDomainMiddleware(MiddlewareMixin):
         if not canonical:
             return None
 
-        # Skip health checks (Render probes via internal hostname)
-        if request.path in self.EXEMPT_PATHS:
-            return None
+        # Skip health checks, static files and media (Render probes, WhiteNoise)
+        for prefix in self.EXEMPT_PREFIXES:
+            if request.path.startswith(prefix):
+                return None
 
-        host = request.get_host().split(':')[0]  # Strip port
+        host = request.get_host().split(':')[0].lower()  # Strip port, case-insensitive
 
-        # Already on canonical domain
+        # Already on canonical domain → nothing to do
         if host == canonical:
             return None
 
-        # Redirect to canonical (301 permanent)
-        # Always https — Render terminates SSL at the load balancer,
-        # so request.is_secure() may return False even for HTTPS traffic.
+        # Redirect loop detection: if the browser already carries our loop-
+        # detection cookie, it means a previous redirect bounced back here
+        # (e.g. Render CDN re-routes the canonical domain to .onrender.com).
+        # Breaking the loop avoids ERR_TOO_MANY_REDIRECTS.
+        if request.COOKIES.get(self._LOOP_COOKIE):
+            logger.warning(
+                "Canonical redirect loop detected (host=%s, canonical=%s). "
+                "Check Render custom-domain configuration and DNS records.",
+                host, canonical,
+            )
+            return None
+
+        # Build redirect URL — determine scheme properly
+        if request.is_secure():
+            scheme = 'https'
+        else:
+            # Behind Render/proxy, request may appear as HTTP even for HTTPS
+            # traffic.  Trust X-Forwarded-Proto when SECURE_PROXY_SSL_HEADER
+            # is configured (Django already handles this via is_secure()).
+            # Fallback to https in production as a safe default.
+            scheme = 'https'
+
         from django.http import HttpResponsePermanentRedirect
-        new_url = f"https://{canonical}{request.get_full_path()}"
-        return HttpResponsePermanentRedirect(new_url)
+        new_url = f"{scheme}://{canonical}{request.get_full_path()}"
+        response = HttpResponsePermanentRedirect(new_url)
+
+        # Set a short-lived cookie so the next request can detect a loop.
+        # SameSite=Lax ensures the cookie is sent on top-level navigations.
+        response.set_cookie(
+            self._LOOP_COOKIE, '1',
+            max_age=30,
+            httponly=True,
+            samesite='Lax',
+            secure=getattr(settings, 'SESSION_COOKIE_SECURE', False),
+        )
+        return response

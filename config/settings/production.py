@@ -75,7 +75,11 @@ PERMISSIONS_POLICY = {
 SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 
 # 🛡️ BANK-GRADE: Restrict session cookie to production domain
-SESSION_COOKIE_DOMAIN = 'traitdunion.it'  # No leading dot — modern browsers handle subdomains
+# Ne PAS fixer SESSION_COOKIE_DOMAIN : Django utilise automatiquement le
+# domaine de la requête, ce qui évite les problèmes de cookies rejetés
+# pendant les redirections (ex: .onrender.com → traitdunion.it).
+# Avec la valeur par défaut (None), le cookie s'applique uniquement à l'hôte
+# qui sert la page, ce qui est le comportement correct derrière un reverse proxy.
 
 # ==============================================================================
 # DATABASE (PostgreSQL via Render)
