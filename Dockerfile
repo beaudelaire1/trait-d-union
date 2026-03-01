@@ -32,7 +32,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000
 
 # Build-time only args (non persistants dans l'image finale)
-ARG DJANGO_SECRET_KEY=build-only-placeholder
+ARG DJANGO_SECRET_KEY=build-only-collectstatic-not-a-real-secret-do-not-use-in-production-ever
 ARG DATABASE_URL=sqlite:///dummy.db
 
 WORKDIR /app
