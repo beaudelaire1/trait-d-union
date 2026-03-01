@@ -49,8 +49,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True  # X-Content-Type-Options: nosniff
 X_FRAME_OPTIONS = 'DENY'  # Protection clickjacking
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-# 🔍 SEO: Canonical domain (www → non-www redirect, Render → custom domain)
-CANONICAL_DOMAIN = 'traitdunion.it'
+# 🔍 SEO: Canonical domain (www ↔ apex). Default aligns with Cloudflare redirect
+# to www to avoid redirect loops. Override via env if you want apex.
+CANONICAL_DOMAIN = os.environ.get('CANONICAL_DOMAIN', 'www.traitdunion.it')
 
 # Permissions Policy (anciennement Feature-Policy)
 # 🛡️ BANK-GRADE: Exhaustive permissions lockdown

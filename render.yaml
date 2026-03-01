@@ -45,8 +45,10 @@ services:
         generateValue: true
       - key: DJANGO_ALLOWED_HOSTS
         value: traitdunion.it,www.traitdunion.it,.onrender.com
+      - key: CANONICAL_DOMAIN
+        value: www.traitdunion.it
       - key: SITE_URL
-        value: https://traitdunion.it
+        value: https://www.traitdunion.it
       - key: CSRF_TRUSTED_ORIGINS
         value: https://traitdunion.it,https://www.traitdunion.it,https://*.onrender.com
       
