@@ -27,10 +27,23 @@ def _staff_protected_include(module):
 
 # 🛡️ SECURITY: OTP-protected admin site (2FA required for all staff)
 from django_otp.admin import OTPAdminSite
-admin.site.__class__ = OTPAdminSite
+
+
+class TUSOTPAdminSite(OTPAdminSite):
+    """OTPAdminSite with TOTP QR code URL injected into login context."""
+
+    def login(self, request, extra_context=None):
+        from django.urls import reverse
+        extra_context = extra_context or {}
+        extra_context['totp_qr_url'] = reverse('admin_totp_qr')
+        return super().login(request, extra_context)
+
+
+admin.site.__class__ = TUSOTPAdminSite
 
 from config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap
 from apps.pages.healthz import healthz
+from core.views_totp import totp_qr_code
 
 
 # Sitemap configuration
@@ -45,6 +58,8 @@ urlpatterns = [
     path('tus-gestion-secure/dashboard/', include('apps.pages.dashboard_urls')),
     path('tus-gestion-secure/messaging/', include('apps.messaging.urls', namespace='messaging')),
     path('tus-gestion-secure/emails/', include('apps.leads.email_urls', namespace='admin_emails')),
+    # 🛡️ TOTP QR code endpoint (credentials required via POST)
+    path('tus-gestion-secure/totp-qr/', totp_qr_code, name='admin_totp_qr'),
     path('tus-gestion-secure/', admin.site.urls),  # URL admin sécurisée
     path('', include('apps.pages.urls')),
     path('portfolio/', include('apps.portfolio.urls')),

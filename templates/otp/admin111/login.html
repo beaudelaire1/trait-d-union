@@ -1,0 +1,483 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" />
+    {{ form.media }}
+
+    <style>
+        /* ── TUS Admin Login ── */
+        :root {
+            --tus-bg: #0a0a0a;
+            --tus-surface: #141414;
+            --tus-border: #262626;
+            --tus-accent: #c8a96e;
+            --tus-accent-hover: #d4b87a;
+            --tus-text: #fafafa;
+            --tus-text-muted: #a3a3a3;
+            --tus-error: #ef4444;
+            --tus-radius: 12px;
+        }
+
+        body.login {
+            background: var(--tus-bg) !important;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        #header {
+            background: transparent !important;
+            border-bottom: 1px solid var(--tus-border);
+            padding: 20px 0;
+        }
+
+        #header a:link, #header a:visited, #header h1 {
+            color: var(--tus-text) !important;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        #branding h1 span {
+            color: var(--tus-accent) !important;
+        }
+
+        #content-main {
+            max-width: 420px;
+            margin: 60px auto;
+            background: var(--tus-surface);
+            border: 1px solid var(--tus-border);
+            border-radius: var(--tus-radius);
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .login #content-main form .form-row {
+            padding: 8px 0;
+        }
+
+        .login #content-main form .form-row label {
+            color: var(--tus-text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .login #content-main form input[type="text"],
+        .login #content-main form input[type="password"],
+        #id_otp_token,
+        select#id_otp_device {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--tus-bg);
+            border: 1px solid var(--tus-border);
+            border-radius: 8px;
+            color: var(--tus-text);
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+            clear: both;
+        }
+
+        .login #content-main form input:focus,
+        #id_otp_token:focus {
+            border-color: var(--tus-accent);
+            box-shadow: 0 0 0 3px rgba(200, 169, 110, 0.15);
+            outline: none;
+        }
+
+        .errornote {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border: 1px solid rgba(239, 68, 68, 0.3) !important;
+            border-radius: 8px !important;
+            color: var(--tus-error) !important;
+            padding: 12px 16px !important;
+            margin-bottom: 16px !important;
+            font-size: 0.9rem;
+        }
+
+        .login .submit-row {
+            padding: 16px 0 0 0;
+        }
+
+        .login .submit-row input[type="submit"] {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--tus-accent);
+            color: var(--tus-bg);
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .login .submit-row input[type="submit"]:hover {
+            background: var(--tus-accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .login .submit-row input[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        .login .submit-row input[name="otp_challenge"] {
+            background: transparent;
+            border: 1px solid var(--tus-border);
+            color: var(--tus-text-muted);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .login .submit-row input[name="otp_challenge"]:hover {
+            border-color: var(--tus-accent);
+            color: var(--tus-accent);
+        }
+
+        .login .submit-row label {
+            display: none !important;
+        }
+
+        .password-reset-link {
+            margin-top: 8px;
+        }
+
+        .password-reset-link a {
+            color: var(--tus-text-muted);
+            font-size: 0.85rem;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .password-reset-link a:hover {
+            color: var(--tus-accent);
+        }
+
+        /* ── QR Code Section ── */
+        .totp-qr-section {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--tus-border);
+            text-align: center;
+        }
+
+        .totp-qr-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--tus-border);
+            border-radius: 8px;
+            color: var(--tus-text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .totp-qr-btn:hover {
+            border-color: var(--tus-accent);
+            color: var(--tus-accent);
+            background: rgba(200, 169, 110, 0.05);
+        }
+
+        .totp-qr-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .totp-qr-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .totp-qr-modal.active {
+            display: flex;
+        }
+
+        .totp-qr-card {
+            background: var(--tus-surface);
+            border: 1px solid var(--tus-border);
+            border-radius: var(--tus-radius);
+            padding: 32px;
+            max-width: 360px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .totp-qr-card h3 {
+            color: var(--tus-text);
+            margin: 0 0 4px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .totp-qr-card p {
+            color: var(--tus-text-muted);
+            font-size: 0.85rem;
+            margin: 0 0 20px 0;
+            line-height: 1.5;
+        }
+
+        .totp-qr-img-wrap {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+
+        .totp-qr-img-wrap img {
+            display: block;
+            width: 200px;
+            height: 200px;
+            image-rendering: pixelated;
+        }
+
+        .totp-qr-error {
+            color: var(--tus-error);
+            font-size: 0.85rem;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+
+        .totp-qr-loading {
+            color: var(--tus-text-muted);
+            padding: 40px 0;
+        }
+
+        .totp-qr-loading .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--tus-border);
+            border-top-color: var(--tus-accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .totp-qr-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--tus-text-muted);
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            font-size: 1.2rem;
+            transition: color 0.2s;
+        }
+
+        .totp-qr-close:hover {
+            color: var(--tus-text);
+        }
+
+        .totp-qr-hint {
+            color: var(--tus-text-muted);
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+    </style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+{% if form.errors and not form.non_field_errors %}
+<p class="errornote">
+{% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+</p>
+{% endif %}
+
+{% if form.non_field_errors %}
+{% for error in form.non_field_errors %}
+<p class="errornote">
+    {{ error }}
+</p>
+{% endfor %}
+{% endif %}
+
+<div id="content-main">
+
+{% if user.is_authenticated %}
+<p class="errornote">
+{% blocktrans trimmed %}
+    You are authenticated as {{ username }}, but are not authorized to
+    access this page. Would you like to login to a different account?
+{% endblocktrans %}
+</p>
+{% endif %}
+
+<form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+  <div class="form-row">
+    {{ form.username.errors }}
+    {{ form.username.label_tag }} {{ form.username }}
+  </div>
+  <div class="form-row">
+    {{ form.password.errors }}
+    {{ form.password.label_tag }} {{ form.password }}
+    <input type="hidden" name="next" value="{{ next }}" />
+  </div>
+  {% if form.get_user %}
+  <div class="form-row">
+    {{ form.otp_device.errors }}
+    <label for="id_otp_device">{% trans 'OTP Device:' %}</label> {{ form.otp_device }}
+  </div>
+  {% endif %}
+  <div class="form-row">
+    {{ form.otp_token.errors }}
+    <label for="id_otp_token" class="required">{% trans 'Code TOTP :' %}</label> {{ form.otp_token }}
+  </div>
+  {% url 'admin_password_reset' as password_reset_url %}
+  {% if password_reset_url %}
+  <div class="password-reset-link">
+    <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+  </div>
+  {% endif %}
+  <div class="submit-row">
+    <label>&nbsp;</label><input type="submit" value="{% trans 'Se connecter' %}" />
+    {% if form.get_user %}
+    <label>&nbsp;</label><input type="submit" name="otp_challenge" value="{% trans 'Get OTP Challenge' %}" />
+    {% endif %}
+  </div>
+</form>
+
+<!-- 🛡️ QR Code TOTP Section -->
+<div class="totp-qr-section">
+    <button type="button" class="totp-qr-btn" id="totp-qr-trigger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+            <rect x="14" y="14" width="3" height="3"></rect>
+            <line x1="21" y1="14" x2="21" y2="14.01"></line>
+            <line x1="21" y1="21" x2="21" y2="21.01"></line>
+            <line x1="14" y1="21" x2="14" y2="21.01"></line>
+        </svg>
+        Afficher mon QR Code TOTP
+    </button>
+</div>
+
+</div>
+
+<!-- QR Code Modal -->
+<div class="totp-qr-modal" id="totp-qr-modal">
+    <div class="totp-qr-card">
+        <button class="totp-qr-close" id="totp-qr-close" title="Fermer">&times;</button>
+        <div id="totp-qr-content">
+            <div class="totp-qr-loading">
+                <div class="spinner"></div>
+                <p>Vérification des identifiants…</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const trigger = document.getElementById('totp-qr-trigger');
+    const modal = document.getElementById('totp-qr-modal');
+    const closeBtn = document.getElementById('totp-qr-close');
+    const content = document.getElementById('totp-qr-content');
+    const QR_URL = '{{ totp_qr_url }}';
+
+    function showModal() {
+        const username = document.getElementById('id_username').value.trim();
+        const password = document.getElementById('id_password').value;
+
+        if (!username || !password) {
+            content.innerHTML = '<div class="totp-qr-error">Entrez d\'abord votre nom d\'utilisateur et mot de passe ci-dessus.</div>';
+            modal.classList.add('active');
+            return;
+        }
+
+        // Show loading
+        content.innerHTML = '<div class="totp-qr-loading"><div class="spinner"></div><p>Vérification…</p></div>';
+        modal.classList.add('active');
+
+        // Fetch QR code
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        fetch(QR_URL, {
+            method: 'POST',
+            body: formData,
+            credentials: 'same-origin',
+        })
+        .then(function(response) {
+            if (response.ok) {
+                return response.blob().then(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    content.innerHTML =
+                        '<h3>📱 Scannez ce QR Code</h3>' +
+                        '<p>Ouvrez votre app d\'authentification<br>(Google Authenticator, Authy, etc.)</p>' +
+                        '<div class="totp-qr-img-wrap"><img src="' + url + '" alt="QR Code TOTP" /></div>' +
+                        '<p class="totp-qr-hint">Entrez le code à 6 chiffres affiché dans l\'app ci-dessus</p>';
+                });
+            } else {
+                return response.json().then(function(data) {
+                    content.innerHTML = '<div class="totp-qr-error">' + (data.error || 'Erreur inconnue') + '</div>';
+                });
+            }
+        })
+        .catch(function() {
+            content.innerHTML = '<div class="totp-qr-error">Erreur réseau. Vérifiez votre connexion.</div>';
+        });
+    }
+
+    function hideModal() {
+        modal.classList.remove('active');
+    }
+
+    trigger.addEventListener('click', showModal);
+    closeBtn.addEventListener('click', hideModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) hideModal();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') hideModal();
+    });
+})();
+</script>
+{% endblock %}

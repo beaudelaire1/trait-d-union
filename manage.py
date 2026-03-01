@@ -3,6 +3,7 @@
 import os
 import sys
 import warnings
+from pathlib import Path
 
 # Supprimer les warnings GLib/GTK (WeasyPrint sur Windows)
 os.environ['G_MESSAGES_DEBUG'] = ''
@@ -16,6 +17,12 @@ warnings.filterwarnings('ignore', message='.*GLib.*')
 
 def main() -> None:
     """Run administrative tasks."""
+    # Charger .env AVANT tout : garantit le bon settings module sans bricolage
+    _env_path = Path(__file__).resolve().parent / '.env'
+    if _env_path.exists():
+        from dotenv import load_dotenv
+        load_dotenv(_env_path, override=False)
+
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
     try:
         from django.core.management import execute_from_command_line  # type: ignore

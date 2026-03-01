@@ -1077,8 +1077,56 @@ textarea:focus-visible,
     background: var(--tus-surface-1) !important;
     border: 1px solid var(--tus-border) !important;
     border-radius: var(--tus-radius-lg) !important;
-    overflow: visible;
+    overflow: hidden;
     margin-bottom: 16px;
+}
+
+/* Dashboard cards — keep buttons inside their cells */
+.dashboard .card {
+    overflow: hidden;
+}
+
+.dashboard .card .card-body {
+    padding: 0 !important;
+}
+
+.dashboard .card .card-body .table {
+    margin-bottom: 0;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.dashboard .card .card-body .table td {
+    vertical-align: middle;
+    padding: 10px 12px !important;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* First column (model name) takes remaining space */
+.dashboard .card .card-body .table td:first-child {
+    width: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Second column (buttons) — fixed width, no overflow */
+.dashboard .card .card-body .table td:last-child {
+    width: 180px;
+    text-align: right;
+}
+
+.dashboard .card .card-body .table .btn-group {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+}
+
+.dashboard .card .card-body .table .btn-group .btn.btn-xs {
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    white-space: nowrap;
+    border-radius: 6px;
 }
 
 .module caption,
