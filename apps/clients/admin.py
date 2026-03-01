@@ -629,10 +629,21 @@ class WorkflowTemplateAdmin(admin.ModelAdmin):
     milestone_count.short_description = "Nb jalons"
     
     def total_estimated_days(self, obj):
-        """Durée totale estimée."""
-        total = sum(m.estimated_duration_days for m in obj.milestone_templates.all())
+        """Durée totale estimée (uses annotated value to avoid N+1)."""
+        total = getattr(obj, '_total_days', None)
+        if total is None:
+            total = sum(m.estimated_duration_days for m in obj.milestone_templates.all())
         return f"{total} jours"
     total_estimated_days.short_description = "Durée estimée"
+    total_estimated_days.admin_order_field = '_total_days'
+
+    def get_queryset(self, request):
+        """⚡ PERFORMANCE: Annotate total days to avoid N+1 in list_display."""
+        from django.db.models import Sum
+        qs = super().get_queryset(request)
+        return qs.annotate(
+            _total_days=Sum('milestone_templates__estimated_duration_days')
+        )
     
     def duplicate_workflow(self, request, queryset):
         """Action pour dupliquer un workflow."""

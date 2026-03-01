@@ -59,7 +59,7 @@
                             <p class="dropzone-hint">ou cliquez pour sélectionner</p>
                             <p class="dropzone-formats">PDF, DOC, PNG, JPG, ZIP, SVG, AI, PSD</p>
                         </div>
-                        <div class="dropzone-preview" id="dropzone-preview" style="display: none;">
+                        <div class="dropzone-preview dropzone-preview-hidden" id="dropzone-preview">
                             <div class="preview-icon">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -114,7 +114,7 @@
     </main>
 </div>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function() {
     const dropzone = document.getElementById('dropzone');
     const fileInput = document.getElementById('file-input');
@@ -154,13 +154,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function showPreview(file) {
         previewName.textContent = file.name;
-        content.style.display = 'none';
-        preview.style.display = 'flex';
+        content.classList.add('dropzone-content-hidden');
+        preview.classList.remove('dropzone-preview-hidden');
     }
     
     function hidePreview() {
-        content.style.display = 'block';
-        preview.style.display = 'none';
+        content.classList.remove('dropzone-content-hidden');
+        preview.classList.add('dropzone-preview-hidden');
     }
 });
 </script>

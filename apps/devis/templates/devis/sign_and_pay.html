@@ -8,7 +8,7 @@
 {% if stripe_configured and stripe_publishable_key %}
 <script src="https://js.stripe.com/v3/"></script>
 {% endif %}
-<style>
+<style nonce="{{ request.csp_nonce }}">
     .signature-container {
         border: 2px dashed #d1d5db;
         border-radius: 12px;
@@ -209,7 +209,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function() {
     // Initialiser le pad de signature
     const canvas = document.getElementById('signature-pad');

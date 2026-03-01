@@ -64,7 +64,7 @@ def download_invoice(request, pk: int):
         pdf_bytes = invoice.generate_pdf(attach=False)
         
         response = HttpResponse(pdf_bytes, content_type="application/pdf")
-        response['Content-Disposition'] = f'inline; filename="facture_{invoice.number}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="facture_{invoice.number}.pdf"'
         return response
     except Exception as exc:
         logger.error(f"Erreur lors de la génération du PDF pour la facture {pk}: {exc}", exc_info=True)
@@ -120,6 +120,25 @@ def invoice_create_checkout(request, token: str):
     """
     Crée une session Stripe Checkout pour le paiement d'une facture.
     """
+    # 🛡️ SECURITY: Rate-limit checkout session creation per IP (anti-abuse)
+    from django.core.cache import cache as _cache
+    forwarded = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    client_ip = forwarded.split(',')[0].strip() if forwarded else request.META.get('REMOTE_ADDR', '')
+    checkout_key = f"ratelimit:inv_checkout:{client_ip}"
+    try:
+        checkout_count = _cache.get(checkout_key, 0)
+        if checkout_count >= 10:  # max 10 checkout sessions per hour per IP
+            return JsonResponse({
+                "success": False,
+                "error": "Trop de tentatives. Réessayez plus tard."
+            }, status=429)
+        try:
+            _cache.incr(checkout_key)
+        except ValueError:
+            _cache.set(checkout_key, 1, 3600)
+    except Exception:
+        pass  # Cache down — fail-open, Stripe handles abuse on their end
+
     invoice = get_object_or_404(Invoice, public_token=token)
     
     # Vérifier le statut
@@ -242,7 +261,9 @@ def invoice_public_pdf(request, token: str):
     try:
         pdf_bytes = invoice.generate_pdf(attach=False)
         response = HttpResponse(pdf_bytes, content_type="application/pdf")
-        response['Content-Disposition'] = f'inline; filename="facture_{invoice.number}.pdf"'
+        # 🛡️ SECURITY: Force download (attachment) on public endpoints to prevent
+        # browser-rendered PDF XSS vectors and accidental data exposure.
+        response['Content-Disposition'] = f'attachment; filename="facture_{invoice.number}.pdf"'
         return response
     except Exception as exc:
         logger.error(f"Erreur génération PDF facture publique: {exc}", exc_info=True)
@@ -252,25 +273,10 @@ def invoice_public_pdf(request, token: str):
 @csrf_exempt
 @require_POST
 def stripe_invoice_webhook(request):
+    """Webhook Stripe pour les paiements de factures.
+
+    🛡️ BANK-GRADE: Délègue à la vue unifiée (DRY — single source of truth).
     """
-    Webhook Stripe pour les paiements de factures.
-    """
-    from core.services.stripe_service import StripePaymentService, is_stripe_configured
-    
-    if not is_stripe_configured():
-        return HttpResponse(status=400)
-    
-    payload = request.body
-    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
-    
-    try:
-        event = StripePaymentService.verify_webhook_signature(payload, sig_header)
-    except ValueError as e:
-        logger.error(f"Webhook facture signature invalide: {e}")
-        return HttpResponse(status=400)
-    
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        StripePaymentService.handle_checkout_completed(session)
-    
-    return HttpResponse(status=200)
+    from core.services.stripe_service import stripe_webhook_view
+    return stripe_webhook_view(request)
+

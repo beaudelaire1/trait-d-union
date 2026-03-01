@@ -22,25 +22,40 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:  # type: ignore[override]
         context = super().get_context_data(**kwargs)
         
-        # Charger les services depuis la base de données
-        services_qs = Service.objects.select_related('category').filter(is_active=True, is_featured=True)[:4]
-        context['services'] = [
-            {
-                'title': service.name,
-                'description': service.short_description or service.description[:150],
-                'icon': service.category.icon if service.category else '🔧',
-                'slug': service.slug,
-            }
-            for service in services_qs
-        ]
+        # ⚡ PERFORMANCE: Cache homepage data (services, testimonials, portfolio count)
+        from django.core.cache import cache
         
-        # Charger les témoignages depuis la base de données
-        from apps.pages.models import Testimonial
-        context['testimonials'] = Testimonial.objects.filter(is_published=True)[:3]
+        # Charger les services depuis la base de données (cached 5 min)
+        services_data = cache.get('homepage_services')
+        if services_data is None:
+            services_qs = Service.objects.select_related('category').filter(is_active=True, is_featured=True)[:4]
+            services_data = [
+                {
+                    'title': service.name,
+                    'description': service.short_description or service.description[:150],
+                    'icon': service.category.icon if service.category else '🔧',
+                    'slug': service.slug,
+                }
+                for service in services_qs
+            ]
+            cache.set('homepage_services', services_data, 300)
+        context['services'] = services_data
         
-        # Compteur dynamique de projets portfolio
-        from apps.portfolio.models import Project
-        context['portfolio_count'] = Project.objects.filter(is_published=True).count()
+        # Charger les témoignages depuis la base de données (cached 5 min)
+        testimonials = cache.get('homepage_testimonials')
+        if testimonials is None:
+            from apps.pages.models import Testimonial
+            testimonials = list(Testimonial.objects.filter(is_published=True)[:3])
+            cache.set('homepage_testimonials', testimonials, 300)
+        context['testimonials'] = testimonials
+        
+        # Compteur dynamique de projets portfolio (cached 10 min)
+        portfolio_count = cache.get('homepage_portfolio_count')
+        if portfolio_count is None:
+            from apps.portfolio.models import Project
+            portfolio_count = Project.objects.filter(is_published=True).count()
+            cache.set('homepage_portfolio_count', portfolio_count, 600)
+        context['portfolio_count'] = portfolio_count
         
         # Breadcrumbs SEO (page d'accueil = racine)
         context['breadcrumbs_list'] = [
@@ -76,6 +91,77 @@ class MethodView(TemplateView):
             {'name': 'Méthode', 'url': '/method/'},
         ]
         return context
+
+
+class FAQView(TemplateView):
+    """FAQ page with breadcrumbs for SEO rich snippets."""
+
+    template_name: str = 'pages/faq.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'FAQ', 'url': '/faq/'},
+        ]
+        return context
+
+
+class MentionsLegalesView(TemplateView):
+    """Mentions légales page with breadcrumbs."""
+
+    template_name: str = 'pages/mentions_legales.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Mentions légales', 'url': '/mentions-legales/'},
+        ]
+        return context
+
+
+class ConfidentialiteView(TemplateView):
+    """Politique de confidentialité page with breadcrumbs."""
+
+    template_name: str = 'pages/confidentialite.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Politique de confidentialité', 'url': '/confidentialite/'},
+        ]
+        return context
+
+
+class CGVView(TemplateView):
+    """Conditions générales de vente page with breadcrumbs."""
+
+    template_name: str = 'pages/cgv.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Conditions générales de vente', 'url': '/cgv/'},
+        ]
+        return context
+
+
+class LegalView(TemplateView):
+    """Legal page with breadcrumbs."""
+
+    template_name: str = 'pages/legal.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Informations légales', 'url': '/legal/'},
+        ]
+        return context
+
 
 
 def page_not_found(request: HttpRequest, exception: Exception) -> HttpResponse:

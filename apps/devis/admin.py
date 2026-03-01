@@ -44,6 +44,7 @@ class ClientAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'city')
     search_fields = ('full_name', 'email', 'phone', 'city', 'address_line')
     readonly_fields = ('created_at',)
+    autocomplete_fields = ('linked_profile',)
     actions = ['action_create_portal_account']
     
     fieldsets = (
@@ -53,6 +54,10 @@ class ClientAdmin(admin.ModelAdmin):
         ('Adresse', {
             'fields': ('address_line', 'city', 'zip_code')
         }),
+        ('Portail client', {
+            'fields': ('linked_profile',),
+            'description': '🔗 Lien direct vers le profil portail (rempli automatiquement).'
+        }),
         ('Informations système', {
             'fields': ('created_at',),
             'classes': ('collapse',)
@@ -61,16 +66,24 @@ class ClientAdmin(admin.ModelAdmin):
 
     def portal_account_badge(self, obj):
         """Affiche si le client a déjà un compte portail."""
-        if not obj.email:
-            return format_html(
-                '<span style="color:#6B7280; font-size:0.8rem;">—</span>'
-            )
-        user = User.objects.filter(email__iexact=obj.email).first()
-        if user and hasattr(user, 'client_profile'):
+        # 🛡️ SECURITY: Use FK instead of email lookup
+        if obj.linked_profile_id:
             return format_html(
                 '<span style="background:rgba(34,197,94,0.15); color:#4ADE80; '
                 'padding:3px 10px; border-radius:12px; font-size:0.75rem; '
                 'font-weight:600;">✅ Compte actif</span>'
+            )
+        if not obj.email:
+            return format_html(
+                '<span style="color:#6B7280; font-size:0.8rem;">—</span>'
+            )
+        # Fallback: check by email for unlinked records
+        user = User.objects.filter(email__iexact=obj.email).first()
+        if user and hasattr(user, 'client_profile'):
+            return format_html(
+                '<span style="background:rgba(245,158,11,0.15); color:#FCD34D; '
+                'padding:3px 10px; border-radius:12px; font-size:0.75rem; '
+                'font-weight:600;">⚠️ Non lié</span>'
             )
         return format_html(
             '<span style="background:rgba(107,114,128,0.15); color:#9CA3AF; '
@@ -323,11 +336,7 @@ class QuoteAdmin(admin.ModelAdmin):
     def _publish_to_portal(self, quote: Quote, request) -> bool:
         """Publie le PDF du devis dans le portail client (ClientDocument + notification).
 
-        Stratégie :
-        - On cherche un User par email du devis (case-insensitive)
-        - On prend son ClientProfile
-        - On crée un ClientDocument (type "contract") avec le PDF
-        - On envoie une notification portail
+        🛡️ BANK-GRADE: Utilise le FK linked_profile au lieu d'un lookup par email.
         """
         try:
             if not quote.client or not quote.client.email:
@@ -338,12 +347,13 @@ class QuoteAdmin(admin.ModelAdmin):
                 )
                 return False
 
-            user = User.objects.filter(email__iexact=quote.client.email).first()
-            client_profile = getattr(user, "client_profile", None) if user else None
+            # 🛡️ BANK-GRADE: Use FK (linked_profile) instead of email lookup (IDOR risk)
+            client_profile = getattr(quote.client, 'linked_profile', None)
             if not client_profile:
                 self.message_user(
                     request,
-                    f"Portail: aucun client trouvé pour {quote.client.email}",
+                    f"Portail: aucun profil lié pour {quote.client.email}. "
+                    f"Liez le client via le champ 'linked_profile' dans l'admin.",
                     level=messages.WARNING,
                 )
                 return False

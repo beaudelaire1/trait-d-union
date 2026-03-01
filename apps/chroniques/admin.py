@@ -27,6 +27,18 @@ class ArticleAdmin(admin.ModelAdmin):
     search_fields = ("title", "excerpt", "body")
     prepopulated_fields = {"slug": ("title",)}
     date_hierarchy = "publish_date"
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'slug', 'author', 'cover_image', 'excerpt', 'body'),
+        }),
+        ('🔍 SEO', {
+            'fields': ('meta_description',),
+            'description': 'Meta description pour Google (160 chars max). Si vide, le résumé sera utilisé.',
+        }),
+        ('Publication', {
+            'fields': ('is_published', 'publish_date'),
+        }),
+    )
 
     class Media:
         css = {

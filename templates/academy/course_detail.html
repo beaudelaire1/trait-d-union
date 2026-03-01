@@ -170,7 +170,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
   function selectLesson(lessonId) {
     // Hide all lessons
     document.querySelectorAll('.lesson-content').forEach(el => el.classList.add('hidden'));

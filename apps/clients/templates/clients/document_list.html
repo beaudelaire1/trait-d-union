@@ -38,7 +38,7 @@
             {% if documents %}
             
             <!-- Filtres par type -->
-            <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+            <div class="doc-filter-bar">
                 <button @click="activeFilter = 'all'" 
                         :class="activeFilter === 'all' ? 'btn-filter-active' : 'btn-filter'"
                         class="btn-filter">
@@ -122,11 +122,11 @@
                                 </td>
                                 <td>
                                     {% if doc.document_type == 'devis' %}
-                                    <span class="doc-type-badge" style="background:rgba(11,45,255,0.15); color:#4D6FFF;">{{ doc.get_document_type_display }}</span>
+                                    <span class="doc-type-badge doc-type-badge-devis">{{ doc.get_document_type_display }}</span>
                                     {% elif doc.document_type == 'facture' %}
-                                    <span class="doc-type-badge" style="background:rgba(34,197,94,0.15); color:#4ADE80;">{{ doc.get_document_type_display }}</span>
+                                    <span class="doc-type-badge doc-type-badge-facture">{{ doc.get_document_type_display }}</span>
                                     {% elif doc.document_type == 'contract' %}
-                                    <span class="doc-type-badge" style="background:rgba(245,158,11,0.15); color:#FCD34D;">{{ doc.get_document_type_display }}</span>
+                                    <span class="doc-type-badge doc-type-badge-contract">{{ doc.get_document_type_display }}</span>
                                     {% else %}
                                     <span class="doc-type">{{ doc.get_document_type_display }}</span>
                                     {% endif %}

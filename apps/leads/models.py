@@ -1,6 +1,7 @@
 """Models for the leads app (contact requests)."""
 from __future__ import annotations
 
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 
@@ -36,7 +37,17 @@ class Lead(models.Model):
     message = models.TextField("Message")
     budget = models.CharField("Budget estimé", max_length=20, choices=BudgetRange.choices, blank=True)
     existing_url = models.URLField("Site existant", max_length=500, blank=True)
-    attachment = models.FileField("Pièce jointe", upload_to='leads/attachments/', blank=True)
+    attachment = models.FileField(
+        "Pièce jointe",
+        upload_to='leads/attachments/',
+        blank=True,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['pdf', 'doc', 'docx', 'xls', 'xlsx',
+                                    'jpg', 'jpeg', 'png', 'webp', 'zip'],
+            ),
+        ],
+    )
     honeypot = models.CharField(max_length=255, blank=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -157,6 +157,8 @@ class Invoice(models.Model):
         indexes = [
             models.Index(fields=["number", "issue_date"]),
             models.Index(fields=['status'], name='idx_invoice_status'),
+            models.Index(fields=['client', 'status'], name='idx_invoice_client_status'),
+            models.Index(fields=['quote'], name='idx_invoice_quote'),
         ]
         verbose_name = _("facture")
         verbose_name_plural = _("factures")
@@ -226,11 +228,26 @@ class Invoice(models.Model):
         """
         Calcule les totaux HT, TVA et TTC.
         """
-        total_ht = Decimal("0.00")
-        total_tva = Decimal("0.00")
-        for it in self.items:
-            total_ht += it.total_ht
-            total_tva += it.total_tva
+        from django.db.models import F, Sum, ExpressionWrapper, DecimalField
+
+        # ⚡ PERFORMANCE: Use DB aggregation instead of Python loop
+        agg = self.invoice_items.aggregate(
+            sum_ht=Sum(
+                ExpressionWrapper(
+                    F('quantity') * F('unit_price'),
+                    output_field=DecimalField(max_digits=12, decimal_places=2)
+                )
+            ),
+            sum_tva=Sum(
+                ExpressionWrapper(
+                    F('quantity') * F('unit_price') * F('tax_rate') / Decimal("100"),
+                    output_field=DecimalField(max_digits=12, decimal_places=2)
+                )
+            ),
+        )
+
+        total_ht = agg['sum_ht'] or Decimal("0.00")
+        total_tva = agg['sum_tva'] or Decimal("0.00")
         
         discount = self.discount or Decimal("0.00")
         if discount > 0 and total_ht > 0:

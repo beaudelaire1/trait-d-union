@@ -46,6 +46,15 @@ class Client(models.Model):
     city = models.CharField(max_length=100, blank=True)
     zip_code = models.CharField(max_length=20, blank=True)
     company = models.CharField(max_length=200, blank=True)
+    linked_profile = models.ForeignKey(
+        'clients.ClientProfile',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='linked_clients',
+        verbose_name=_("Profil portail"),
+        help_text=_("Lien direct vers le compte portail client (rempli automatiquement)."),
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -361,26 +370,30 @@ class Quote(models.Model):
     def compute_totals(self):
         """Calcule et met à jour les totaux HT, TVA et TTC à partir des items.
 
-        Implémentation Django "Service Layer" simple (sans couche hexagonale).
+        ⚡ PERFORMANCE: Uses DB-level aggregation (Sum + F expressions) instead of
+        Python-side loop, matching the pattern in Invoice.compute_totals().
         """
         from decimal import Decimal
+        from django.db.models import Sum, F, ExpressionWrapper, DecimalField
 
-        total_ht = Decimal("0.00")
-        total_tva = Decimal("0.00")
+        agg = self.quote_items.aggregate(
+            sum_ht=Sum(
+                ExpressionWrapper(
+                    F('quantity') * F('unit_price'),
+                    output_field=DecimalField(max_digits=12, decimal_places=2),
+                )
+            ),
+            sum_tva=Sum(
+                ExpressionWrapper(
+                    F('quantity') * F('unit_price') * F('tax_rate') / Decimal("100"),
+                    output_field=DecimalField(max_digits=12, decimal_places=2),
+                )
+            ),
+        )
 
-        # quote.items related_name expected
-        for item in self.quote_items.all():
-            qty = Decimal(str(getattr(item, "quantity", 0) or 0))
-            unit = Decimal(str(getattr(item, "unit_price", 0) or 0))
-            rate = Decimal(str(getattr(item, "tax_rate", 0) or 0))
-            line_ht = qty * unit
-            line_tva = (line_ht * rate) / Decimal("100")
-            total_ht += line_ht
-            total_tva += line_tva
-
-        self.total_ht = total_ht
-        self.tva = total_tva
-        self.total_ttc = total_ht + total_tva
+        self.total_ht = agg['sum_ht'] or Decimal("0.00")
+        self.tva = agg['sum_tva'] or Decimal("0.00")
+        self.total_ttc = self.total_ht + self.tva
         self.save(update_fields=["total_ht", "tva", "total_ttc"])
 
     def generate_pdf(self, attach: bool = True) -> bytes:

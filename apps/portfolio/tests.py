@@ -27,7 +27,7 @@ class ProjectModelTest(TestCase):
         project = Project.objects.create(
             title="Test Project",
             slug="test-project",
-            project_type=ProjectType.VITRINE,
+            project_type=ProjectType.SITE,
             objective="Test",
             solution="Test",
             result="Test",
@@ -39,7 +39,7 @@ class ProjectModelTest(TestCase):
         project = Project.objects.create(
             title="URL Test",
             slug="url-test",
-            project_type=ProjectType.SYSTEME,
+            project_type=ProjectType.OUTILS,
             objective="Test URL",
             solution="Test",
             result="Test",
@@ -58,7 +58,7 @@ class ProjectListViewTest(TestCase):
         self.project1 = Project.objects.create(
             title="Project 1",
             slug="project-1",
-            project_type=ProjectType.VITRINE,
+            project_type=ProjectType.SITE,
             objective="Objective 1",
             solution="Solution 1",
             result="Result 1",
@@ -76,7 +76,7 @@ class ProjectListViewTest(TestCase):
         self.unpublished = Project.objects.create(
             title="Unpublished",
             slug="unpublished",
-            project_type=ProjectType.SYSTEME,
+            project_type=ProjectType.OUTILS,
             objective="Hidden",
             solution="Hidden",
             result="Hidden",
@@ -98,7 +98,7 @@ class ProjectListViewTest(TestCase):
 
     def test_filter_by_type(self):
         """Test filtering projects by type."""
-        response = self.client.get(self.url, {'type': 'vitrine'})
+        response = self.client.get(self.url, {'type': 'site'})
         projects = response.context['projects']
         self.assertEqual(projects.count(), 1)
         self.assertEqual(projects[0], self.project1)
@@ -120,7 +120,7 @@ class ProjectDetailViewTest(TestCase):
         self.project = Project.objects.create(
             title="Detail Test",
             slug="detail-test",
-            project_type=ProjectType.VITRINE,
+            project_type=ProjectType.SITE,
             objective="Test objective",
             solution="Test solution",
             result="Test result",

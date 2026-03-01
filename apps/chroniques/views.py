@@ -15,9 +15,22 @@ def article_list(request):
     except (ProgrammingError, OperationalError):
         # Table doesn't exist yet (migration pending)
         page_obj = None
-    return render(request, "chroniques/list.html", {"page_obj": page_obj})
+    return render(request, "chroniques/list.html", {
+        "page_obj": page_obj,
+        "breadcrumbs_list": [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Chroniques', 'url': '/chroniques/'},
+        ],
+    })
 
 
 def article_detail(request, slug: str):
     article = get_object_or_404(Article, slug=slug, is_published=True)
-    return render(request, "chroniques/detail.html", {"article": article})
+    return render(request, "chroniques/detail.html", {
+        "article": article,
+        "breadcrumbs_list": [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Chroniques', 'url': '/chroniques/'},
+            {'name': article.title, 'url': article.get_absolute_url()},
+        ],
+    })

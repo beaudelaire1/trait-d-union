@@ -14,7 +14,6 @@ _SITE_LAST_MODIFIED = datetime(2026, 2, 25, tzinfo=timezone.utc)
 class StaticViewSitemap(Sitemap):
     """Sitemap for static pages."""
     
-    priority = 0.5
     changefreq = 'monthly'
     
     def items(self):
@@ -22,9 +21,14 @@ class StaticViewSitemap(Sitemap):
             'pages:home',
             'pages:services',
             'pages:method',
-            'pages:legal',
+            'pages:faq',
+            'pages:mentions_legales',
+            'pages:confidentialite',
+            'pages:cgv',
             'leads:contact',
-            'resources:index',
+            'resources:list',
+            'chroniques:list',
+            'portfolio:list',
         ]
     
     def location(self, item):
@@ -36,13 +40,20 @@ class StaticViewSitemap(Sitemap):
     
     def priority(self, item):
         # Priorité maximale pour pages stratégiques SEO Guyane/Outre-Mer
-        if item == 'pages:home':
-            return 1.0
-        elif item in ('pages:services', 'leads:contact'):
-            return 0.95  # Augmenté pour conversion
-        elif item == 'pages:method':
-            return 0.85  # Augmenté pour différenciation
-        return 0.5
+        priorities = {
+            'pages:home': 1.0,
+            'pages:services': 0.95,
+            'leads:contact': 0.95,
+            'pages:method': 0.85,
+            'pages:faq': 0.80,
+            'portfolio:list': 0.85,
+            'chroniques:list': 0.75,
+            'resources:list': 0.50,
+            'pages:mentions_legales': 0.20,
+            'pages:confidentialite': 0.20,
+            'pages:cgv': 0.20,
+        }
+        return priorities.get(item, 0.5)
 
 
 class PortfolioSitemap(Sitemap):

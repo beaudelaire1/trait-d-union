@@ -7,6 +7,7 @@ __pycache__/
 venv/
 .venv/
 env/
+venv*/
 
 # Environment variables
 .env
@@ -17,7 +18,9 @@ env/
 # Django
 *.log
 db.sqlite3
+*.sqlite3
 media/
+config/secret_key
 
 # IDE
 .idea/
@@ -32,24 +35,45 @@ staticfiles/
 .DS_Store
 Thumbs.db
 
-# Test scripts (local only)
-send_test_*.py
-*_test_*.py
-test_*.py
-send_*_email.py
-check_*.py
-debug_*.py
+# Test / debug / throwaway scripts at root level
+/send_*.py
+/test_*.py
+/check_*.py
+/debug_*.py
+/update_*.py
+/run_*.py
+/inspect_*.py
+/fix_*.py
+/audit_*.py
+/gen_pdf*.py
+/generate_pdf*.py
+/create_test_*.py
 send_premium_*.py
 
 # Local development files
 plandaction.txt
-gen_pdf*.py
-generate_pdf*.py
 pdfs_test*/
-create_test_*.py
+
+# Coverage & test artifacts
+.coverage
+coverage_report*.txt
+failures*.txt
+htmlcov/
 
 # Node modules (regenerate with npm install)
 node_modules/
 
-# Virtual environments
-venv*/
+# Collected static (regenerate with collectstatic)
+staticfiles/
+
+# Build artifacts
+.dist/
+
+# AI agent workspace
+.agent/
+AUDIT_ARCHITECTURE.md
+skills.md
+
+# One-off scripts
+_migrate_*.py
+deploy_*.sh

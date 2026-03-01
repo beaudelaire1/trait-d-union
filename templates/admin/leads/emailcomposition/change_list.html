@@ -3,7 +3,7 @@
 
 {% block extrahead %}
 {{ block.super }}
-<style>
+<style nonce="{{ request.csp_nonce }}">
     .tus-admin-tools {
         display: inline-flex;
         align-items: center;

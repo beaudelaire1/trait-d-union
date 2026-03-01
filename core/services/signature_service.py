@@ -14,7 +14,7 @@ import base64
 import hashlib
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, UTC
 from io import BytesIO
 from typing import Optional, Dict, Any, Tuple
 
@@ -162,7 +162,7 @@ class SignatureService:
         audit_trail = {
             'version': '1.0',
             'timestamp': now.isoformat(),
-            'timestamp_utc': now.utcnow().isoformat() + 'Z',
+            'timestamp_utc': now.astimezone(UTC).isoformat().replace('+00:00', 'Z'),
             'timezone': str(settings.TIME_ZONE),
 
             'document': {
@@ -221,9 +221,15 @@ class SignatureService:
         if base64_data.startswith('data:image'):
             base64_data = base64_data.split(',')[1]
 
+        if not base64_data or not base64_data.strip():
+            return None
+
         try:
-            image_data = base64.b64decode(base64_data)
+            image_data = base64.b64decode(base64_data, validate=True)
         except Exception:
+            return None
+
+        if not image_data:
             return None
 
         # Créer le répertoire si nécessaire
@@ -262,15 +268,9 @@ class SignatureService:
 
     @classmethod
     def get_client_ip(cls, request) -> str:
-        """
-        Récupère l'adresse IP réelle du client.
+        """Récupère l'adresse IP réelle du client.
 
-        Gère les proxies (X-Forwarded-For) et Render.
+        🛡️ SECURITY: Delegates to core.utils.get_client_ip (DRY — single source of truth).
         """
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            # Prendre la première IP (client original)
-            ip = x_forwarded_for.split(',')[0].strip()
-        else:
-            ip = request.META.get('REMOTE_ADDR', 'unknown')
-        return ip
+        from core.utils import get_client_ip
+        return get_client_ip(request)

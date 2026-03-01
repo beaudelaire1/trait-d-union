@@ -20,13 +20,8 @@ document.addEventListener('DOMContentLoaded', function () {
         smoothWheel: true,
         wheelMultiplier: 0.8,
         touchMultiplier: 1.5,
+        autoRaf: true,  // Built-in rAF management — no manual loop needed
     });
-
-    function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
 
     // Pause Lenis on modals / overlays
     window.lenisInstance = lenis;

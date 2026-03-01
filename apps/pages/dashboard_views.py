@@ -2,6 +2,7 @@
 from decimal import Decimal
 from datetime import date, timedelta
 from django.contrib.admin.views.decorators import staff_member_required
+from django.core.cache import cache
 from django.shortcuts import render
 from django.utils import timezone
 from django.db.models import Sum, Count, Avg, Q, F
@@ -12,10 +13,23 @@ from apps.factures.models import Invoice
 from apps.leads.models import Lead
 from apps.clients.models import ClientProfile, Project
 
+DASHBOARD_CACHE_TTL = 300  # 5 minutes
+
 
 @staff_member_required
 def dashboard_view(request):
-    """Main dashboard view with KPIs and charts."""
+    """Main dashboard view with KPIs and charts.
+
+    ⚡ PERFORMANCE: Aggregation results cached for 5 min. Force refresh with ?refresh=1.
+    """
+    # Allow manual cache bust
+    if request.GET.get('refresh'):
+        cache.delete('dashboard_kpis')
+
+    cached = cache.get('dashboard_kpis')
+    if cached:
+        return render(request, 'admin/dashboard.html', cached)
+
     today = timezone.now().date()
     current_month_start = today.replace(day=1)
     last_month_start = (current_month_start - timedelta(days=1)).replace(day=1)
@@ -153,7 +167,7 @@ def dashboard_view(request):
     colors = []
     
     for item in pipeline_by_status:
-        status_labels.append(dict(Quote.STATUS_CHOICES).get(item['status'], item['status']))
+        status_labels.append(dict(Quote.QuoteStatus.choices).get(item['status'], item['status']))
         status_counts.append(item['count'])
         status_values.append(float(item['value'] or 0))
         colors.append(status_colors.get(item['status'], '#6b7280'))
@@ -162,8 +176,8 @@ def dashboard_view(request):
     # Récents
     # ===================
     recent_leads = Lead.objects.order_by('-created_at')[:5]
-    recent_quotes = Quote.objects.order_by('-created_at')[:5]
-    recent_invoices = Invoice.objects.order_by('-created_at')[:5]
+    recent_quotes = Quote.objects.select_related('client').order_by('-created_at')[:5]
+    recent_invoices = Invoice.objects.select_related('client', 'quote').order_by('-created_at')[:5]
     
     context = {
         # Date
@@ -200,4 +214,7 @@ def dashboard_view(request):
         'recent_invoices': recent_invoices,
     }
     
+    # ⚡ PERFORMANCE: Cache the full context for 5 minutes
+    cache.set('dashboard_kpis', context, DASHBOARD_CACHE_TTL)
+
     return render(request, 'admin/dashboard.html', context)

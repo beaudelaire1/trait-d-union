@@ -19,6 +19,7 @@ from django.core.exceptions import ValidationError
 from apps.devis.models import Quote
 from apps.clients.models import ClientProfile
 from apps.audit.models import AuditLog
+from core.utils import get_client_ip
 
 logger = logging.getLogger(__name__)
 
@@ -202,6 +203,11 @@ def provision_client_account(
             }
         )
     
+    # 🛡️ SECURITY: Ensure the quote's Client record is linked to the profile
+    if quote.client and not quote.client.linked_profile_id:
+        quote.client.linked_profile = result.client_profile
+        quote.client.save(update_fields=['linked_profile'])
+
     return ProvisionClientResult(
         user=result.user,
         client_profile=result.client_profile,
@@ -209,12 +215,3 @@ def provision_client_account(
         temporary_password=result.temporary_password,
     )
 
-
-def get_client_ip(request) -> str:
-    """Extrait l'adresse IP du client depuis la request."""
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0].strip()
-    else:
-        ip = request.META.get('REMOTE_ADDR', '')
-    return ip[:45]  # Limiter la longueur

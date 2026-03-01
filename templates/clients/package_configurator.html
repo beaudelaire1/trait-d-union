@@ -100,7 +100,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
   const basePrice = parseFloat("{{ package.base_price }}");
   
   document.querySelectorAll('.addon-checkbox').forEach(checkbox => {

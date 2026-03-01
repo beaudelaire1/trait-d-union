@@ -150,7 +150,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 (() => {
     const turnstileSiteKey = "{{ turnstile_site_key|default:'' }}";
     const recaptchaSiteKey = "{{ recaptcha_site_key|default:'' }}";
@@ -204,7 +204,7 @@
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=turnstileOnLoad&render=explicit" async defer></script>
 {% endif %}
 
-<style>
+<style nonce="{{ request.csp_nonce }}">
 /* ========================================
    AUTH PAGES - PREMIUM DESIGN
    ======================================== */

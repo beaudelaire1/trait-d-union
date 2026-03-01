@@ -1,6 +1,21 @@
 """Forms for the client portal."""
+import re
+
 from django import forms
+from django.core.validators import RegexValidator
+
 from .models import ClientProfile, ClientDocument
+
+
+# 🛡️ BANK-GRADE: Server-side SIRET / TVA intra validators
+_SIRET_VALIDATOR = RegexValidator(
+    regex=r'^\d{14}$',
+    message="Le SIRET doit contenir exactement 14 chiffres.",
+)
+_TVA_INTRA_VALIDATOR = RegexValidator(
+    regex=r'^FR\d{11}$',
+    message="Le numéro de TVA intracommunautaire doit être au format FR + 11 chiffres (ex: FR12345678901).",
+)
 
 
 class ClientProfileForm(forms.ModelForm):
@@ -47,15 +62,19 @@ class ClientProfileForm(forms.ModelForm):
             }),
             'siret': forms.TextInput(attrs={
                 'class': 'form-input',
-                'placeholder': '123 456 789 00012'
+                'placeholder': '12345678900012',
+                'maxlength': '14',
+                'pattern': r'\d{14}',
             }),
             'tva_number': forms.TextInput(attrs={
                 'class': 'form-input',
-                'placeholder': 'FR12345678901'
+                'placeholder': 'FR12345678901',
+                'maxlength': '13',
+                'pattern': r'FR\d{11}',
             }),
             'avatar': forms.FileInput(attrs={
                 'class': 'form-input',
-                'accept': 'image/*'
+                'accept': 'image/jpeg,image/png,image/webp'
             }),
             'email_notifications': forms.CheckboxInput(attrs={
                 'class': 'form-checkbox'
@@ -67,6 +86,73 @@ class ClientProfileForm(forms.ModelForm):
         if self.instance and self.instance.user:
             self.fields['first_name'].initial = self.instance.user.first_name
             self.fields['last_name'].initial = self.instance.user.last_name
+
+    def clean_siret(self):
+        """🛡️ BANK-GRADE: Validate SIRET format (14 digits, strip spaces)."""
+        value = self.cleaned_data.get('siret', '').strip()
+        if not value:
+            return value
+        # Strip spaces/dashes for user convenience
+        value = re.sub(r'[\s\-.]', '', value)
+        _SIRET_VALIDATOR(value)
+        return value
+
+    def clean_avatar(self):
+        """🛡️ BANK-GRADE: Validate avatar file (type, size, magic bytes, Pillow verify)."""
+        avatar = self.cleaned_data.get('avatar')
+        if not avatar:
+            return avatar
+
+        # 1) Taille max 2 Mo
+        if hasattr(avatar, 'size') and avatar.size > 2 * 1024 * 1024:
+            raise forms.ValidationError("L'avatar ne doit pas dépasser 2 Mo.")
+
+        # 2) Extension autorisée
+        import os
+        ext = os.path.splitext(avatar.name)[1].lower()
+        if ext not in {'.jpg', '.jpeg', '.png', '.webp'}:
+            raise forms.ValidationError(
+                f"Extension non autorisée ({ext}). "
+                "Formats acceptés : .jpg, .jpeg, .png, .webp"
+            )
+
+        # 3) Magic bytes
+        _MAGIC = {
+            '.jpg': [b'\xff\xd8\xff'],
+            '.jpeg': [b'\xff\xd8\xff'],
+            '.png': [b'\x89PNG\r\n\x1a\n'],
+            '.webp': [b'RIFF'],
+        }
+        avatar.seek(0)
+        header = avatar.read(12)
+        avatar.seek(0)
+        signatures = _MAGIC.get(ext, [])
+        if signatures and not any(header.startswith(sig) for sig in signatures):
+            raise forms.ValidationError(
+                "Le contenu du fichier ne correspond pas au format déclaré."
+            )
+
+        # 4) Vérification Pillow (détecte les fichiers tronqués/malveillants)
+        try:
+            from PIL import Image
+            img = Image.open(avatar)
+            img.verify()
+            avatar.seek(0)
+        except Exception:
+            raise forms.ValidationError(
+                "Le fichier ne semble pas être une image valide."
+            )
+
+        return avatar
+
+    def clean_tva_number(self):
+        """🛡️ BANK-GRADE: Validate TVA intracommunautaire format (FR + 11 digits)."""
+        value = self.cleaned_data.get('tva_number', '').strip()
+        if not value:
+            return value
+        value = re.sub(r'[\s\-.]', '', value).upper()
+        _TVA_INTRA_VALIDATOR(value)
+        return value
     
     def save(self, commit=True):
         profile = super().save(commit=False)
@@ -81,11 +167,24 @@ class ClientProfileForm(forms.ModelForm):
 
 class DocumentUploadForm(forms.ModelForm):
     """Form for uploading documents."""
-    
+
     # Limites de sécurité
     MAX_FILE_SIZE_MB = 10
     ALLOWED_EXTENSIONS = {'.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg', '.zip', '.svg', '.ai', '.psd'}
-    
+
+    # 🛡️ SECURITY: Magic bytes signatures for file type validation (anti content-type spoofing)
+    _MAGIC_SIGNATURES = {
+        '.pdf': [b'%PDF'],
+        '.doc': [b'\xd0\xcf\x11\xe0'],  # OLE2 compound document
+        '.docx': [b'PK\x03\x04'],  # ZIP (OOXML)
+        '.png': [b'\x89PNG\r\n\x1a\n'],
+        '.jpg': [b'\xff\xd8\xff'],
+        '.jpeg': [b'\xff\xd8\xff'],
+        '.zip': [b'PK\x03\x04', b'PK\x05\x06'],
+        '.svg': [b'<?xml', b'<svg'],
+        # .ai and .psd have complex headers — skip magic check for these
+    }
+
     class Meta:
         model = ClientDocument
         fields = ['title', 'document_type', 'file', 'notes']
@@ -109,8 +208,9 @@ class DocumentUploadForm(forms.ModelForm):
         }
 
     def clean_file(self):
-        """Valide le type et la taille du fichier uploadé."""
+        """Valide le type, la taille et les magic bytes du fichier uploadé."""
         import os
+        from core.utils import validate_file_magic
         uploaded = self.cleaned_data.get('file')
         if not uploaded:
             return uploaded
@@ -127,7 +227,15 @@ class DocumentUploadForm(forms.ModelForm):
                 f"Type de fichier non autorisé ({ext}). "
                 f"Extensions acceptées : {', '.join(sorted(self.ALLOWED_EXTENSIONS))}"
             )
+
+        # 🛡️ SECURITY: Validate magic bytes to prevent content-type spoofing
+        if not validate_file_magic(uploaded, ext):
+            raise forms.ValidationError(
+                'Le contenu du fichier ne correspond pas à son type déclaré.'
+            )
+
         return uploaded
+
 
 
 class ClientRequestForm(forms.Form):

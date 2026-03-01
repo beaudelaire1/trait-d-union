@@ -10,6 +10,7 @@ from django.utils import timezone
 
 from apps.devis.email_service import send_quote_validation_code
 from apps.devis.models import Quote, QuoteValidation
+from core.utils import get_client_ip as _get_client_ip
 
 logger = logging.getLogger(__name__)
 
@@ -70,16 +71,6 @@ def get_pending_validation_for_quote(quote: Quote) -> QuoteValidation:
         QuoteValidation.objects.filter(quote=quote, confirmed_at__isnull=True)
         .latest("created_at")
     )
-
-
-def _get_client_ip(request) -> str:
-    """Extrait l'IP du client depuis la requête HTTP."""
-    if request is None:
-        return ""
-    xff = request.META.get("HTTP_X_FORWARDED_FOR", "")
-    if xff:
-        return xff.split(",")[0].strip()[:45]
-    return request.META.get("REMOTE_ADDR", "")[:45]
 
 
 def confirm_quote_validation_code(

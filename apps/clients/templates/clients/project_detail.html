@@ -279,7 +279,7 @@
     </section>
 </div>
 
-<style>
+<style nonce="{{ request.csp_nonce }}">
 .project-detail-page {
     --tus-black: #07080A;
     --tus-white: #F6F7FB;
@@ -878,7 +878,7 @@
 <!-- Alpine.js Collapse Plugin -->
 <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 function projectTracker(targetProgress, targetTime) {
     return {
         animatedProgress: 0,

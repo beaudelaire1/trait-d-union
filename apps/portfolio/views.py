@@ -18,7 +18,7 @@ class ProjectListView(ListView):
     context_object_name: str = 'projects'
 
     def get_queryset(self) -> QuerySet[Project]:
-        queryset = Project.objects.filter(is_published=True)
+        queryset = Project.objects.filter(is_published=True).defer('objective', 'solution', 'strategy', 'result')
         project_type = self.request.GET.get('type')
         if project_type in ProjectType.values:
             queryset = queryset.filter(project_type=project_type)
@@ -31,6 +31,14 @@ class ProjectListView(ListView):
             return ['portfolio/_project_list_partial.html']
         return [self.template_name]
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Portfolio', 'url': '/portfolio/'},
+        ]
+        return context
+
 
 class ProjectDetailView(DetailView):
     """Detail page of a single project."""
@@ -40,3 +48,13 @@ class ProjectDetailView(DetailView):
 
     def get_queryset(self) -> QuerySet[Project]:
         return super().get_queryset().prefetch_related('strategy_phases', 'images')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = self.object
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Portfolio', 'url': '/portfolio/'},
+            {'name': project.title, 'url': project.get_absolute_url()},
+        ]
+        return context

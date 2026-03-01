@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
+<style nonce="{{ request.csp_nonce }}">
 /* ============================================================
    TRAIT D'UNION STUDIO - Interface Premium de Composition Email
    Charte: TUS Black #07080A | TUS Blue #0B2DFF | TUS Green #22C55E
@@ -601,7 +601,7 @@ body { background: var(--tus-black) !important; }
 
 {% block extra_js %}
 <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-<script>
+<script nonce="{{ request.csp_nonce }}">
 // ============================================================
 // TRAIT D'UNION STUDIO - Logique Premium Compose
 // ============================================================
@@ -970,7 +970,7 @@ function previewEmail() {
         <html>
         <head>
             <title>Aperçu: ${subject}</title>
-            <style>
+            <style nonce="{{ request.csp_nonce }}">
                 body { font-family: Inter, sans-serif; background: #07080A; color: #F6F7FB; padding: 40px; max-width: 700px; margin: 0 auto; }
             </style>
         </head>

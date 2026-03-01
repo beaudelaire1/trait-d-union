@@ -9,26 +9,48 @@
 {% block twitter_description %}{{ project.objective|plain_text|truncatewords:30 }}{% endblock %}
 {% block twitter_image %}{% if project.thumbnail %}{{ project.thumbnail.url }}{% endif %}{% endblock %}
 
+{% block extra_head %}
+<!-- 🔍 SEO: CreativeWork Schema.org for portfolio projects (Google Rich Cards) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  "name": "{{ project.title|escapejs }}",
+  "description": "{{ project.objective|plain_text|truncatewords:30|escapejs }}",
+  "url": "{{ request.scheme }}://{{ request.get_host }}{{ project.get_absolute_url }}",
+  {% if project.thumbnail %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ project.thumbnail.url }}",{% endif %}
+  "dateCreated": "{{ project.created_at|date:'c' }}",
+  "dateModified": "{{ project.updated_at|date:'c' }}",
+  "creator": {
+    "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization"
+  },
+  "genre": "{{ project.get_project_type_display|escapejs }}",
+  {% if project.url %}"sameAs": "{{ project.url }}",{% endif %}
+  "keywords": "{{ project.tech_list|join:', '|escapejs }}"
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Scroll Progress Bar -->
-<div id="scroll-progress" class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-tus-blue via-cyan-400 to-tus-green z-[9999] origin-left" style="transform: scaleX(0); will-change: transform;"></div>
+<div id="scroll-progress" class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-tus-blue via-cyan-400 to-tus-green z-[9999] origin-left scroll-progress-init" ></div>
 
 <!-- Chapter Navigation Dots -->
 <nav id="chapter-nav" class="fixed right-6 top-1/2 -translate-y-1/2 z-50 hidden lg:flex flex-col items-center gap-4 opacity-0 transition-opacity duration-500" aria-label="Navigation chapitres">
     <a href="#" class="chapter-dot group relative" data-target="1" aria-label="Chapitre 1 — Pourquoi">
-        <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300" style="background: rgba(255,255,255,0.2);"></span>
+ <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300 bg-dot-indicator" ></span>
         <span class="absolute right-8 top-1/2 -translate-y-1/2 text-xs text-tus-white/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Pourquoi</span>
     </a>
     <a href="#" class="chapter-dot group relative" data-target="2" aria-label="Chapitre 2 — Défi technique">
-        <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300" style="background: rgba(255,255,255,0.2);"></span>
+ <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300 bg-dot-indicator" ></span>
         <span class="absolute right-8 top-1/2 -translate-y-1/2 text-xs text-tus-white/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Défi technique</span>
     </a>
     <a href="#" class="chapter-dot group relative" data-target="3" aria-label="Chapitre 3 — Stratégie">
-        <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300" style="background: rgba(255,255,255,0.2);"></span>
+ <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300 bg-dot-indicator" ></span>
         <span class="absolute right-8 top-1/2 -translate-y-1/2 text-xs text-tus-white/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Stratégie</span>
     </a>
     <a href="#" class="chapter-dot group relative" data-target="4" aria-label="Chapitre 4 — Résultat">
-        <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300" style="background: rgba(255,255,255,0.2);"></span>
+ <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300 bg-dot-indicator" ></span>
         <span class="absolute right-8 top-1/2 -translate-y-1/2 text-xs text-tus-white/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Résultat</span>
     </a>
 </nav>
@@ -60,7 +82,7 @@
             </nav>
 
             <!-- Badge type -->
-            <div class="reveal" style="transition-delay: 0.1s;">
+ <div class="reveal td-100" >
                 <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue-a11y text-sm font-medium border border-tus-blue/20 mb-8 badge-float">
                     {% if project.project_type == 'vitrine' %}
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 012 2v1a2 2 0 002 2v.667a2.5 2.5 0 01-.629 1.658l-.318.319A4 4 0 0114 17h-.5a2 2 0 01-2-2 2 2 0 00-2-2H8.5a2 2 0 01-1.768-1.06L5.572 9.416A2 2 0 014.332 8.027z"/></svg>
@@ -74,15 +96,15 @@
             </div>
 
             <!-- Titre héroïque -->
-            <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[0.95] mb-8 reveal-clip" style="transition-delay: 0.2s;">
+ <h1 class="text-5xl md:text-7xl lg:text-8xl font-display font-bold leading-[0.95] mb-8 reveal-clip td-200" >
                 {{ project.title }}
             </h1>
 
             <!-- Decorative hero rule -->
-            <div class="hero-rule max-w-xs mb-10 reveal" style="transition-delay: 0.3s;"></div>
+ <div class="hero-rule max-w-xs mb-10 reveal td-300" ></div>
 
             <!-- Meta hero -->
-            <div class="flex flex-wrap items-center gap-8 text-tus-white/50 text-lg reveal" style="transition-delay: 0.4s;">
+ <div class="flex flex-wrap items-center gap-8 text-tus-white/50 text-lg reveal td-400" >
                 {% if project.client_name %}
                 <span class="flex items-center gap-2">
                     <svg class="w-5 h-5 text-tus-blue-a11y/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
@@ -101,7 +123,7 @@
         </div>
 
         <!-- Premium Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 reveal" style="transition-delay: 0.6s;">
+ <div class="absolute bottom-10 left-1/2 -translate-x-1/2 reveal td-600" >
             <div class="flex flex-col items-center gap-4 text-tus-white/25">
                 <span class="text-[10px] uppercase tracking-[0.3em] font-medium font-display">Explorer</span>
                 <div class="scroll-capsule"></div>
@@ -123,7 +145,7 @@
                 <div class="reveal-left">
                     <div class="relative">
                         <span class="text-8xl lg:text-[11rem] font-display font-extrabold text-tus-white/[0.04] select-none leading-none block number-display text-shimmer">01</span>
-                        <div class="chapter-accent absolute -left-6 top-4" style="--accent: rgba(11,45,255,0.6)"></div>
+ <div class="chapter-accent absolute -left-6 top-4 chapter-accent-blue" ></div>
                     </div>
                     <div class="mt-4 lg:mt-6">
                         <span class="text-tus-blue-a11y text-[11px] font-semibold uppercase tracking-[0.3em] block mb-3">Chapitre</span>
@@ -134,14 +156,14 @@
                 <!-- RIGHT — Narration, client, image -->
                 <div class="lg:pt-8">
                     <!-- Narration -->
-                    <div class="reveal-right" style="transition-delay: 0.15s;">
+ <div class="reveal-right td-150" >
                         <div class="prose-chapter text-xl md:text-2xl lg:text-[1.65rem] text-tus-white/90 leading-[1.75] narrative-text max-w-2xl">
                             {{ project.objective|safe_html }}
                         </div>
                     </div>
 
                     {% if project.client_name %}
-                    <div class="mt-14 reveal-right" style="transition-delay: 0.3s;">
+ <div class="mt-14 reveal-right td-300" >
                         <div class="inline-flex items-center gap-4 p-5 rounded-2xl border border-tus-white/10 bg-tus-white/[0.02] hover:border-tus-blue/20 transition-all duration-500">
                             <div class="w-12 h-12 rounded-xl bg-tus-blue/10 flex items-center justify-center flex-shrink-0">
                                 <svg class="w-6 h-6 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
@@ -158,7 +180,7 @@
 
             <!-- Thumbnail héroïque pleine largeur sous la grille -->
             {% if project.thumbnail %}
-            <div class="mt-24 reveal-scale" style="transition-delay: 0.2s;">
+ <div class="mt-24 reveal-scale td-200" >
                 <div class="relative group image-luminance" data-cursor="view">
                     <div class="absolute -inset-4 bg-gradient-to-r from-tus-blue/15 to-tus-green/10 rounded-3xl blur-3xl opacity-0 group-hover:opacity-60 transition-opacity duration-700"></div>
                     <div class="relative rounded-2xl overflow-hidden border border-tus-white/10 gallery-tilt">
@@ -180,9 +202,9 @@
             <!-- Trace fantôme -->
             <div class="divider-track absolute inset-0 h-px top-1/2 w-full bg-gradient-to-r from-transparent via-tus-white/[0.03] to-transparent"></div>
             <!-- Particule gauche -->
-            <div class="divider-spark absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full" style="background: radial-gradient(circle, #4D6FFF 0%, rgba(11,45,255,0.6) 40%, transparent 70%); filter: blur(0.5px);"></div>
+ <div class="divider-spark absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-divider-spark-blue" ></div>
             <!-- Particule droite (dual) -->
-            <div class="divider-spark-right absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full" style="background: radial-gradient(circle, #4D6FFF 0%, rgba(11,45,255,0.6) 40%, transparent 70%); filter: blur(0.5px);"></div>
+ <div class="divider-spark-right absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-divider-spark-blue" ></div>
             <!-- Onde de choc -->
             <div class="divider-shockwave absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full border border-blue-400/40"></div>
             <!-- Echo shockwave (delayed) -->
@@ -190,21 +212,21 @@
             <!-- Champ magnétique -->
             <div class="divider-field"></div>
             <!-- Halo ardent -->
-            <div class="divider-glow absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full" style="background: radial-gradient(circle, rgba(11,45,255,0.18) 0%, rgba(11,45,255,0.06) 40%, transparent 70%);"></div>
+ <div class="divider-glow absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-divider-glow-blue" ></div>
             <!-- Orbe vivant -->
             <div class="divider-orb absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div class="w-2.5 h-2.5 rounded-full" style="background: #4D6FFF; box-shadow: 0 0 12px 4px rgba(11,45,255,0.5), 0 0 40px 12px rgba(11,45,255,0.25), 0 0 80px 24px rgba(11,45,255,0.1);"></div>
+ <div class="w-2.5 h-2.5 rounded-full bg-divider-orb-blue" ></div>
             </div>
             <!-- Lignes d'énergie -->
-            <div class="divider-line-left absolute top-1/2 right-1/2 h-px origin-right" style="background: linear-gradient(270deg, rgba(77,111,255,0.6), rgba(11,45,255,0.15), transparent);"></div>
-            <div class="divider-line-right absolute top-1/2 left-1/2 h-px origin-left" style="background: linear-gradient(90deg, rgba(77,111,255,0.6), rgba(11,45,255,0.15), transparent);"></div>
+ <div class="divider-line-left absolute top-1/2 right-1/2 h-px origin-right bg-divider-line-left-blue" ></div>
+ <div class="divider-line-right absolute top-1/2 left-1/2 h-px origin-left bg-divider-line-right-blue" ></div>
             <!-- Étincelles -->
             <div class="divider-sparks absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1">
-                <span class="spark absolute rounded-full bg-blue-300" style="width:2px;height:2px;"></span>
-                <span class="spark absolute rounded-full bg-blue-400" style="width:1.5px;height:1.5px;"></span>
-                <span class="spark absolute rounded-full bg-blue-200" style="width:2px;height:2px;"></span>
-                <span class="spark absolute rounded-full bg-blue-300" style="width:1px;height:1px;"></span>
-                <span class="spark absolute rounded-full bg-white" style="width:1.5px;height:1.5px;"></span>
+ <span class="spark absolute rounded-full bg-blue-300 spark-2" ></span>
+ <span class="spark absolute rounded-full bg-blue-400 spark-1-5" ></span>
+ <span class="spark absolute rounded-full bg-blue-200 spark-2" ></span>
+ <span class="spark absolute rounded-full bg-blue-300 spark-1" ></span>
+ <span class="spark absolute rounded-full bg-white spark-1-5" ></span>
             </div>
         </div>
         <!-- Label -->
@@ -220,7 +242,7 @@
         <div class="max-w-6xl mx-auto px-6 relative z-10">
             <div class="grid lg:grid-cols-2 gap-20 items-center">
                 <!-- Visual — Code placeholder LEFT -->
-                <div class="order-2 lg:order-1 reveal-left" style="transition-delay: 0.1s;">
+ <div class="order-2 lg:order-1 reveal-left td-100" >
                     <!-- Capture Ch.02 -->
                     <div class="relative group image-luminance">
                         <div class="absolute -inset-3 bg-gradient-to-br from-tus-blue/15 to-cyan-500/10 rounded-3xl blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700"></div>
@@ -261,7 +283,7 @@
                             <h2 class="text-3xl md:text-4xl font-display font-bold">Défi technique</h2>
                         </div>
                     </div>
-                    <div class="space-y-6 reveal-right" style="transition-delay: 0.15s;">
+ <div class="space-y-6 reveal-right td-150" >
                         <div class="prose-chapter text-xl md:text-2xl text-tus-white/90 leading-relaxed narrative-text">
                             {{ project.solution|safe_html }}
                         </div>
@@ -288,23 +310,23 @@
     <div class="suspense-divider relative py-36 overflow-hidden" data-color="blue">
         <div class="divider-stage max-w-6xl mx-auto px-6 relative h-[2px]">
             <div class="divider-track absolute inset-0 h-px top-1/2 w-full bg-gradient-to-r from-transparent via-tus-white/[0.03] to-transparent"></div>
-            <div class="divider-spark absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full" style="background: radial-gradient(circle, #4D6FFF 0%, rgba(11,45,255,0.6) 40%, transparent 70%); filter: blur(0.5px);"></div>
-            <div class="divider-spark-right absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full" style="background: radial-gradient(circle, #4D6FFF 0%, rgba(11,45,255,0.6) 40%, transparent 70%); filter: blur(0.5px);"></div>
+ <div class="divider-spark absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-divider-spark-blue" ></div>
+ <div class="divider-spark-right absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-divider-spark-blue" ></div>
             <div class="divider-shockwave absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full border border-blue-400/40"></div>
             <div class="divider-echo absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full border border-blue-300/20"></div>
             <div class="divider-field"></div>
-            <div class="divider-glow absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full" style="background: radial-gradient(circle, rgba(11,45,255,0.18) 0%, rgba(11,45,255,0.06) 40%, transparent 70%);"></div>
+ <div class="divider-glow absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-divider-glow-blue" ></div>
             <div class="divider-orb absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div class="w-2.5 h-2.5 rounded-full" style="background: #4D6FFF; box-shadow: 0 0 12px 4px rgba(11,45,255,0.5), 0 0 40px 12px rgba(11,45,255,0.25), 0 0 80px 24px rgba(11,45,255,0.1);"></div>
+ <div class="w-2.5 h-2.5 rounded-full bg-divider-orb-blue" ></div>
             </div>
-            <div class="divider-line-left absolute top-1/2 right-1/2 h-px origin-right" style="background: linear-gradient(270deg, rgba(77,111,255,0.6), rgba(11,45,255,0.15), transparent);"></div>
-            <div class="divider-line-right absolute top-1/2 left-1/2 h-px origin-left" style="background: linear-gradient(90deg, rgba(77,111,255,0.6), rgba(11,45,255,0.15), transparent);"></div>
+ <div class="divider-line-left absolute top-1/2 right-1/2 h-px origin-right bg-divider-line-left-blue" ></div>
+ <div class="divider-line-right absolute top-1/2 left-1/2 h-px origin-left bg-divider-line-right-blue" ></div>
             <div class="divider-sparks absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1">
-                <span class="spark absolute rounded-full bg-blue-300" style="width:2px;height:2px;"></span>
-                <span class="spark absolute rounded-full bg-blue-400" style="width:1.5px;height:1.5px;"></span>
-                <span class="spark absolute rounded-full bg-blue-200" style="width:2px;height:2px;"></span>
-                <span class="spark absolute rounded-full bg-blue-300" style="width:1px;height:1px;"></span>
-                <span class="spark absolute rounded-full bg-white" style="width:1.5px;height:1.5px;"></span>
+ <span class="spark absolute rounded-full bg-blue-300 spark-2" ></span>
+ <span class="spark absolute rounded-full bg-blue-400 spark-1-5" ></span>
+ <span class="spark absolute rounded-full bg-blue-200 spark-2" ></span>
+ <span class="spark absolute rounded-full bg-blue-300 spark-1" ></span>
+ <span class="spark absolute rounded-full bg-white spark-1-5" ></span>
             </div>
         </div>
         <div class="divider-label absolute left-1/2 -translate-x-1/2 bottom-8">
@@ -327,7 +349,7 @@
             <div class="flex items-center gap-6 mb-16 reveal-left">
                 <div class="relative">
                     <span class="text-8xl lg:text-9xl font-display font-bold text-tus-blue-a11y/8 select-none leading-none parallax-num number-display text-shimmer" data-speed="0.05">03</span>
-                    <div class="chapter-accent absolute -left-4 top-2" style="--accent: rgba(11,45,255,0.5)"></div>
+                    <div class="chapter-accent absolute -left-4 top-2 chapter-accent-blue"></div>
                 </div>
                 <div>
                     <span class="text-tus-blue-a11y text-sm font-semibold uppercase tracking-[0.2em] block mb-1">Chapitre</span>
@@ -337,7 +359,7 @@
 
             {# ── Paragraphe d'introduction (optionnel, champ strategy TinyMCE) ── #}
             {% if project.strategy %}
-            <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
+ <div class="max-w-3xl mb-20 reveal td-100" >
                 <div class="prose-chapter text-xl md:text-2xl text-tus-white/90 leading-relaxed narrative-text">
                     {{ project.strategy|safe_html }}
                 </div>
@@ -349,7 +371,7 @@
             {% if phases %}
             {# Intro par défaut si pas de texte strategy #}
             {% if not project.strategy %}
-            <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
+ <div class="max-w-3xl mb-20 reveal td-100" >
                 <p class="text-xl md:text-2xl text-tus-white/90 leading-relaxed narrative-text">
                     Chaque projet nécessite une méthodologie adaptée. Pour {{ project.client_name|default:project.title }}, nous avons déployé un processus en {{ phases|length }} phase{{ phases|length|pluralize }} pour garantir un résultat aligné sur les objectifs.
                 </p>
@@ -362,7 +384,7 @@
                     <div class="w-full h-full bg-gradient-to-b from-tus-blue/40 via-tus-blue/20 to-tus-green/30 strategy-timeline-line"></div>
                 </div>
                 {% for phase in phases %}
-                <div class="relative pl-16 {% if not forloop.last %}pb-20{% endif %} reveal-left" style="transition-delay: 0.{{ forloop.counter0|add:"1" }}5s;">
+                <div class="relative pl-16 {% if not forloop.last %}pb-20{% endif %} reveal-left" data-td="{{ forloop.counter0|add:1 }}">
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full {% if forloop.last %}bg-tus-green/15 border-2 border-tus-green/40{% else %}bg-tus-blue/15 border-2 border-tus-blue/40{% endif %} flex items-center justify-center backdrop-blur-sm">
                         <span class="{% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %} text-xs font-bold">{{ forloop.counter|stringformat:"02d" }}</span>
                         <div class="timeline-pulse {% if forloop.last %}text-tus-green/30{% else %}text-tus-blue-a11y/30{% endif %}"></div>
@@ -409,7 +431,7 @@
             {# Aucune phase en BDD et pas de texte strategy → timeline par défaut #}
             {% if not project.strategy %}
             <!-- Contenu par défaut — timeline 3 phases -->
-            <div class="max-w-3xl mb-20 reveal" style="transition-delay: 0.1s;">
+ <div class="max-w-3xl mb-20 reveal td-100" >
                 <p class="text-xl md:text-2xl text-tus-white/90 leading-relaxed narrative-text">
                     Chaque projet nécessite une méthodologie adaptée. Pour {{ project.client_name|default:project.title }}, nous avons déployé un processus en trois phases pour garantir un résultat aligné sur les objectifs.
                 </p>
@@ -420,7 +442,7 @@
                     <div class="w-full h-full bg-gradient-to-b from-tus-blue/40 via-tus-blue/20 to-tus-green/30 strategy-timeline-line"></div>
                 </div>
                 <!-- Phase 1 — Analyse -->
-                <div class="relative pl-16 pb-20 reveal-left" style="transition-delay: 0.15s;">
+ <div class="relative pl-16 pb-20 reveal-left td-150" >
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full bg-tus-blue/15 border-2 border-tus-blue/40 flex items-center justify-center backdrop-blur-sm">
                         <span class="text-tus-blue-a11y text-xs font-bold">01</span>
                         <div class="timeline-pulse text-tus-blue-a11y/30"></div>
@@ -439,7 +461,7 @@
                     </div>
                 </div>
                 <!-- Phase 2 — Architecture -->
-                <div class="relative pl-16 pb-20 reveal-left" style="transition-delay: 0.3s;">
+ <div class="relative pl-16 pb-20 reveal-left td-300" >
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full bg-tus-blue/15 border-2 border-tus-blue/40 flex items-center justify-center backdrop-blur-sm">
                         <span class="text-tus-blue-a11y text-xs font-bold">02</span>
                         <div class="timeline-pulse text-tus-blue-a11y/30"></div>
@@ -458,7 +480,7 @@
                     </div>
                 </div>
                 <!-- Phase 3 — Déploiement -->
-                <div class="relative pl-16 reveal-left" style="transition-delay: 0.45s;">
+ <div class="relative pl-16 reveal-left td-450" >
                     <div class="absolute left-0 top-2 w-9 h-9 rounded-full bg-tus-green/15 border-2 border-tus-green/40 flex items-center justify-center backdrop-blur-sm">
                         <span class="text-tus-green text-xs font-bold">03</span>
                         <div class="timeline-pulse text-tus-green/30"></div>
@@ -483,7 +505,7 @@
 
             <!-- Stack technique reprise ici si pas déjà affichée en Ch.02 -->
             {% if project.tech_list %}
-            <div class="mt-20 reveal" style="transition-delay: 0.2s;">
+ <div class="mt-20 reveal td-200" >
                 <div class="flex items-center gap-3 mb-6">
                     <div class="w-8 h-px bg-gradient-to-r from-tus-blue/50 to-transparent"></div>
                     <span class="text-xs text-tus-white/40 uppercase tracking-widest">Technologies mobilisées</span>
@@ -499,7 +521,7 @@
             {% endif %}
 
             <!-- Capture architecture Ch.03 — full-width -->
-            <div class="mt-36 lg:mt-44 reveal-scale" style="transition-delay: 0.25s;">
+ <div class="mt-36 lg:mt-44 reveal-scale td-250" >
                 <div class="relative group image-luminance">
                     <div class="absolute -inset-4 bg-gradient-to-r from-tus-blue/10 via-cyan-500/10 to-tus-green/10 rounded-3xl blur-3xl opacity-40 group-hover:opacity-70 transition-opacity duration-700"></div>
                     <div class="relative rounded-2xl overflow-hidden border border-tus-white/10 bg-[#0d1117] gallery-tilt">
@@ -542,23 +564,23 @@
     <div class="suspense-divider relative py-36 overflow-hidden" data-color="green">
         <div class="divider-stage max-w-6xl mx-auto px-6 relative h-[2px]">
             <div class="divider-track absolute inset-0 h-px top-1/2 w-full bg-gradient-to-r from-transparent via-tus-white/[0.03] to-transparent"></div>
-            <div class="divider-spark absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full" style="background: radial-gradient(circle, #4ADE80 0%, rgba(34,197,94,0.6) 40%, transparent 70%); filter: blur(0.5px);"></div>
-            <div class="divider-spark-right absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full" style="background: radial-gradient(circle, #4ADE80 0%, rgba(34,197,94,0.6) 40%, transparent 70%); filter: blur(0.5px);"></div>
+ <div class="divider-spark absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-divider-spark-green" ></div>
+ <div class="divider-spark-right absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-divider-spark-green" ></div>
             <div class="divider-shockwave absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full border border-green-400/40"></div>
             <div class="divider-echo absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 rounded-full border border-green-300/20"></div>
             <div class="divider-field"></div>
-            <div class="divider-glow absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full" style="background: radial-gradient(circle, rgba(34,197,94,0.18) 0%, rgba(34,197,94,0.06) 40%, transparent 70%);"></div>
+ <div class="divider-glow absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-divider-glow-green" ></div>
             <div class="divider-orb absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div class="w-2.5 h-2.5 rounded-full" style="background: #4ADE80; box-shadow: 0 0 12px 4px rgba(34,197,94,0.5), 0 0 40px 12px rgba(34,197,94,0.25), 0 0 80px 24px rgba(34,197,94,0.1);"></div>
+ <div class="w-2.5 h-2.5 rounded-full bg-divider-orb-green" ></div>
             </div>
-            <div class="divider-line-left absolute top-1/2 right-1/2 h-px origin-right" style="background: linear-gradient(270deg, rgba(74,222,128,0.6), rgba(34,197,94,0.15), transparent);"></div>
-            <div class="divider-line-right absolute top-1/2 left-1/2 h-px origin-left" style="background: linear-gradient(90deg, rgba(74,222,128,0.6), rgba(34,197,94,0.15), transparent);"></div>
+ <div class="divider-line-left absolute top-1/2 right-1/2 h-px origin-right bg-divider-line-left-green" ></div>
+ <div class="divider-line-right absolute top-1/2 left-1/2 h-px origin-left bg-divider-line-right-green" ></div>
             <div class="divider-sparks absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1">
-                <span class="spark absolute rounded-full bg-green-300" style="width:2px;height:2px;"></span>
-                <span class="spark absolute rounded-full bg-green-400" style="width:1.5px;height:1.5px;"></span>
-                <span class="spark absolute rounded-full bg-green-200" style="width:2px;height:2px;"></span>
-                <span class="spark absolute rounded-full bg-green-300" style="width:1px;height:1px;"></span>
-                <span class="spark absolute rounded-full bg-white" style="width:1.5px;height:1.5px;"></span>
+ <span class="spark absolute rounded-full bg-green-300 spark-2" ></span>
+ <span class="spark absolute rounded-full bg-green-400 spark-1-5" ></span>
+ <span class="spark absolute rounded-full bg-green-200 spark-2" ></span>
+ <span class="spark absolute rounded-full bg-green-300 spark-1" ></span>
+ <span class="spark absolute rounded-full bg-white spark-1-5" ></span>
             </div>
         </div>
         <div class="divider-label absolute left-1/2 -translate-x-1/2 bottom-8">
@@ -584,13 +606,13 @@
                         <h2 class="text-3xl md:text-4xl font-display font-bold">Résultat</h2>
                     </div>
                 </div>
-                <div class="prose-chapter text-xl text-tus-white/90 max-w-3xl mx-auto leading-relaxed reveal" style="transition-delay: 0.1s;">
+ <div class="prose-chapter text-xl text-tus-white/90 max-w-3xl mx-auto leading-relaxed reveal td-100" >
                     {{ project.result|safe_html }}
                 </div>
             </div>
 
             <!-- Résultat capture — full-width hero image -->
-            <div class="reveal-scale" style="transition-delay: 0.15s;">
+ <div class="reveal-scale td-150" >
                 <div class="relative group image-luminance" data-cursor="view">
                     <div class="absolute -inset-4 bg-gradient-to-r from-tus-green/15 via-tus-blue/10 to-tus-green/15 rounded-3xl blur-3xl opacity-30 group-hover:opacity-60 transition-opacity duration-700"></div>
                     <div class="relative rounded-3xl overflow-hidden border border-tus-white/10 bg-tus-white/[0.03] shadow-2xl shadow-tus-blue/5 gallery-tilt">
@@ -625,7 +647,7 @@
 
             <!-- Impact metrics row -->
             {% if project.url %}
-            <div class="mt-16 reveal" style="transition-delay: 0.2s;">
+ <div class="mt-16 reveal td-200" >
                 <a href="{{ project.url }}" target="_blank" rel="noopener" 
                    class="group flex items-center justify-between p-6 rounded-2xl border border-tus-green/20 bg-tus-green/[0.03] hover:bg-tus-green/[0.08] hover:border-tus-green/40 transition-all duration-500">
                     <div class="flex items-center gap-4">
@@ -778,8 +800,15 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 (function() {
+    // ============================================
+    // DATA-TD: Apply transition-delay from data attribute
+    // ============================================
+    document.querySelectorAll('[data-td]').forEach(function(el) {
+        el.style.transitionDelay = '0.' + el.dataset.td + '5s';
+    });
+
     // ============================================
     // SCROLL PROGRESS BAR
     // ============================================
@@ -877,9 +906,16 @@
     if (heroTitle && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         const text = heroTitle.textContent.trim();
         const words = text.split(/\s+/);
+        // Build spans without inline style="" — use CSS classes + JS .style for dynamic delays
         heroTitle.innerHTML = words.map((word, i) =>
-            `<span class="inline-block overflow-hidden"><span class="inline-block hero-word" style="transform: translateY(110%); opacity: 0; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${0.25 + i * 0.08}s, opacity 0.6s ease ${0.25 + i * 0.08}s;">${word}</span></span>`
+            `<span class="inline-block overflow-hidden"><span class="inline-block hero-word hero-word-init" data-hw-delay="${i}">${word}</span></span>`
         ).join(' ');
+        // Apply per-word transition delays via JS (CSP-safe: element.style.x is allowed)
+        heroTitle.querySelectorAll('.hero-word').forEach(w => {
+            const idx = parseInt(w.dataset.hwDelay, 10);
+            const delay = (0.25 + idx * 0.08) + 's';
+            w.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ' + delay + ', opacity 0.6s ease ' + delay;
+        });
 
         // Replace reveal-clip with manual trigger (we handle it ourselves)
         heroTitle.classList.remove('reveal-clip');
@@ -890,8 +926,8 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     heroTitle.querySelectorAll('.hero-word').forEach(w => {
-                        w.style.transform = 'translateY(0)';
-                        w.style.opacity = '1';
+                        w.classList.remove('hero-word-init');
+                        w.classList.add('hero-word-reveal');
                     });
                     titleObserver.unobserve(heroTitle);
                 }

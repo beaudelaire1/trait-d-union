@@ -35,3 +35,16 @@ nh3>=0.2.14
 
 # Tâches asynchrones (emails, PDF, etc.)
 django-q2>=1.6.0
+
+# 🛡️ SECURITY: Content Security Policy with nonces
+django-csp>=3.8
+
+# 🛡️ SECURITY: Permissions-Policy header
+django-permissions-policy>=4.18.0
+
+# 🛡️ SECURITY: Admin 2FA (TOTP)
+django-otp>=1.3.0
+qrcode>=7.4
+
+# Redis client for health checks
+redis>=5.0.0

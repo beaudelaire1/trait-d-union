@@ -210,6 +210,28 @@ class QuoteRequestForm(forms.ModelForm):
         widget=MultiFileInput(attrs={"multiple": True}),
     )
 
+    # Magic bytes for allowed image types
+    _IMAGE_MAGIC = {
+        b'\xff\xd8\xff': 'image/jpeg',
+        b'\x89PNG\r\n\x1a\n': 'image/png',
+        b'GIF87a': 'image/gif',
+        b'GIF89a': 'image/gif',
+        b'RIFF': 'image/webp',  # RIFF....WEBP
+    }
+
+    def _validate_image_magic(self, f):
+        """Validate file magic bytes match an allowed image format."""
+        f.seek(0)
+        header = f.read(12)
+        f.seek(0)
+        for magic, _ in self._IMAGE_MAGIC.items():
+            if header.startswith(magic):
+                return True
+        # Special case for WEBP: RIFF + 4 bytes size + WEBP
+        if header[:4] == b'RIFF' and header[8:12] == b'WEBP':
+            return True
+        return False
+
     def clean_photos(self):
         files = self.files.getlist("photos")
         if not files:
@@ -218,9 +240,20 @@ class QuoteRequestForm(forms.ModelForm):
         if len(files) > 5:
             raise forms.ValidationError("Maximum 5 fichiers.")
 
+        allowed_content_types = {'image/jpeg', 'image/png', 'image/gif', 'image/webp'}
         for f in files:
             if f.size > 5 * 1024 * 1024:
                 raise forms.ValidationError("Chaque fichier doit faire au maximum 5 Mo.")
+            if f.content_type not in allowed_content_types:
+                raise forms.ValidationError(
+                    f"Type de fichier non autorisé : {f.content_type}. "
+                    "Seuls JPEG, PNG, GIF et WebP sont acceptés."
+                )
+            # 🛡️ SECURITY: Validate magic bytes to prevent content-type spoofing
+            if not self._validate_image_magic(f):
+                raise forms.ValidationError(
+                    f"Le fichier « {f.name} » ne correspond pas à un format image valide."
+                )
 
         self.cleaned_data["photos_list"] = files
         # conserve une valeur compat (ModelForm) même si on utilise photos_list

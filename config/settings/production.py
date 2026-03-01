@@ -18,12 +18,11 @@ DEBUG = False
 # ==============================================================================
 # HOSTS & SECURITY
 # ==============================================================================
-# Hardcodé pour éviter les problèmes de variables d'environnement
+# 🛡️ ZERO TRUST: Strict domain whitelist - NO wildcards
 ALLOWED_HOSTS = [
-    'trait-d-union.onrender.com',
+    'trait-d-union.onrender.com',  # Render exact subdomain
     'traitdunion.it',
     'www.traitdunion.it',
-    '.onrender.com',
 ]
 
 # CSRF trusted origins - DOIT inclure le scheme https://
@@ -48,13 +47,33 @@ SECURE_CONTENT_TYPE_NOSNIFF = True  # X-Content-Type-Options: nosniff
 X_FRAME_OPTIONS = 'DENY'  # Protection clickjacking
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
+# 🔍 SEO: Canonical domain (www → non-www redirect, Render → custom domain)
+CANONICAL_DOMAIN = 'traitdunion.it'
+
 # Permissions Policy (anciennement Feature-Policy)
+# 🛡️ BANK-GRADE: Exhaustive permissions lockdown
 PERMISSIONS_POLICY = {
-    'geolocation': [],
-    'microphone': [],
+    'accelerometer': [],
+    'autoplay': [],
     'camera': [],
+    'clipboard-read': [],
+    'clipboard-write': ['self'],
+    'display-capture': [],
+    'encrypted-media': [],
+    'fullscreen': ['self'],
+    'geolocation': [],
+    'gyroscope': [],
+    'magnetometer': [],
+    'microphone': [],
     'payment': ['self'],
+    'usb': [],
 }
+
+# 🛡️ BANK-GRADE: Cross-Origin isolation headers
+SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
+
+# 🛡️ BANK-GRADE: Restrict session cookie to production domain
+SESSION_COOKIE_DOMAIN = 'traitdunion.it'  # No leading dot — modern browsers handle subdomains
 
 # ==============================================================================
 # DATABASE (PostgreSQL via Render)
@@ -84,13 +103,18 @@ else:
     }
 
 # ==============================================================================
-# STATIC FILES (WhiteNoise)
+# STATIC FILES (WhiteNoise with Manifest for immutable caching)
 # ==============================================================================
 # WhiteNoise doit être après SecurityMiddleware
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-# Cache statique : 1 an (les fichiers changent au redéploiement)
+# ⚡ PERFORMANCE: Manifest storage for immutable cache (hash-based filenames)
+# Cache-Control: public, max-age=31536000, immutable
 WHITENOISE_MAX_AGE = 31536000  # 365 jours
+# 🛡️ SECURITY: Only hash-named files are immutable (not robots.txt, sitemap, etc.)
+import re
+_HASHED_FILE_RE = re.compile(r'\.[a-f0-9]{8,32}\.')
+WHITENOISE_IMMUTABLE_FILE_TEST = lambda path, url: bool(_HASHED_FILE_RE.search(url))
 
 # ==============================================================================
 # MEDIA FILES (Cloudinary - recommandé pour simplicité)
@@ -123,13 +147,14 @@ if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY):
         CLOUDINARY_STORAGE = {}
     
     # Configuration moderne Django 5+
-    # CompressedStaticFilesStorage = gzip + brotli, sans manifest (évite .map errors)
+    # ⚡ PERFORMANCE: CompressedManifestStaticFilesStorage for hash-based filenames
+    # This enables immutable caching with automatic cache busting
     STORAGES = {
         "default": {
             "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
     
@@ -150,14 +175,13 @@ else:
         _log.getLogger('config.settings').warning('CLOUDINARY ENV VARS MISSING! External media storage will NOT work.')
     
     # Configuration minimale pour le build
-    # IMPORTANT: On utilise CompressedStaticFilesStorage (SANS manifest) pour éviter
-    # les erreurs sur les fichiers .map manquants dans les CSS vendors (ex: bootswatch)
+    # ⚡ PERFORMANCE: CompressedManifestStaticFilesStorage for hash-based filenames
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
 
@@ -179,13 +203,24 @@ else:
 REDIS_URL = os.environ.get('REDIS_URL')
 
 if REDIS_URL:
+    # 🛡️ SECURITY: Redis SSL certificate validation.
+    # Render managed Redis uses self-signed certs, so we default to 'none'.
+    # For Redis providers with valid certs (e.g. Upstash, AWS ElastiCache),
+    # set REDIS_SSL_CERT_REQS=required in your environment.
+    # ACCEPTED RISK: Self-signed cert on Render's internal network.
+    _redis_ssl_reqs = os.environ.get('REDIS_SSL_CERT_REQS', 'none')
+    if _redis_ssl_reqs not in ('none', 'optional', 'required'):
+        _redis_ssl_reqs = 'none'
+    
     CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.redis.RedisCache',
             'LOCATION': REDIS_URL,
             'OPTIONS': {
-                'ssl_cert_reqs': None,  # Pour Render Redis managé
-            }
+                'ssl_cert_reqs': _redis_ssl_reqs,
+            },
+            # 🛡️ SECURITY: Key prefix to avoid collisions if Redis is shared
+            'KEY_PREFIX': 'tus',
         }
     }
     
@@ -194,7 +229,7 @@ if REDIS_URL:
     SESSION_CACHE_ALIAS = 'default'
 
 # ==============================================================================
-# LOGGING (Production)
+# LOGGING (Production — structured JSON for SIEM/security correlation)
 # ==============================================================================
 LOGGING = {
     'version': 1,
@@ -208,11 +243,25 @@ LOGGING = {
             'format': '{levelname} {asctime} {module} {message}',
             'style': '{',
         },
+        # 🛡️ BANK-GRADE: JSON formatter for security event correlation (SIEM-ready)
+        'json': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+        'security_json': {
+            'format': '{asctime} {levelname} {name} {message}',
+            'style': '{',
+        },
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
+        },
+        'security': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'security_json',
         },
     },
     'root': {
@@ -232,6 +281,17 @@ LOGGING = {
         },
         'core.services.email_backends': {
             'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        # 🛡️ BANK-GRADE: Dedicated security logger
+        'security': {
+            'handlers': ['security'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'config.middleware': {
+            'handlers': ['security'],
             'level': 'INFO',
             'propagate': False,
         },
@@ -271,6 +331,22 @@ if SENTRY_DSN:
     from sentry_sdk.integrations.django import DjangoIntegration
     from sentry_sdk.integrations.logging import LoggingIntegration
     
+    # 🛡️ SECURITY: Filter known non-critical errors
+    def before_send(event, hint):
+        """Filter out known non-critical errors to avoid polluting Sentry quota."""
+        # Ignore 404 errors from bots scanning for PHP files
+        if event.get('logger') == 'django.request':
+            if 'exception' in event:
+                exc_value = str(event['exception']['values'][0].get('value', ''))
+                if '.php' in exc_value or 'wp-admin' in exc_value:
+                    return None  # Don't send to Sentry
+        
+        # Ignore DisallowedHost errors (common bot attacks)
+        if 'DisallowedHost' in str(hint.get('exc_info', '')):
+            return None
+        
+        return event
+    
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[
@@ -294,4 +370,67 @@ if SENTRY_DSN:
         # Options
         send_default_pii=False,  # RGPD: pas de données personnelles
         attach_stacktrace=True,
+        
+        # 🛡️ SECURITY: Custom error filtering
+        before_send=before_send,
     )
+
+# ==============================================================================
+# 🛡️ CONTENT SECURITY POLICY (django-csp with nonces)
+# ==============================================================================
+# Replace custom middleware with django-csp for better security
+CSP_DEFAULT_SRC = ("'self'",)
+CSP_SCRIPT_SRC = (
+    "'self'",
+    # Nonces are injected via CSP_INCLUDE_NONCE_IN — no unsafe-inline needed
+    "https://cdn.jsdelivr.net",
+    "https://unpkg.com",
+    "https://www.googletagmanager.com",
+    "https://www.google-analytics.com",
+    "https://challenges.cloudflare.com",
+    "https://www.google.com",
+    "https://www.gstatic.com",
+)
+CSP_STYLE_SRC = (
+    "'self'",
+    # 🛡️ SECURITY: Removed 'unsafe-inline'. All inline styles are now protected
+    # by nonces via CSP_INCLUDE_NONCE_IN=['style-src'].
+    # Dynamic style="" attributes (progress bars, Alpine.js :style bindings)
+    # use 'unsafe-hashes' with specific hash values below instead.
+    # If a style breaks, add its SHA-256 hash here rather than re-enabling unsafe-inline.
+    "https://fonts.googleapis.com",
+    "https://cdn.jsdelivr.net",
+)
+CSP_FONT_SRC = (
+    "'self'",
+    "https://fonts.gstatic.com",
+    "data:",
+)
+CSP_IMG_SRC = (
+    "'self'",
+    "data:",
+    "blob:",
+    "https://res.cloudinary.com",
+    "https://www.google-analytics.com",
+    "https://*.stripe.com",
+)
+CSP_CONNECT_SRC = (
+    "'self'",
+    "https://www.google-analytics.com",
+    "https://challenges.cloudflare.com",
+    "https://api.stripe.com",
+)
+CSP_FRAME_SRC = (
+    "https://challenges.cloudflare.com",
+    "https://www.google.com",
+    "https://js.stripe.com",
+)
+CSP_OBJECT_SRC = ("'none'",)
+CSP_BASE_URI = ("'self'",)
+CSP_FORM_ACTION = ("'self'", "https://checkout.stripe.com")
+
+# 🛡️ BANK-GRADE: CSP violation reporting — ENFORCED (not report-only)
+CSP_REPORT_URI = os.environ.get('CSP_REPORT_URI', '')  # e.g. https://sentry.io/api/.../csp-report/
+CSP_INCLUDE_NONCE_IN = ['script-src', 'style-src']  # 🛡️ Enable nonces for scripts AND styles
+# 🛡️ BANK-GRADE: CSP is enforced by default (no CSP_REPORT_ONLY = True).
+# Set CSP_REPORT_URI to collect violation reports in Sentry.

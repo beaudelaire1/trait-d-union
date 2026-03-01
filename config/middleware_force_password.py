@@ -20,7 +20,6 @@ class ForcePasswordChangeMiddleware(MiddlewareMixin):
     # URLs exemptées du blocage (préfixes)
     EXEMPT_PREFIXES = [
         '/tus-gestion-secure/',
-        '/api/',
         '/static/',
         '/media/',
     ]
@@ -57,26 +56,45 @@ class ForcePasswordChangeMiddleware(MiddlewareMixin):
         return redirect(change_url)
 
     def process_response(self, request, response):
-        """Après un changement de mot de passe réussi (POST + 302), retirer le flag."""
+        """Après un changement de mot de passe réussi, retirer le flag.
+
+        🛡️ BANK-GRADE: Vérifie directement le flag DB du profil client
+        au lieu de se fier uniquement au code HTTP 302 (fragile si allauth
+        change son comportement de redirection).
+        """
         change_url = self._get_change_password_url()
 
         if (
             request.method == 'POST'
             and request.path == change_url
-            and response.status_code == 302
             and request.session.get('must_change_password', False)
         ):
-            # Succès : retirer le flag session
-            request.session.pop('must_change_password', None)
-            request.session.pop('must_change_password_reason', None)
-
-            # Retirer le flag persistant du profil client
+            # Vérifier si le profil DB a été mis à jour (password réellement changé)
+            # On accepte aussi le 302 comme signal complémentaire
+            profile_cleared = False
             try:
                 profile = request.user.client_profile
-                if profile.must_change_password:
-                    profile.must_change_password = False
-                    profile.save(update_fields=['must_change_password'])
+                # Recharger depuis la DB pour avoir l'état frais
+                profile.refresh_from_db(fields=['must_change_password'])
+                if not profile.must_change_password:
+                    profile_cleared = True
             except (AttributeError, Exception):
                 pass
+
+            # Accepter si le profil DB est déjà clear OU si POST+302 (rétrocompat)
+            if profile_cleared or response.status_code == 302:
+                # Retirer le flag session
+                request.session.pop('must_change_password', None)
+                request.session.pop('must_change_password_reason', None)
+
+                # S'assurer que le flag DB est aussi retiré
+                if not profile_cleared:
+                    try:
+                        profile = request.user.client_profile
+                        if profile.must_change_password:
+                            profile.must_change_password = False
+                            profile.save(update_fields=['must_change_password'])
+                    except (AttributeError, Exception):
+                        pass
 
         return response

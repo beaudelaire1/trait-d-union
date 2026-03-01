@@ -46,6 +46,10 @@
                             class="hover:text-tus-blue-a11y transition-colors text-tus-white/80">Portfolio</a></li>
                         <li><a href="{% url 'pages:method' %}"
                             class="hover:text-tus-blue-a11y transition-colors text-tus-white/80">Méthode</a></li>
+                        <li><a href="{% url 'chroniques:list' %}"
+                            class="hover:text-tus-blue-a11y transition-colors text-tus-white/80">Chroniques</a></li>
+                        <li><a href="{% url 'pages:faq' %}"
+                            class="hover:text-tus-blue-a11y transition-colors text-tus-white/80">FAQ</a></li>
                         <li><a href="{% url 'leads:contact' %}"
                             class="hover:text-tus-blue-a11y transition-colors text-tus-white/80">Contact</a></li>
                 </ul>
@@ -62,8 +66,7 @@
                     </li>
                     <li><a href="tel:+594695358041" class="hover:text-tus-blue-a11y transition-colors">+594 695 35 80
                             41</a></li>
-                    <li>{% include 'partials/contact_email.html' with link_style="hover:text-tus-blue-a11y
-                        transition-colors" %}</li>
+                    <li>{% include 'partials/contact_email.html' with link_style="hover:text-tus-blue-a11y transition-colors" %}</li>
                 </ul>
             </div>
 

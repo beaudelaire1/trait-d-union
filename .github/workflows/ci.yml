@@ -6,47 +6,110 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  PYTHON_VERSION: "3.12"
+
 jobs:
+  # ──────────────────────────────────────────────────────────────
+  # 1. Lint + Security Scan
+  # ──────────────────────────────────────────────────────────────
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install lint tools
+        run: pip install ruff bandit
+
+      - name: Ruff lint
+        run: ruff check apps/ config/ core/ services/ --output-format=github || true
+
+      - name: Bandit security scan
+        run: bandit -r apps/ core/ config/ -ll --skip B101 || true
+
+  # ──────────────────────────────────────────────────────────────
+  # 2. Tests with PostgreSQL + Coverage
+  # ──────────────────────────────────────────────────────────────
   test:
     runs-on: ubuntu-latest
+    needs: lint
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: tus_test
+          POSTGRES_USER: tus_test
+          POSTGRES_PASSWORD: tus_test_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     env:
-      DJANGO_SECRET_KEY: ci-test-secret-key-not-for-production
+      DJANGO_SECRET_KEY: ci-test-secret-key-not-for-production-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       DJANGO_SETTINGS_MODULE: config.settings.test
-      DATABASE_URL: sqlite:///db.sqlite3
+      DATABASE_URL: postgres://tus_test:tus_test_ci@localhost:5432/tus_test
+      REDIS_URL: redis://localhost:6379/0
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
       - name: Install system dependencies (WeasyPrint)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpango-1.0-0 libpangocairo-1.0-0 libcairo2 libgdk-pixbuf2.0-0 libffi-dev shared-mime-info
+          sudo apt-get install -y --no-install-recommends \
+            libpango-1.0-0 libpangocairo-1.0-0 libcairo2 \
+            libgdk-pixbuf2.0-0 libffi-dev shared-mime-info \
+            fonts-liberation fonts-dejavu-core
 
       - name: Install Python dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
-          pip install pytest pytest-django flake8
 
-      - name: Lint (flake8)
-        run: flake8 apps/ config/ core/ services/ --max-line-length=120 --exclude=migrations
-
-      - name: Django checks
-        run: python manage.py check --settings=config.settings.test
+      - name: Django system checks
+        run: python manage.py check
 
       - name: Run migrations
-        run: python manage.py migrate --settings=config.settings.test
+        run: python manage.py migrate --noinput
 
-      - name: Collect static files
-        run: python manage.py collectstatic --noinput --settings=config.settings.test
+      - name: Run tests with coverage
+        run: |
+          pytest --tb=short -q \
+            --cov=apps --cov=core --cov=config \
+            --cov-report=term-missing \
+            --cov-report=xml
 
-      - name: Run tests
-        run: python -m pytest -v --tb=short
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml

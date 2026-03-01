@@ -6,7 +6,7 @@
 {% block extrahead %}
 {{ block.super }}
 <script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
-<style>
+<style nonce="{{ request.csp_nonce }}">
     .bulk-form { max-width: 1000px; margin: 0 auto; }
     .form-group { margin-bottom: 20px; }
     .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
@@ -94,8 +94,8 @@
 
 {% block content %}
 <div class="bulk-form">
-    <h1 style="margin-bottom: 10px;">📧 Envoi en masse</h1>
-    <p style="color: #666; margin-bottom: 30px;">
+    <h1 class="bulk-heading">📧 Envoi en masse</h1>
+    <p class="bulk-subtitle">
         Envoyez le même email à plusieurs destinataires. Chaque personne recevra un email <strong>individuel</strong> 
         (pas de CC/BCC visible).
     </p>
@@ -183,7 +183,7 @@ Ou séparés par des virgules : email1@ex.com, email2@ex.com"
         </div>
         
         <!-- Submit -->
-        <div class="form-group" style="margin-top: 30px;">
+        <div class="form-group bulk-submit-group">
             <button type="submit" class="btn-send" id="submitBtn">
                 🚀 Envoyer à <span id="sendCount">0</span> destinataire(s)
             </button>
@@ -195,7 +195,7 @@ Ou séparés par des virgules : email1@ex.com, email2@ex.com"
     </form>
 </div>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
     // Initialiser TinyMCE
     tinymce.init({
         selector: '#body_html',

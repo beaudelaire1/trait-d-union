@@ -104,10 +104,10 @@
                             <thead>
                                 <tr>
                                     <th class="text-left">Description</th>
-                                    <th class="text-center" style="width: 80px;">Qté</th>
-                                    <th class="text-right" style="width: 140px;">Prix unit.</th>
-                                    <th class="text-right" style="width: 90px;">TVA</th>
-                                    <th class="text-right" style="width: 140px;">Total TTC</th>
+                                    <th class="text-center col-qty">Qté</th>
+                                    <th class="text-right col-price">Prix unit.</th>
+                                    <th class="text-right col-vat">TVA</th>
+                                    <th class="text-right col-total">Total TTC</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -157,7 +157,7 @@
             </div>
 
             <!-- Aperçu PDF -->
-            <div class="detail-card" style="margin-top: 1.5rem;">
+            <div class="detail-card mt-6">
                 <div class="detail-card-header">
                     <h2>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -177,7 +177,7 @@
     </main>
 </div>
 
-<style>
+<style nonce="{{ request.csp_nonce }}">
 /* ========================================
    QUOTE DETAIL - DARK PREMIUM THEME
    Cohérent avec le portail client TUS

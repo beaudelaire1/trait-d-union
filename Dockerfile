@@ -1,11 +1,31 @@
 # ==============================================================================
-# Dockerfile - Trait d'Union Studio
+# Dockerfile - Trait d'Union Studio (multi-stage build)
 # ==============================================================================
-# Image simple basée sur Python Bookworm (miroirs Debian stables)
+# Stage 1: Build dependencies + collectstatic
+# Stage 2: Slim production image
 
-FROM python:3.12-bookworm
+# ── STAGE 1 : Builder ────────────────────────────────────────────
+FROM python:3.12-slim-bookworm AS builder
 
-# Variables d'environnement
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /build
+
+# Install build dependencies (needed for pip compile steps, weasyprint libs, etc.)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libffi-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+# ── STAGE 2 : Production ─────────────────────────────────────────
+FROM python:3.12-slim-bookworm
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.production \
@@ -17,46 +37,43 @@ ARG DATABASE_URL=sqlite:///dummy.db
 
 WORKDIR /app
 
-# Dépendances système WeasyPrint
-RUN apt-get update && apt-get install -y \
+# Runtime-only system dependencies (WeasyPrint + PostgreSQL client)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
     libcairo2 \
     libgdk-pixbuf2.0-0 \
-    libffi-dev \
+    libffi8 \
     shared-mime-info \
     fonts-liberation \
     fonts-dejavu-core \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copier et installer les requirements Python
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy installed Python packages from builder
+COPY --from=builder /install /usr/local
 
-# Copier le code source
+# Copy source code
 COPY . .
 
-# Créer les répertoires
+# Create directories
 RUN mkdir -p /app/staticfiles /app/media
 
-# Collecter les fichiers statiques (ARGs disponibles au build-time uniquement)
+# Collect static files (build-time only)
 RUN DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY} DATABASE_URL=${DATABASE_URL} \
     python manage.py collectstatic --noinput --clear
 
-# Créer un utilisateur non-root pour la sécurité (avec home dir pour pip/cache)
+# Create non-root user for security
 RUN addgroup --system appgroup \
     && adduser --system --ingroup appgroup --home /home/appuser appuser \
     && mkdir -p /home/appuser \
     && chown -R appuser:appgroup /app /home/appuser
 USER appuser
 
-# Port
 EXPOSE ${PORT}
 
-# Health check — vérifie que l'app répond
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT}/healthz/')" || exit 1
 
-# Démarrage - Force les settings de production
+# Gunicorn with production settings
 CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.production gunicorn config.wsgi:application --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]

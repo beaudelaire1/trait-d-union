@@ -13,6 +13,7 @@ from django.views.generic import FormView, TemplateView
 
 from core.services.captcha import verify_recaptcha as core_verify_recaptcha
 from core.services.captcha import verify_turnstile as core_verify_turnstile
+from core.utils import get_client_ip
 from .forms import ContactForm, DynamicFieldsForm
 from .models import Lead
 from .services import EmailService
@@ -44,10 +45,25 @@ class ContactView(FormView):
         context['turnstile_fallback_timeout_ms'] = int(
             getattr(settings, 'TURNSTILE_FALLBACK_TIMEOUT_MS', 2500)
         )
+        context['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Contact', 'url': '/contact/'},
+        ]
         return context
 
     def form_valid(self, form: ContactForm) -> HttpResponse:
         remote_ip = self.get_client_ip()
+
+        # 🛡️ HONEYPOT CHECK - Silent rejection for bots
+        honeypot_value = form.cleaned_data.get('honeypot', '')
+        if honeypot_value:
+            # Bot detected - return fake success to avoid alerting the bot
+            logger.warning(
+                "Honeypot triggered - Bot detected from IP %s with value: %s",
+                remote_ip, honeypot_value[:50]
+            )
+            # Return success page without saving or sending emails
+            return redirect(self.success_url)
 
         # Turnstile en priorité, reCAPTCHA en fallback
         turnstile_token = self.request.POST.get('cf-turnstile-response', '')
@@ -81,11 +97,7 @@ class ContactView(FormView):
         return redirect(self.success_url)
 
     def get_client_ip(self) -> str:
-        # Simplistic IP extraction; may need improvements behind proxy
-        ip = self.request.META.get('HTTP_X_FORWARDED_FOR')
-        if ip:
-            return ip.split(',')[0]
-        return self.request.META.get('REMOTE_ADDR', '') or ''
+        return get_client_ip(self.request)
 
 
 class DynamicFieldsView(View):

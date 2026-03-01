@@ -80,7 +80,7 @@ def create_client_account(
             logger.info(f"Compte client existant : {email}")
         except User.DoesNotExist:
             is_new = True
-            temporary_password = secrets.token_urlsafe(16)
+            temporary_password = secrets.token_urlsafe(24)  # 🛡️ BANK-GRADE: 192-bit entropy
 
             # Username à partir de l'email
             username_base = email.split('@')[0]
@@ -129,6 +129,16 @@ def create_client_account(
             async_send_welcome_email(user.pk, temporary_password)
         except Exception as e:
             logger.exception(f"Échec dispatch email bienvenue : {e}")
+
+    # 🛡️ SECURITY: Auto-link any existing Client (devis) records to this profile
+    try:
+        from apps.devis.models import Client as DevisClient
+        DevisClient.objects.filter(
+            email__iexact=email,
+            linked_profile__isnull=True,
+        ).update(linked_profile=client_profile)
+    except Exception:
+        logger.exception("Échec auto-link Client → ClientProfile pour %s", email)
 
     return ClientAccountResult(
         user=user,
@@ -292,7 +302,7 @@ def reset_password_and_notify(user: User) -> str:
     Returns:
         Le nouveau mot de passe temporaire
     """
-    new_password = secrets.token_urlsafe(16)
+    new_password = secrets.token_urlsafe(24)  # 🛡️ BANK-GRADE: 192-bit entropy
     user.set_password(new_password)
     user.save(update_fields=['password'])
 

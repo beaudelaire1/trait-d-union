@@ -224,7 +224,9 @@ class Project(models.Model):
         verbose_name_plural = "Projets"
         ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['status'], name='idx_project_status'),
+            models.Index(fields=['status', '-created_at'], name='idx_project_status_date'),
+            models.Index(fields=['client', 'status'], name='idx_project_client_status'),
+            models.Index(fields=['workflow_template'], name='idx_project_workflow'),
         ]
     
     def __str__(self):
@@ -375,6 +377,10 @@ class ProjectMilestone(models.Model):
         verbose_name = "Jalon"
         verbose_name_plural = "Jalons"
         ordering = ['order', 'due_date']
+        indexes = [
+            models.Index(fields=['project', 'status'], name='idx_milestone_project_status'),
+            models.Index(fields=['project', 'order'], name='idx_milestone_project_order'),
+        ]
     
     def __str__(self):
         return f"{self.project.name} - {self.title}"
@@ -471,6 +477,10 @@ class ProjectActivity(models.Model):
         verbose_name = "Activité projet"
         verbose_name_plural = "Activités projet"
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['project', '-created_at'], name='idx_activity_project_date'),
+            models.Index(fields=['project', 'is_client_visible'], name='idx_activity_visible'),
+        ]
     
     def __str__(self):
         return f"{self.project.name} - {self.title}"
@@ -540,6 +550,9 @@ class ProjectComment(models.Model):
         verbose_name = "Commentaire projet"
         verbose_name_plural = "Commentaires projet"
         ordering = ['created_at']
+        indexes = [
+            models.Index(fields=['project', 'is_internal'], name='idx_comment_project_internal'),
+        ]
     
     def __str__(self):
         return f"{self.project.name} - {self.author.get_full_name()}"
@@ -605,6 +618,9 @@ class ClientDocument(models.Model):
         verbose_name = "Document"
         verbose_name_plural = "Documents"
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['client', '-created_at'], name='idx_document_client_date'),
+        ]
     
     def __str__(self):
         return f"{self.title} - {self.client}"

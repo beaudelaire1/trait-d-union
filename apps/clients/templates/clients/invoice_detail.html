@@ -111,10 +111,10 @@
                             <thead>
                                 <tr>
                                     <th class="text-left">Description</th>
-                                    <th class="text-center" style="width: 80px;">Qté</th>
-                                    <th class="text-right" style="width: 140px;">Prix unit.</th>
-                                    <th class="text-right" style="width: 90px;">TVA</th>
-                                    <th class="text-right" style="width: 140px;">Total TTC</th>
+                                    <th class="text-center col-qty">Qté</th>
+                                    <th class="text-right col-price">Prix unit.</th>
+                                    <th class="text-right col-vat">TVA</th>
+                                    <th class="text-right col-total">Total TTC</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -194,7 +194,7 @@
     </main>
 </div>
 
-<style>
+<style nonce="{{ request.csp_nonce }}">
 /* ========================================
    INVOICE DETAIL - DARK PREMIUM THEME
    Cohérent avec le portail client TUS

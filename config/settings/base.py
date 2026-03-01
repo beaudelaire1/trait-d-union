@@ -40,6 +40,24 @@ if not _secret:
         'DJANGO_SECRET_KEY environment variable is required. '
         'Generate one with: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"'
     )
+
+# 🛡️ SECURITY: Reject trivially weak secret keys (< 32 chars or known placeholders)
+_WEAK_KEYS = frozenset({
+    'dev-local-only',
+    'changez-moi',
+    'changeme',
+    'secret',
+    'dev-secret-key-change-in-production',
+    'build-only-placeholder',
+    'your-secret-key-here',
+    'django-insecure',
+})
+if len(_secret) < 50 or _secret.lower().strip() in _WEAK_KEYS:
+    raise ImproperlyConfigured(
+        f'DJANGO_SECRET_KEY is too weak ({len(_secret)} chars). '
+        f'Must be at least 50 characters and not a known placeholder. '
+        f'Generate one with: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"'
+    )
 SECRET_KEY = _secret
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -77,6 +95,10 @@ INSTALLED_APPS = [
     'apps.audit',
     'services',
     'django_q',
+    # 🛡️ SECURITY: Admin 2FA (TOTP)
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_static',
 ]
 
 # Django Sites framework
@@ -84,21 +106,30 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # 🔍 SEO: Canonical domain redirect (www → non-www, render → custom domain)
+    'config.middleware.CanonicalDomainMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 🛡️ SECURITY: OTP verification middleware (2FA for admin)
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # HTMX must come before CommonMiddleware to set the proper flags
     'django_htmx.middleware.HtmxMiddleware',
     # allauth
     'allauth.account.middleware.AccountMiddleware',
+    # 🛡️ SECURITY: CSP middleware (replaces custom SecurityHeadersMiddleware in production)
+    'csp.middleware.CSPMiddleware',
+    # 🛡️ SECURITY: Permissions-Policy header
+    'django_permissions_policy.PermissionsPolicyMiddleware',
     # custom middlewares
     'config.middleware.RateLimitMiddleware',
-    'config.middleware.SecurityHeadersMiddleware',
     'config.middleware.CacheControlMiddleware',
     'config.middleware_force_password.ForcePasswordChangeMiddleware',
+    # 🛡️ BANK-GRADE: Security event audit logging (login failures, rate limits, suspicious patterns)
+    'config.middleware.SecurityAuditMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -135,6 +166,16 @@ DATABASES = {
     }
 }
 
+# ==============================================================================
+# ⚡ CACHES — Explicit default (overridden in production.py with Redis)
+# ==============================================================================
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'tus-default',
+    }
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/stable/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -142,7 +183,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
+        # 🛡️ BANK-GRADE: 12 chars minimum (ANSSI renforcé / PCI-DSS)
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 12},
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -171,6 +214,15 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==============================================================================
+# 🛡️ SECURITY: File Upload Limits
+# ==============================================================================
+# Maximum size for uploaded files (10MB)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+# Maximum number of fields in POST request (anti-DoS)
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 
 # ==============================================================================
 # EMAIL CONFIGURATION
@@ -232,7 +284,7 @@ except (TypeError, ValueError):
 # ==============================================================================
 # GOOGLE ANALYTICS 4
 # ==============================================================================
-GA4_MEASUREMENT_ID = os.environ.get('GA4_MEASUREMENT_ID', 'G-VNHN8BQGMJ')
+GA4_MEASUREMENT_ID = os.environ.get('GA4_MEASUREMENT_ID', '')
 
 # ==============================================================================
 # PHASE 3 : STRIPE PAYMENT CONFIGURATION
@@ -282,8 +334,8 @@ INVOICE_BRANDING = {
     'website': 'https://traitdunion.it',
     'siret': '908 264 112 00016',
     'tva_intra': '',
-    'iban': 'FR76 1980 6001 8940 2584 2883 094',
-    'bic': 'AGRIMQMX',
+    'iban': os.environ.get('INVOICE_IBAN', ''),
+    'bic': os.environ.get('INVOICE_BIC', ''),
     'logo_url': '/static/img/tus-logo.svg',
 }
 
@@ -406,14 +458,19 @@ AUTHENTICATION_BACKENDS = [
 
 # Allauth settings
 ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_ALLOW_REGISTRATION = False  # Désactive l'inscription publique (accès sur invitation uniquement)
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # 🛡️ SECURITY: force email verification before access
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = True
-ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_ON_GET = False  # UX: prevent accidental logout via GET (bots, crawlers)
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''  # Pas de préfixe [Site]
 ACCOUNT_FORMS = {
     'login': 'core.forms.CaptchaLoginForm',
+}
+# 🛡️ BANK-GRADE: allauth brute-force protection (progressive lockout)
+ACCOUNT_RATE_LIMITS = {
+    'login_failed': '5/900s',  # max 5 tentatives, lockout 15 minutes (bank-grade)
 }
 
 # Redirections
@@ -448,3 +505,27 @@ TINYMCE_DEFAULT_CONFIG = {
     ),
 }
 LOGIN_URL = '/accounts/login/'
+
+# ==============================================================================
+# 🛡️ SECURITY: Session hardening
+# ==============================================================================
+SESSION_COOKIE_AGE = 3600  # 1 heure (portail client sensible : devis, factures, paiements)
+SESSION_COOKIE_HTTPONLY = True  # Empêche l'accès JS au cookie de session
+SESSION_COOKIE_SAMESITE = 'Lax'  # Protection CSRF cross-site
+SESSION_SAVE_EVERY_REQUEST = True  # Renouvelle le TTL à chaque requête (sliding window)
+# 🛡️ BANK-GRADE: Custom cookie name to avoid Django fingerprinting
+SESSION_COOKIE_NAME = 'tus_sid'
+# 🛡️ BANK-GRADE: CSRF cookie hardening (avoid Django fingerprinting, HttpOnly)
+CSRF_COOKIE_NAME = 'tus_ct'
+CSRF_COOKIE_HTTPONLY = True
+
+# 🛡️ SECURITY: Headers applied in ALL environments (dev + prod)
+SECURE_CONTENT_TYPE_NOSNIFF = True  # X-Content-Type-Options: nosniff
+X_FRAME_OPTIONS = 'DENY'  # Clickjacking protection
+# 🛡️ SECURITY: Referrer policy (also set in production.py for HTTPS)
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+# ==============================================================================
+# 🛡️ SECURITY: Admin 2FA (TOTP) configuration
+# ==============================================================================
+OTP_TOTP_ISSUER = "Trait d'Union Studio Admin"

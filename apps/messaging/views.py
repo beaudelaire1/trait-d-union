@@ -302,10 +302,26 @@ def import_prospects(request):
     # CSV Import
     import csv
     from io import StringIO
+    import re
     
     csv_file = request.FILES.get('csv_file')
     if not csv_file:
         return JsonResponse({'error': 'No file provided'}, status=400)
+    
+    # 🛡️ SECURITY: Limit file size (2 MB max)
+    if csv_file.size > 2 * 1024 * 1024:
+        return JsonResponse({'error': 'File too large (max 2 MB)'}, status=400)
+    
+    _EMAIL_RE = re.compile(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$')
+    
+    def _sanitize_csv_field(value: str) -> str:
+        """Strip leading formula-injection characters (=, +, -, @, tab, CR)."""
+        if not value:
+            return value
+        value = value.strip()
+        while value and value[0] in ('=', '+', '-', '@', '\t', '\r'):
+            value = value[1:]
+        return value.strip()
     
     try:
         decoded_file = csv_file.read().decode('utf-8')
@@ -314,16 +330,24 @@ def import_prospects(request):
         created_count = 0
         errors = []
         
-        for row in reader:
+        for i, row in enumerate(reader):
+            if i >= 5000:  # 🛡️ SECURITY: Cap rows to prevent abuse
+                errors.append('Import capped at 5 000 rows')
+                break
             try:
+                email = _sanitize_csv_field(row.get('email', '')).lower()
+                if not email or not _EMAIL_RE.match(email):
+                    errors.append(f"Row {i+1}: invalid email '{email}'")
+                    continue
+                
                 Prospect.objects.get_or_create(
-                    email=row.get('email', '').strip(),
+                    email=email,
                     defaults={
-                        'contact_name': row.get('contact_name', row.get('name', '')).strip(),
-                        'company_name': row.get('company_name', row.get('company', '')).strip(),
-                        'phone': row.get('phone', '').strip(),
-                        'sector': row.get('sector', 'other'),
-                        'source': row.get('source', 'cold_email'),
+                        'contact_name': _sanitize_csv_field(row.get('contact_name', row.get('name', ''))),
+                        'company_name': _sanitize_csv_field(row.get('company_name', row.get('company', ''))),
+                        'phone': _sanitize_csv_field(row.get('phone', '')),
+                        'sector': _sanitize_csv_field(row.get('sector', 'other')) or 'other',
+                        'source': _sanitize_csv_field(row.get('source', 'cold_email')) or 'cold_email',
                     }
                 )
                 created_count += 1

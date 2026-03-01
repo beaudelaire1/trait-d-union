@@ -7,7 +7,7 @@
 {% if stripe_configured and stripe_publishable_key %}
 <script src="https://js.stripe.com/v3/"></script>
 {% endif %}
-<style>
+<style nonce="{{ request.csp_nonce }}">
     .loading-overlay {
         position: fixed;
         inset: 0;
@@ -183,7 +183,7 @@
 
 {% block extra_js %}
 {% if stripe_configured %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function() {
     const payButton = document.getElementById('pay-button');
     

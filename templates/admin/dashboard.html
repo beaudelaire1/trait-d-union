@@ -404,7 +404,7 @@
     </main>
 </div>
 
-<style>
+<style nonce="{{ request.csp_nonce }}">
 /* ============================================
    DASHBOARD PREMIUM - TRAIT D'UNION STUDIO
    ============================================ */
@@ -1288,7 +1288,7 @@ input:focus-visible {
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
+<script nonce="{{ request.csp_nonce }}">
 document.addEventListener('DOMContentLoaded', function() {
     const dashboardLayout = document.querySelector('.dashboard-layout');
     const sidebarToggle = document.getElementById('sidebar-toggle');

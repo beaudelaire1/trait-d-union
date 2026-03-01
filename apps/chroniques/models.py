@@ -27,6 +27,14 @@ class Article(models.Model):
     publish_date = models.DateTimeField("Date de publication", default=timezone.now)
     updated_at = models.DateTimeField("Mise à jour", auto_now=True)
 
+    # 🔍 SEO: Dedicated meta description for search results
+    meta_description = models.CharField(
+        "Meta description",
+        max_length=160,
+        blank=True,
+        help_text="Description pour Google (160 chars max). Si vide, utilise le résumé."
+    )
+
     class Meta:
         ordering = ["-publish_date"]
         verbose_name = "Article"

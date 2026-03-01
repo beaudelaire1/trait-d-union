@@ -4,6 +4,16 @@
 User-agent: *
 Allow: /
 
+# Pages publiques autorisées explicitement
+Allow: /services/
+Allow: /portfolio/
+Allow: /chroniques/
+Allow: /contact/
+Allow: /faq/
+Allow: /method/
+Allow: /resources/
+Allow: /sitemap.xml
+
 # Bloquer l'accès à l'administration
 Disallow: /tus-gestion-secure/
 
@@ -16,9 +26,10 @@ Disallow: /media/leads/
 Disallow: /ecosysteme-tus/
 Disallow: /accounts/
 
-# Crawl-delay pour éviter la surcharge
-Crawl-delay: 1
+# Bloquer les endpoints API/webhook internes
+Disallow: /devis/webhook/
+Disallow: /factures/webhook/
+Disallow: /tinymce/
 
 # Sitemap
 Sitemap: https://traitdunion.it/sitemap.xml
-Sitemap: https://www.traitdunion.it/sitemap.xml

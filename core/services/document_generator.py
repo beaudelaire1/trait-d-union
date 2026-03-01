@@ -30,8 +30,8 @@ DEFAULT_BRANDING = {
     'website': 'https://traitdunion.it',
     'siret': '908 264 112 00016',
     'tva_intra': '',
-    'iban': 'FR76 1980 6001 8940 2584 2883 094',
-    'bic': 'AGRIMQMX',
+    'iban': '',  # 🛡️ Loaded from settings.INVOICE_BRANDING (env vars)
+    'bic': '',
     'logo_url': '/static/img/tus-logo.png',
 }
 
@@ -69,9 +69,8 @@ class DocumentGenerator:
     @classmethod
     def _patch_fonts(cls, html_content: str) -> str:
         """Remplace les imports Google Fonts par CSS avec fallbacks locaux."""
-        # Remplacer l'import Google Fonts par un CSS local
-        google_fonts_import = "@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap');"
-        
+        import re
+
         # CSS fallback utilisant des fonts système
         local_fonts_css = """
         @font-face {
@@ -86,10 +85,12 @@ class DocumentGenerator:
             src: local('Space Grotesk'), local('Arial'), system-ui, -apple-system, sans-serif;
         }
         """
-        
-        html_content = html_content.replace(
-            google_fonts_import,
-            local_fonts_css
+
+        # Remove any @import url('...fonts.googleapis.com...') pattern
+        html_content = re.sub(
+            r"@import\s+url\(['\"]https?://fonts\.googleapis\.com[^)]*\)\s*;?",
+            local_fonts_css,
+            html_content,
         )
         return html_content
     

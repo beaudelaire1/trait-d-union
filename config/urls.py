@@ -2,9 +2,32 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.sitemaps.views import sitemap
-from django.urls import path, include
+from django.urls import path, include, URLPattern, URLResolver
 from django.views.generic import TemplateView
+
+
+def _staff_protected_include(module):
+    """Wrap all views from an included module with staff_member_required."""
+    result = include(module)
+    # include() may return a 2-tuple (urlpatterns, app_ns) or 3-tuple
+    if len(result) == 3:
+        url_patterns, app_ns, inst_ns = result
+    else:
+        url_patterns, app_ns = result
+        inst_ns = app_ns
+    # url_patterns may be a module with a .urlpatterns attribute
+    if hasattr(url_patterns, 'urlpatterns'):
+        url_patterns = url_patterns.urlpatterns
+    for pattern in url_patterns:
+        if isinstance(pattern, URLPattern) and pattern.callback:
+            pattern.callback = staff_member_required(pattern.callback)
+    return url_patterns, app_ns, inst_ns
+
+# 🛡️ SECURITY: OTP-protected admin site (2FA required for all staff)
+from django_otp.admin import OTPAdminSite
+admin.site.__class__ = OTPAdminSite
 
 from config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap
 from apps.pages.healthz import healthz
@@ -34,8 +57,8 @@ urlpatterns = [
     # Client portal (Phase 4)
     path('ecosysteme-tus/', include('apps.clients.urls')),
     path('accounts/', include('allauth.urls')),
-    # TinyMCE
-    path('tinymce/', include('tinymce.urls')),
+    # TinyMCE — 🛡️ SECURITY: restricted to authenticated staff only
+    path('tinymce/', _staff_protected_include('tinymce.urls')),
     # SEO
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),

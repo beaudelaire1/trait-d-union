@@ -1,5 +1,7 @@
 """Modèles transversaux (contexte/forms/services).
 
-Note : AuditLog a été migré vers apps.audit.models pour mieux l'organiser.
+Note : AuditLog et StripeEventLog vivent dans apps.audit.models.
+Re-export ici pour compatibilité d'import.
 """
 
+from apps.audit.models import StripeEventLog  # noqa: F401

@@ -339,3 +339,63 @@ class StripePaymentService:
         except stripe.error.StripeError as e:
             logger.error(f"Erreur récupération session {session_id}: {e}")
             return None
+
+
+# ---------------------------------------------------------------------------
+# Vue webhook unifiée — importée par apps/devis et apps/factures
+# ---------------------------------------------------------------------------
+
+def stripe_webhook_view(request):
+    """Vue unifiée pour tous les webhooks Stripe.
+
+    🛡️ BANK-GRADE:
+    - Vérifie la signature Stripe
+    - **Idempotent** : rejette (200) les événements déjà traités via StripeEventLog
+    - Dispatche vers le bon handler selon event.type
+    """
+    from django.http import JsonResponse
+    from apps.audit.models import StripeEventLog
+
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
+
+    if not sig_header:
+        return JsonResponse({'error': 'Missing Stripe-Signature header'}, status=400)
+
+    # 1. Verify signature
+    try:
+        event = StripePaymentService.verify_webhook_signature(payload, sig_header)
+    except ValueError as e:
+        logger.warning("Stripe webhook signature invalide: %s", e)
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        logger.error("Stripe webhook error: %s", e)
+        return JsonResponse({'error': 'Webhook processing error'}, status=400)
+
+    event_id = event.get('id', '')
+    event_type = event.get('type', '')
+
+    # 2. Idempotency guard — return 200 so Stripe stops retrying
+    if StripeEventLog.is_already_processed(event_id):
+        logger.info("Stripe event %s déjà traité — ignoré.", event_id)
+        return JsonResponse({'status': 'already_processed'})
+
+    # 3. Dispatch
+    handled = False
+    if event_type == 'checkout.session.completed':
+        session = event['data']['object']
+        handled = StripePaymentService.handle_checkout_completed(session)
+    else:
+        logger.info("Stripe event type non géré: %s", event_type)
+        # Return 200 anyway to avoid Stripe retries on unhandled types
+        StripeEventLog.mark_processed(event_id, event_type)
+        return JsonResponse({'status': 'ignored'})
+
+    # 4. Record successful processing
+    if handled:
+        StripeEventLog.mark_processed(event_id, event_type)
+        return JsonResponse({'status': 'success'})
+    else:
+        # Don't mark as processed so Stripe can retry
+        logger.error("Stripe event %s processing failed", event_id)
+        return JsonResponse({'error': 'Processing failed'}, status=500)

@@ -2116,3 +2116,148 @@ button[type="submit"] {
         animation: none !important;
     }
 }
+
+/* ============================================
+   TRANSITION-DELAY UTILITY CLASSES
+   Replaces inline style="transition-delay: X.Xs;"
+   to allow removal of 'unsafe-inline' from CSP_STYLE_SRC
+   ============================================ */
+.td-050  { transition-delay: 0.05s; }
+.td-100  { transition-delay: 0.1s; }
+.td-150  { transition-delay: 0.15s; }
+.td-200  { transition-delay: 0.2s; }
+.td-250  { transition-delay: 0.25s; }
+.td-300  { transition-delay: 0.3s; }
+.td-350  { transition-delay: 0.35s; }
+.td-400  { transition-delay: 0.4s; }
+.td-450  { transition-delay: 0.45s; }
+.td-500  { transition-delay: 0.5s; }
+.td-550  { transition-delay: 0.55s; }
+.td-600  { transition-delay: 0.6s; }
+.td-650  { transition-delay: 0.65s; }
+.td-700  { transition-delay: 0.7s; }
+.td-750  { transition-delay: 0.75s; }
+.td-800  { transition-delay: 0.8s; }
+
+/* ============================================
+   INLINE BACKGROUND REPLACEMENTS
+   ============================================ */
+.bg-badge-gradient {
+    background: linear-gradient(180deg, rgba(11,45,255,0.04) 0%, rgba(11,45,255,0.12) 40%, rgba(11,45,255,0.06) 70%, transparent 100%);
+}
+
+.bg-divider-line-left-blue {
+    background: linear-gradient(270deg, rgba(77,111,255,0.6), rgba(11,45,255,0.15), transparent);
+}
+
+.bg-divider-line-right-blue {
+    background: linear-gradient(90deg, rgba(77,111,255,0.6), rgba(11,45,255,0.15), transparent);
+}
+
+.bg-divider-line-left-green {
+    background: linear-gradient(270deg, rgba(74,222,128,0.6), rgba(34,197,94,0.15), transparent);
+}
+
+.bg-divider-line-right-green {
+    background: linear-gradient(90deg, rgba(74,222,128,0.6), rgba(34,197,94,0.15), transparent);
+}
+
+.bg-divider-spark-blue {
+    background: radial-gradient(circle, #4D6FFF 0%, rgba(11,45,255,0.6) 40%, transparent 70%);
+    filter: blur(0.5px);
+}
+
+.bg-divider-glow-blue {
+    background: radial-gradient(circle, rgba(11,45,255,0.18) 0%, rgba(11,45,255,0.06) 40%, transparent 70%);
+}
+
+.bg-divider-orb-blue {
+    background: #4D6FFF;
+    box-shadow: 0 0 12px 4px rgba(11,45,255,0.5), 0 0 40px 12px rgba(11,45,255,0.25), 0 0 80px 24px rgba(11,45,255,0.1);
+}
+
+.bg-divider-orb-green {
+    background: #4ADE80;
+    box-shadow: 0 0 12px 4px rgba(34,197,94,0.5), 0 0 40px 12px rgba(34,197,94,0.25), 0 0 80px 24px rgba(34,197,94,0.1);
+}
+
+.bg-dot-indicator {
+    background: rgba(255,255,255,0.2);
+}
+
+.spark-size {
+    width: 2px;
+    height: 2px;
+}
+
+.chapter-accent-blue {
+    --accent: rgba(11,45,255,0.6);
+}
+
+.chapter-accent-green {
+    --accent: rgba(34,197,94,0.6);
+}
+
+.bg-divider-spark-green {
+    background: radial-gradient(circle, #4ADE80 0%, rgba(34,197,94,0.6) 40%, transparent 70%);
+    filter: blur(0.5px);
+}
+
+.bg-divider-glow-green {
+    background: radial-gradient(circle, rgba(34,197,94,0.18) 0%, rgba(34,197,94,0.06) 40%, transparent 70%);
+}
+
+.spark-2   { width: 2px; height: 2px; }
+.spark-1-5 { width: 1.5px; height: 1.5px; }
+.spark-1   { width: 1px; height: 1px; }
+
+/* Hero word animation — initial hidden state (replaces inline style) */
+.hero-word-init {
+    transform: translateY(110%);
+    opacity: 0;
+}
+/* Hero word animation — revealed state */
+.hero-word-reveal {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Dropzone content hidden (toggle via JS class) */
+.dropzone-content-hidden { display: none; }
+
+.scroll-progress-init {
+    transform: scaleX(0);
+    will-change: transform;
+}
+
+.svg-back-arrow {
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* ============================================
+   CLIENT PORTAL INLINE STYLE REPLACEMENTS
+   ============================================ */
+.doc-type-badge-devis   { background: rgba(11,45,255,0.15); color: #4D6FFF; }
+.doc-type-badge-facture { background: rgba(34,197,94,0.15); color: #4ADE80; }
+.doc-type-badge-contract { background: rgba(245,158,11,0.15); color: #FCD34D; }
+
+.doc-filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+
+.col-qty   { width: 80px; }
+.col-price { width: 140px; }
+.col-vat   { width: 90px; }
+.col-total { width: 140px; }
+
+.mt-6 { margin-top: 1.5rem; }
+
+.dropzone-preview-hidden { display: none; }
+
+.success-svg-mb { margin-bottom: 0.5rem; }
+.success-title  { margin: 0; font-weight: 600; }
+.success-sub    { margin: 0.25rem 0 0; font-size: 0.85rem; opacity: 0.8; }
+
+/* Admin email bulk page */
+.bulk-heading  { margin-bottom: 10px; }
+.bulk-subtitle { color: #666; margin-bottom: 30px; }
+.bulk-submit-group { margin-top: 30px; }

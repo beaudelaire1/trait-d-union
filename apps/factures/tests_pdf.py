@@ -31,9 +31,10 @@ class TestQuotePDFGeneration(TestCase):
         )
         
         self.service = Service.objects.create(
-            title="Développement Web",
+            name="Développement Web",
+            slug="dev-web-test",
             description="Service de développement web",
-            price=Decimal("1000.00")
+            base_price=Decimal("1000.00")
         )
         
         self.quote = Quote.objects.create(

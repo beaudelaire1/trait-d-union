@@ -24,10 +24,10 @@ services:
       - "8000:8000"
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings.production
-      - DJANGO_SECRET_KEY=dev-secret-key-change-in-production
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY must be set in .env}
       - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
-      - DATABASE_URL=postgresql://tus_user:tus_password@db:5432/tus_db
-      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-tus_user}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-tus_db}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-}@redis:6379/0
       - SITE_URL=http://localhost:8000
       - DEBUG=False
       # Brevo (optionnel en local)
@@ -61,9 +61,9 @@ services:
     container_name: tus-db
     restart: unless-stopped
     environment:
-      - POSTGRES_DB=tus_db
-      - POSTGRES_USER=tus_user
-      - POSTGRES_PASSWORD=tus_password
+      - POSTGRES_DB=${POSTGRES_DB:-tus_db}
+      - POSTGRES_USER=${POSTGRES_USER:-tus_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -71,7 +71,7 @@ services:
     networks:
       - tus-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U tus_user -d tus_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tus_user} -d ${POSTGRES_DB:-tus_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -83,7 +83,7 @@ services:
     image: redis:7-alpine
     container_name: tus-redis
     restart: unless-stopped
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme_dev}
     volumes:
       - redis_data:/data
     ports:

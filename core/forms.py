@@ -8,13 +8,8 @@ from allauth.account.forms import LoginForm
 from core.services.captcha import verify_recaptcha, verify_turnstile
 
 
-def _get_client_ip(request) -> str:
-    if not request:
-        return ''
-    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if forwarded_for:
-        return forwarded_for.split(',')[0].strip()
-    return request.META.get('REMOTE_ADDR', '') or ''
+# 🛡️ SECURITY: Single source of truth (DRY)
+from core.utils import get_client_ip as _get_client_ip
 
 
 def _has_turnstile() -> bool:

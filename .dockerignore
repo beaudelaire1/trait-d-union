@@ -77,6 +77,14 @@ add_*.py
 create_*.py
 update_*.py
 
+# Agent / AI
+.agent/
+skills.md
+
+# Node (Tailwind dev deps — CSS is pre-compiled)
+node_modules/
+package-lock.json
+
 # Fichiers temporaires
 *.tmp
 *.temp

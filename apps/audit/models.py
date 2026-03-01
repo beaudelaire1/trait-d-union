@@ -36,6 +36,13 @@ class AuditLog(models.Model):
         
         CLIENT_ACCOUNT_CREATED = "client_account_created", _("Compte client créé")
         CLIENT_PASSWORD_RESET_FORCED = "client_password_reset_forced", _("Réinitialisation de mot de passe forcée")
+        
+        # 🛡️ BANK-GRADE: Security event types for SIEM correlation
+        LOGIN_SUCCESS = "login_success", _("Connexion réussie")
+        LOGIN_FAILED = "login_failed", _("Tentative de connexion échouée")
+        RATE_LIMIT_HIT = "rate_limit_hit", _("Limite de débit atteinte")
+        SUSPICIOUS_ACTIVITY = "suspicious_activity", _("Activité suspecte détectée")
+        ADMIN_ACTION = "admin_action", _("Action admin")
     
     # Champs de base
     action_type = models.CharField(
@@ -129,3 +136,32 @@ class AuditLog(models.Model):
             description=description,
             metadata=metadata,
         )
+
+
+class StripeEventLog(models.Model):
+    """🛡️ BANK-GRADE: Idempotency guard for Stripe webhooks.
+
+    Stores processed event IDs to prevent double-processing when
+    Stripe retries a webhook delivery.
+    """
+    event_id = models.CharField(max_length=255, unique=True, db_index=True)
+    event_type = models.CharField(max_length=100)
+    processed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Stripe Event Log")
+        verbose_name_plural = _("Stripe Event Logs")
+        indexes = [
+            models.Index(fields=['-processed_at'], name='idx_stripe_event_date'),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.event_type} — {self.event_id}"
+
+    @classmethod
+    def is_already_processed(cls, event_id: str) -> bool:
+        return cls.objects.filter(event_id=event_id).exists()
+
+    @classmethod
+    def mark_processed(cls, event_id: str, event_type: str = '') -> 'StripeEventLog':
+        return cls.objects.create(event_id=event_id, event_type=event_type)

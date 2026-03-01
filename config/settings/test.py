@@ -10,9 +10,15 @@ import os
 # CORE SETTINGS
 # ==============================================================================
 DEBUG = False
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'test-secret-key-for-testing')
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'test-only-not-for-production-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+
+# Disable signals that auto-provision accounts during tests
+TESTING = True
 
 # ==============================================================================
 # DATABASE (PostgreSQL for CI, SQLite for local tests)

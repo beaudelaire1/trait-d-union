@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.core.files.storage import default_storage
 from django.views.decorators.clickjacking import xframe_options_sameorigin
+from django.views.decorators.http import require_POST
 
 from .models import ClientProfile, Project, ProjectMilestone, ClientDocument, ClientNotification
 from .forms import ClientProfileForm, DocumentUploadForm, ClientRequestForm
@@ -40,12 +41,12 @@ class ClientRequiredMixin(LoginRequiredMixin):
             from apps.factures.models import Invoice
             
             context['pending_quotes_count'] = Quote.objects.filter(
-                client__email=self.request.user.email,
+                client__linked_profile=profile,
                 status='sent'
             ).count()
             
             context['pending_invoices_count'] = Invoice.objects.filter(
-                client__email=self.request.user.email,
+                client__linked_profile=profile,
                 status__in=['sent', 'overdue']
             ).count()
         
@@ -60,18 +61,23 @@ class DashboardView(ClientRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         profile = self.request.user.client_profile
         
-        # Active projects
+        # Active projects (with prefetch to avoid N+1)
         context['active_projects'] = profile.projects.filter(
             status__in=['briefing', 'design', 'development', 'review']
-        )[:5]
+        ).select_related('workflow_template')[:5]
         
-        # Recent documents
-        context['recent_documents'] = profile.documents.all()[:5]
+        # Recent documents (with project name)
+        context['recent_documents'] = profile.documents.select_related('project').all()[:5]
         
-        # Stats
+        # Stats — single query with conditional aggregation
+        from django.db.models import Count, Q
+        stats = profile.projects.aggregate(
+            total_projects=Count('id'),
+            active_projects=Count('id', filter=~Q(status='delivered')),
+        )
         context['stats'] = {
-            'total_projects': profile.projects.count(),
-            'active_projects': profile.projects.exclude(status='delivered').count(),
+            'total_projects': stats['total_projects'],
+            'active_projects': stats['active_projects'],
             'documents': profile.documents.count(),
         }
         
@@ -80,12 +86,12 @@ class DashboardView(ClientRequiredMixin, TemplateView):
         from apps.factures.models import Invoice
         
         context['recent_quotes'] = Quote.objects.filter(
-            client__email=self.request.user.email
-        ).order_by('-created_at')[:5]
+            client__linked_profile=profile
+        ).select_related('client').order_by('-created_at')[:5]
         
         context['recent_invoices'] = Invoice.objects.filter(
-            quote__client__email=self.request.user.email
-        ).order_by('-created_at')[:5]
+            client__linked_profile=profile
+        ).select_related('client', 'quote').order_by('-created_at')[:5]
         
         return context
 
@@ -112,7 +118,7 @@ class ProjectListView(ClientRequiredMixin, ListView):
     context_object_name = 'projects'
     
     def get_queryset(self):
-        return self.request.user.client_profile.projects.all()
+        return self.request.user.client_profile.projects.select_related('workflow_template').all()
 
 
 class ProjectDetailView(ClientRequiredMixin, DetailView):
@@ -122,13 +128,14 @@ class ProjectDetailView(ClientRequiredMixin, DetailView):
     context_object_name = 'project'
     
     def get_queryset(self):
-        return self.request.user.client_profile.projects.all()
+        return self.request.user.client_profile.projects.select_related('workflow_template').all()
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        milestones = list(self.object.milestones.all())
+        # ⚡ PERFORMANCE: Prefetch milestones + documents in 2 queries instead of N+1
+        milestones = list(self.object.milestones.select_related('responsible').all())
         context['milestones'] = milestones
-        context['documents'] = self.object.documents.all()
+        context['documents'] = self.object.documents.select_related('client').all()
         
         # Activity log (visible to client only)
         context['activities'] = self.object.activities.filter(
@@ -241,8 +248,6 @@ class DocumentListView(ClientRequiredMixin, ListView):
     
     def get_queryset(self):
         return self.request.user.client_profile.documents.select_related('project').all()
-
-
 @login_required
 def upload_document(request, project_id=None):
     """Upload a document."""
@@ -288,10 +293,8 @@ class QuoteListView(ClientRequiredMixin, ListView):
         from apps.devis.models import Quote
         profile = self.request.user.client_profile
         return Quote.objects.filter(
-            client__email=profile.user.email
+            client__linked_profile=profile
         ).select_related('client').order_by('-created_at')
-
-
 class InvoiceListView(ClientRequiredMixin, ListView):
     """List all invoices for the client."""
     template_name = 'clients/invoice_list.html'
@@ -301,7 +304,7 @@ class InvoiceListView(ClientRequiredMixin, ListView):
         from apps.factures.models import Invoice
         profile = self.request.user.client_profile
         return Invoice.objects.filter(
-            client__email=profile.user.email
+            client__linked_profile=profile
         ).select_related('client').order_by('-created_at')
 
 
@@ -364,13 +367,12 @@ class NewClientRequestView(ClientRequiredMixin, TemplateView):
 
 
 @login_required
+@require_POST
 def mark_notifications_read(request):
     """Mark all notifications as read for the current user."""
-    if request.method == 'POST':
-        profile = request.user.client_profile
-        ClientNotification.objects.filter(client=profile, read=False).update(read=True)
-        return JsonResponse({'success': True})
-    return JsonResponse({'error': 'Method not allowed'}, status=405)
+    profile = request.user.client_profile
+    ClientNotification.objects.filter(client=profile, read=False).update(read=True)
+    return JsonResponse({'success': True})
 
 
 @login_required
@@ -388,6 +390,7 @@ def add_project_comment(request, project_id):
         # Validation du fichier joint
         if attachment:
             import os
+            from core.utils import validate_file_magic
             max_size = 10 * 1024 * 1024  # 10 Mo
             allowed_ext = {'.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg', '.zip', '.svg'}
             ext = os.path.splitext(attachment.name)[1].lower()
@@ -400,6 +403,12 @@ def add_project_comment(request, project_id):
                 if request.headers.get('HX-Request'):
                     return HttpResponse(f'Type de fichier non autorisé ({ext})', status=400)
                 messages.error(request, f'Type de fichier non autorisé ({ext}).')
+                return redirect('clients:project_detail', pk=project.pk)
+            # 🛡️ SECURITY: Validate magic bytes to prevent content-type spoofing
+            if not validate_file_magic(attachment, ext):
+                if request.headers.get('HX-Request'):
+                    return HttpResponse('Le contenu du fichier ne correspond pas à son type déclaré', status=400)
+                messages.error(request, 'Le contenu du fichier ne correspond pas à son type déclaré.')
                 return redirect('clients:project_detail', pk=project.pk)
         
         if message or attachment:
@@ -435,6 +444,7 @@ def add_project_comment(request, project_id):
 
 
 @login_required
+@require_POST
 def quick_request(request):
     """Handle quick requests from client dashboard (HTMX endpoint).
     
@@ -442,9 +452,6 @@ def quick_request(request):
     All client data is automatically attached from their profile.
     """
     from apps.leads.models import Lead
-    
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
     
     profile = request.user.client_profile
     request_type = request.POST.get('request_type', 'other')
@@ -528,7 +535,11 @@ def quote_detail(request, pk):
     from apps.devis.models import Quote
     
     profile = request.user.client_profile
-    quote = get_object_or_404(Quote, pk=pk, client__email=profile.user.email)
+    # 🛡️ SECURITY: Use FK relationship instead of fragile email matching
+    quote = get_object_or_404(
+        Quote.objects.select_related('client').prefetch_related('quote_items'),
+        pk=pk, client__linked_profile=profile,
+    )
     
     return render(request, 'clients/quote_detail.html', {
         'quote': quote,
@@ -543,7 +554,7 @@ def quote_pdf_download(request, pk):
     from core.services.document_generator import DocumentGenerator
     
     profile = request.user.client_profile
-    quote = get_object_or_404(Quote, pk=pk, client__email=profile.user.email)
+    quote = get_object_or_404(Quote, pk=pk, client__linked_profile=profile)
     
     # Toujours générer à la volée (filesystem éphémère sur Render)
     try:
@@ -552,7 +563,7 @@ def quote_pdf_download(request, pk):
         response['Content-Disposition'] = f'attachment; filename="devis_{quote.number}.pdf"'
         return response
     except Exception as e:
-        messages.error(request, f"Erreur lors de la génération du PDF: {str(e)}")
+        messages.error(request, "Erreur lors de la génération du PDF.")
         return redirect('clients:quotes')
 
 
@@ -565,7 +576,7 @@ def quote_pdf_view(request, pk):
     from core.services.document_generator import DocumentGenerator
 
     profile = request.user.client_profile
-    quote = get_object_or_404(Quote, pk=pk, client__email=profile.user.email)
+    quote = get_object_or_404(Quote, pk=pk, client__linked_profile=profile)
 
     # Toujours générer à la volée (filesystem éphémère sur Render)
     try:
@@ -598,7 +609,7 @@ def invoice_detail(request, pk):
     invoice = get_object_or_404(
         Invoice,
         pk=pk,
-        quote__client__email=profile.user.email
+        client__linked_profile=profile
     )
     
     return render(request, 'clients/invoice_detail.html', {
@@ -615,7 +626,7 @@ def invoice_pdf_download(request, pk):
     invoice = get_object_or_404(
         Invoice,
         pk=pk,
-        quote__client__email=profile.user.email
+        client__linked_profile=profile
     )
     
     if invoice.pdf:
@@ -637,5 +648,5 @@ def invoice_pdf_download(request, pk):
             content_type='application/pdf'
         )
     except Exception as e:
-        messages.error(request, f"Erreur lors de la génération du PDF: {str(e)}")
+        messages.error(request, "Erreur lors de la génération du PDF.")
         return redirect('clients:invoices')

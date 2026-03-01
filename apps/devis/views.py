@@ -31,10 +31,42 @@ logger = logging.getLogger(__name__)
 
 @require_http_methods(["GET", "POST"])
 def public_devis(request):
-    """Formulaire public : création d'une QuoteRequest."""
+    """Formulaire public : création d'une QuoteRequest.
+
+    🛡️ SECURITY: Turnstile/reCAPTCHA vérifié AVANT sauvegarde (anti-bot).
+    """
     if request.method == "POST":
         form = QuoteRequestForm(request.POST, request.FILES)
         if form.is_valid():
+            # ── vérification CAPTCHA (même logique que ContactView) ──
+            from django.conf import settings
+            from core.services.captcha import verify_turnstile, verify_recaptcha
+            from core.utils import get_client_ip
+
+            remote_ip = get_client_ip(request)
+            turnstile_token = request.POST.get('cf-turnstile-response', '')
+            recaptcha_token = request.POST.get('g-recaptcha-response', '')
+
+            if turnstile_token:
+                is_valid = verify_turnstile(token=turnstile_token, remote_ip=remote_ip)
+            elif recaptcha_token:
+                is_valid = verify_recaptcha(token=recaptcha_token, remote_ip=remote_ip)
+            else:
+                has_captcha = (
+                    getattr(settings, 'TURNSTILE_SITE_KEY', '')
+                    or getattr(settings, 'RECAPTCHA_SITE_KEY', '')
+                )
+                is_valid = not has_captcha
+
+            if not is_valid:
+                logger.warning("CAPTCHA devis échoué ip=%s", remote_ip)
+                form.add_error(None, "La vérification de sécurité a échoué. Veuillez réessayer.")
+                return render(request, "devis/request_quote.html", {
+                    "form": form,
+                    "turnstile_site_key": getattr(settings, 'TURNSTILE_SITE_KEY', ''),
+                    "recaptcha_site_key": getattr(settings, 'RECAPTCHA_SITE_KEY', ''),
+                })
+
             qr: QuoteRequest = form.save()
             files = form.cleaned_data.get("photos_list") or []
             for f in files:
@@ -47,7 +79,13 @@ def public_devis(request):
             return redirect("devis:quote_success")
     else:
         form = QuoteRequestForm()
-    return render(request, "devis/request_quote.html", {"form": form})
+
+    from django.conf import settings as _s
+    return render(request, "devis/request_quote.html", {
+        "form": form,
+        "turnstile_site_key": getattr(_s, 'TURNSTILE_SITE_KEY', ''),
+        "recaptcha_site_key": getattr(_s, 'RECAPTCHA_SITE_KEY', ''),
+    })
 
 
 def quote_success(request):
@@ -68,7 +106,7 @@ def download_quote_pdf(request, pk):
         
         # Return as response
         response = HttpResponse(pdf_bytes, content_type="application/pdf")
-        response['Content-Disposition'] = f'inline; filename="devis_{quote.number}.pdf"'
+        response['Content-Disposition'] = f'attachment; filename="devis_{quote.number}.pdf"'
         return response
     except Exception as exc:
         logger.error(f"Erreur lors de la génération du PDF pour le devis {pk}: {exc}", exc_info=True)
@@ -205,6 +243,12 @@ def quote_validate_code(request, token: str):
                 ok = False
                 messages.error(request, "Ce code a expiré. Merci de relancer une validation.")
                 return render(request, "devis/validate_expired.html", {"quote": quote})
+            except QuoteValidationRateLimitError:
+                ok = False
+                messages.error(request, "Trop de tentatives. Veuillez patienter quelques minutes.")
+                return render(request, "devis/validate_code.html", {
+                    "quote": quote, "form": form, "validation": validation,
+                })
 
             if ok:
                 messages.success(request, "Merci ! Votre devis est validé.")
@@ -250,7 +294,9 @@ def quote_public_pdf(request, token: str):
         
         response = HttpResponse(pdf_bytes, content_type="application/pdf")
         response['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
-        response['Content-Disposition'] = f'inline; filename="devis_{quote.number}.pdf"'
+        # 🛡️ SECURITY: Force download (attachment) on public endpoints to prevent
+        # browser-rendered PDF XSS vectors and accidental data exposure.
+        response['Content-Disposition'] = f'attachment; filename="devis_{quote.number}.pdf"'
         return response
     except Exception as exc:
         logger.error(f"Erreur lors de la génération du PDF public pour le token {token}: {exc}", exc_info=True)
@@ -273,8 +319,8 @@ def quote_sign_and_pay(request, token: str):
     """
     quote = get_object_or_404(Quote, public_token=token)
     
-    # Vérifier que le devis peut être signé (statut SENT)
-    if quote.status not in [Quote.QuoteStatus.SENT, Quote.QuoteStatus.DRAFT]:
+    # 🛡️ SECURITY: Seuls les devis SENT peuvent être signés (jamais DRAFT)
+    if quote.status != Quote.QuoteStatus.SENT:
         if quote.status == Quote.QuoteStatus.ACCEPTED:
             messages.info(request, "Ce devis a déjà été accepté.")
             return render(request, "devis/already_signed.html", {"quote": quote})
@@ -308,14 +354,34 @@ def quote_submit_signature(request, token: str):
     Reçoit: signature_data (base64 PNG)
     Retourne: JSON avec success et éventuellement checkout_url
     """
+    # 🛡️ SECURITY: Rate-limit signature submissions (anti-abuse)
+    from django.core.cache import cache as _cache
+    forwarded = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    client_ip = forwarded.split(',')[0].strip() if forwarded else request.META.get('REMOTE_ADDR', '')
+    sig_key = f"ratelimit:signature:{client_ip}"
+    sig_count = _cache.get(sig_key, 0)
+    if sig_count >= 10:  # max 10 signature attempts per hour per IP
+        return JsonResponse({"success": False, "error": "Trop de tentatives. Réessayez plus tard."}, status=429)
+    try:
+        _cache.incr(sig_key)
+    except ValueError:
+        _cache.set(sig_key, 1, 3600)
+
     quote = get_object_or_404(Quote, public_token=token)
     
-    # Vérifier le statut
-    if quote.status not in [Quote.QuoteStatus.SENT, Quote.QuoteStatus.DRAFT]:
+    # 🛡️ SECURITY: Seuls les devis SENT sont signables
+    if quote.status != Quote.QuoteStatus.SENT:
         return JsonResponse({
             "success": False,
             "error": "Ce devis ne peut pas être signé."
         }, status=400)
+    
+    # 🛡️ SECURITY: Limit request body size for signature data (max 500KB base64 PNG)
+    if len(request.body) > 512 * 1024:
+        return JsonResponse({
+            "success": False,
+            "error": "Données de signature trop volumineuses."
+        }, status=413)
     
     # Récupérer les données
     try:
@@ -439,26 +505,10 @@ def quote_payment_success(request):
 @csrf_exempt
 @require_POST
 def stripe_webhook(request):
+    """Webhook Stripe pour les paiements de devis.
+
+    🛡️ BANK-GRADE: Délègue à la vue unifiée (DRY — single source of truth).
     """
-    Webhook Stripe pour gérer les événements de paiement.
-    """
-    from core.services.stripe_service import StripePaymentService, is_stripe_configured
-    
-    if not is_stripe_configured():
-        return HttpResponse(status=400)
-    
-    payload = request.body
-    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE', '')
-    
-    try:
-        event = StripePaymentService.verify_webhook_signature(payload, sig_header)
-    except ValueError as e:
-        logger.error(f"Webhook signature invalide: {e}")
-        return HttpResponse(status=400)
-    
-    # Traiter les événements
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        StripePaymentService.handle_checkout_completed(session)
-    
-    return HttpResponse(status=200)
+    from core.services.stripe_service import stripe_webhook_view
+    return stripe_webhook_view(request)
+

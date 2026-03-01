@@ -30,7 +30,7 @@ def obfuscate_email(email: str) -> Dict[str, str]:
     return {
         'encoded': encoded,
         'display': display,
-        'original': email  # Pour debug uniquement, ne pas exposer en template
+        # 🛡️ SECURITY: 'original' field removed — was leaking cleartext email to templates
     }
 
 

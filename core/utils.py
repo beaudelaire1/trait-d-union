@@ -1,5 +1,31 @@
 """Utilitaires partagés pour le projet Trait d'Union Studio."""
+from __future__ import annotations
+
 from decimal import Decimal
+
+
+def get_client_ip(request) -> str:
+    """Extract client IP from request, handling reverse proxies.
+
+    🛡️ SECURITY: Single source of truth for IP extraction.
+    - Only trusts the FIRST entry in X-Forwarded-For
+    - Truncates to 45 chars (IPv6 max length)
+    - Rejects characters that shouldn't appear in an IP address
+    - Returns '127.0.0.1' when request is None or IP is unparseable
+    """
+    if request is None:
+        return ''
+    forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
+    if forwarded_for:
+        ip = forwarded_for.split(',')[0].strip()
+    else:
+        ip = request.META.get('REMOTE_ADDR', '')
+    # Sanitize: max 45 chars (IPv6), strip whitespace, no special chars
+    ip = ip.strip()[:45]
+    # Remove any characters that shouldn't be in an IP address
+    if ip and not all(c in '0123456789abcdefABCDEF.:' for c in ip):
+        ip = request.META.get('REMOTE_ADDR', '127.0.0.1')[:45]
+    return ip or '127.0.0.1'
 
 
 def num2words_fr(value: Decimal) -> str:

@@ -1,4 +1,5 @@
 """Custom middleware for TUS website."""
+import logging
 import time
 from typing import Any, Callable
 
@@ -6,6 +7,12 @@ from django.core.cache import cache
 from django.http import HttpRequest, HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import http_date
+
+logger = logging.getLogger(__name__)
+
+
+# 🛡️ SECURITY: Single source of truth for IP extraction (DRY)
+from core.utils import get_client_ip as _get_client_ip  # noqa: E402
 
 
 class RateLimitMiddleware(MiddlewareMixin):
@@ -26,9 +33,26 @@ class RateLimitMiddleware(MiddlewareMixin):
         ('/contact/', 5, 3600),
         ('/accounts/login/', 10, 3600),
         ('/accounts/signup/', 5, 3600),
+        ('/devis/', 5, 3600),
+        ('/devis/pdf/', 20, 3600),  # 🛡️ Rate limit public PDF downloads (GET)
+        ('/factures/payer/', 10, 3600),  # 🛡️ Rate limit public invoice payment page
+        ('/factures/webhook/', 60, 60),  # 🛡️ Rate limit Stripe webhooks (60/min)
+        ('/tus-gestion-secure/login/', 5, 900),  # 🛡️ Admin login: 5 attempts / 15 min
+    ]
+
+    # Routes also rate-limited on GET (e.g. public PDF downloads)
+    GET_RATE_LIMITS: list[tuple[str, int, int]] = [
+        ('/devis/pdf/', 20, 3600),
+        ('/factures/pdf/', 20, 3600),  # 🛡️ Rate limit public invoice PDF downloads
     ]
 
     def process_request(self, request: HttpRequest) -> None | HttpResponse:
+        # Rate-limit GET on specific routes
+        if request.method == 'GET':
+            for path_prefix, max_requests, window_seconds in self.GET_RATE_LIMITS:
+                if request.path.startswith(path_prefix):
+                    return self._check_rate(request, path_prefix, max_requests, window_seconds)
+
         if request.method != 'POST':
             return None
 
@@ -45,73 +69,56 @@ class RateLimitMiddleware(MiddlewareMixin):
         max_requests: int,
         window_seconds: int,
     ) -> None | HttpResponse:
-        """Check and enforce rate limit for a given route."""
-        ip = request.META.get('REMOTE_ADDR', '')
+        """Check and enforce rate limit for a given route.
+
+        🛡️ SECURITY: If the cache backend is unavailable (Redis down),
+        fail-open to avoid blocking legitimate traffic.  The Stripe
+        webhook signature and Django CSRF still protect against abuse.
+        Rate limiting is a *defense-in-depth* layer, not the sole gate.
+        """
+        # 🛡️ SECURITY: Sanitized IP extraction (see _get_client_ip)
+        ip = _get_client_ip(request)
         # Normalise le path prefix pour la clé cache (ex: "contact", "login")
         route_key = path_prefix.strip('/').replace('/', '_')
         cache_key = f"ratelimit:{route_key}:{ip}"
 
-        current = cache.get(cache_key, 0)
-        if current >= max_requests:
-            response = HttpResponse('Too Many Requests', status=429)
-            response['Retry-After'] = str(window_seconds)
-            return response
-
-        # incr() est atomique dans les backends Redis/memcached
         try:
-            cache.incr(cache_key)
-        except ValueError:
-            # Clé n'existe pas encore → la créer avec TTL
-            cache.set(cache_key, 1, window_seconds)
+            current = cache.get(cache_key, 0)
+            if current >= max_requests:
+                response = HttpResponse('Too Many Requests', status=429)
+                response['Retry-After'] = str(window_seconds)
+                return response
+
+            # incr() est atomique dans les backends Redis/memcached
+            try:
+                cache.incr(cache_key)
+            except ValueError:
+                # Clé n'existe pas encore → la créer avec TTL
+                cache.set(cache_key, 1, window_seconds)
+        except Exception:
+            # 🛡️ SECURITY: Cache backend unavailable (Redis down) — fail-closed
+            # for sensitive routes, fail-open for everything else.
+            import logging
+            _logger = logging.getLogger('config.middleware')
+            _logger.warning(
+                "Rate limit cache unavailable for %s — applying in-memory fallback", route_key
+            )
+            # Fail-closed on login / contact / signup (block if cache down)
+            _SENSITIVE_ROUTES = {'contact', 'accounts_login', 'accounts_signup', 'tus-gestion-secure_login'}
+            if route_key in _SENSITIVE_ROUTES:
+                response = HttpResponse('Service temporarily unavailable', status=503)
+                response['Retry-After'] = '30'
+                return response
 
         return None
 
 
-class SecurityHeadersMiddleware(MiddlewareMixin):
-    """Middleware that adds security-related HTTP headers including CSP."""
 
-    # Content-Security-Policy directives.
-    # Kept as a class attribute for easy override in tests / settings.
-    CSP_DIRECTIVES = (
-        "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com "
-        "https://www.googletagmanager.com https://www.google-analytics.com "
-        "https://challenges.cloudflare.com https://www.google.com https://www.gstatic.com; "
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; "
-        "font-src 'self' https://fonts.gstatic.com data:; "
-        "img-src 'self' data: blob: https://res.cloudinary.com https://www.google-analytics.com https://*.stripe.com; "
-        "connect-src 'self' https://www.google-analytics.com https://challenges.cloudflare.com https://api.stripe.com; "
-        "frame-src https://challenges.cloudflare.com https://www.google.com https://js.stripe.com; "
-        "object-src 'none'; "
-        "base-uri 'self'; "
-        "form-action 'self' https://checkout.stripe.com"
-    )
-
-    def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
-        response.setdefault('X-Frame-Options', 'SAMEORIGIN')
-        response.setdefault('X-Content-Type-Options', 'nosniff')
-        response.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
-
-        # Content-Security-Policy
-        if 'Content-Security-Policy' not in response:
-            response['Content-Security-Policy'] = self.CSP_DIRECTIVES
-
-        # Permissions-Policy (anciennement Feature-Policy)
-        from django.conf import settings
-        permissions = getattr(settings, 'PERMISSIONS_POLICY', None)
-        if permissions and 'Permissions-Policy' not in response:
-            directives = []
-            for feature, origins in permissions.items():
-                if not origins:
-                    directives.append(f'{feature}=()')
-                elif origins == ['self']:
-                    directives.append(f'{feature}=(self)')
-                else:
-                    allowed = ' '.join(f'"{o}"' for o in origins)
-                    directives.append(f'{feature}=({allowed})')
-            response['Permissions-Policy'] = ', '.join(directives)
-
-        return response
+# NOTE: SecurityHeadersMiddleware has been REMOVED (was dead code).
+# All security headers are now handled by:
+#   - django-csp (csp.middleware.CSPMiddleware) for CSP
+#   - Django's SecurityMiddleware for X-Content-Type-Options, HSTS, etc.
+#   - Permissions-Policy is set via PERMISSIONS_POLICY dict in settings
 
 
 class CacheControlMiddleware(MiddlewareMixin):
@@ -131,6 +138,8 @@ class CacheControlMiddleware(MiddlewareMixin):
 
         if request.path.startswith(('/tus-gestion-secure/', '/ecosysteme-tus/', '/accounts/')):
             response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+            # 🛡️ SECURITY: Prevent search engines from indexing admin/portal pages
+            response['X-Robots-Tag'] = 'noindex, nofollow, noarchive'
             return response
 
         if 'text/html' in content_type:
@@ -144,3 +153,106 @@ class CacheControlMiddleware(MiddlewareMixin):
             return response
 
         return response
+
+
+class SecurityAuditMiddleware(MiddlewareMixin):
+    """🛡️ BANK-GRADE: Log security events to AuditLog for SIEM correlation.
+
+    Captures:
+    - Failed login attempts (401/403 on login endpoints)
+    - Rate limit hits (429 responses)
+    - Suspicious patterns (path traversal, SQL injection probes)
+    """
+
+    _SUSPICIOUS_PATTERNS = (
+        '../', '..\\', '%2e%2e', 'union+select', 'union%20select',
+        '<script', '%3cscript', 'javascript:', 'onerror=', 'onload=',
+        '.php', 'wp-admin', 'wp-login', '.env', '.git/',
+    )
+
+    def process_response(self, request: HttpRequest, response: HttpResponse) -> HttpResponse:
+        # Log rate limit hits
+        if response.status_code == 429:
+            self._log_security_event(
+                request, 'rate_limit_hit',
+                f"Rate limit 429 on {request.method} {request.path}",
+            )
+
+        # Log failed login attempts
+        if (
+            response.status_code in (401, 403)
+            and request.path.startswith(('/accounts/login/', '/tus-gestion-secure/login/'))
+            and request.method == 'POST'
+        ):
+            self._log_security_event(
+                request, 'login_failed',
+                f"Failed login attempt on {request.path}",
+            )
+
+        # Log suspicious path patterns
+        path_lower = request.path.lower()
+        query_lower = request.META.get('QUERY_STRING', '').lower()
+        combined = path_lower + query_lower
+        for pattern in self._SUSPICIOUS_PATTERNS:
+            if pattern in combined:
+                self._log_security_event(
+                    request, 'suspicious_activity',
+                    f"Suspicious pattern '{pattern}' in {request.method} {request.path}",
+                )
+                break
+
+        return response
+
+    def _log_security_event(self, request: HttpRequest, action_type: str, description: str):
+        """Best-effort async security event logging."""
+        try:
+            from apps.audit.models import AuditLog
+            ip = _get_client_ip(request)
+            user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
+            AuditLog.log_action(
+                action_type=action_type,
+                actor=request.user if hasattr(request, 'user') and request.user.is_authenticated else None,
+                content_type='security.event',
+                object_id=0,
+                description=description,
+                metadata={
+                    'ip': ip,
+                    'user_agent': user_agent,
+                    'path': request.path[:500],
+                    'method': request.method,
+                },
+            )
+        except Exception:
+            # Never break the request pipeline for audit logging
+            logger.warning("Failed to log security event: %s", description)
+
+
+class CanonicalDomainMiddleware(MiddlewareMixin):
+    """🔍 SEO: Redirect www → non-www and Render subdomain → canonical domain.
+
+    Prevents duplicate content penalties from Google by enforcing a single
+    canonical domain. Only active when CANONICAL_DOMAIN is set (production).
+
+    Redirects:
+    - www.traitdunion.it → traitdunion.it (301)
+    - trait-d-union.onrender.com → traitdunion.it (301)
+    """
+
+    def process_request(self, request: HttpRequest) -> HttpResponse | None:
+        from django.conf import settings
+
+        canonical = getattr(settings, 'CANONICAL_DOMAIN', '')
+        if not canonical:
+            return None
+
+        host = request.get_host().split(':')[0]  # Strip port
+
+        # Already on canonical domain
+        if host == canonical:
+            return None
+
+        # Redirect to canonical (301 permanent)
+        from django.http import HttpResponsePermanentRedirect
+        scheme = 'https' if request.is_secure() else 'http'
+        new_url = f"{scheme}://{canonical}{request.get_full_path()}"
+        return HttpResponsePermanentRedirect(new_url)

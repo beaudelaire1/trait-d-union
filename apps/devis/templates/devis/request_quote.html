@@ -15,16 +15,16 @@
         <!-- Header -->
         <div class="text-center mb-12">
             <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue-a11y text-sm font-medium mb-6 reveal">Devis gratuit</span>
-            <h1 class="font-display text-4xl md:text-5xl font-bold text-tus-white mb-4 reveal-clip" style="transition-delay: 0.1s;">
+ <h1 class="font-display text-4xl md:text-5xl font-bold text-tus-white mb-4 reveal-clip td-100" >
                 Demander un <span class="text-tus-blue-a11y">devis</span>
             </h1>
-            <p class="text-tus-white/70 text-lg max-w-xl mx-auto reveal" style="transition-delay: 0.2s;">
+ <p class="text-tus-white/70 text-lg max-w-xl mx-auto reveal td-200" >
                 Décrivez votre projet et recevez une estimation personnalisée sous 24h.
             </p>
         </div>
 
         <!-- Form Card -->
-        <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 md:p-12 reveal-scale" style="transition-delay: 0.15s;">
+ <div class="bg-tus-white/5 backdrop-blur-sm border border-tus-white/10 rounded-2xl p-8 md:p-12 reveal-scale td-150" >
             <form method="post" enctype="multipart/form-data" class="space-y-6 stagger-children">
                 {% csrf_token %}
                 
@@ -126,7 +126,7 @@
     </div>
 </section>
 
-<script>
+<script nonce="{{ request.csp_nonce }}">
 function updateFileLabel(input) {
     const label = document.getElementById('file-label');
     if (input.files.length > 0) {

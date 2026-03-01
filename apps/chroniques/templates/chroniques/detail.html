@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static chroniques_filters %}
 
 {% block title %}{{ article.title }} — Chroniques TUS{% endblock %}
-{% block meta_description %}{{ article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
+{% block meta_description %}{{ article.meta_description|default:article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
 {% block og_title %}{{ article.title }} — Chroniques TUS{% endblock %}
-{% block og_description %}{{ article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
+{% block og_description %}{{ article.meta_description|default:article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
 {% block og_image %}{% if article.cover_image %}{{ article.cover_image.url }}{% endif %}{% endblock %}
 {% block twitter_title %}{{ article.title }} — Chroniques TUS{% endblock %}
 {% block twitter_description %}{{ article.excerpt|default:"Article des Chroniques TUS" }}{% endblock %}
@@ -77,7 +77,7 @@
         {% endif %}
 
         <div class="article-content max-w-none">
-            {{ article.body|safe|linebreaksbr }}
+            {{ article.body|safe_html|linebreaksbr }}
         </div>
     </div>
 </div>

@@ -7,7 +7,6 @@ principaux (numéro, devis associé, montant, date).
 """
 
 from django.contrib import admin, messages
-from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django.core.files.base import ContentFile
 from django import forms
@@ -154,13 +153,14 @@ def publish_invoice_to_portal(invoice: Invoice, request=None) -> bool:
                 )
             return False
 
-        user = User.objects.filter(email__iexact=invoice.client.email).first()
-        client_profile = getattr(user, "client_profile", None) if user else None
+        # 🛡️ BANK-GRADE: Use FK (linked_profile) instead of email lookup (IDOR risk)
+        client_profile = getattr(invoice.client, 'linked_profile', None)
         if not client_profile:
             if request:
                 messages.warning(
                     request,
-                    f"Portail: aucun client trouvé pour {invoice.client.email}",
+                    f"Portail: aucun profil lié pour {invoice.client.email}. "
+                    f"Liez le client via le champ 'linked_profile' dans l'admin.",
                 )
             return False
 

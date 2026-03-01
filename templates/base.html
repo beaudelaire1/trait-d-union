@@ -27,18 +27,30 @@
     <meta name="keywords"
         content="{% block meta_keywords %}architecture digitale guyane, création site internet cayenne, site web guadeloupe, site web martinique, développeur web guyane, création site internet guyane, site internet kourou, site web saint-laurent maroni, studio web outre-mer{% endblock %}">
 
-    <!-- Canonical URL -->
-    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
+    <!-- 🔍 SEO: Geo targeting for local search (Guyane française) -->
+    <meta name="geo.region" content="GF">
+    <meta name="geo.placename" content="Cayenne, Guyane française">
+    <meta name="geo.position" content="4.9372;-52.3260">
+    <meta name="ICBM" content="4.9372, -52.3260">
+
+    <!-- Canonical URL — 🔍 SEO: Strip query params to avoid duplicate content from pagination -->
+    <link rel="canonical" href="{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
     <!-- Hreflang — Ciblage régional Guyane/Outre-mer -->
-    <link rel="alternate" hreflang="fr" href="{{ request.build_absolute_uri }}">
-    <link rel="alternate" hreflang="x-default" href="{{ request.build_absolute_uri }}">
+    <link rel="alternate" hreflang="fr" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="fr-GF" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="fr-MQ" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="fr-GP" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
 
     <!-- OpenGraph tags -->
-    <meta property="og:title" content="{% block og_title %}Trait d'Union Studio - Architecture Digitale{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}Trait d'Union Studio — Architecture Digitale{% endblock %}">
     <meta property="og:description"
         content="{% block og_description %}Studio d'architecture digitale en Guyane, Martinique et Guadeloupe. Création de sites internet et plateformes sur mesure.{% endblock %}">
+    {# 📸 SEO: og:image MUST be ≥1200×630 for rich social previews. Place the file at static/img/og-default.png #}
     <meta property="og:image"
-        content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}{% endblock %}">
+        content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.png' %}{% endblock %}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="fr_FR">
@@ -47,15 +59,15 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title"
-        content="{% block twitter_title %}Trait d'Union Studio - Architecture Digitale{% endblock %}">
+        content="{% block twitter_title %}Trait d'Union Studio — Architecture Digitale{% endblock %}">
     <meta name="twitter:description"
         content="{% block twitter_description %}Studio d'architecture digitale en Guyane (Cayenne, Kourou, Saint-Laurent), Martinique et Guadeloupe. Création de sites internet et plateformes sur mesure.{% endblock %}">
     <meta name="twitter:image"
-        content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/apple-touch-icon.png' %}{% endblock %}">
+        content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.png' %}{% endblock %}">
 
     <!-- Google Analytics (G4) — chargé dynamiquement après consentement RGPD -->
     {% if not debug %}
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
         // GA4 n'est PAS chargé ici. Il sera injecté dynamiquement par le
         // cookie consent (applyPreferences) uniquement si l'utilisateur
         // a consenti aux cookies analytiques.
@@ -105,12 +117,22 @@
     <!-- Breadcrumb Schema.org for SEO (Google Rich Snippets) -->
     {% include 'partials/breadcrumb_schema.html' %}
 
-    <!-- Preload fonts for better LCP -->
+    <!-- Preconnect for fonts & JS CDNs (shave ~200ms off TTFB) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+    <!-- 🔍 SEO: Pagination hints for crawlers -->
+    {% block seo_pagination %}{% endblock %}
     <link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap"
-        rel="stylesheet">
+        rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet"></noscript>
     <!-- Tailwind CSS (compilé) -->
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -118,13 +140,13 @@
     {% block extra_head %}{% endblock %}
 </head>
 
-<body class="bg-tus-black text-tus-white font-body antialiased">
+<body class="bg-tus-black text-tus-white font-body antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <!-- Skip to main content — WCAG 2.4.1 (Level A) -->
     <a href="#main-content"
         class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-tus-blue focus:text-tus-white/80 focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold focus:outline-none focus:ring-2 focus:ring-tus-white">Aller
         au contenu principal</a>
     {% include 'partials/navbar.html' %}
-    <main id="main-content" class="min-h-screen main-view-transition">
+    <main id="main-content" class="min-h-screen main-view-transition pt-20">
         {% block content %}{% endblock %}
     </main>
     {% include 'partials/footer.html' %}

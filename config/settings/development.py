@@ -7,7 +7,8 @@ from .base import *  # noqa: F401,F403
 import os
 
 DEBUG = True
-ALLOWED_HOSTS = ['*']
+# 🛡️ SECURITY: Restrict dev hosts — prevents accidental deployment with wrong settings module
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]']
 
 INSTALLED_APPS += [
     'django_extensions',
@@ -35,9 +36,9 @@ if _is_postgres_available(5432):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'tus_db',
-            'USER': 'tus_user',
-            'PASSWORD': 'tus_password',
+            'NAME': os.environ.get('DB_NAME', 'tus_db'),
+            'USER': os.environ.get('DB_USER', 'tus_user'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', 'tus_password'),
             'HOST': 'localhost',
             'PORT': '5432',
         }

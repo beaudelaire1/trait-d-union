@@ -37,6 +37,11 @@ class Project(models.Model):
     class Meta:
         ordering = ['-created_at']
 
+        indexes = [
+            models.Index(fields=['is_published', '-created_at'], name='idx_portfolio_published'),
+            models.Index(fields=['project_type', 'is_published'], name='idx_portfolio_type'),
+        ]
+
     def __str__(self) -> str:
         return self.title
 

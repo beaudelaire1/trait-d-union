@@ -80,12 +80,11 @@ def send_quote_with_pdf(sender, instance, created, **kwargs):
     if not created:
         return
 
-    # Use async dispatch
+    # Use async dispatch — ⚡ PERFORMANCE: PDF generation (WeasyPrint, 1-5s) is now
+    # dispatched to qcluster worker instead of blocking the request cycle.
     try:
-        from core.tasks import async_send_quote_email
-        if not instance.pdf:
-            instance.generate_pdf(attach=True)
-        async_send_quote_email(instance.pk)
+        from core.tasks import async_send_quote_pdf_email
+        async_send_quote_pdf_email(instance.pk)  # worker handles PDF generation + send
     except Exception as e:
         logger.error(f"Erreur lors de l'envoi automatique du devis {instance.pk}: {e}")
 

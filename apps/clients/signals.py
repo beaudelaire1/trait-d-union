@@ -11,9 +11,15 @@ from apps.clients.models import ClientNotification, ClientProfile
 logger = logging.getLogger(__name__)
 
 
-def _resolve_profile(email: str):
-    """Résout un ClientProfile depuis un email. Retourne None si absent."""
-    return ClientProfile.objects.filter(user__email=email).first()
+def _resolve_profile(email: str, client_obj=None):
+    """Résout un ClientProfile depuis un Client (FK) ou un email (fallback).
+
+    🛡️ SECURITY: Prefer FK-based lookup (linked_profile) over email matching.
+    """
+    # 🛡️ BANK-GRADE: Only use FK-based lookup. No email fallback (IDOR risk).
+    if client_obj and hasattr(client_obj, 'linked_profile') and client_obj.linked_profile_id:
+        return client_obj.linked_profile
+    return None
 
 
 @receiver(post_save, sender=Quote)
@@ -22,7 +28,7 @@ def notify_quote_created(sender, instance, created, **kwargs):
     if not (created and instance.status == 'sent'):
         return
     try:
-        profile = _resolve_profile(instance.client.email)
+        profile = _resolve_profile(instance.client.email, client_obj=instance.client)
         if profile:
             ClientNotification.objects.create(
                 client=profile,
@@ -43,7 +49,7 @@ def notify_quote_accepted(sender, instance, created, **kwargs):
     if not (instance.status == 'accepted' and instance.signed_at):
         return
     try:
-        profile = _resolve_profile(instance.client.email)
+        profile = _resolve_profile(instance.client.email, client_obj=instance.client)
         if profile and not ClientNotification.objects.filter(
             client=profile, notification_type='quote',
             title='Devis accepté', related_url=f'/ecosysteme-tus/devis/{instance.pk}/'
@@ -73,7 +79,7 @@ def notify_invoice_created(sender, instance, created, **kwargs):
         client_obj = _resolve_invoice_client(instance)
         if not client_obj:
             return
-        profile = _resolve_profile(client_obj.email)
+        profile = _resolve_profile(client_obj.email, client_obj=client_obj)
         if profile:
             ClientNotification.objects.create(
                 client=profile,
@@ -97,7 +103,7 @@ def notify_invoice_paid(sender, instance, created, **kwargs):
         client_obj = _resolve_invoice_client(instance)
         if not client_obj:
             return
-        profile = _resolve_profile(client_obj.email)
+        profile = _resolve_profile(client_obj.email, client_obj=client_obj)
         if profile and not ClientNotification.objects.filter(
             client=profile, notification_type='invoice',
             title='Paiement reçu', related_url=f'/ecosysteme-tus/factures/{instance.pk}/'
