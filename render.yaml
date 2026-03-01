@@ -16,8 +16,8 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     
-    # Build command (migrations, collectstatic)
-    buildCommand: chmod +x build.sh && ./build.sh
+    # Pre-deploy command (Docker runtime: buildCommand is ignored, use preDeployCommand)
+    preDeployCommand: chmod +x build.sh && ./build.sh
     
     # Health check
     healthCheckPath: /

@@ -236,13 +236,22 @@ class CanonicalDomainMiddleware(MiddlewareMixin):
     Redirects:
     - www.traitdunion.it → traitdunion.it (301)
     - trait-d-union.onrender.com → traitdunion.it (301)
+
+    Always uses https:// scheme because Render terminates SSL at the LB.
     """
+
+    # Paths excluded from canonical redirect (health checks, etc.)
+    EXEMPT_PATHS = ('/healthz/',)
 
     def process_request(self, request: HttpRequest) -> HttpResponse | None:
         from django.conf import settings
 
         canonical = getattr(settings, 'CANONICAL_DOMAIN', '')
         if not canonical:
+            return None
+
+        # Skip health checks (Render probes via internal hostname)
+        if request.path in self.EXEMPT_PATHS:
             return None
 
         host = request.get_host().split(':')[0]  # Strip port
@@ -252,7 +261,8 @@ class CanonicalDomainMiddleware(MiddlewareMixin):
             return None
 
         # Redirect to canonical (301 permanent)
+        # Always https — Render terminates SSL at the load balancer,
+        # so request.is_secure() may return False even for HTTPS traffic.
         from django.http import HttpResponsePermanentRedirect
-        scheme = 'https' if request.is_secure() else 'http'
-        new_url = f"{scheme}://{canonical}{request.get_full_path()}"
+        new_url = f"https://{canonical}{request.get_full_path()}"
         return HttpResponsePermanentRedirect(new_url)
