@@ -338,8 +338,16 @@ INVOICE_BRANDING = {
 
 QUOTE_BRANDING = INVOICE_BRANDING  # Alias pour les devis
 
-# Site URL (pour les emails)
-SITE_URL = os.environ.get('SITE_URL', 'https://traitdunion.it')
+# Site URL (pour les emails) — garde-fou : jamais localhost en production
+_raw_site_url = os.environ.get('SITE_URL', 'https://traitdunion.it')
+if any(h in _raw_site_url for h in ('localhost', '127.0.0.1', '0.0.0.0')):
+    import logging as _logging
+    _logging.getLogger(__name__).warning(
+        "SITE_URL contient localhost (%r), fallback → https://traitdunion.it", _raw_site_url
+    )
+    SITE_URL = 'https://traitdunion.it'
+else:
+    SITE_URL = _raw_site_url.rstrip('/')
 
 # Jazzmin Admin Theme Configuration
 JAZZMIN_SETTINGS = {

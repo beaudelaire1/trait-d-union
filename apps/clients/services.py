@@ -161,7 +161,11 @@ def send_welcome_email(
         temporary_password: Le mot de passe temporaire généré
         context_label: Libellé optionnel (ex: "Devis DEV-2026-042")
     """
-    site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it')
+    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+    # Sécurité : ne jamais envoyer un lien localhost/127.0.0.1 par email
+    if 'localhost' in site_url or '127.0.0.1' in site_url or '0.0.0.0' in site_url:
+        logger.warning(f"SITE_URL contient localhost ({site_url!r}), fallback sur https://traitdunion.it")
+        site_url = 'https://traitdunion.it'
     login_url = f"{site_url}/accounts/login/"
     first_name = user.first_name or user.username
     from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@traitdunion.it')
