@@ -107,6 +107,18 @@ def create_client_account(
             )
             logger.info(f"Compte client créé : {username} ({email})")
 
+            # Allauth : marquer l'email comme vérifié (compte créé sur invitation admin)
+            # Sans cela, ACCOUNT_EMAIL_VERIFICATION='mandatory' bloquerait la connexion
+            try:
+                from allauth.account.models import EmailAddress
+                EmailAddress.objects.get_or_create(
+                    user=user,
+                    email=email,
+                    defaults={'verified': True, 'primary': True},
+                )
+            except Exception as exc:
+                logger.warning(f"Impossible de créer EmailAddress allauth : {exc}")
+
         # Créer / récupérer le ClientProfile
         client_profile, profile_created = ClientProfile.objects.get_or_create(
             user=user,

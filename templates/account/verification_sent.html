@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vérification envoyée - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="confirm-container">
+        <div class="confirm-card">
+            <!-- Logo -->
+            <div class="confirm-logo">
+                <svg height="40" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="tusGradVerif" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="#0B2DFF"/>
+                            <stop offset="0.62" stop-color="#2D5BFF"/>
+                            <stop offset="1" stop-color="#F6F7FB"/>
+                        </linearGradient>
+                    </defs>
+                    <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D'UNION</text>
+                    <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradVerif)"/>
+                    <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+                </svg>
+            </div>
+
+            <div class="confirm-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2">
+                    <path d="M22 2L11 13"></path>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                </svg>
+            </div>
+
+            <h1>Email envoyé !</h1>
+            <p class="confirm-text">
+                Un email de vérification a été envoyé à votre adresse.<br>
+                Cliquez sur le lien dans l'email pour confirmer votre compte.
+            </p>
+
+            <div class="confirm-tips">
+                <p>📬 Vérifiez aussi vos <strong>spams</strong> si vous ne voyez pas l'email.</p>
+            </div>
+
+            <a href="{% url 'account_login' %}" class="btn-confirm secondary">
+                Retour à la connexion
+            </a>
+        </div>
+    </div>
+</div>
+
+<style nonce="{{ request.csp_nonce }}">
+.auth-page {
+    min-height: 100vh;
+    background: #0a0a0f;
+    padding-top: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-container {
+    width: 100%;
+    max-width: 480px;
+    margin: 2rem;
+}
+
+.confirm-card {
+    background: #12121a;
+    border-radius: 24px;
+    padding: 3rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.confirm-logo {
+    margin-bottom: 2.5rem;
+}
+
+.confirm-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.2);
+    margin-bottom: 1.5rem;
+}
+
+.confirm-card h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f6f7fb;
+    margin-bottom: 0.75rem;
+}
+
+.confirm-text {
+    color: rgba(246,247,251,0.6);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.confirm-tips {
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.15);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.confirm-tips p {
+    color: rgba(246,247,251,0.7);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.confirm-tips strong {
+    color: #22C55E;
+}
+
+.btn-confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem;
+    background: #0B2DFF;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-confirm.secondary {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+}
+
+.btn-confirm:hover {
+    transform: translateY(-2px);
+    color: white;
+}
+
+.btn-confirm.secondary:hover {
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 640px) {
+    .confirm-container {
+        margin: 1rem;
+    }
+    .confirm-card {
+        padding: 2rem 1.5rem;
+    }
+    .confirm-card h1 {
+        font-size: 1.4rem;
+    }
+}
+</style>
+{% endblock %}

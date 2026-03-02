@@ -39,6 +39,11 @@ else:
     print(f"ℹ️  Superuser '{username}' existe déjà ou DJANGO_SUPERUSER_PASSWORD non défini")
 EOF
 
+# 3. Fix: ajouter EmailAddress allauth vérifiée pour les comptes existants
+echo ""
+echo "📧 Vérification des EmailAddress allauth..."
+python manage.py fix_email_addresses --apply
+
 echo ""
 echo "=========================================="
 echo "✅ Pre-deploy terminé avec succès!"

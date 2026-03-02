@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmer votre email - Trait d'Union Studio{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="confirm-container">
+        <div class="confirm-card">
+            <!-- Logo -->
+            <div class="confirm-logo">
+                <svg height="40" viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="tusGradConfirm" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="#0B2DFF"/>
+                            <stop offset="0.62" stop-color="#2D5BFF"/>
+                            <stop offset="1" stop-color="#F6F7FB"/>
+                        </linearGradient>
+                    </defs>
+                    <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D'UNION</text>
+                    <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradConfirm)"/>
+                    <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+                </svg>
+            </div>
+
+            {% if confirmation %}
+            <!-- Confirmation form -->
+            <div class="confirm-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0B2DFF" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+            </div>
+
+            <h1>Confirmer votre email</h1>
+            <p class="confirm-text">
+                Confirmez que <strong>{{ confirmation.email_address.email }}</strong> 
+                est bien votre adresse email.
+            </p>
+
+            <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-confirm">
+                    Confirmer mon email
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                </button>
+            </form>
+            {% else %}
+            <!-- Invalid / expired link -->
+            <div class="confirm-icon error">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+            </div>
+
+            <h1>Lien invalide</h1>
+            <p class="confirm-text">
+                Ce lien de confirmation est invalide ou a expiré.
+            </p>
+            <a href="{% url 'account_login' %}" class="btn-confirm">
+                Retour à la connexion
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style nonce="{{ request.csp_nonce }}">
+.auth-page {
+    min-height: 100vh;
+    background: #0a0a0f;
+    padding-top: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.confirm-container {
+    width: 100%;
+    max-width: 480px;
+    margin: 2rem;
+}
+
+.confirm-card {
+    background: #12121a;
+    border-radius: 24px;
+    padding: 3rem;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    text-align: center;
+}
+
+.confirm-logo {
+    margin-bottom: 2.5rem;
+}
+
+.confirm-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(11,45,255,0.1);
+    border: 1px solid rgba(11,45,255,0.2);
+    margin-bottom: 1.5rem;
+}
+
+.confirm-icon.error {
+    background: rgba(239,68,68,0.1);
+    border-color: rgba(239,68,68,0.2);
+}
+
+.confirm-card h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f6f7fb;
+    margin-bottom: 0.75rem;
+}
+
+.confirm-text {
+    color: rgba(246,247,251,0.6);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.confirm-text strong {
+    color: #0B2DFF;
+}
+
+.btn-confirm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem;
+    background: #0B2DFF;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn-confirm:hover {
+    background: #0922cc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(11,45,255,0.4);
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .confirm-container {
+        margin: 1rem;
+    }
+    .confirm-card {
+        padding: 2rem 1.5rem;
+    }
+    .confirm-card h1 {
+        font-size: 1.4rem;
+    }
+}
+</style>
+{% endblock %}
