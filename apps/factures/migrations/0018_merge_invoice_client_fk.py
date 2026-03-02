@@ -44,6 +44,8 @@ def noop(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
+    atomic = False
+
     dependencies = [
         ('factures', '0017_add_performance_indexes'),
         ('clients', '0011_populate_from_devis_client'),

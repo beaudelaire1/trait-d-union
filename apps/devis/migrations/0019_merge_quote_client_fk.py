@@ -48,6 +48,8 @@ def noop(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
+    atomic = False
+
     dependencies = [
         ('devis', '0018_remove_client_idx_client_linked_profile_and_more'),
         ('clients', '0011_populate_from_devis_client'),
