@@ -53,11 +53,14 @@ class PremiumEmailService:
         subject = f"Facture {invoice.number} – {company_name}"
         
         # Construire l'URL de vue en ligne
-        site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it')
+        site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+        # Sécurité : ne jamais envoyer un lien localhost par email
+        if any(h in site_url for h in ('localhost', '127.0.0.1', '0.0.0.0')):
+            site_url = 'https://traitdunion.it'
         view_url = None
         if hasattr(invoice, 'public_token') and invoice.public_token:
             try:
-                view_url = f"{site_url}{reverse('factures:invoice_public_view', kwargs={'token': invoice.public_token})}"
+                view_url = f"{site_url}{reverse('factures:public_pdf', kwargs={'token': invoice.public_token})}"
             except Exception:
                 pass
         

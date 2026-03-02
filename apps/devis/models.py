@@ -549,7 +549,7 @@ class QuoteValidation(models.Model):
         return self.confirmed_at is not None
 
     @classmethod
-    def create_for_quote(cls, quote: "Quote", *, ttl_minutes: int = 15) -> "QuoteValidation":
+    def create_for_quote(cls, quote: "Quote", *, ttl_minutes: int = 30) -> "QuoteValidation":
         """Crée un jeton + code et invalide les précédents jetons non confirmés."""
         import secrets
         from django.utils import timezone

@@ -38,7 +38,7 @@ def start_quote_validation(
     *,
     request=None,
     to_email: Optional[str] = None,
-    ttl_minutes: int = 15,
+    ttl_minutes: int = 30,
 ) -> QuoteValidationStartResult:
     """Démarre le workflow de validation (2FA) pour un devis.
 
@@ -47,6 +47,7 @@ def start_quote_validation(
     - Rate-limit : 1 envoi OTP par minute par devis (anti-spam email).
     - Un nouveau QuoteValidation est créé (les précédents non confirmés sont invalidés).
     - Un email OTP est envoyé au client.
+    - Le code expire après 30 minutes (email delivery delays).
     """
     if quote.status != Quote.QuoteStatus.SENT:
         raise QuoteNotValidatableError(f"Devis non validable (status={quote.status!r}).")

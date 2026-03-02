@@ -276,7 +276,7 @@ def send_quote_validation_code(quote, validation, request=None, *, to_email: Opt
                 f"<div style='text-align:center; font-size: 32px; font-weight: bold; letter-spacing: 8px; "
                 f"background: rgba(11, 45, 255, 0.1); padding: 20px; border-radius: 12px; margin: 20px 0;'>"
                 f"{validation.code}</div>"
-                f"<br>Ce code expire dans <strong>15 minutes</strong>."
+                f"<br>Ce code expire dans <strong>30 minutes</strong>."
             ),
             'details': [
                 {'label': 'Devis', 'value': quote.number},

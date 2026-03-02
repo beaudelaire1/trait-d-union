@@ -45,8 +45,8 @@ _WEAK_KEYS = frozenset({
     'django-insecure',
 })
 
-_secret = os.environ.get('DJANGO_SECRET_KEY', '')
-if not _secret or len(_secret) < 32 or _secret.lower().strip() in _WEAK_KEYS:
+_secret = os.environ.get('DJANGO_SECRET_KEY', '').strip()
+if not _secret or len(_secret) < 32 or _secret.lower() in _WEAK_KEYS:
     from django.core.management.utils import get_random_secret_key
     _secret = get_random_secret_key()
     import logging as _logging
@@ -470,6 +470,10 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_LOGOUT_ON_GET = False  # UX: prevent accidental logout via GET (bots, crawlers)
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ''  # Pas de préfixe [Site]
+# Lien de confirmation email : 7 jours d'expiration, confirmation au clic (sans POST)
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # UX: un clic suffit pour confirmer
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # UX: connexion auto après confirmation
 ACCOUNT_FORMS = {
     'login': 'core.forms.CaptchaLoginForm',
 }

@@ -231,8 +231,10 @@ if REDIS_URL:
         }
     }
     
-    # Sessions via Redis (plus rapide)
-    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    # Sessions via Redis + PostgreSQL fallback (résilience)
+    # 'cached_db' écrit dans Redis ET dans la table django_session.
+    # Si Redis tombe, Django relit la session depuis PostgreSQL.
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
     SESSION_CACHE_ALIAS = 'default'
 
 # ==============================================================================

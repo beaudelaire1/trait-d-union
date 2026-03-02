@@ -108,16 +108,20 @@ def create_client_account(
             logger.info(f"Compte client créé : {username} ({email})")
 
             # Allauth : marquer l'email comme vérifié (compte créé sur invitation admin)
-            # Sans cela, ACCOUNT_EMAIL_VERIFICATION='mandatory' bloquerait la connexion
+            # Sans cela, ACCOUNT_EMAIL_VERIFICATION='mandatory' bloquerait la connexion.
+            # IMPORTANT : update_or_create (pas get_or_create) car allauth peut
+            # créer automatiquement un EmailAddress(verified=False) via ses signaux
+            # AVANT que ce code ne s'exécute. get_or_create n'applique 'defaults'
+            # que lors de la création → le verified=False ne serait jamais corrigé.
             try:
                 from allauth.account.models import EmailAddress
-                EmailAddress.objects.get_or_create(
+                EmailAddress.objects.update_or_create(
                     user=user,
                     email=email,
                     defaults={'verified': True, 'primary': True},
                 )
             except Exception as exc:
-                logger.warning(f"Impossible de créer EmailAddress allauth : {exc}")
+                logger.warning(f"Impossible de créer/mettre à jour EmailAddress allauth : {exc}")
 
         # Créer / récupérer le ClientProfile
         client_profile, profile_created = ClientProfile.objects.get_or_create(

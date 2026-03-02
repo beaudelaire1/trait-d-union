@@ -30,9 +30,30 @@ class Command(BaseCommand):
 
         users = User.objects.filter(is_active=True).exclude(email="")
         for user in users:
-            # Check if THIS user already has a verified EmailAddress for their email
-            has_email = EmailAddress.objects.filter(user=user, email__iexact=user.email).exists()
-            if not has_email:
+            # Check if THIS user already has a VERIFIED EmailAddress for their email
+            existing_for_user = EmailAddress.objects.filter(user=user, email__iexact=user.email).first()
+
+            if existing_for_user and existing_for_user.verified and existing_for_user.primary:
+                # Already correct — skip
+                continue
+
+            if existing_for_user and not existing_for_user.verified:
+                # Record exists but NOT verified → fix it
+                if apply:
+                    existing_for_user.verified = True
+                    existing_for_user.primary = True
+                    existing_for_user.save(update_fields=['verified', 'primary'])
+                    self.stdout.write(self.style.SUCCESS(
+                        f"  ✅ {user.username} ({user.email}) — marked verified"
+                    ))
+                else:
+                    self.stdout.write(self.style.WARNING(
+                        f"  ⚠️  {user.username} ({user.email}) — exists but NOT verified"
+                    ))
+                fixed += 1
+                continue
+
+            if not existing_for_user:
                 if apply:
                     # Check if the email exists for ANOTHER user (unique constraint)
                     existing = EmailAddress.objects.filter(email__iexact=user.email).first()
