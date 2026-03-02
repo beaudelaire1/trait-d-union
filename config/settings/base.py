@@ -51,8 +51,15 @@ if not _secret or len(_secret) < 32 or _secret.lower() in _WEAK_KEYS:
     _secret = get_random_secret_key()
     import logging as _logging
     _logging.getLogger('django.security').warning(
-        'DJANGO_SECRET_KEY absent ou trop faible — clé aléatoire générée automatiquement. '
-        'À ne pas utiliser en production persistante (sessions invalidées à chaque redémarrage).'
+        'DJANGO_SECRET_KEY absent ou trop faible (longueur=%d) — clé aléatoire générée '
+        'automatiquement. Sessions invalidées à chaque redémarrage.',
+        len(os.environ.get('DJANGO_SECRET_KEY', '')),
+    )
+else:
+    import logging as _logging
+    _logging.getLogger('django.security').info(
+        'SECRET_KEY acceptée (longueur=%d, premiers chars=%s…)',
+        len(_secret), _secret[:4],
     )
 SECRET_KEY = _secret
 
@@ -113,6 +120,8 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 🔍 TEMPORARY: Session debug logging for admin (REMOVE once session issue is resolved)
+    'config.middleware_session_debug.SessionDebugMiddleware',
     # HTMX must come before CommonMiddleware to set the proper flags
     'django_htmx.middleware.HtmxMiddleware',
     # allauth
@@ -526,7 +535,9 @@ SESSION_SAVE_EVERY_REQUEST = True  # Renouvelle le TTL à chaque requête (slidi
 SESSION_COOKIE_NAME = 'tus_sid'
 # 🛡️ BANK-GRADE: CSRF cookie hardening (avoid Django fingerprinting, HttpOnly)
 CSRF_COOKIE_NAME = 'tus_ct'
-CSRF_COOKIE_HTTPONLY = True
+# CSRF_COOKIE_HTTPONLY doit rester à False (défaut Django) pour que
+# Jazzmin Admin et HTMX puissent lire le token CSRF via JavaScript.
+CSRF_COOKIE_HTTPONLY = False
 
 # 🛡️ SECURITY: Headers applied in ALL environments (dev + prod)
 SECURE_CONTENT_TYPE_NOSNIFF = True  # X-Content-Type-Options: nosniff

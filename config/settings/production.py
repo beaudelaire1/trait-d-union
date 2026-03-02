@@ -230,12 +230,12 @@ if REDIS_URL:
             'KEY_PREFIX': 'tus',
         }
     }
-    
-    # Sessions via Redis + PostgreSQL fallback (résilience)
-    # 'cached_db' écrit dans Redis ET dans la table django_session.
-    # Si Redis tombe, Django relit la session depuis PostgreSQL.
-    SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
-    SESSION_CACHE_ALIAS = 'default'
+
+# Sessions TOUJOURS en base PostgreSQL (fiabilité maximale).
+# Redis est utilisé uniquement pour le cache (rate limiting, etc.).
+# Raison : cached_db/cache backends causes des pertes de session
+# quand Redis est instable ou quand les workers Gunicorn redémarrent.
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # ==============================================================================
 # LOGGING (Production — structured JSON for SIEM/security correlation)
@@ -300,6 +300,17 @@ LOGGING = {
             'propagate': False,
         },
         'config.middleware': {
+            'handlers': ['security'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        # 🔍 TEMPORARY: Session debug logger (REMOVE once session issue resolved)
+        'tus.session_debug': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.security': {
             'handlers': ['security'],
             'level': 'INFO',
             'propagate': False,
