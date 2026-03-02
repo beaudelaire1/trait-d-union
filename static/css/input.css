@@ -87,6 +87,7 @@
     @apply transition-all duration-300;
   }
 
+  /* ── Article content (chroniques detail page) ────────────────── */
   .article-content {
     color: rgba(246, 247, 251, 0.86);
     font-size: 1.05rem;
@@ -97,6 +98,11 @@
     margin: 0 0 1.25rem;
     text-align: justify;
     hyphens: auto;
+  }
+
+  /* When an explicit alignment is set via inline style, disable hyphens */
+  .article-content [style*="text-align"] {
+    hyphens: none;
   }
 
   .article-content h2 {
@@ -113,10 +119,25 @@
     color: #F6F7FB;
   }
 
+  .article-content h4 {
+    margin: 1.5rem 0 0.6rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #F6F7FB;
+  }
+
   .article-content ul,
   .article-content ol {
     padding-left: 1.4rem;
     margin: 0 0 1.25rem;
+  }
+
+  .article-content ul {
+    list-style-type: disc;
+  }
+
+  .article-content ol {
+    list-style-type: decimal;
   }
 
   .article-content li {
@@ -127,6 +148,10 @@
     color: #0B2DFF;
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  .article-content a:hover {
+    color: #2D5BFF;
   }
 
   .article-content strong {
@@ -142,5 +167,88 @@
   .article-content u {
     text-decoration: underline;
     text-underline-offset: 3px;
+  }
+
+  .article-content blockquote {
+    border-left: 3px solid #0B2DFF;
+    padding: 0.8rem 1.2rem;
+    margin: 1.5rem 0;
+    background: rgba(11, 45, 255, 0.05);
+    border-radius: 0 8px 8px 0;
+    color: rgba(246, 247, 251, 0.8);
+    font-style: italic;
+  }
+
+  .article-content code {
+    background: rgba(246, 247, 251, 0.08);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  .article-content pre {
+    background: rgba(246, 247, 251, 0.06);
+    border: 1px solid rgba(246, 247, 251, 0.1);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin: 1.5rem 0;
+    overflow-x: auto;
+  }
+
+  .article-content pre code {
+    background: none;
+    padding: 0;
+  }
+
+  .article-content hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(11, 45, 255, 0.3), transparent);
+    margin: 2rem 0;
+  }
+
+  .article-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+  }
+
+  .article-content figure {
+    margin: 1.5rem 0;
+  }
+
+  .article-content figcaption {
+    text-align: center;
+    color: rgba(246, 247, 251, 0.5);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+
+  .article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    border: 1px solid rgba(246, 247, 251, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .article-content th,
+  .article-content td {
+    padding: 0.6rem 1rem;
+    border: 1px solid rgba(246, 247, 251, 0.1);
+    text-align: left;
+  }
+
+  .article-content th {
+    background: rgba(11, 45, 255, 0.08);
+    font-weight: 600;
+    color: #F6F7FB;
+  }
+
+  .article-content tr:nth-child(even) {
+    background: rgba(246, 247, 251, 0.02);
   }
 }

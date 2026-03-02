@@ -508,28 +508,38 @@ ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 # ── TinyMCE ──────────────────────────────────────────────────────
 TINYMCE_DEFAULT_CONFIG = {
     'theme': 'silver',
-    'height': 360,
+    'height': 480,
     'menubar': False,
-    'plugins': 'lists link autolink',
+    'plugins': 'lists link autolink table code charmap',
     'toolbar': (
-        'undo redo | bold italic underline | '
-        'bullist numlist | link | removeformat'
+        'undo redo | formatselect | bold italic underline | '
+        'alignleft aligncenter alignright alignjustify | '
+        'forecolor backcolor | bullist numlist | link table | removeformat | code'
     ),
+    'block_formats': 'Paragraphe=p;Titre 2=h2;Titre 3=h3;Titre 4=h4;Citation=blockquote',
     'content_style': (
         "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap');"
         "body { font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.7; "
         "color: #222; letter-spacing: -0.005em; }"
+        "p { margin: 0 0 1rem; text-align: justify; }"
+        "h2 { font-size: 1.4rem; margin: 1.5rem 0 0.8rem; }"
+        "h3 { font-size: 1.2rem; margin: 1.2rem 0 0.6rem; }"
         "strong, b { font-weight: 700; }"
         "ul, ol { padding-left: 1.5em; margin: 0.8em 0; }"
         "li { margin-bottom: 0.3em; }"
+        "blockquote { border-left: 3px solid #0B2DFF; padding: 0.5em 1em; margin: 1em 0; }"
     ),
     'branding': False,
-    'statusbar': False,
+    'statusbar': True,
     'valid_elements': (
-        'p,br,strong/b,em/i,u,'
+        'p[style],br,strong/b,em/i,u,sub,sup,span[style],div[style],'
         'ul,ol,li,'
         'a[href|title|target],'
-        'h3,h4,h5,blockquote,code,hr'
+        'h2[style],h3[style],h4[style],h5[style],h6[style],'
+        'blockquote[style],code,pre,hr,'
+        'img[src|alt|title|width|height|loading|style],'
+        'figure,figcaption,'
+        'table,thead,tbody,tr,td[colspan|rowspan|style],th[colspan|rowspan|style]'
     ),
 }
 LOGIN_URL = '/accounts/login/'
