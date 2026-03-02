@@ -353,3 +353,122 @@ class TestSendPasswordChangedEmail:
         _task_send_password_changed_email(user.pk)
         assert len(mail.outbox) == 1
         assert user.email in mail.outbox[0].to
+
+
+# ==============================================================================
+# CLIENT COMMENT → ADMIN NOTIFICATION
+# ==============================================================================
+
+@pytest.fixture
+def client_user_with_project(db):
+    """Create a non-staff user with a ClientProfile and a Project."""
+    from apps.clients.models import ClientProfile, Project
+    user = User.objects.create_user(
+        'clientuser', 'client@example.com', 'ClientP@ss1!',
+        first_name='Jean', last_name='Dupont',
+    )
+    profile = ClientProfile.objects.get_or_create(user=user)[0]
+    project = Project.objects.create(
+        client=profile,
+        name='Site Vitrine Test',
+        status='development',
+    )
+    return user, profile, project
+
+
+@pytest.mark.django_db
+class TestClientCommentNotification:
+    """Test que les commentaires clients déclenchent une notif admin."""
+
+    @patch('core.tasks.async_notify_admin_new_comment')
+    def test_add_comment_dispatches_admin_notif(self, mock_notif, client, client_user_with_project):
+        """Posting a comment dispatches the async admin notification."""
+        user, profile, project = client_user_with_project
+        client.force_login(user)
+        url = f'/ecosysteme-tus/projets/{project.pk}/commentaire/'
+        response = client.post(url, {'message': 'Bonjour, une question sur le design.'})
+        assert response.status_code in (200, 302)
+        mock_notif.assert_called_once()
+
+    def test_comment_creates_project_comment(self, client, client_user_with_project):
+        """Comment is persisted in ProjectComment model."""
+        from apps.clients.models import ProjectComment
+        user, profile, project = client_user_with_project
+        client.force_login(user)
+        url = f'/ecosysteme-tus/projets/{project.pk}/commentaire/'
+        client.post(url, {'message': 'Test message persisté.'})
+        assert ProjectComment.objects.filter(project=project, author=user).exists()
+        comment = ProjectComment.objects.get(project=project, author=user)
+        assert comment.read_by_admin is False
+        assert comment.is_from_client is True
+
+    def test_comment_not_from_staff(self, client, client_user_with_project):
+        """is_from_client returns False for staff comments."""
+        from apps.clients.models import ProjectComment
+        user, profile, project = client_user_with_project
+        staff = User.objects.create_user('staffguy', 'staff@tus.it', 'Pass1!', is_staff=True)
+        comment = ProjectComment.objects.create(
+            project=project, author=staff, message='Réponse admin',
+        )
+        assert comment.is_from_client is False
+
+
+@pytest.mark.django_db
+class TestAdminCommentEmailNotification:
+    """Test send_new_comment_notification_to_admin email service."""
+
+    def test_sends_email_to_admin(self, client_user_with_project):
+        """Email is sent to ADMIN_EMAIL when a client comments."""
+        from apps.clients.models import ProjectComment
+        from apps.clients.services import send_new_comment_notification_to_admin
+        from django.core import mail
+
+        user, profile, project = client_user_with_project
+        comment = ProjectComment.objects.create(
+            project=project, author=user, message='Question design',
+        )
+        send_new_comment_notification_to_admin(comment)
+        assert len(mail.outbox) == 1
+        msg = mail.outbox[0]
+        assert 'Nouveau message client' in msg.subject
+        assert 'Site Vitrine Test' in msg.subject
+        html = msg.alternatives[0][0]
+        assert 'Question design' in html
+
+    def test_task_worker_sends_notification(self, client_user_with_project):
+        """The async task worker sends the email."""
+        from apps.clients.models import ProjectComment
+        from core.tasks import _task_notify_admin_new_comment
+        from django.core import mail
+
+        user, profile, project = client_user_with_project
+        comment = ProjectComment.objects.create(
+            project=project, author=user, message='Urgent: besoin de validation',
+        )
+        _task_notify_admin_new_comment(comment.pk)
+        assert len(mail.outbox) == 1
+        assert 'Nouveau message client' in mail.outbox[0].subject
+
+
+@pytest.mark.django_db
+class TestProjectCommentReadByAdmin:
+    """Test read_by_admin flag behavior."""
+
+    def test_new_comment_defaults_unread(self, client_user_with_project):
+        """New comments have read_by_admin=False by default."""
+        from apps.clients.models import ProjectComment
+        user, profile, project = client_user_with_project
+        comment = ProjectComment.objects.create(
+            project=project, author=user, message='Test',
+        )
+        assert comment.read_by_admin is False
+
+    @patch('core.tasks._dispatch')
+    def test_async_dispatcher_calls_dispatch(self, mock_dispatch):
+        """async_notify_admin_new_comment calls _dispatch correctly."""
+        from core.tasks import async_notify_admin_new_comment
+        async_notify_admin_new_comment(42)
+        mock_dispatch.assert_called_once()
+        args, kwargs = mock_dispatch.call_args
+        assert args[1] == 42
+        assert 'admin_comment_notif' in kwargs.get('task_name', '')

@@ -436,6 +436,13 @@ def add_project_comment(request, project_id):
                 is_client_visible=True
             )
             
+            # Notifier l'admin par email (async)
+            try:
+                from core.tasks import async_notify_admin_new_comment
+                async_notify_admin_new_comment(comment.pk)
+            except Exception:
+                pass  # Ne pas bloquer le client si la notif échoue
+            
             # Return partial for HTMX
             if request.headers.get('HX-Request'):
                 return render(request, 'clients/partials/comment_item.html', {

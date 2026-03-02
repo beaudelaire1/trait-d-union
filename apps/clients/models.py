@@ -546,6 +546,10 @@ class ProjectComment(models.Model):
         "Lu par le client",
         default=False
     )
+    read_by_admin = models.BooleanField(
+        "Lu par l'admin",
+        default=False
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -562,8 +566,8 @@ class ProjectComment(models.Model):
     
     @property
     def is_from_client(self):
-        """Check if comment is from the client."""
-        return hasattr(self.author, 'client_profile')
+        """Check if comment is from the client (not staff)."""
+        return not self.author.is_staff
 
 
 class ClientDocument(models.Model):

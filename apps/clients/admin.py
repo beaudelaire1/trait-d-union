@@ -234,8 +234,8 @@ class ProjectCommentInline(admin.TabularInline):
     """Inline for project comments."""
     model = ProjectComment
     extra = 0
-    readonly_fields = ['created_at']
-    fields = ['author', 'message', 'is_internal', 'created_at']
+    readonly_fields = ['created_at', 'read_by_admin']
+    fields = ['author', 'message', 'is_internal', 'read_by_admin', 'created_at']
     ordering = ['-created_at']
 
 
@@ -247,7 +247,7 @@ class ProjectAdmin(admin.ModelAdmin):
     - Sélectionner un workflow → jalons générés automatiquement
     - OU ajouter des jalons manuellement via l'inline
     """
-    list_display = ['name', 'client', 'status', 'progress', 'start_date', 'estimated_delivery', 'workflow_used']
+    list_display = ['name', 'client', 'status', 'progress', 'unread_comments_badge', 'start_date', 'estimated_delivery', 'workflow_used']
     list_filter = ['status', 'workflow_template', 'start_date', 'created_at']
     search_fields = ['name', 'client__company_name', 'client__user__email']
     readonly_fields = ['created_at', 'updated_at']
@@ -277,12 +277,47 @@ class ProjectAdmin(admin.ModelAdmin):
         }),
     )
     
+    def get_queryset(self, request):
+        """Annotate projects with unread client comment count for list display."""
+        from django.db.models import Count, Q
+        qs = super().get_queryset(request)
+        return qs.annotate(
+            _unread_client_comments=Count(
+                'comments',
+                filter=Q(
+                    comments__read_by_admin=False,
+                    comments__is_internal=False,
+                ) & ~Q(comments__author__is_staff=True),
+            )
+        )
+    
+    def unread_comments_badge(self, obj):
+        """Affiche le nombre de commentaires clients non lus."""
+        count = getattr(obj, '_unread_client_comments', 0)
+        if count == 0:
+            return format_html('<span style="color:#6B7280;">—</span>')
+        return format_html(
+            '<span style="background:#EF4444; color:white; padding:2px 10px; '
+            'border-radius:12px; font-size:0.75rem; font-weight:700;">💬 {}</span>',
+            count
+        )
+    unread_comments_badge.short_description = "Messages"
+
     def workflow_used(self, obj):
         """Affiche le workflow utilisé."""
         if obj.workflow_template:
             return f"✅ {obj.workflow_template.name}"
         return "❌ Manuel"
     workflow_used.short_description = "Workflow"
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """Marquer les commentaires clients comme lus quand l'admin ouvre le projet."""
+        ProjectComment.objects.filter(
+            project_id=object_id,
+            read_by_admin=False,
+            is_internal=False,
+        ).exclude(author__is_staff=True).update(read_by_admin=True)
+        return super().change_view(request, object_id, form_url, extra_context)
     
     def save_model(self, request, obj, form, change):
         """Log activity when status or progress changes.
@@ -573,14 +608,40 @@ class ProjectActivityAdmin(admin.ModelAdmin):
 @admin.register(ProjectComment)
 class ProjectCommentAdmin(admin.ModelAdmin):
     """Admin for project comments."""
-    list_display = ['project', 'author', 'short_message', 'is_internal', 'read_by_client', 'created_at']
-    list_filter = ['is_internal', 'read_by_client', 'created_at']
+    list_display = ['project', 'author', 'short_message', 'is_from_client_badge', 'is_internal', 'read_by_admin', 'created_at']
+    list_filter = ['is_internal', 'read_by_admin', 'read_by_client', 'created_at']
     search_fields = ['message', 'project__name', 'author__username']
     readonly_fields = ['created_at', 'updated_at']
+    actions = ['mark_as_read_action']
     
     def short_message(self, obj):
         return obj.message[:50] + '...' if len(obj.message) > 50 else obj.message
     short_message.short_description = "Message"
+    
+    def is_from_client_badge(self, obj):
+        """Badge indiquant si le message vient d'un client."""
+        if obj.is_from_client:
+            label = '👤 Client'
+            color = '#0B2DFF'
+        else:
+            label = '🏢 Équipe'
+            color = '#22C55E'
+        return format_html(
+            '<span style="background:{}; color:white; padding:2px 8px; '
+            'border-radius:4px; font-size:0.75rem; font-weight:600;">{}</span>',
+            color, label
+        )
+    is_from_client_badge.short_description = "Source"
+    
+    @admin.action(description="✅ Marquer comme lu")
+    def mark_as_read_action(self, request, queryset):
+        count = queryset.filter(read_by_admin=False).update(read_by_admin=True)
+        self.message_user(request, f"✅ {count} commentaire(s) marqué(s) comme lu(s).")
+    
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        """Marquer comme lu quand l'admin ouvre le commentaire."""
+        ProjectComment.objects.filter(pk=object_id, read_by_admin=False).update(read_by_admin=True)
+        return super().change_view(request, object_id, form_url, extra_context)
 
 
 @admin.register(ClientNotification)

@@ -163,6 +163,15 @@ def async_send_password_changed_email(user_id: int):
     )
 
 
+def async_notify_admin_new_comment(comment_id: int):
+    """Notifie l'admin qu'un client a posté un commentaire sur un projet."""
+    return _dispatch(
+        'core.tasks._task_notify_admin_new_comment',
+        comment_id,
+        task_name=f'admin_comment_notif_{comment_id}',
+    )
+
+
 # ==============================================================================
 # WORKERS (fonctions exécutées par le cluster django-q2)
 # ==============================================================================
@@ -195,6 +204,16 @@ def _task_send_password_changed_email(user_id: int):
     user = User.objects.get(pk=user_id)
     send_password_changed_email(user)
     logger.info(f"[ASYNC] Email confirmation changement mdp envoyé à {user.email}")
+
+
+def _task_notify_admin_new_comment(comment_id: int):
+    """Worker : notifie l'admin qu'un client a posté un commentaire."""
+    from apps.clients.models import ProjectComment
+    from apps.clients.services import send_new_comment_notification_to_admin
+
+    comment = ProjectComment.objects.select_related('project', 'author').get(pk=comment_id)
+    send_new_comment_notification_to_admin(comment)
+    logger.info(f"[ASYNC] Notification admin commentaire #{comment_id} envoyée")
 
 
 def _task_send_quote_email(quote_id: int):
