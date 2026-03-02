@@ -55,6 +55,7 @@ class Command(BaseCommand):
             user=user,
             name=f"CLI-provisioned ({username})",
             confirmed=True,
+            tolerance=2,  # ±60s — compense le décalage d'horloge cloud
         )
 
         self.stdout.write(self.style.SUCCESS(f"\nTOTP device created for '{username}'."))

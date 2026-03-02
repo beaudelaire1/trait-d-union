@@ -69,6 +69,7 @@ def totp_qr_code(request):
                 user=user,
                 name=f'Auto-provisioned ({user.username})',
                 confirmed=True,
+                tolerance=2,  # ±60s — compense le décalage d'horloge cloud
             )
             logger.info(
                 'TOTP device auto-created for staff user=%s ip=%s',

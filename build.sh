@@ -44,6 +44,18 @@ echo ""
 echo "📧 Vérification des EmailAddress allauth..."
 python manage.py fix_email_addresses --apply
 
+# 4. Fix: augmenter la tolérance TOTP (±60s) pour compenser le drift d'horloge cloud
+echo ""
+echo "🔐 Mise à jour tolérance TOTP..."
+python manage.py shell << 'EOFTOTP'
+from django_otp.plugins.otp_totp.models import TOTPDevice
+updated = TOTPDevice.objects.filter(tolerance__lt=2).update(tolerance=2)
+if updated:
+    print(f"✅ {updated} device(s) TOTP mis à jour (tolerance=2)")
+else:
+    print("ℹ️  Tous les devices TOTP ont déjà tolerance≥2")
+EOFTOTP
+
 echo ""
 echo "=========================================="
 echo "✅ Pre-deploy terminé avec succès!"
