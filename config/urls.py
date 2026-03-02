@@ -44,6 +44,7 @@ admin.site.__class__ = TUSOTPAdminSite
 from config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap
 from apps.pages.healthz import healthz
 from core.views_totp import totp_qr_code
+from core.views_session import session_ping
 
 
 # Sitemap configuration
@@ -60,6 +61,8 @@ urlpatterns = [
     path('tus-gestion-secure/emails/', include('apps.leads.email_urls', namespace='admin_emails')),
     # 🛡️ TOTP QR code endpoint (credentials required via POST)
     path('tus-gestion-secure/totp-qr/', totp_qr_code, name='admin_totp_qr'),
+    # 🛡️ Session keep-alive (heartbeat JS in admin calls this every few minutes)
+    path('tus-gestion-secure/session-ping/', session_ping, name='session_ping'),
     path('tus-gestion-secure/', admin.site.urls),  # URL admin sécurisée
     path('', include('apps.pages.urls')),
     path('portfolio/', include('apps.portfolio.urls')),

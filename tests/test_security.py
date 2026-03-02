@@ -5,8 +5,11 @@ are correctly configured at the Django settings level.
 """
 import pytest
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test import Client
 from django.urls import reverse
+
+User = get_user_model()
 
 
 class TestSecuritySettings:
@@ -28,6 +31,12 @@ class TestSecuritySettings:
     def test_session_cookie_httponly(self):
         """Session cookie must be HttpOnly."""
         assert settings.SESSION_COOKIE_HTTPONLY is True
+
+    def test_session_inactivity_timeout(self):
+        """Session must expire after 15 minutes of inactivity (900s)."""
+        assert settings.SESSION_COOKIE_AGE == 900
+        assert settings.SESSION_SAVE_EVERY_REQUEST is True
+        assert settings.SESSION_EXPIRE_AT_BROWSER_CLOSE is False
 
     def test_x_frame_options(self):
         """X-Frame-Options should be DENY or SAMEORIGIN."""
@@ -71,3 +80,63 @@ class TestSecurityHeaders:
         """X-Content-Type-Options: nosniff should be set."""
         response = client.get('/')
         assert response.get('X-Content-Type-Options') == 'nosniff'
+
+
+@pytest.mark.django_db
+class TestSessionPing:
+    """Tests for the session keep-alive endpoint."""
+
+    def test_anonymous_gets_403(self, client):
+        """Anonymous users must not be able to ping."""
+        response = client.get('/tus-gestion-secure/session-ping/')
+        assert response.status_code == 403
+
+    def test_non_staff_gets_403(self, client):
+        """Non-staff authenticated users must not be able to ping."""
+        user = User.objects.create_user(
+            username='regular', password='testpass123', email='r@test.com',
+        )
+        client.force_login(user)
+        response = client.get('/tus-gestion-secure/session-ping/')
+        assert response.status_code == 403
+
+    def test_staff_gets_204(self, client):
+        """Staff users get 204 No Content (session renewed)."""
+        user = User.objects.create_user(
+            username='staffuser', password='testpass123',
+            email='s@test.com', is_staff=True,
+        )
+        client.force_login(user)
+        response = client.get('/tus-gestion-secure/session-ping/')
+        assert response.status_code == 204
+
+    def test_post_not_allowed(self, client):
+        """Only GET is accepted."""
+        user = User.objects.create_user(
+            username='staffpost', password='testpass123',
+            email='sp@test.com', is_staff=True,
+        )
+        client.force_login(user)
+        response = client.post('/tus-gestion-secure/session-ping/')
+        assert response.status_code == 405
+
+    def test_ping_updates_last_activity(self, client):
+        """Ping should store _last_activity in the session."""
+        user = User.objects.create_user(
+            username='staffact', password='testpass123',
+            email='sa@test.com', is_staff=True,
+        )
+        client.force_login(user)
+        response = client.get('/tus-gestion-secure/session-ping/')
+        assert response.status_code == 204
+        assert '_last_activity' in client.session
+
+    def test_no_cache_header(self, client):
+        """Ping response must not be cached."""
+        user = User.objects.create_user(
+            username='staffcache', password='testpass123',
+            email='sc@test.com', is_staff=True,
+        )
+        client.force_login(user)
+        response = client.get('/tus-gestion-secure/session-ping/')
+        assert 'no-store' in response.get('Cache-Control', '')

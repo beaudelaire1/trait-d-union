@@ -73,4 +73,8 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT}/healthz/')" || exit 1
 
 # Gunicorn with production settings
-CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.production gunicorn config.wsgi:application --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]
+# --preload : charge l'app UNE SEULE FOIS dans le master process avant de fork
+# les workers. Garantit que SECRET_KEY, settings et connexions DB sont
+# identiques dans tous les workers (élimine le risque de clé aléatoire
+# différente par worker si DJANGO_SECRET_KEY est absent/faible).
+CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.production gunicorn config.wsgi:application --preload --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]

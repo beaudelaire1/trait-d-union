@@ -112,7 +112,7 @@ else:
 # ==============================================================================
 # STATIC FILES (WhiteNoise with Manifest for immutable caching)
 # ==============================================================================
-# WhiteNoise doit être après SecurityMiddleware
+# WhiteNoise doit être après SecurityMiddleware, avant SessionMiddleware
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 # ⚡ PERFORMANCE: Manifest storage for immutable cache (hash-based filenames)
@@ -304,8 +304,8 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        # 🔍 TEMPORARY: Session debug logger (REMOVE once session issue resolved)
-        'tus.session_debug': {
+        # 🛡️ Session guard: loggue uniquement les anomalies admin (WARNING+)
+        'tus.session_guard': {
             'handlers': ['console'],
             'level': 'WARNING',
             'propagate': False,

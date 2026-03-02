@@ -63,6 +63,14 @@ else:
     )
 SECRET_KEY = _secret
 
+# 🛡️ SECURITY: Anciennes clés acceptées pour valider les sessions existantes
+# lors d'une rotation de SECRET_KEY (Django 4.1+). Les sessions signées avec
+# une clé fallback restent valides en lecture, mais sont re-signées avec la
+# nouvelle clé au prochain save (SESSION_SAVE_EVERY_REQUEST).
+# En production, mettre l'ancienne clé dans DJANGO_SECRET_KEY_FALLBACK.
+_fallback = os.environ.get('DJANGO_SECRET_KEY_FALLBACK', '').strip()
+SECRET_KEY_FALLBACKS = [_fallback] if _fallback and len(_fallback) >= 32 else []
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -110,9 +118,11 @@ SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # 🔍 SEO: Canonical domain redirect (www → non-www, render → custom domain)
-    'config.middleware.CanonicalDomainMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # 🔍 SEO: Canonical domain redirect (www → non-www, render → custom domain)
+    # Placé APRÈS SessionMiddleware pour que Set-Cookie soit toujours émis,
+    # même sur les réponses de redirection 301 (évite la perte de session).
+    'config.middleware.CanonicalDomainMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -120,8 +130,8 @@ MIDDLEWARE = [
     'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 🔍 TEMPORARY: Session debug logging for admin (REMOVE once session issue is resolved)
-    'config.middleware_session_debug.SessionDebugMiddleware',
+    # 🛡️ Session guard: loggue les anomalies de session admin (WARNING only, 0 overhead si OK)
+    'config.middleware_session_debug.SessionGuardMiddleware',
     # HTMX must come before CommonMiddleware to set the proper flags
     'django_htmx.middleware.HtmxMiddleware',
     # allauth
@@ -525,12 +535,18 @@ TINYMCE_DEFAULT_CONFIG = {
 LOGIN_URL = '/accounts/login/'
 
 # ==============================================================================
-# 🛡️ SECURITY: Session hardening
+# 🛡️ SECURITY: Session hardening — 15 min inactivity timeout
 # ==============================================================================
-SESSION_COOKIE_AGE = 7200  # 2 heures (sliding window via SESSION_SAVE_EVERY_REQUEST)
+# Sliding window: chaque requête HTTP renouvelle le cookie pour 15 minutes.
+# Si l'utilisateur ne fait AUCUNE requête pendant 15 min → session expirée.
+# Un heartbeat JS dans l'admin maintient la session pendant l'utilisation active
+# (édition de formulaires, lecture de pages).
+SESSION_COOKIE_AGE = 900  # 15 minutes d'inactivité (sliding window)
 SESSION_COOKIE_HTTPONLY = True  # Empêche l'accès JS au cookie de session
 SESSION_COOKIE_SAMESITE = 'Lax'  # Protection CSRF cross-site
-SESSION_SAVE_EVERY_REQUEST = True  # Renouvelle le TTL à chaque requête (sliding window)
+SESSION_COOKIE_PATH = '/'  # Cookie valide pour tout le site (explicite)
+SESSION_SAVE_EVERY_REQUEST = True  # Renouvelle le TTL à chaque requête → inactivité only
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Ne PAS expirer à la fermeture du navigateur
 # 🛡️ BANK-GRADE: Custom cookie name to avoid Django fingerprinting
 SESSION_COOKIE_NAME = 'tus_sid'
 # 🛡️ BANK-GRADE: CSRF cookie hardening (avoid Django fingerprinting, HttpOnly)

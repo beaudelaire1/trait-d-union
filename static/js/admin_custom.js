@@ -1,10 +1,98 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    TRAIT D'UNION STUDIO — Admin Premium JS
    Raccourcis clavier · Navigation bidirectionnelle · Animations · UX premium
+   Session heartbeat (15 min inactivity timeout)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 (function () {
     'use strict';
+
+    /* ── Session Heartbeat ───────────────────────────────────────────── */
+    /* Keeps the server-side session alive while the user is actively
+       interacting with the admin (mouse, keyboard, scroll, touch).
+
+       - Tracks the last user interaction timestamp.
+       - Every PING_INTERVAL_MS, checks if the user was active within
+         the last IDLE_THRESHOLD_MS.  If yes → sends a lightweight GET
+         to /tus-gestion-secure/session-ping/ (returns 204).
+       - If the user has been idle for longer than IDLE_THRESHOLD_MS,
+         pings STOP → the session cookie expires after SESSION_COOKIE_AGE
+         (15 min from the last server hit) → user is logged out.
+       - Shows a warning banner 2 minutes before session expiry so the
+         user can click anywhere to renew.                               */
+
+    var PING_INTERVAL_MS  = 4 * 60 * 1000;   // ping every 4 min
+    var IDLE_THRESHOLD_MS = 10 * 60 * 1000;   // stop pinging after 10 min idle
+    var WARN_BEFORE_MS    = 2 * 60 * 1000;    // warn 2 min before expiry
+    var SESSION_TTL_MS    = 15 * 60 * 1000;   // must match SESSION_COOKIE_AGE (900s)
+    var PING_URL          = '/tus-gestion-secure/session-ping/';
+
+    var lastUserActivity = Date.now();
+    var lastServerHit    = Date.now();
+    var warningBanner    = null;
+
+    function onUserActivity() {
+        lastUserActivity = Date.now();
+        // If the warning banner is visible, hide it (user came back)
+        if (warningBanner && warningBanner.parentNode) {
+            warningBanner.parentNode.removeChild(warningBanner);
+            warningBanner = null;
+            // Immediately ping to renew the session
+            sendPing();
+        }
+    }
+
+    function sendPing() {
+        fetch(PING_URL, { method: 'GET', credentials: 'same-origin' })
+            .then(function (resp) {
+                if (resp.status === 204) {
+                    lastServerHit = Date.now();
+                } else if (resp.status === 403) {
+                    // Session already expired on server side → reload to login page
+                    window.location.reload();
+                }
+            })
+            .catch(function () { /* network error — ignore silently */ });
+    }
+
+    function showExpiryWarning() {
+        if (warningBanner) return; // already showing
+        warningBanner = document.createElement('div');
+        warningBanner.id = 'session-expiry-warning';
+        warningBanner.style.cssText =
+            'position:fixed;top:0;left:0;right:0;z-index:99999;' +
+            'background:#f59e0b;color:#000;text-align:center;padding:10px 16px;' +
+            'font-weight:600;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.18);';
+        warningBanner.textContent =
+            '⏳ Votre session expire bientôt — cliquez n\u0027importe où pour la prolonger.';
+        document.body.appendChild(warningBanner);
+    }
+
+    function heartbeatTick() {
+        var now = Date.now();
+        var idleSince = now - lastUserActivity;
+        var sinceLastHit = now - lastServerHit;
+
+        // User is active → ping the server to renew the session
+        if (idleSince < IDLE_THRESHOLD_MS) {
+            sendPing();
+        }
+
+        // Show warning if we're close to expiry and no ping was sent
+        if (sinceLastHit > (SESSION_TTL_MS - WARN_BEFORE_MS)) {
+            showExpiryWarning();
+        }
+    }
+
+    // Listen for user interactions (passive for perf)
+    ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'].forEach(
+        function (evt) {
+            document.addEventListener(evt, onUserActivity, { passive: true });
+        }
+    );
+
+    // Start the periodic heartbeat
+    setInterval(heartbeatTick, PING_INTERVAL_MS);
 
     /* ── Keyboard shortcuts ──────────────────────────────────────────── */
 
