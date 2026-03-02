@@ -46,7 +46,7 @@ _WEAK_KEYS = frozenset({
 })
 
 _secret = os.environ.get('DJANGO_SECRET_KEY', '')
-if not _secret or len(_secret) < 50 or _secret.lower().strip() in _WEAK_KEYS:
+if not _secret or len(_secret) < 32 or _secret.lower().strip() in _WEAK_KEYS:
     from django.core.management.utils import get_random_secret_key
     _secret = get_random_secret_key()
     import logging as _logging
@@ -514,7 +514,7 @@ LOGIN_URL = '/accounts/login/'
 # ==============================================================================
 # 🛡️ SECURITY: Session hardening
 # ==============================================================================
-SESSION_COOKIE_AGE = 3600  # 1 heure (portail client sensible : devis, factures, paiements)
+SESSION_COOKIE_AGE = 7200  # 2 heures (sliding window via SESSION_SAVE_EVERY_REQUEST)
 SESSION_COOKIE_HTTPONLY = True  # Empêche l'accès JS au cookie de session
 SESSION_COOKIE_SAMESITE = 'Lax'  # Protection CSRF cross-site
 SESSION_SAVE_EVERY_REQUEST = True  # Renouvelle le TTL à chaque requête (sliding window)
