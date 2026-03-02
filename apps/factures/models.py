@@ -43,7 +43,7 @@ class Invoice(models.Model):
     # Référence en chaîne => évite tout import circulaire
     quote = models.ForeignKey("devis.Quote", on_delete=models.SET_NULL, null=True, blank=True, related_name="invoices")
     client = models.ForeignKey(
-        "devis.Client",
+        "clients.ClientProfile",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

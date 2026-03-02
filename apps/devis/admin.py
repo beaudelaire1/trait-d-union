@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.utils.html import format_html
 from django import forms
 from django.contrib.auth.models import User
-from apps.clients.models import ClientDocument, ClientNotification
-from .models import Quote, QuoteItem, Client
+from apps.clients.models import ClientProfile, ClientDocument, ClientNotification
+from .models import Quote, QuoteItem
 
 
 class QuoteAdminForm(forms.ModelForm):
@@ -34,111 +34,6 @@ class QuoteItemInline(admin.TabularInline):
     extra = 1
     autocomplete_fields = ("service",)
     fields = ("service", "description", "quantity", "unit_price", "tax_rate")
-
-
-@admin.register(Client)
-class ClientAdmin(admin.ModelAdmin):
-    """Administration des clients — avec création rapide de compte portail."""
-    
-    list_display = ('full_name', 'email', 'phone', 'city', 'portal_account_badge', 'created_at')
-    list_filter = ('created_at', 'city')
-    search_fields = ('full_name', 'email', 'phone', 'city', 'address_line')
-    readonly_fields = ('created_at',)
-    autocomplete_fields = ('linked_profile',)
-    actions = ['action_create_portal_account']
-    
-    fieldsets = (
-        ('Informations personnelles', {
-            'fields': ('full_name', 'email', 'phone', 'company')
-        }),
-        ('Adresse', {
-            'fields': ('address_line', 'city', 'zip_code')
-        }),
-        ('Portail client', {
-            'fields': ('linked_profile',),
-            'description': '🔗 Lien direct vers le profil portail (rempli automatiquement).'
-        }),
-        ('Informations système', {
-            'fields': ('created_at',),
-            'classes': ('collapse',)
-        }),
-    )
-
-    def portal_account_badge(self, obj):
-        """Affiche si le client a déjà un compte portail."""
-        # 🛡️ SECURITY: Use FK instead of email lookup
-        if obj.linked_profile_id:
-            return format_html(
-                '<span style="background:rgba(34,197,94,0.15); color:#4ADE80; '
-                'padding:3px 10px; border-radius:12px; font-size:0.75rem; '
-                'font-weight:600;">✅ Compte actif</span>'
-            )
-        if not obj.email:
-            return format_html(
-                '<span style="color:#6B7280; font-size:0.8rem;">—</span>'
-            )
-        # Fallback: check by email for unlinked records
-        user = User.objects.filter(email__iexact=obj.email).first()
-        if user and hasattr(user, 'client_profile'):
-            return format_html(
-                '<span style="background:rgba(245,158,11,0.15); color:#FCD34D; '
-                'padding:3px 10px; border-radius:12px; font-size:0.75rem; '
-                'font-weight:600;">⚠️ Non lié</span>'
-            )
-        return format_html(
-            '<span style="background:rgba(107,114,128,0.15); color:#9CA3AF; '
-            'padding:3px 10px; border-radius:12px; font-size:0.75rem; '
-            'font-weight:600;">Aucun compte</span>'
-        )
-    portal_account_badge.short_description = "Portail TUS"
-
-    @admin.action(description="👤 Créer le compte portail client")
-    def action_create_portal_account(self, request, queryset):
-        """Crée un compte portail (User + ClientProfile) pour les contacts sélectionnés.
-        
-        - Génère un mot de passe temporaire
-        - Envoie l'email de bienvenue
-        - Le client devra changer son mot de passe à la première connexion
-        """
-        from apps.clients.services import create_client_account, ClientAccountError
-
-        created = 0
-        skipped = 0
-        errors = []
-
-        for client in queryset:
-            if not client.email:
-                errors.append(f"{client.full_name}: pas d'email")
-                continue
-
-            try:
-                result = create_client_account(
-                    email=client.email,
-                    full_name=client.full_name,
-                    company_name=client.company or '',
-                    phone=client.phone or '',
-                    address=f"{client.address_line} {client.city} {client.zip_code}".strip(),
-                    send_email=True,
-                )
-                if result.is_new:
-                    created += 1
-                else:
-                    skipped += 1
-            except ClientAccountError as e:
-                errors.append(f"{client.full_name}: {e}")
-
-        if created:
-            messages.success(
-                request,
-                f"✅ {created} compte(s) client créé(s) — email de bienvenue envoyé."
-            )
-        if skipped:
-            messages.info(
-                request,
-                f"ℹ️ {skipped} contact(s) avai(en)t déjà un compte portail."
-            )
-        for err in errors:
-            messages.warning(request, f"⚠️ {err}")
 
 
 @admin.register(Quote)
@@ -334,12 +229,10 @@ class QuoteAdmin(admin.ModelAdmin):
         self.message_user(request, f"Devis en cours d'envoi. {published} publié(s) sur le portail.", level=messages.SUCCESS)
 
     def _publish_to_portal(self, quote: Quote, request) -> bool:
-        """Publie le PDF du devis dans le portail client (ClientDocument + notification).
-
-        🛡️ BANK-GRADE: Utilise le FK linked_profile au lieu d'un lookup par email.
-        """
+        """Publie le PDF du devis dans le portail client (ClientDocument + notification)."""
         try:
-            if not quote.client or not quote.client.email:
+            client = quote.client
+            if not client or not client.email:
                 self.message_user(
                     request,
                     "Portail: client ou email manquant sur le devis",
@@ -347,13 +240,10 @@ class QuoteAdmin(admin.ModelAdmin):
                 )
                 return False
 
-            # 🛡️ BANK-GRADE: Use FK (linked_profile) instead of email lookup (IDOR risk)
-            client_profile = getattr(quote.client, 'linked_profile', None)
-            if not client_profile:
+            if not client.has_portal_access:
                 self.message_user(
                     request,
-                    f"Portail: aucun profil lié pour {quote.client.email}. "
-                    f"Liez le client via le champ 'linked_profile' dans l'admin.",
+                    f"Portail: {client.email} n'a pas de compte portail.",
                     level=messages.WARNING,
                 )
                 return False
@@ -363,7 +253,7 @@ class QuoteAdmin(admin.ModelAdmin):
 
             title = f"Devis {quote.number or quote.id}"
             doc, created = ClientDocument.objects.get_or_create(
-                client=client_profile,
+                client=client,
                 title=title,
                 defaults={
                     "document_type": "devis",
@@ -372,12 +262,11 @@ class QuoteAdmin(admin.ModelAdmin):
                 },
             )
             if not created:
-                # mettre à jour le fichier si déjà existant
                 doc.file = quote.pdf
                 doc.save(update_fields=["file"])
 
             ClientNotification.objects.create(
-                client=client_profile,
+                client=client,
                 notification_type="quote",
                 title=title,
                 message="Nouveau devis disponible dans votre portail client.",
@@ -385,7 +274,6 @@ class QuoteAdmin(admin.ModelAdmin):
             )
             return True
         except Exception:
-            # on évite de bloquer l'action principale
             return False
 
 # NOTE : on ne register pas QuoteItem pour éviter un menu séparé en admin.

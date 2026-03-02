@@ -35,7 +35,7 @@ class ClientProfileCreationForm(forms.ModelForm):
 
     class Meta:
         model = ClientProfile
-        fields = ['email', 'full_name', 'company_name', 'phone', 'address', 'send_welcome_email']
+        fields = ['email', 'full_name', 'company_name', 'phone', 'address_line', 'city', 'zip_code', 'address', 'send_welcome_email']
 
     def clean_email(self):
         email = self.cleaned_data['email'].strip().lower()
@@ -66,8 +66,8 @@ class ClientProfileCreationForm(forms.ModelForm):
 @admin.register(ClientProfile)
 class ClientProfileAdmin(admin.ModelAdmin):
     """Admin for client profiles — création rapide et gestion complète."""
-    list_display = ['user', 'company_name', 'phone', 'portal_status_badge', 'created_at']
-    search_fields = ['user__email', 'user__username', 'company_name', 'phone']
+    list_display = ['full_name', 'email', 'company_name', 'phone', 'portal_status_badge', 'created_at']
+    search_fields = ['full_name', 'email', 'company_name', 'phone', 'user__username']
     list_filter = ['email_notifications', 'must_change_password', 'created_at']
     readonly_fields = ['created_at', 'updated_at']
     actions = ['action_reset_password', 'action_resend_welcome_email']
@@ -83,7 +83,7 @@ class ClientProfileAdmin(admin.ModelAdmin):
         if obj is None:  # Création
             return (
                 ('Nouveau compte client', {
-                    'fields': ('email', 'full_name', 'company_name', 'phone', 'address', 'send_welcome_email'),
+                    'fields': ('email', 'full_name', 'company_name', 'phone', 'address_line', 'city', 'zip_code', 'address', 'send_welcome_email'),
                     'description': (
                         '🆕 <strong>Création rapide :</strong> '
                         'Renseignez l\'email du client. Un compte utilisateur sera créé '
@@ -94,8 +94,14 @@ class ClientProfileAdmin(admin.ModelAdmin):
             )
         # Modification
         return (
-            (None, {
-                'fields': ('user', 'company_name', 'phone', 'address', 'siret', 'tva_number', 'avatar')
+            ('Identité', {
+                'fields': ('full_name', 'email', 'company_name', 'phone')
+            }),
+            ('Adresse', {
+                'fields': ('address_line', 'city', 'zip_code', 'address')
+            }),
+            ('Portail', {
+                'fields': ('user', 'siret', 'tva_number', 'avatar')
             }),
             ('Préférences', {
                 'fields': ('email_notifications', 'must_change_password')
@@ -127,6 +133,12 @@ class ClientProfileAdmin(admin.ModelAdmin):
 
     def portal_status_badge(self, obj):
         """Badge indiquant l'état du compte portail."""
+        if not obj.user_id:
+            return format_html(
+                '<span style="background:rgba(107,114,128,0.15); color:#9CA3AF; '
+                'padding:3px 10px; border-radius:12px; font-size:0.75rem; '
+                'font-weight:600;">📇 Contact</span>'
+            )
         if obj.must_change_password:
             return format_html(
                 '<span style="background:rgba(245,158,11,0.15); color:#FCD34D; '

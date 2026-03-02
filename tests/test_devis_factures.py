@@ -6,8 +6,9 @@ from unittest.mock import patch, MagicMock
 from django.test import Client, RequestFactory, override_settings
 from django.contrib.auth.models import User
 
-from apps.devis.models import Client as DevisClient, Quote
+from apps.devis.models import Quote
 from apps.factures.models import Invoice
+from apps.clients.models import ClientProfile
 
 
 @pytest.fixture
@@ -17,7 +18,7 @@ def staff_user(db):
 
 @pytest.fixture
 def devis_client(db):
-    return DevisClient.objects.create(
+    return ClientProfile.objects.create(
         full_name='Marie Martin', email='marie@test.com', phone='+594600000000',
     )
 

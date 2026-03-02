@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from decimal import Decimal
 from datetime import date
 
-from apps.devis.models import Quote, Client
+from apps.devis.models import Quote
 from apps.devis.application.validate_quote_usecase import (
     validate_quote,
     provision_client_account,
@@ -26,7 +26,7 @@ class ValidateQuoteUseCaseTestCase(TestCase):
             password='testpass123'
         )
         
-        self.client_contact = Client.objects.create(
+        self.client_contact = ClientProfile.objects.create(
             full_name='Test Client',
             email='client@test.com',
             phone='+336',
@@ -94,11 +94,11 @@ class ProvisionClientAccountTestCase(TestCase):
     
     def setUp(self):
         """Setup de test."""
-        self.client_contact = Client.objects.create(
+        self.client_contact = ClientProfile.objects.create(
             full_name='New Client',
             email='newclient@test.com',
             phone='+336',
-            company='ACME Corp',
+            company_name='ACME Corp',
         )
         
         self.quote = Quote.objects.create(

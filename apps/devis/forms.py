@@ -8,7 +8,8 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
 from services.models import Service
-from .models import Client, Quote, QuoteRequest, QuoteRequestPhoto, QuoteItem
+from .models import Quote, QuoteRequest, QuoteRequestPhoto, QuoteItem
+from apps.clients.models import ClientProfile
 
 
 phone_validator = RegexValidator(
@@ -181,7 +182,7 @@ class DevisForm(forms.Form):
         if extra_lines:
             message = "\n".join(extra_lines) + "\n\n" + message
 
-        client = Client.objects.create(
+        client = ClientProfile.objects.create(
             full_name=cleaned["full_name"],
             email=cleaned["email"],
             phone=cleaned["phone"],

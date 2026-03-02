@@ -145,7 +145,8 @@ class InvoiceAdmin(admin.ModelAdmin):
 def publish_invoice_to_portal(invoice: Invoice, request=None) -> bool:
     """Publie le PDF de facture dans le portail client (ClientDocument + notification)."""
     try:
-        if not invoice.client or not invoice.client.email:
+        client = invoice.client
+        if not client or not client.email:
             if request:
                 messages.warning(
                     request,
@@ -153,14 +154,11 @@ def publish_invoice_to_portal(invoice: Invoice, request=None) -> bool:
                 )
             return False
 
-        # 🛡️ BANK-GRADE: Use FK (linked_profile) instead of email lookup (IDOR risk)
-        client_profile = getattr(invoice.client, 'linked_profile', None)
-        if not client_profile:
+        if not client.has_portal_access:
             if request:
                 messages.warning(
                     request,
-                    f"Portail: aucun profil lié pour {invoice.client.email}. "
-                    f"Liez le client via le champ 'linked_profile' dans l'admin.",
+                    f"Portail: {client.email} n'a pas de compte portail.",
                 )
             return False
 
@@ -169,7 +167,7 @@ def publish_invoice_to_portal(invoice: Invoice, request=None) -> bool:
 
         title = f"Facture {invoice.number or invoice.id}"
         doc, created = ClientDocument.objects.get_or_create(
-            client=client_profile,
+            client=client,
             title=title,
             defaults={
                 "document_type": "facture",
@@ -182,7 +180,7 @@ def publish_invoice_to_portal(invoice: Invoice, request=None) -> bool:
             doc.save(update_fields=["file"])
 
         ClientNotification.objects.create(
-            client=client_profile,
+            client=client,
             notification_type="invoice",
             title=title,
             message="Nouvelle facture disponible dans votre portail client.",

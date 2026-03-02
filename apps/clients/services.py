@@ -127,6 +127,8 @@ def create_client_account(
         client_profile, profile_created = ClientProfile.objects.get_or_create(
             user=user,
             defaults={
+                'full_name': full_name or '',
+                'email': email,
                 'company_name': company_name or '',
                 'phone': phone or '',
                 'address': address or '',
@@ -145,16 +147,6 @@ def create_client_account(
             async_send_welcome_email(user.pk, temporary_password)
         except Exception as e:
             logger.exception(f"Échec dispatch email bienvenue : {e}")
-
-    # 🛡️ SECURITY: Auto-link any existing Client (devis) records to this profile
-    try:
-        from apps.devis.models import Client as DevisClient
-        DevisClient.objects.filter(
-            email__iexact=email,
-            linked_profile__isnull=True,
-        ).update(linked_profile=client_profile)
-    except Exception:
-        logger.exception("Échec auto-link Client → ClientProfile pour %s", email)
 
     return ClientAccountResult(
         user=user,

@@ -9,8 +9,9 @@ from datetime import date
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from apps.devis.models import Client, Quote, QuoteItem
+from apps.devis.models import Quote, QuoteItem
 from apps.factures.models import Invoice, InvoiceItem
+from apps.clients.models import ClientProfile
 from services.models import Service
 from core.services.document_generator import DocumentGenerator
 
@@ -21,7 +22,7 @@ class TestQuotePDFGeneration(TestCase):
     
     def setUp(self):
         """Crée les données de test."""
-        self.client_obj = Client.objects.create(
+        self.client_obj = ClientProfile.objects.create(
             full_name="John Doe",
             email="john@example.com",
             phone="0612345678",
@@ -91,7 +92,7 @@ class TestInvoicePDFGeneration(TestCase):
     
     def setUp(self):
         """Crée les données de test."""
-        self.client_obj = Client.objects.create(
+        self.client_obj = ClientProfile.objects.create(
             full_name="Jane Smith",
             email="jane@example.com",
             phone="0687654321",

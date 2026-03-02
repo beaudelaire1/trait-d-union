@@ -41,12 +41,12 @@ class ClientRequiredMixin(LoginRequiredMixin):
             from apps.factures.models import Invoice
             
             context['pending_quotes_count'] = Quote.objects.filter(
-                client__linked_profile=profile,
+                client=profile,
                 status='sent'
             ).count()
             
             context['pending_invoices_count'] = Invoice.objects.filter(
-                client__linked_profile=profile,
+                client=profile,
                 status__in=['sent', 'overdue']
             ).count()
         
@@ -86,11 +86,11 @@ class DashboardView(ClientRequiredMixin, TemplateView):
         from apps.factures.models import Invoice
         
         context['recent_quotes'] = Quote.objects.filter(
-            client__linked_profile=profile
+            client=profile
         ).select_related('client').order_by('-created_at')[:5]
         
         context['recent_invoices'] = Invoice.objects.filter(
-            client__linked_profile=profile
+            client=profile
         ).select_related('client', 'quote').order_by('-created_at')[:5]
         
         return context
@@ -293,7 +293,7 @@ class QuoteListView(ClientRequiredMixin, ListView):
         from apps.devis.models import Quote
         profile = self.request.user.client_profile
         return Quote.objects.filter(
-            client__linked_profile=profile
+            client=profile
         ).select_related('client').order_by('-created_at')
 class InvoiceListView(ClientRequiredMixin, ListView):
     """List all invoices for the client."""
@@ -304,7 +304,7 @@ class InvoiceListView(ClientRequiredMixin, ListView):
         from apps.factures.models import Invoice
         profile = self.request.user.client_profile
         return Invoice.objects.filter(
-            client__linked_profile=profile
+            client=profile
         ).select_related('client').order_by('-created_at')
 
 
@@ -538,7 +538,7 @@ def quote_detail(request, pk):
     # 🛡️ SECURITY: Use FK relationship instead of fragile email matching
     quote = get_object_or_404(
         Quote.objects.select_related('client').prefetch_related('quote_items'),
-        pk=pk, client__linked_profile=profile,
+        pk=pk, client=profile,
     )
     
     return render(request, 'clients/quote_detail.html', {
@@ -554,7 +554,7 @@ def quote_pdf_download(request, pk):
     from core.services.document_generator import DocumentGenerator
     
     profile = request.user.client_profile
-    quote = get_object_or_404(Quote, pk=pk, client__linked_profile=profile)
+    quote = get_object_or_404(Quote, pk=pk, client=profile)
     
     # Toujours générer à la volée (filesystem éphémère sur Render)
     try:
@@ -576,7 +576,7 @@ def quote_pdf_view(request, pk):
     from core.services.document_generator import DocumentGenerator
 
     profile = request.user.client_profile
-    quote = get_object_or_404(Quote, pk=pk, client__linked_profile=profile)
+    quote = get_object_or_404(Quote, pk=pk, client=profile)
 
     # Toujours générer à la volée (filesystem éphémère sur Render)
     try:
@@ -609,7 +609,7 @@ def invoice_detail(request, pk):
     invoice = get_object_or_404(
         Invoice,
         pk=pk,
-        client__linked_profile=profile
+        client=profile
     )
     
     return render(request, 'clients/invoice_detail.html', {
@@ -626,7 +626,7 @@ def invoice_pdf_download(request, pk):
     invoice = get_object_or_404(
         Invoice,
         pk=pk,
-        client__linked_profile=profile
+        client=profile
     )
     
     if invoice.pdf:

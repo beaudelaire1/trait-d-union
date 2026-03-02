@@ -8,8 +8,9 @@ from django.contrib.auth.models import User
 from decimal import Decimal
 from datetime import date
 
-from apps.devis.models import Client, Quote, QuoteItem
+from apps.devis.models import Quote, QuoteItem
 from apps.factures.models import Invoice, InvoiceItem
+from apps.clients.models import ClientProfile
 from services.models import Service
 
 
@@ -65,7 +66,7 @@ class Command(BaseCommand):
     
     def _create_test_client(self):
         """Crée un client de test."""
-        client, created = Client.objects.get_or_create(
+        client, created = ClientProfile.objects.get_or_create(
             email="test@traitdunion.it",
             defaults={
                 "full_name": "Test Client",

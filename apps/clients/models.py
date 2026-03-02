@@ -15,73 +15,76 @@ from .models_workflow import WorkflowTemplate, MilestoneTemplate
 
 
 class ClientProfile(models.Model):
-    """Extended profile for client users."""
-    
+    """Modèle client unifié — fiche contact + accès portail.
+
+    Remplace l'ancien duo devis.Client / clients.ClientProfile.
+    - Si ``user`` est renseigné : le client a un compte portail.
+    - Si ``user`` est NULL : simple fiche contact (devis, factures).
+    """
+
+    # ── Identité ──────────────────────────────────────────────
+    full_name = models.CharField("Nom complet", max_length=200, default="")
+    email = models.EmailField("Email", default="")
+    phone = models.CharField("Téléphone", max_length=50, blank=True)
+    company_name = models.CharField("Nom de l'entreprise", max_length=200, blank=True)
+
+    # ── Adresse ───────────────────────────────────────────────
+    address_line = models.CharField("Adresse", max_length=255, blank=True)
+    city = models.CharField("Ville", max_length=100, blank=True)
+    zip_code = models.CharField("Code postal", max_length=20, blank=True)
+
+    # ── Champ hérité (portail) : adresse libre ────────────────
+    address = models.TextField("Adresse (texte libre)", blank=True)
+
+    # ── Portail (optionnel) ───────────────────────────────────
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        related_name='client_profile'
-    )
-    company_name = models.CharField(
-        "Nom de l'entreprise",
-        max_length=200,
-        blank=True
-    )
-    phone = models.CharField(
-        "Téléphone",
-        max_length=20,
-        blank=True
-    )
-    address = models.TextField(
-        "Adresse",
-        blank=True
-    )
-    siret = models.CharField(
-        "SIRET",
-        max_length=14,
-        blank=True
-    )
-    tva_number = models.CharField(
-        "N° TVA intracommunautaire",
-        max_length=20,
-        blank=True
-    )
-    avatar = models.ImageField(
-        "Photo de profil",
-        upload_to='clients/avatars/',
+        related_name='client_profile',
+        null=True,
         blank=True,
-        null=True
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    # Preferences
-    email_notifications = models.BooleanField(
-        "Notifications par email",
-        default=True
-    )
+    siret = models.CharField("SIRET", max_length=14, blank=True)
+    tva_number = models.CharField("N° TVA intracommunautaire", max_length=20, blank=True)
+    avatar = models.ImageField("Photo de profil", upload_to='clients/avatars/', blank=True, null=True)
+
+    # ── Préférences ───────────────────────────────────────────
+    email_notifications = models.BooleanField("Notifications par email", default=True)
     must_change_password = models.BooleanField(
         "Doit changer le mot de passe",
         default=False,
         help_text="Activé automatiquement lors de la création du compte. "
-                  "Désactivé après le premier changement de mot de passe."
+                  "Désactivé après le premier changement de mot de passe.",
     )
-    
+
+    # ── Dates ─────────────────────────────────────────────────
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
-        verbose_name = "Profil client"
-        verbose_name_plural = "Profils clients"
-    
+        verbose_name = "Client"
+        verbose_name_plural = "Clients"
+        indexes = [
+            models.Index(fields=['email'], name='idx_client_email'),
+        ]
+
     def __str__(self):
-        if self.company_name:
-            return f"{self.company_name} ({self.user.email})"
-        return self.user.email
-    
+        label = self.full_name or self.company_name
+        if self.user_id:
+            return f"{label} ({self.user.email})"
+        return f"{label} ({self.email})"
+
+    # ── Propriétés de compatibilité ───────────────────────────
+
     @property
-    def full_name(self):
-        """Return full name or company name."""
-        if self.user.get_full_name():
-            return self.user.get_full_name()
-        return self.company_name or self.user.username
+    def company(self):
+        """Alias pour company_name (compat templates devis/factures)."""
+        return self.company_name
+
+    @property
+    def has_portal_access(self):
+        """True si un compte portail (User) est associé."""
+        return self.user_id is not None
 
 
 class ClientNotification(models.Model):

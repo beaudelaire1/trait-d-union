@@ -3,11 +3,8 @@ Modèles pour la gestion des devis.
 
 L'application ``devis`` gère les entités suivantes :
 
-* ``Client`` : représente un contact (particulier ou entreprise) qui demande un devis.
-  Les champs incluent nom complet, email, téléphone et adresse.  Cette entité
-  peut être enrichie selon les besoins (ex. société, SIREN).
-
-* ``Quote`` : une demande de devis associée à un client.  Elle contient un
+* ``Quote`` : une demande de devis associée à un client (``clients.ClientProfile``).
+  Elle contient un
   numéro unique, un statut et des champs pour le service souhaité, un message
   libre et des totaux (HT, TVA, TTC) pour préparer la conversion en
   facture.  Les totaux peuvent être calculés via la méthode ``compute_totals``.
@@ -37,36 +34,7 @@ def _num2words_fr(v: Decimal) -> str:
     return num2words_fr(v)
 
 
-class Client(models.Model):
-    """Informations de contact pour une demande de devis."""
-    full_name = models.CharField(max_length=200)
-    email = models.EmailField()
-    phone = models.CharField(max_length=50)
-    address_line = models.CharField(max_length=255, blank=True)
-    city = models.CharField(max_length=100, blank=True)
-    zip_code = models.CharField(max_length=20, blank=True)
-    company = models.CharField(max_length=200, blank=True)
-    linked_profile = models.ForeignKey(
-        'clients.ClientProfile',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='linked_clients',
-        verbose_name=_("Profil portail"),
-        help_text=_("Lien direct vers le compte portail client (rempli automatiquement)."),
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-        verbose_name = _("client")
-        verbose_name_plural = _("clients")
-        indexes = [
-            models.Index(fields=['email'], name='idx_devis_client_email'),
-        ]
-
-    def __str__(self) -> str:
-        return self.full_name
+# Client model removed — use clients.ClientProfile instead.
 
 
 class QuoteRequestPhoto(models.Model):
@@ -146,7 +114,12 @@ class Quote(models.Model):
     )
 
     public_token = models.CharField(max_length=64, unique=True, blank=True, help_text="Jeton public stable pour consulter le PDF du devis.")
-    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="quotes")
+    client = models.ForeignKey(
+        'clients.ClientProfile',
+        on_delete=models.CASCADE,
+        related_name='quotes',
+        verbose_name=_("Client"),
+    )
     quote_request = models.ForeignKey(
         "QuoteRequest",
         on_delete=models.SET_NULL,

@@ -178,7 +178,7 @@ def provision_client_account(
         result = create_client_account(
             email=client_email,
             full_name=quote.client.full_name or '',
-            company_name=quote.client.company or '',
+            company_name=quote.client.company_name or '',
             phone=quote.client.phone or '',
             address=quote.client.address_line or '',
             send_email=True,
@@ -202,11 +202,6 @@ def provision_client_account(
                 'temporary_password_set': True,
             }
         )
-    
-    # 🛡️ SECURITY: Ensure the quote's Client record is linked to the profile
-    if quote.client and not quote.client.linked_profile_id:
-        quote.client.linked_profile = result.client_profile
-        quote.client.save(update_fields=['linked_profile'])
 
     return ProvisionClientResult(
         user=result.user,

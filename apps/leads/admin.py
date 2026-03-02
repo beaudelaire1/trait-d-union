@@ -101,6 +101,7 @@ class LeadAdmin(admin.ModelAdmin):
                     full_name=lead.name,
                     send_email=True,
                 )
+
                 lead.converted_to_client = result.client_profile
                 lead.converted_at = timezone.now()
                 lead.status = LeadStatus.CONVERTED
