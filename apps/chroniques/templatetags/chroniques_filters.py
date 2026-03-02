@@ -16,7 +16,7 @@ ALLOWED_TAGS = {
 }
 
 ALLOWED_ATTRIBUTES = {
-    'a': {'href', 'title', 'target', 'rel'},
+    'a': {'href', 'title', 'target'},  # 'rel' is set via link_rel param
     'img': {'src', 'alt', 'title', 'width', 'height', 'loading'},
     'code': {'class'},
     'pre': {'class'},
