@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     'apps.messaging',
     'apps.audit',
     'services',
+    'core',
     'django_q',
     # 🛡️ SECURITY: Admin 2FA (TOTP)
     'django_otp',

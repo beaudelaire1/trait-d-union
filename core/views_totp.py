@@ -57,17 +57,25 @@ def totp_qr_code(request):
         logger.warning('TOTP QR auth failed for user=%s ip=%s', username, ip)
         return JsonResponse({'error': 'Identifiants invalides.'}, status=403)
 
-    # Find user's TOTP device
+    # Find or auto-create user's TOTP device
     try:
         from django_otp.plugins.otp_totp.models import TOTPDevice
         device = TOTPDevice.objects.filter(user=user, confirmed=True).first()
         if device is None:
-            return JsonResponse(
-                {'error': 'Aucun appareil TOTP configuré pour ce compte.'},
-                status=404,
+            # Auto-provisioning: create a confirmed TOTP device on first request.
+            # This solves the chicken-and-egg problem in production where no
+            # admin access exists yet to manually create a device.
+            device = TOTPDevice.objects.create(
+                user=user,
+                name=f'Auto-provisioned ({user.username})',
+                confirmed=True,
+            )
+            logger.info(
+                'TOTP device auto-created for staff user=%s ip=%s',
+                username, ip,
             )
     except Exception:
-        logger.exception('Error fetching TOTP device for user=%s', username)
+        logger.exception('Error fetching/creating TOTP device for user=%s', username)
         return JsonResponse({'error': 'Erreur serveur.'}, status=500)
 
     # Generate QR code
