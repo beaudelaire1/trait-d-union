@@ -328,3 +328,118 @@ def reset_password_and_notify(user: User) -> str:
 
     send_welcome_email(user, new_password, context_label='réinitialisation de mot de passe')
     return new_password
+
+
+def send_password_changed_email(user: User) -> None:
+    """Envoie un email de confirmation après changement de mot de passe.
+
+    Informe le client que son mot de passe a bien été modifié.
+    Inclut un appel à l'action si ce n'est pas lui.
+    """
+    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+    if 'localhost' in site_url or '127.0.0.1' in site_url or '0.0.0.0' in site_url:
+        site_url = 'https://traitdunion.it'
+
+    first_name = user.first_name or user.username
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@traitdunion.it')
+    subject = "Mot de passe modifié — Trait d'Union Studio"
+
+    text_content = f"""Bonjour {first_name},
+
+Votre mot de passe Trait d'Union Studio a été modifié avec succès.
+
+Si vous n'êtes pas à l'origine de ce changement, contactez-nous immédiatement :
+contact@traitdunion.it
+
+— Trait d'Union Studio"""
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>
+<body style="margin:0; padding:0; background:#0a0a0f; font-family:'DM Sans',Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0f; padding:40px 20px;">
+<tr><td align="center">
+<table width="560" cellpadding="0" cellspacing="0" style="background:#12121a; border-radius:16px; border:1px solid rgba(255,255,255,0.08); overflow:hidden;">
+
+  <!-- Logo -->
+  <tr><td style="padding:32px 40px 16px; text-align:center;">
+    <span style="font-size:1.4rem; font-weight:700; color:#F6F7FB; letter-spacing:0.02em;">Trait d'Union Studio</span>
+  </td></tr>
+
+  <!-- Success icon -->
+  <tr><td style="padding:0 40px 16px; text-align:center;">
+    <div style="display:inline-block; width:64px; height:64px; line-height:64px; font-size:2rem; background:rgba(34,197,94,0.12); border-radius:50%; text-align:center;">✅</div>
+  </td></tr>
+
+  <!-- Title -->
+  <tr><td style="padding:0 40px 24px; text-align:center;">
+    <h1 style="margin:0; font-size:1.5rem; font-weight:700; color:#F6F7FB;">Mot de passe modifié</h1>
+    <p style="margin:12px 0 0; font-size:0.95rem; color:rgba(246,247,251,0.7); line-height:1.6;">
+      Bonjour {first_name}, votre mot de passe a été changé avec succès.
+    </p>
+  </td></tr>
+
+  <!-- Info box -->
+  <tr><td style="padding:0 40px 24px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#111827; border:1px solid rgba(34,197,94,0.25); border-radius:12px;">
+      <tr><td style="padding:20px 24px;">
+        <p style="margin:0 0 8px; font-size:0.9rem; color:#4ADE80; font-weight:600;">🔒 Sécurité</p>
+        <p style="margin:0; font-size:0.85rem; color:rgba(246,247,251,0.6); line-height:1.5;">
+          Votre mot de passe temporaire a été remplacé par le mot de passe que vous avez choisi.
+          Vous pouvez maintenant accéder à l'ensemble de votre espace client.
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <!-- Warning -->
+  <tr><td style="padding:0 40px 24px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:8px;">
+      <tr><td style="padding:14px 18px; font-size:0.85rem; color:#FCA5A5;">
+        ⚠️ Si vous n'êtes <strong>pas à l'origine</strong> de ce changement, contactez-nous immédiatement à
+        <a href="mailto:contact@traitdunion.it" style="color:#F87171; text-decoration:underline;">contact@traitdunion.it</a>.
+      </td></tr>
+    </table>
+  </td></tr>
+
+  <!-- CTA -->
+  <tr><td style="padding:0 40px 32px; text-align:center;">
+    <a href="{site_url}/ecosysteme-tus/" style="display:inline-block; background:linear-gradient(135deg,#0B2DFF,#22C55E); color:#fff; text-decoration:none; padding:14px 40px; border-radius:8px; font-weight:700; font-size:0.95rem;">
+      Accéder à mon espace client →
+    </a>
+  </td></tr>
+
+  <!-- Footer -->
+  <tr><td style="padding:24px 40px; border-top:1px solid rgba(246,247,251,0.08); text-align:center;">
+    <p style="margin:0; font-size:0.78rem; color:rgba(246,247,251,0.35);">
+      Trait d'Union Studio · Guyane<br>
+      Questions ? <a href="mailto:contact@traitdunion.it" style="color:#4D6FFF; text-decoration:none;">contact@traitdunion.it</a>
+    </p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>"""
+
+    try:
+        from core.services.email_backends import brevo_service
+        if brevo_service.is_configured():
+            brevo_service.send_email(
+                to_email=user.email,
+                to_name=first_name,
+                subject=subject,
+                html_content=html_content,
+                from_email=from_email,
+                from_name=getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio"),
+                tags=['password_changed', 'security', 'portal'],
+            )
+            logger.info(f"Email confirmation changement mdp envoyé via Brevo à {user.email}")
+            return
+    except Exception as exc:
+        logger.warning(f"Brevo indisponible, fallback Django: {exc}")
+
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [user.email])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send(fail_silently=False)

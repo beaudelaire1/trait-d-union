@@ -24,6 +24,9 @@ class ForcePasswordChangeMiddleware(MiddlewareMixin):
         '/media/',
     ]
 
+    # URL de la page succès changement de mot de passe
+    SUCCESS_URL_NAME = 'clients:password_change_done'
+
     def _get_change_password_url(self):
         """URL résolue dynamiquement via reverse (allauth)."""
         try:
@@ -48,8 +51,17 @@ class ForcePasswordChangeMiddleware(MiddlewareMixin):
         change_url = self._get_change_password_url()
         logout_url = reverse('account_logout')
 
-        # Autoriser la page de changement de mot de passe et le logout
-        if request.path in (change_url, logout_url):
+        # Autoriser la page de changement de mot de passe, le logout, et la page succès
+        try:
+            success_url = reverse(self.SUCCESS_URL_NAME)
+        except Exception:
+            success_url = None
+
+        allowed = [change_url, logout_url]
+        if success_url:
+            allowed.append(success_url)
+
+        if request.path in allowed:
             return None
 
         # TOUT LE RESTE est bloqué → redirection forcée
@@ -96,5 +108,20 @@ class ForcePasswordChangeMiddleware(MiddlewareMixin):
                             profile.save(update_fields=['must_change_password'])
                     except (AttributeError, Exception):
                         pass
+
+                # Envoyer l'email de confirmation en arrière-plan
+                try:
+                    from core.tasks import async_send_password_changed_email
+                    async_send_password_changed_email(request.user.pk)
+                except Exception:
+                    pass
+
+                # Rediriger vers la page de succès
+                try:
+                    success_url = reverse(self.SUCCESS_URL_NAME)
+                    from django.shortcuts import redirect as _redirect
+                    return _redirect(success_url)
+                except Exception:
+                    pass
 
         return response

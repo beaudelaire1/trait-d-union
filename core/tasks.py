@@ -154,6 +154,15 @@ def async_send_generic_email(to_email: str, subject: str, html_content: str, fro
     )
 
 
+def async_send_password_changed_email(user_id: int):
+    """Envoie l'email de confirmation de changement de mot de passe."""
+    return _dispatch(
+        'core.tasks._task_send_password_changed_email',
+        user_id,
+        task_name=f'password_changed_email_{user_id}',
+    )
+
+
 # ==============================================================================
 # WORKERS (fonctions exécutées par le cluster django-q2)
 # ==============================================================================
@@ -176,6 +185,16 @@ def _task_reset_password_notify(user_id: int):
     user = User.objects.get(pk=user_id)
     reset_password_and_notify(user)
     logger.info(f"[ASYNC] Password reset + email envoyé à {user.email}")
+
+
+def _task_send_password_changed_email(user_id: int):
+    """Worker : envoie l'email de confirmation de changement de mot de passe."""
+    from django.contrib.auth.models import User
+    from apps.clients.services import send_password_changed_email
+
+    user = User.objects.get(pk=user_id)
+    send_password_changed_email(user)
+    logger.info(f"[ASYNC] Email confirmation changement mdp envoyé à {user.email}")
 
 
 def _task_send_quote_email(quote_id: int):

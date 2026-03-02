@@ -36,4 +36,7 @@ urlpatterns = [
     
     # Notifications
     path('api/notifications/mark-read/', views.mark_notifications_read, name='mark_notifications_read'),
+    
+    # Password change success
+    path('mot-de-passe-modifie/', views.password_change_done, name='password_change_done'),
 ]

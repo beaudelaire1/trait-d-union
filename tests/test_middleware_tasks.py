@@ -79,7 +79,7 @@ class TestForcePasswordChangeMiddleware:
         factory = RequestFactory()
         change_url = mw._get_change_password_url()
         request = factory.post(change_url)
-        request.user = MagicMock(is_authenticated=True)
+        request.user = MagicMock(is_authenticated=True, pk=42)
         request.session = {
             'must_change_password': True,
             'must_change_password_reason': 'first_login',
@@ -89,10 +89,66 @@ class TestForcePasswordChangeMiddleware:
         request.user.client_profile = mock_profile
 
         response = HttpResponse(status=302)
-        mw.process_response(request, response)
+        with patch('core.tasks.async_send_password_changed_email'):
+            result = mw.process_response(request, response)
 
         assert 'must_change_password' not in request.session
         assert mock_profile.must_change_password is False
+
+    def test_process_response_redirects_to_success_page(self):
+        """After successful password change, middleware redirects to success page."""
+        mw = self._get_middleware()
+        factory = RequestFactory()
+        change_url = mw._get_change_password_url()
+        request = factory.post(change_url)
+        request.user = MagicMock(is_authenticated=True, pk=1)
+        request.session = {
+            'must_change_password': True,
+            'must_change_password_reason': 'first_login',
+        }
+        mock_profile = MagicMock(must_change_password=True)
+        request.user.client_profile = mock_profile
+
+        response = HttpResponse(status=302)
+        with patch('core.tasks.async_send_password_changed_email'):
+            result = mw.process_response(request, response)
+
+        # Must redirect to the password_change_done URL
+        assert result.status_code == 302
+        from django.urls import reverse
+        success_url = reverse('clients:password_change_done')
+        assert result['Location'] == success_url
+
+    @patch('core.tasks.async_send_password_changed_email')
+    def test_process_response_dispatches_email(self, mock_email):
+        """After successful password change, sends confirmation email."""
+        mw = self._get_middleware()
+        factory = RequestFactory()
+        change_url = mw._get_change_password_url()
+        request = factory.post(change_url)
+        request.user = MagicMock(is_authenticated=True, pk=99)
+        request.session = {
+            'must_change_password': True,
+        }
+        mock_profile = MagicMock(must_change_password=True)
+        request.user.client_profile = mock_profile
+
+        response = HttpResponse(status=302)
+        mw.process_response(request, response)
+
+        mock_email.assert_called_once_with(99)
+
+    def test_success_url_allowed_during_force(self):
+        """The password_change_done URL is accessible even with force flag."""
+        mw = self._get_middleware()
+        factory = RequestFactory()
+        from django.urls import reverse
+        success_url = reverse('clients:password_change_done')
+        request = factory.get(success_url)
+        request.user = MagicMock(is_authenticated=True)
+        request.session = {'must_change_password': True}
+        result = mw.process_request(request)
+        assert result is None  # Not blocked
 
     def test_process_response_no_flag_noop(self):
         mw = self._get_middleware()
@@ -219,6 +275,15 @@ class TestPublicDispatchers:
         async_send_generic_email('to@ex.com', 'Subj', '<p>HTML</p>')
         mock_dispatch.assert_called_once()
 
+    @patch('core.tasks._dispatch')
+    def test_async_send_password_changed_email(self, mock_dispatch):
+        from core.tasks import async_send_password_changed_email
+        async_send_password_changed_email(77)
+        mock_dispatch.assert_called_once()
+        args, kwargs = mock_dispatch.call_args
+        assert args[1] == 77
+        assert 'password_changed' in kwargs.get('task_name', args[-1] if len(args) > 2 else '')
+
 
 @pytest.mark.django_db
 class TestTaskGenericEmailWorker:
@@ -231,3 +296,60 @@ class TestTaskGenericEmailWorker:
         assert len(mail.outbox) == 1
         assert mail.outbox[0].subject == 'Test Subject'
         assert mail.outbox[0].to == ['to@example.com']
+
+
+# ==============================================================================
+# PASSWORD CHANGE DONE VIEW
+# ==============================================================================
+
+@pytest.mark.django_db
+class TestPasswordChangeDoneView:
+    """Test the password_change_done success page."""
+
+    def test_authenticated_user_sees_success_page(self, client, user):
+        """Authenticated user can access the success page."""
+        client.force_login(user)
+        from django.urls import reverse
+        url = reverse('clients:password_change_done')
+        response = client.get(url)
+        assert response.status_code == 200
+        assert 'Mot de passe modifié' in response.content.decode()
+
+    def test_anonymous_user_redirected(self, client):
+        """Anonymous user is redirected to login."""
+        from django.urls import reverse
+        url = reverse('clients:password_change_done')
+        response = client.get(url)
+        assert response.status_code == 302
+        assert '/accounts/login/' in response['Location'] or 'login' in response['Location'].lower()
+
+
+# ==============================================================================
+# PASSWORD CHANGED EMAIL SERVICE
+# ==============================================================================
+
+@pytest.mark.django_db
+class TestSendPasswordChangedEmail:
+    """Test send_password_changed_email service function."""
+
+    def test_sends_email_via_django_fallback(self, user):
+        """Email sent via Django backend when Brevo not configured."""
+        from apps.clients.services import send_password_changed_email
+        from django.core import mail
+        send_password_changed_email(user)
+        assert len(mail.outbox) == 1
+        msg = mail.outbox[0]
+        assert 'Mot de passe modifié' in msg.subject
+        assert user.email in msg.to
+        # Check HTML alternative exists
+        assert len(msg.alternatives) == 1
+        html = msg.alternatives[0][0]
+        assert 'Sécurité' in html or 'passe' in html.lower()
+
+    def test_task_worker_sends_email(self, user):
+        """The task worker fetches user and sends email."""
+        from core.tasks import _task_send_password_changed_email
+        from django.core import mail
+        _task_send_password_changed_email(user.pk)
+        assert len(mail.outbox) == 1
+        assert user.email in mail.outbox[0].to

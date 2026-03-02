@@ -14,6 +14,12 @@ from .models import ClientProfile, Project, ProjectMilestone, ClientDocument, Cl
 from .forms import ClientProfileForm, DocumentUploadForm, ClientRequestForm
 
 
+@login_required
+def password_change_done(request):
+    """Page de succès après le changement de mot de passe."""
+    return render(request, 'clients/password_change_done.html')
+
+
 class ClientRequiredMixin(LoginRequiredMixin):
     """Mixin to ensure user has a client profile."""
     
