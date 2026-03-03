@@ -51,12 +51,57 @@
             <p class="text-tus-white/70">Articles courts et points de vue sur nos pratiques.</p>
         </div>
 
+        {# ── Search + Sort bar ─────────────────────────────────── #}
+        <form method="get" action="{% url 'chroniques:list' %}" class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 reveal">
+            {% if active_category %}
+            <input type="hidden" name="category" value="{{ active_category.slug }}">
+            {% endif %}
+            <div class="relative w-full sm:w-72">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tus-white/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Rechercher un article…"
+                       class="w-full pl-9 pr-3 py-2 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm text-tus-white placeholder-tus-white/40 focus:border-tus-blue/60 focus:outline-none transition-colors">
+            </div>
+            <select name="sort" onchange="this.form.submit()"
+                    class="py-2 px-3 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm text-tus-white/70 focus:border-tus-blue/60 focus:outline-none transition-colors appearance-none cursor-pointer">
+                {% for key, label in sort_options.items %}
+                <option value="{{ key }}" {% if key == current_sort %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-tus-blue-a11y text-white text-sm hover:bg-tus-blue transition-colors">Rechercher</button>
+        </form>
+
+        {# ── Category pills ───────────────────────────────────── #}
         {% if categories %}
         <div class="flex flex-wrap items-center justify-center gap-2 mb-8 reveal">
-            <a href="{% url 'chroniques:list' %}" class="px-4 py-1.5 rounded-full text-sm border transition-colors {% if not active_category %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40{% endif %}">Tous</a>
+            <a href="{% url 'chroniques:list' %}{% if search_query %}?q={{ search_query }}{% endif %}{% if current_sort != 'recent' %}{% if search_query %}&{% else %}?{% endif %}sort={{ current_sort }}{% endif %}"
+               class="px-4 py-1.5 rounded-full text-sm border transition-colors {% if not active_category %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40{% endif %}">
+                Tous
+            </a>
             {% for cat in categories %}
-            <a href="{% url 'chroniques:list' %}?category={{ cat.slug }}" class="px-4 py-1.5 rounded-full text-sm border transition-colors {% if active_category and active_category.slug == cat.slug %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40{% endif %}">{{ cat.name }}</a>
+            <a href="{% url 'chroniques:list' %}?category={{ cat.slug }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort != 'recent' %}&sort={{ current_sort }}{% endif %}"
+               class="px-4 py-1.5 rounded-full text-sm border transition-colors {% if active_category and active_category.slug == cat.slug %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40{% endif %}">
+                {{ cat.name }}
+            </a>
             {% endfor %}
+        </div>
+        {% endif %}
+
+        {# ── Active filters summary ──────────────────────────── #}
+        {% if search_query or active_category %}
+        <div class="flex flex-wrap items-center justify-center gap-2 mb-6 text-sm">
+            {% if search_query %}
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-tus-blue/10 text-tus-blue-a11y border border-tus-blue/20">
+                « {{ search_query }} »
+                <a href="{% url 'chroniques:list' %}{% if active_category %}?category={{ active_category.slug }}{% endif %}{% if current_sort != 'recent' %}{% if active_category %}&{% else %}?{% endif %}sort={{ current_sort }}{% endif %}" class="ml-1 hover:text-white">✕</a>
+            </span>
+            {% endif %}
+            {% if active_category %}
+            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-tus-blue/10 text-tus-blue-a11y border border-tus-blue/20">
+                {{ active_category.name }}
+                <a href="{% url 'chroniques:list' %}{% if search_query %}?q={{ search_query }}{% endif %}{% if current_sort != 'recent' %}{% if search_query %}&{% else %}?{% endif %}sort={{ current_sort }}{% endif %}" class="ml-1 hover:text-white">✕</a>
+            </span>
+            {% endif %}
+            <a href="{% url 'chroniques:list' %}" class="text-tus-white/50 hover:text-tus-white transition-colors text-xs underline">Réinitialiser</a>
         </div>
         {% endif %}
 
@@ -92,18 +137,25 @@
             {% endfor %}
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination (preserves filters) -->
         <div class="mt-12 flex items-center justify-center gap-2">
             {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }}" class="px-4 py-2 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm">Précédent</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}" class="px-4 py-2 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm hover:border-tus-blue/40 transition-colors">Précédent</a>
             {% endif %}
             <span class="px-4 py-2 text-sm text-tus-white/60">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}" class="px-4 py-2 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm">Suivant</a>
+            <a href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}" class="px-4 py-2 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm hover:border-tus-blue/40 transition-colors">Suivant</a>
             {% endif %}
         </div>
         {% else %}
-        <div class="text-center py-16 text-tus-white/60">Aucun article pour le moment.</div>
+        <div class="text-center py-16 text-tus-white/60">
+            {% if search_query %}
+            Aucun article ne correspond à votre recherche.
+            <a href="{% url 'chroniques:list' %}" class="block mt-2 text-tus-blue-a11y hover:underline text-sm">Voir tous les articles</a>
+            {% else %}
+            Aucun article pour le moment.
+            {% endif %}
+        </div>
         {% endif %}
     </div>
 </div>
