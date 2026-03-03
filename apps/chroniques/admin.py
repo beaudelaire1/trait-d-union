@@ -2,7 +2,14 @@ from django import forms
 from django.contrib import admin
 from django.db import models
 
-from .models import Article
+from .models import Article, Category
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "slug")
+    prepopulated_fields = {"slug": ("name",)}
+    search_fields = ("name",)
 
 
 class ArticleAdminForm(forms.ModelForm):
@@ -22,14 +29,14 @@ class ArticleAdminForm(forms.ModelForm):
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
     form = ArticleAdminForm
-    list_display = ("title", "is_published", "publish_date", "author")
-    list_filter = ("is_published", "publish_date")
-    search_fields = ("title", "excerpt", "body")
+    list_display = ("title", "category", "is_published", "publish_date", "author")
+    list_filter = ("is_published", "publish_date", "category")
+    search_fields = ("title", "subtitle", "excerpt", "body")
     prepopulated_fields = {"slug": ("title",)}
     date_hierarchy = "publish_date"
     fieldsets = (
         (None, {
-            'fields': ('title', 'slug', 'author', 'cover_image', 'excerpt', 'body'),
+            'fields': ('title', 'subtitle', 'slug', 'category', 'author', 'cover_image', 'excerpt', 'body'),
         }),
         ('🔍 SEO', {
             'fields': ('meta_description',),

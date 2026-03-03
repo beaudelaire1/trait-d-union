@@ -64,7 +64,13 @@
             Retour aux Chroniques
         </a>
 
-        <h1 class="text-3xl md:text-4xl font-display font-bold mb-4 text-tus-white">{{ article.title }}</h1>
+        <h1 class="text-3xl md:text-4xl font-display font-bold mb-2 text-tus-white">{{ article.title }}</h1>
+        {% if article.subtitle %}
+        <p class="text-xl text-tus-white/60 mb-4">{{ article.subtitle }}</p>
+        {% endif %}
+        {% if article.category %}
+        <span class="inline-block px-3 py-1 rounded-full text-xs bg-tus-blue/20 text-tus-blue-a11y mb-3">{{ article.category.name }}</span>
+        {% endif %}
         {% if article.excerpt %}
         <p class="text-tus-white/70 text-base md:text-lg mb-3">{{ article.excerpt }}</p>
         {% endif %}
