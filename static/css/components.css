@@ -14,8 +14,8 @@
 
 /* Fix pour les options de select sur fond sombre */
 select option {
-    background-color: #07080A;
-    color: #F6F7FB;
+    background-color: var(--tus-black);
+    color: var(--tus-white);
     padding: 12px;
 }
 
@@ -23,7 +23,7 @@ select option:hover,
 select option:focus,
 select option:checked {
     background-color: #0B2DFF;
-    color: #F6F7FB;
+    color: var(--tus-white);
 }
 
 /* Fix pour les navigateurs WebKit */
@@ -32,7 +32,7 @@ select::-webkit-scrollbar {
 }
 
 select::-webkit-scrollbar-track {
-    background: #0D1016;
+    background: var(--surface-dark);
 }
 
 select::-webkit-scrollbar-thumb {
@@ -254,8 +254,8 @@ button[aria-busy="true"]::after,
     transform: translate(-50%, -50%);
     width: 20px;
     height: 20px;
-    border: 3px solid rgba(246, 247, 251, 0.3);
-    border-top-color: #F6F7FB;
+    border: 3px solid rgb(var(--tus-white-rgb) / 0.3);
+    border-top-color: var(--tus-white);
     border-radius: 50%;
     animation: spinner 0.8s linear infinite;
 }

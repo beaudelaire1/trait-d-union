@@ -5,17 +5,18 @@ module.exports = {
     './apps/**/templates/**/*.html',
     './static/**/*.js',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        'tus-black': '#07080A',
-        'tus-white': '#F6F7FB',
+        'tus-black': 'rgb(var(--tus-black-rgb) / <alpha-value>)',
+        'tus-white': 'rgb(var(--tus-white-rgb) / <alpha-value>)',
         'tus-blue': '#0B2DFF',
         'tus-blue-a11y': '#6B8AFF', /* WCAG AA sur fond noir (> 4.5:1) */
         'tus-green': '#22C55E',
         'tus-green-light': '#4ADE80',
-        'surface-dark': '#0D1016',
-        'stroke-dark': 'rgba(246,247,251,0.10)',
+        'surface-dark': 'rgb(var(--surface-dark-rgb) / <alpha-value>)',
+        'stroke-dark': 'rgb(var(--stroke-dark-rgb) / <alpha-value>)',
       },
       fontFamily: {
         'display': ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],

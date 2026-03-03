@@ -137,6 +137,11 @@
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/light-mode.css' %}">
+    <!-- Theme toggle (inline pour éviter le FOUC - applique data-theme avant le rendu) -->
+    <script>
+        (function(){var t=localStorage.getItem('tus-theme')||'dark';if(t==='light')document.documentElement.setAttribute('data-theme','light');})();
+    </script>
     {% block extra_head %}{% endblock %}
 </head>
 
@@ -158,6 +163,7 @@
         integrity="sha384-wS7Gv0yNGCJOC5uNPGFGaFJYgXXuGy3rMBgGY09MzXVBkWY9sMJ6oRR9v8awkgi"
         crossorigin="anonymous"></script>
     <script defer src="{% static 'js/app.js' %}"></script>
+    <script defer src="{% static 'js/theme-toggle.js' %}"></script>
     <script defer src="{% static 'js/micro-interactions.js' %}"></script>
     {% block extra_js %}{% endblock %}
 

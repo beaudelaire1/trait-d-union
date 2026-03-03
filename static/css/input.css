@@ -8,9 +8,16 @@
    Import depuis le fichier style.css existant
    ======================================== */
 
-/* Variables CSS personnalisées */
+/* Variables CSS personnalisées — Thème Dark (défaut) */
 @layer base {
   :root {
+    /* RGB triplets pour compatibilité Tailwind opacity modifiers */
+    --tus-black-rgb: 7 8 10;
+    --tus-white-rgb: 246 247 251;
+    --surface-dark-rgb: 13 16 22;
+    --stroke-dark-rgb: 246 247 251;
+
+    /* Raccourcis pour usage dans style.css / components.css */
     --tus-black: #07080A;
     --tus-white: #F6F7FB;
     --tus-blue: #0B2DFF;
@@ -39,7 +46,7 @@
   .glass-effect {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    background: rgba(7, 8, 10, 0.85);
+    background: rgb(var(--tus-black-rgb) / 0.85);
     border: 1px solid var(--stroke-dark);
   }
 
@@ -89,7 +96,7 @@
 
   /* ── Article content (chroniques detail page) ────────────────── */
   .article-content {
-    color: rgba(246, 247, 251, 0.86);
+    color: rgb(var(--tus-white-rgb) / 0.86);
     font-size: 1.05rem;
     line-height: 1.8;
   }
@@ -109,21 +116,21 @@
     margin: 2.2rem 0 1rem;
     font-size: 1.6rem;
     font-weight: 700;
-    color: #F6F7FB;
+    color: var(--tus-white);
   }
 
   .article-content h3 {
     margin: 1.8rem 0 0.8rem;
     font-size: 1.3rem;
     font-weight: 700;
-    color: #F6F7FB;
+    color: var(--tus-white);
   }
 
   .article-content h4 {
     margin: 1.5rem 0 0.6rem;
     font-size: 1.15rem;
     font-weight: 600;
-    color: #F6F7FB;
+    color: var(--tus-white);
   }
 
   .article-content ul,
@@ -156,12 +163,12 @@
 
   .article-content strong {
     font-weight: 700;
-    color: #F6F7FB;
+    color: var(--tus-white);
   }
 
   .article-content em {
     font-style: italic;
-    color: rgba(246, 247, 251, 0.9);
+    color: rgb(var(--tus-white-rgb) / 0.9);
   }
 
   .article-content u {
@@ -175,12 +182,12 @@
     margin: 1.5rem 0;
     background: rgba(11, 45, 255, 0.05);
     border-radius: 0 8px 8px 0;
-    color: rgba(246, 247, 251, 0.8);
+    color: rgb(var(--tus-white-rgb) / 0.8);
     font-style: italic;
   }
 
   .article-content code {
-    background: rgba(246, 247, 251, 0.08);
+    background: rgb(var(--tus-white-rgb) / 0.08);
     padding: 0.15em 0.4em;
     border-radius: 4px;
     font-size: 0.9em;
@@ -188,8 +195,8 @@
   }
 
   .article-content pre {
-    background: rgba(246, 247, 251, 0.06);
-    border: 1px solid rgba(246, 247, 251, 0.1);
+    background: rgb(var(--tus-white-rgb) / 0.06);
+    border: 1px solid rgb(var(--tus-white-rgb) / 0.1);
     border-radius: 8px;
     padding: 1rem 1.2rem;
     margin: 1.5rem 0;
@@ -221,7 +228,7 @@
 
   .article-content figcaption {
     text-align: center;
-    color: rgba(246, 247, 251, 0.5);
+    color: rgb(var(--tus-white-rgb) / 0.5);
     font-size: 0.9rem;
     margin-top: 0.5rem;
   }
@@ -230,7 +237,7 @@
     width: 100%;
     border-collapse: collapse;
     margin: 1.5rem 0;
-    border: 1px solid rgba(246, 247, 251, 0.1);
+    border: 1px solid rgb(var(--tus-white-rgb) / 0.1);
     border-radius: 8px;
     overflow: hidden;
   }
@@ -238,17 +245,17 @@
   .article-content th,
   .article-content td {
     padding: 0.6rem 1rem;
-    border: 1px solid rgba(246, 247, 251, 0.1);
+    border: 1px solid rgb(var(--tus-white-rgb) / 0.1);
     text-align: left;
   }
 
   .article-content th {
     background: rgba(11, 45, 255, 0.08);
     font-weight: 600;
-    color: #F6F7FB;
+    color: var(--tus-white);
   }
 
   .article-content tr:nth-child(even) {
-    background: rgba(246, 247, 251, 0.02);
+    background: rgb(var(--tus-white-rgb) / 0.02);
   }
 }

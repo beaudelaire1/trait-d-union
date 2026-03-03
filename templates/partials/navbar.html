@@ -13,12 +13,12 @@
                     </linearGradient>
                 </defs>
                 <text x="0" y="54" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="44" font-weight="800"
-                    letter-spacing="0.5" fill="#F6F7FB" class="group-hover:fill-tus-blue transition-colors">TRAIT
+                    letter-spacing="0.5" fill="currentColor" class="group-hover:fill-tus-blue transition-colors">TRAIT
                     D'UNION</text>
                 <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradNav)"
                     class="origin-left group-hover:scale-x-110 transition-transform" />
                 <text x="0" y="106" font-family="Plus Jakarta Sans, Arial, sans-serif" font-size="22" font-weight="600"
-                    letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+                    letter-spacing="4" fill="currentColor" opacity="0.82">STUDIO</text>
             </svg>
         </a>
 
@@ -70,6 +70,24 @@
                 </a>
             </li>
             {% endif %}
+            <!-- Theme Toggle (dark/light) — Desktop -->
+            <li>
+                <button id="theme-toggle-btn" type="button"
+                    class="theme-toggle-pill" aria-label="Changer de thème">
+                    <span class="theme-toggle-track">
+                        <span class="theme-toggle-thumb">
+                            <!-- Soleil -->
+                            <svg class="theme-icon-sun w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <!-- Lune -->
+                            <svg class="theme-icon-moon w-3.5 h-3.5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            </svg>
+                        </span>
+                    </span>
+                </button>
+            </li>
             <li>
                 <a href="{% url 'leads:contact' %}"
                     class="btn-primary btn-magnetic bg-tus-blue px-5 py-2.5 rounded-full font-semibold">
@@ -78,8 +96,23 @@
             </li>
         </ul>
 
-        <!-- Mobile menu button -->
-        <button class="md:hidden text-tus-white p-2 relative z-[70]" aria-label="Menu" id="mobile-menu-btn"
+        <!-- Mobile: theme toggle + menu button -->
+        <div class="flex items-center gap-2 md:hidden">
+            <!-- Theme Toggle — Mobile -->
+            <button id="theme-toggle-btn-mobile" type="button"
+                class="theme-toggle-pill" aria-label="Changer de thème">
+                <span class="theme-toggle-track">
+                    <span class="theme-toggle-thumb">
+                        <svg class="theme-icon-sun w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <svg class="theme-icon-moon w-3.5 h-3.5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </span>
+                </span>
+            </button>
+        <button class="text-tus-white p-2 relative z-[70]" aria-label="Menu" id="mobile-menu-btn"
             aria-expanded="false">
             <!-- Icône hamburger -->
             <svg id="menu-icon-open" class="w-6 h-6 transition-all duration-150" fill="none" stroke="currentColor"
@@ -93,6 +126,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
+        </div>
     </div>
 
     <!-- Mobile Menu Overlay -->

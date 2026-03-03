@@ -5,6 +5,11 @@
 
 :root {
     /* Couleurs officielles - Charte Graphique TUS */
+    --tus-black-rgb: 7 8 10;
+    --tus-white-rgb: 246 247 251;
+    --surface-dark-rgb: 13 16 22;
+    --stroke-dark-rgb: 246 247 251;
+
     --tus-black: #07080A;
     --tus-white: #F6F7FB;
     --tus-blue: #0B2DFF;
@@ -42,8 +47,8 @@
 }
 
 .mobile-menu-overlay {
-    background-color: #07080A !important;
-    background: linear-gradient(180deg, #07080A 0%, #000033 60%, #0B2DFF 100%) !important;
+    background-color: var(--tus-black) !important;
+    background: linear-gradient(180deg, var(--tus-black) 0%, #000033 60%, #0B2DFF 100%) !important;
     overflow-y: auto;
     height: 100vh;
 }
@@ -51,12 +56,12 @@
 /* Accessibility overrides for legacy opacity utility classes */
 .text-tus-white\/40,
 .text-tus-white\/30 {
-    color: rgba(246, 247, 251, 0.6) !important;
+    color: rgb(var(--tus-white-rgb) / 0.6) !important;
 }
 
 .placeholder-tus-white\/40::placeholder,
 .placeholder-tus-white\/30::placeholder {
-    color: rgba(246, 247, 251, 0.5) !important;
+    color: rgb(var(--tus-white-rgb) / 0.5) !important;
 }
 
 /* ============================================
@@ -169,7 +174,7 @@ a {
    Cards Premium
    ============================================ */
 .card-premium {
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    background: linear-gradient(180deg, rgb(var(--tus-white-rgb) / 0.03), rgb(var(--tus-white-rgb) / 0.01));
     border: 1px solid var(--stroke-dark);
     border-radius: 18px;
     padding: 2rem;
@@ -260,7 +265,7 @@ select {
 
 .faq-item.open {
     border-color: rgba(11, 45, 255, 0.3);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgb(var(--tus-white-rgb) / 0.03);
 }
 
 .htmx-request::after {
@@ -298,7 +303,7 @@ select {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(246,247,251,0.2);
+    background: rgb(var(--tus-white-rgb) / 0.2);
 }
 
 /* ============================================
@@ -413,12 +418,12 @@ select {
 .ticker-word {
     display: inline-block;
     margin: 0 0.3em;
-    color: rgba(246, 247, 251, 0.7);
+    color: rgb(var(--tus-white-rgb) / 0.7);
     animation: wordShimmer 3s ease-in-out infinite;
     background: linear-gradient(90deg,
-        rgba(246, 247, 251, 0.7) 0%,
-        rgba(255, 255, 255, 1) 50%,
-        rgba(246, 247, 251, 0.7) 100%);
+        rgb(var(--tus-white-rgb) / 0.7) 0%,
+        var(--tus-white) 50%,
+        rgb(var(--tus-white-rgb) / 0.7) 100%);
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
@@ -578,7 +583,7 @@ select {
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.06),
+        rgb(var(--tus-white-rgb) / 0.06),
         transparent
     );
     transition: left 320ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -644,7 +649,7 @@ select {
 .scroll-capsule {
     width: 28px;
     height: 48px;
-    border: 1.5px solid rgba(246,247,251,0.15);
+    border: 1.5px solid rgb(var(--tus-white-rgb) / 0.15);
     border-radius: 14px;
     position: relative;
     overflow: hidden;
@@ -670,11 +675,11 @@ select {
 .text-shimmer {
     background: linear-gradient(
         120deg,
-        rgba(246,247,251,0.04) 0%,
-        rgba(246,247,251,0.08) 30%,
+        rgb(var(--tus-white-rgb) / 0.04) 0%,
+        rgb(var(--tus-white-rgb) / 0.08) 30%,
         rgba(11,45,255,0.12) 50%,
-        rgba(246,247,251,0.08) 70%,
-        rgba(246,247,251,0.04) 100%
+        rgb(var(--tus-white-rgb) / 0.08) 70%,
+        rgb(var(--tus-white-rgb) / 0.04) 100%
     );
     background-size: 300% 100%;
     -webkit-background-clip: text;
@@ -739,10 +744,10 @@ select {
 
 /* --- Glassmorphism Cards --- */
 .glass-card {
-    background: rgba(246,247,251,0.02);
+    background: rgb(var(--tus-white-rgb) / 0.02);
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
-    border: 1px solid rgba(246,247,251,0.08);
+    border: 1px solid rgb(var(--tus-white-rgb) / 0.08);
     position: relative;
     overflow: hidden;
     transition: border-color 0.5s ease, box-shadow 0.5s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -946,7 +951,7 @@ select {
 .number-display {
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.06em;
-    background: linear-gradient(180deg, rgba(246,247,251,0.06) 0%, rgba(246,247,251,0.02) 100%);
+    background: linear-gradient(180deg, rgb(var(--tus-white-rgb) / 0.06) 0%, rgb(var(--tus-white-rgb) / 0.02) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -1226,8 +1231,8 @@ html.has-custom-cursor * {
 }
 
 .bento-item {
-    background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-    border: 1px solid rgba(246, 247, 251, 0.08);
+    background: linear-gradient(180deg, rgb(var(--tus-white-rgb) / 0.05) 0%, rgb(var(--tus-white-rgb) / 0.02) 100%);
+    border: 1px solid rgb(var(--tus-white-rgb) / 0.08);
     border-radius: 24px;
     padding: 2rem;
     overflow: hidden;
@@ -1862,7 +1867,7 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
     margin-bottom: 0.5em;
     line-height: 1.75;
     font-weight: 400;
-    color: rgba(255, 255, 255, 0.88);
+    color: rgb(var(--tus-white-rgb) / 0.88);
 }
 .prose-chapter li::marker {
     color: rgba(11, 45, 255, 0.6);
@@ -1870,13 +1875,13 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
 .prose-chapter strong,
 .prose-chapter b {
     font-weight: 700 !important;
-    color: #F6F7FB;
+    color: var(--tus-white);
     letter-spacing: -0.01em;
 }
 .prose-chapter em,
 .prose-chapter i {
     font-style: italic !important;
-    color: rgba(255, 255, 255, 0.92);
+    color: rgb(var(--tus-white-rgb) / 0.92);
 }
 .prose-chapter u {
     text-decoration: underline !important;
@@ -1888,7 +1893,7 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
     border-left: 3px solid rgba(11, 45, 255, 0.5);
     padding-left: 1.5em;
     margin: 1.5em 0;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgb(var(--tus-white-rgb) / 0.75);
     font-style: italic;
     font-weight: 400;
 }
@@ -1899,7 +1904,7 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
     font-weight: 700 !important;
     letter-spacing: -0.02em;
     margin: 1.8em 0 0.6em;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgb(var(--tus-white-rgb) / 0.95);
 }
 .prose-chapter h4 {
     display: block !important;
@@ -1908,7 +1913,7 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
     font-weight: 600 !important;
     letter-spacing: -0.015em;
     margin: 1.4em 0 0.5em;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgb(var(--tus-white-rgb) / 0.9);
 }
 .prose-chapter h5 {
     display: block !important;
@@ -1917,7 +1922,7 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
     font-weight: 600 !important;
     letter-spacing: -0.01em;
     margin: 1.2em 0 0.4em;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgb(var(--tus-white-rgb) / 0.85);
     text-transform: uppercase;
     font-size: 0.85em;
     letter-spacing: 0.05em;
@@ -1939,7 +1944,7 @@ section[data-chapter="3"].narrative-chapter .strategy-timeline-line {
 .prose-chapter hr {
     display: block !important;
     border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgb(var(--tus-white-rgb) / 0.1);
     margin: 2em 0;
 }
 
@@ -2182,7 +2187,7 @@ button[type="submit"] {
 }
 
 .bg-dot-indicator {
-    background: rgba(255,255,255,0.2);
+    background: rgb(var(--tus-white-rgb) / 0.2);
 }
 
 .spark-size {
@@ -2261,3 +2266,69 @@ button[type="submit"] {
 .bulk-heading  { margin-bottom: 10px; }
 .bulk-subtitle { color: #666; margin-bottom: 30px; }
 .bulk-submit-group { margin-top: 30px; }
+
+/* ============================================
+   THEME TOGGLE — Premium Pill Switch
+   ============================================ */
+.theme-toggle-pill {
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    min-width: 44px;
+}
+
+.theme-toggle-track {
+    display: flex;
+    align-items: center;
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background: rgba(246, 247, 251, 0.12);
+    border: 1px solid rgba(246, 247, 251, 0.15);
+    position: relative;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle-pill:hover .theme-toggle-track {
+    background: rgba(246, 247, 251, 0.18);
+    border-color: rgba(11, 45, 255, 0.4);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 8px rgba(11, 45, 255, 0.2);
+}
+
+.theme-toggle-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0B2DFF 0%, #2D5BFF 100%);
+    box-shadow: 0 1px 4px rgba(11, 45, 255, 0.4);
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
+    color: #FFFFFF;
+}
+
+.theme-toggle-thumb.translate-x-5 {
+    transform: translateX(20px);
+}
+
+/* ── Transitions douces entre thèmes ── */
+body,
+#navbar,
+footer,
+.card-premium,
+.glass-card,
+.bento-item,
+.client-sidebar,
+.faq-item,
+input, textarea, select {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}

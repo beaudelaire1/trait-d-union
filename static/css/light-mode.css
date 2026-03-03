@@ -1,0 +1,392 @@
+/* ============================================
+   LIGHT MODE — Theme Overrides
+   Trait d'Union Studio
+   
+   Fichier dédié au thème clair.
+   Activé via data-theme="light" sur <html>.
+   ============================================ */
+
+/* ── CSS Variables ── */
+[data-theme="light"] {
+    --tus-black-rgb: 255 255 255;
+    --tus-white-rgb: 17 24 39;
+    --surface-dark-rgb: 243 244 246;
+    --stroke-dark-rgb: 17 24 39;
+
+    --tus-black: #FFFFFF;
+    --tus-white: #111827;
+    --surface-dark: #F3F4F6;
+    --stroke-dark: rgba(17,24,39,0.12);
+}
+
+/* ── Body ── */
+[data-theme="light"] body {
+    background-color: #FFFFFF;
+    color: #111827;
+}
+
+/* ============================================
+   INVERSION DES BLANCS LITTÉRAUX
+   
+   Les templates utilisent border-white/10, bg-white/[0.02] etc.
+   En dark mode : blanc translucide sur fond noir = subtil.
+   En light mode : blanc sur blanc = invisible.
+   → On inverse vers noir translucide.
+   ============================================ */
+
+/* Bordures : white/XX → dark equivalent */
+[data-theme="light"] [class*="border-white/"] {
+    border-color: rgba(17, 24, 39, 0.12) !important;
+}
+
+/* Bordures : border-tus-white/XX → visible */
+[data-theme="light"] [class*="border-tus-white/"] {
+    border-color: rgba(17, 24, 39, 0.15) !important;
+}
+
+/* Fonds translucides : bg-white/[0.0x] → surfaces visibles */
+[data-theme="light"] [class*="bg-white/"] {
+    background-color: #FFFFFF !important;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Hover states : bg-white/[0.05] et au-delà */
+[data-theme="light"] [class*="hover\:bg-white/"]:hover {
+    background-color: rgba(17, 24, 39, 0.05) !important;
+}
+
+/* Gradients from/to white : override les stops transparents */
+[data-theme="light"] [class*="from-white/"],
+[data-theme="light"] [class*="to-white/"],
+[data-theme="light"] [class*="via-white/"] {
+    --tw-gradient-from: rgba(17, 24, 39, 0.04);
+    --tw-gradient-to: rgba(17, 24, 39, 0.01);
+}
+
+/* ── Bouton CTA Primary : texte TOUJOURS blanc sur fond bleu ── */
+[data-theme="light"] .btn-glow .text-tus-white,
+[data-theme="light"] .btn-glow span[class*="text-tus-white"],
+[data-theme="light"] .btn-glow svg[class*="text-tus-white"],
+[data-theme="light"] a[class*="btn-glow"] span,
+[data-theme="light"] a[class*="btn-glow"] svg {
+    color: #FFFFFF !important;
+}
+
+/* ── Bouton secondaire inline (Voir nos réalisations etc.) ── */
+/* Exclure btn-primary (Contact) qui doit rester bleu */
+[data-theme="light"] a[class*="btn-magnetic"]:not([class*="btn-glow"]):not([class*="btn-primary"]) {
+    border-color: rgba(17, 24, 39, 0.20) !important;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] a[class*="btn-magnetic"]:not([class*="btn-glow"]):not([class*="btn-primary"]):hover {
+    border-color: #0B2DFF !important;
+    background-color: rgba(11, 45, 255, 0.04);
+    box-shadow: 0 4px 16px rgba(11, 45, 255, 0.10);
+}
+
+/* ── Scroll indicator ── */
+[data-theme="light"] .animate-bounce .border-2 {
+    border-color: rgba(17, 24, 39, 0.25) !important;
+}
+[data-theme="light"] .animate-bounce .bg-tus-white\/50 {
+    background-color: rgba(17, 24, 39, 0.35) !important;
+}
+
+/* ── Texte : respecter les opacités pour la hiérarchie ── */
+/* Scoping strict via <main> pour ne PAS écraser navbar/footer
+   qui ont un fond bleu foncé et nécessitent du texte clair. */
+[data-theme="light"] main [class*="text-tus-white/50"] {
+    color: rgba(17, 24, 39, 0.65) !important;
+}
+[data-theme="light"] main [class*="text-tus-white/60"] {
+    color: rgba(17, 24, 39, 0.70) !important;
+}
+[data-theme="light"] main [class*="text-tus-white/70"] {
+    color: rgba(17, 24, 39, 0.75) !important;
+}
+[data-theme="light"] main [class*="text-tus-white/80"] {
+    color: rgba(17, 24, 39, 0.85) !important;
+}
+[data-theme="light"] main [class*="text-tus-white/90"] {
+    color: rgba(17, 24, 39, 0.92) !important;
+}
+
+/* ── Navbar : bleu profond premium ── */
+[data-theme="light"] #navbar {
+    background: linear-gradient(135deg, #0A1628 0%, #0F2044 100%);
+    border-color: rgba(11, 45, 255, 0.15);
+    box-shadow: 0 1px 20px rgba(10, 22, 40, 0.12);
+}
+/* Texte navbar reste clair (fond bleu foncé) */
+[data-theme="light"] #navbar a,
+[data-theme="light"] #navbar button,
+[data-theme="light"] #navbar svg {
+    color: rgba(246, 247, 251, 0.85) !important;
+}
+[data-theme="light"] #navbar a:hover,
+[data-theme="light"] #navbar button:hover {
+    color: #F6F7FB !important;
+}
+[data-theme="light"] #navbar .btn-primary {
+    color: #FFFFFF !important;
+    background-color: #0B2DFF !important;
+    box-shadow: 0 2px 12px rgba(11, 45, 255, 0.3);
+}
+
+/* ── Footer : bleu profond premium assorti ── */
+[data-theme="light"] footer {
+    background: linear-gradient(180deg, #0A1628 0%, #060E1A 100%);
+    border-color: rgba(11, 45, 255, 0.15);
+}
+[data-theme="light"] footer,
+[data-theme="light"] footer a,
+[data-theme="light"] footer p,
+[data-theme="light"] footer span,
+[data-theme="light"] footer h4,
+[data-theme="light"] footer li,
+[data-theme="light"] footer svg,
+[data-theme="light"] footer button {
+    color: rgba(246, 247, 251, 0.8) !important;
+}
+[data-theme="light"] footer h4 {
+    color: #F6F7FB !important;
+}
+[data-theme="light"] footer a:hover,
+[data-theme="light"] footer button:hover {
+    color: #6B8AFF !important;
+}
+[data-theme="light"] footer .border-stroke-dark {
+    border-color: rgba(246, 247, 251, 0.1);
+}
+
+/* ── Mobile overlay ── */
+[data-theme="light"] .mobile-menu-overlay {
+    background: linear-gradient(180deg, #0A1628 0%, #0F2044 60%, #0B2DFF 100%) !important;
+}
+
+/* ── Glass & surfaces ── */
+[data-theme="light"] .glass,
+[data-theme="light"] .glass-effect {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(17, 24, 39, 0.10);
+    box-shadow: 0 1px 16px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .glass-card {
+    background: #FFFFFF;
+    border-color: rgba(17, 24, 39, 0.10);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .card-premium {
+    background: #FFFFFF;
+    border-color: rgba(17, 24, 39, 0.10);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .card-premium:hover {
+    border-color: rgba(11, 45, 255, 0.25);
+    box-shadow: 0 8px 32px rgba(11, 45, 255, 0.10);
+}
+
+/* ── Bento items ── */
+[data-theme="light"] .bento-item {
+    background: #FFFFFF;
+    border-color: rgba(17, 24, 39, 0.10);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] .bento-item:hover {
+    border-color: rgba(11, 45, 255, 0.25);
+    box-shadow: 0 8px 32px rgba(11, 45, 255, 0.10);
+}
+
+/* ── FAQ accordion ── */
+[data-theme="light"] .faq-item.open {
+    background: rgba(11, 45, 255, 0.03);
+    border-color: rgba(11, 45, 255, 0.15);
+}
+
+/* ── Glow effects atténués ── */
+[data-theme="light"] .glow-blue {
+    box-shadow: 0 0 30px rgba(11, 45, 255, 0.12);
+}
+[data-theme="light"] .glow-blue-hover:hover {
+    box-shadow: 0 0 40px rgba(11, 45, 255, 0.18);
+}
+
+/* ── Scrollbar ── */
+[data-theme="light"] ::-webkit-scrollbar-track {
+    background: #F0F1F5;
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: rgba(11, 45, 255, 0.2);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(11, 45, 255, 0.35);
+}
+
+/* ── Selection ── */
+[data-theme="light"] ::selection {
+    background-color: #0B2DFF;
+    color: #FFFFFF;
+}
+
+/* ── Select arrow ── */
+[data-theme="light"] select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23111827'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+}
+[data-theme="light"] select option {
+    background-color: #FFFFFF;
+    color: #111827;
+}
+
+/* ── Client portal ── */
+[data-theme="light"] .client-portal {
+    background: #FFFFFF !important;
+}
+[data-theme="light"] .client-sidebar {
+    background: #FFFFFF !important;
+    border-right-color: rgba(17, 24, 39, 0.08) !important;
+    box-shadow: 1px 0 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ── Inputs / forms ── */
+[data-theme="light"] .input-premium,
+[data-theme="light"] input[type="text"],
+[data-theme="light"] input[type="email"],
+[data-theme="light"] input[type="tel"],
+[data-theme="light"] input[type="password"],
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+    background: #FFFFFF;
+    border-color: rgba(17, 24, 39, 0.12);
+    color: #111827;
+}
+[data-theme="light"] .input-premium:focus,
+[data-theme="light"] input:focus,
+[data-theme="light"] textarea:focus,
+[data-theme="light"] select:focus {
+    border-color: rgba(11, 45, 255, 0.4);
+    box-shadow: 0 0 0 3px rgba(11, 45, 255, 0.08);
+}
+
+/* ── Bordures générales ── */
+[data-theme="light"] .border-stroke-dark {
+    border-color: rgba(17, 24, 39, 0.08);
+}
+[data-theme="light"] footer .border-stroke-dark {
+    border-color: rgba(246, 247, 251, 0.1);
+}
+
+/* ── Bouton secondaire ── */
+[data-theme="light"] .btn-secondary {
+    border-color: rgba(17, 24, 39, 0.15);
+    color: #111827;
+}
+[data-theme="light"] .btn-secondary:hover {
+    border-color: #0B2DFF;
+    color: #0B2DFF;
+    background-color: rgba(11, 45, 255, 0.04);
+}
+
+/* ── Surfaces ── */
+[data-theme="light"] .bg-tus-surface,
+[data-theme="light"] .bg-surface-dark {
+    background-color: #F5F6FA;
+}
+
+/* ── Cards génériques (round + border in templates) ── */
+[data-theme="light"] .rounded-2xl[class*="border"],
+[data-theme="light"] .rounded-3xl[class*="border"],
+[data-theme="light"] .rounded-xl[class*="border"] {
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .rounded-2xl[class*="border"]:hover,
+[data-theme="light"] .rounded-3xl[class*="border"]:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Badges/pills (sur fond blanc) ── */
+[data-theme="light"] .bg-tus-green {
+    color: #FFFFFF !important;
+}
+[data-theme="light"] .bg-tus-blue {
+    color: #FFFFFF !important;
+}
+
+/* ── Service cards & backdrop-blur containers ── */
+/* En dark mode bg-tus-white/5 + backdrop-blur = effet verre subtil.
+   En light mode on veut un fond blanc net avec shadow premium. */
+[data-theme="light"] .backdrop-blur-sm {
+    background-color: #FFFFFF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* card-tilt : toutes les cards interactives */
+[data-theme="light"] .card-tilt {
+    background: #FFFFFF !important;
+    border-color: rgba(17, 24, 39, 0.10) !important;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+[data-theme="light"] .card-tilt:hover {
+    border-color: rgba(11, 45, 255, 0.25) !important;
+    box-shadow: 0 8px 32px rgba(11, 45, 255, 0.10);
+}
+
+/* Separators inside cards: border-t, border-b with tus-white */
+[data-theme="light"] .border-t[class*="border-tus-white"] {
+    border-top-color: rgba(17, 24, 39, 0.08) !important;
+}
+
+/* ── Icon containers (bg-tus-blue/10, bg-tus-green/5 etc.) ── */
+[data-theme="light"] [class*="bg-tus-blue/10"],
+[data-theme="light"] [class*="bg-tus-blue/15"],
+[data-theme="light"] [class*="bg-tus-blue/20"] {
+    background-color: rgba(11, 45, 255, 0.08) !important;
+}
+[data-theme="light"] [class*="bg-tus-green/5"],
+[data-theme="light"] [class*="bg-tus-green/10"],
+[data-theme="light"] [class*="bg-tus-green/15"],
+[data-theme="light"] [class*="bg-tus-green/20"] {
+    background-color: rgba(72, 199, 142, 0.10) !important;
+}
+
+/* ── Gradient zones ── */
+/* Radial BG effects are barely visible on white — reduce */
+[data-theme="light"] [class*="from-tus-blue/15"],
+[data-theme="light"] [class*="from-tus-blue/10"],
+[data-theme="light"] [class*="from-tus-blue/5"],
+[data-theme="light"] [class*="from-tus-green/10"],
+[data-theme="light"] [class*="to-tus-blue/15"],
+[data-theme="light"] [class*="to-tus-green/10"] {
+    opacity: 0.6;
+}
+
+/* ── Theme toggle — variantes light ── */
+[data-theme="light"] .theme-toggle-track {
+    background: rgba(11, 45, 255, 0.1);
+    border-color: rgba(11, 45, 255, 0.2);
+    box-shadow: inset 0 1px 3px rgba(11, 45, 255, 0.08);
+}
+[data-theme="light"] .theme-toggle-pill:hover .theme-toggle-track {
+    background: rgba(11, 45, 255, 0.15);
+    border-color: rgba(11, 45, 255, 0.35);
+}
+[data-theme="light"] .theme-toggle-thumb {
+    background: linear-gradient(135deg, #0A1628 0%, #1A2D50 100%);
+    box-shadow: 0 1px 4px rgba(10, 22, 40, 0.3);
+}
+/* Toggle dans la navbar (fond bleu foncé) */
+[data-theme="light"] #navbar .theme-toggle-track {
+    background: rgba(246, 247, 251, 0.12);
+    border-color: rgba(246, 247, 251, 0.15);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+[data-theme="light"] #navbar .theme-toggle-thumb {
+    background: linear-gradient(135deg, #F6F7FB 0%, #D0D4E0 100%);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    color: #0A1628;
+}
