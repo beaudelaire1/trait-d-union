@@ -55,7 +55,7 @@
         <div class="flex flex-wrap items-center justify-center gap-2 mb-8 reveal">
             <a href="{% url 'chroniques:list' %}" class="px-4 py-1.5 rounded-full text-sm border transition-colors {% if not active_category %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40{% endif %}">Tous</a>
             {% for cat in categories %}
-            <a href="{% url 'chroniques:list' %}?category={{ cat.slug }}" class="px-4 py-1.5 rounded-full text-sm border transition-colors {% if active_category.slug == cat.slug %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40{% endif %}">{{ cat.name }}</a>
+            <a href="{% url 'chroniques:list' %}?category={{ cat.slug }}" class="px-4 py-1.5 rounded-full text-sm border transition-colors {% if active_category and active_category.slug == cat.slug %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40{% endif %}">{{ cat.name }}</a>
             {% endfor %}
         </div>
         {% endif %}
