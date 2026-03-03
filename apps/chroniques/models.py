@@ -8,11 +8,31 @@ from django.utils import timezone
 User = get_user_model()
 
 
+class Category(models.Model):
+    """Catégorie d'article pour les Chroniques TUS."""
+
+    name = models.CharField("Nom", max_length=100, unique=True)
+    slug = models.SlugField("Slug", max_length=100, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name = "Catégorie"
+        verbose_name_plural = "Catégories"
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class Article(models.Model):
     """Article de Chroniques TUS."""
 
     title = models.CharField("Titre", max_length=200)
+    subtitle = models.CharField("Sous-titre", max_length=300, blank=True)
     slug = models.SlugField("Slug", max_length=200, unique=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name="Catégorie", related_name="articles",
+    )
     excerpt = models.TextField("Résumé", blank=True)
     body = models.TextField("Contenu")
 
