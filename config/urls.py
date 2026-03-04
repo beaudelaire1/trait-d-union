@@ -65,7 +65,7 @@ urlpatterns = [
     path('tus-gestion-secure/session-ping/', session_ping, name='session_ping'),
     path('tus-gestion-secure/', admin.site.urls),  # URL admin sécurisée
     path('', include('apps.pages.urls')),
-    path('portfolio/', include('apps.portfolio.urls')),
+    path('nos-signatures/', include('apps.portfolio.urls')),
     path('contact/', include('apps.leads.urls')),
     path('resources/', include('apps.resources.urls')),
     path('chroniques/', include('apps.chroniques.urls')),
