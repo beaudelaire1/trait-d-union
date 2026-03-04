@@ -182,7 +182,7 @@ class TestBreadcrumbs:
         result = breadcrumbs(request)
         names = [b['name'] for b in result['breadcrumbs_list']]
         assert 'Accueil' in names
-        assert 'Portfolio' in names
+        assert 'Nos signatures' in names
 
     def test_numeric_segment_skipped(self):
         factory = RequestFactory()

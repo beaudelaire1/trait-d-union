@@ -75,7 +75,7 @@
                 <ol class="flex items-center gap-2 text-sm text-tus-white/40">
                     <li><a href="{% url 'pages:home' %}" class="hover:text-tus-white transition-colors">Accueil</a></li>
                     <li><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
-                    <li><a href="{% url 'portfolio:list' %}" class="hover:text-tus-white transition-colors">Portfolio</a></li>
+                    <li><a href="{% url 'portfolio:list' %}" class="hover:text-tus-white transition-colors">Nos signatures</a></li>
                     <li><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></li>
                     <li class="text-tus-white/70">{{ project.title|truncatewords:5 }}</li>
                 </ol>
@@ -786,7 +786,7 @@
                 <div class="w-12 h-12 rounded-full bg-tus-white/5 border border-tus-white/10 flex items-center justify-center group-hover:bg-tus-white/10 transition-all duration-300">
                     <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
                 </div>
-                <span class="font-medium">Retour au portfolio</span>
+                <span class="font-medium">Retour à nos signatures</span>
             </a>
             <a href="{% url 'leads:contact' %}" 
                class="inline-flex items-center gap-2 text-tus-blue-a11y hover:text-cyan-400 font-semibold transition-colors">

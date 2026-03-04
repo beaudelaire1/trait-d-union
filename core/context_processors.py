@@ -42,7 +42,7 @@ def breadcrumbs(request):
         # Pages principales
         'services': 'Nos Services',
         'methode': 'Notre Méthode',
-        'portfolio': 'Portfolio',
+        'portfolio': 'Nos signatures',
         'chroniques': 'Chroniques TUS',
         'contact': 'Contact',
         'apropos': 'À Propos',
