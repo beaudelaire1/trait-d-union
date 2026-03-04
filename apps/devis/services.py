@@ -106,6 +106,7 @@ def create_invoice_from_quote(quote: Union[int, Quote]) -> InvoiceCreationResult
             quantity=item.quantity,
             unit_price=item.unit_price,
             tax_rate=item.tax_rate,
+            line_discount=item.line_discount,
         )
 
     # Mettre à jour le statut du devis

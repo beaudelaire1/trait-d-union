@@ -33,7 +33,7 @@ class QuoteItemInline(admin.TabularInline):
     model = QuoteItem
     extra = 1
     autocomplete_fields = ("service",)
-    fields = ("service", "description", "quantity", "unit_price", "tax_rate")
+    fields = ("service", "description", "quantity", "unit_price", "tax_rate", "line_discount")
 
 
 @admin.register(Quote)

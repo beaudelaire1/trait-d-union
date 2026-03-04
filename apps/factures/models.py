@@ -234,13 +234,13 @@ class Invoice(models.Model):
         agg = self.invoice_items.aggregate(
             sum_ht=Sum(
                 ExpressionWrapper(
-                    F('quantity') * F('unit_price'),
+                    F('quantity') * F('unit_price') * (Decimal("1") - F('line_discount') / Decimal("100")),
                     output_field=DecimalField(max_digits=12, decimal_places=2)
                 )
             ),
             sum_tva=Sum(
                 ExpressionWrapper(
-                    F('quantity') * F('unit_price') * F('tax_rate') / Decimal("100"),
+                    F('quantity') * F('unit_price') * (Decimal("1") - F('line_discount') / Decimal("100")) * F('tax_rate') / Decimal("100"),
                     output_field=DecimalField(max_digits=12, decimal_places=2)
                 )
             ),
@@ -281,6 +281,13 @@ class InvoiceItem(models.Model):
     quantity = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("1.00"))
     unit_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
     tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal("0.00"))
+    line_discount = models.DecimalField(
+        _("Remise ligne (%)"),
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text=_("Remise en pourcentage appliquée à cette ligne."),
+    )
 
     class Meta:
         verbose_name = _("ligne de facture")
@@ -290,8 +297,16 @@ class InvoiceItem(models.Model):
         return self.description or "Ligne"
 
     @property
-    def total_ht(self) -> Decimal:
+    def line_ht_brut(self) -> Decimal:
         return (self.unit_price * self.quantity).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    @property
+    def discount_amount(self) -> Decimal:
+        return (self.line_ht_brut * (self.line_discount or Decimal("0")) / Decimal("100")).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+    @property
+    def total_ht(self) -> Decimal:
+        return (self.line_ht_brut - self.discount_amount).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     @property
     def total_tva(self) -> Decimal:

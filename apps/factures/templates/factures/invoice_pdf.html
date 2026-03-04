@@ -286,19 +286,22 @@
         
         /* Définir widths des colonnes avec :nth-child */
         .items-table th:nth-child(1),
-        .items-table td:nth-child(1) { width: 40%; } /* Description */
+        .items-table td:nth-child(1) { width: 34%; } /* Description */
         
         .items-table th:nth-child(2),
-        .items-table td:nth-child(2) { width: 12%; } /* Qté */
+        .items-table td:nth-child(2) { width: 10%; } /* Qté */
         
         .items-table th:nth-child(3),
-        .items-table td:nth-child(3) { width: 16%; } /* Prix unitaire */
+        .items-table td:nth-child(3) { width: 14%; } /* Prix unitaire */
         
         .items-table th:nth-child(4),
-        .items-table td:nth-child(4) { width: 12%; } /* TVA */
+        .items-table td:nth-child(4) { width: 10%; } /* Remise */
         
         .items-table th:nth-child(5),
-        .items-table td:nth-child(5) { width: 20%; } /* Total TTC */
+        .items-table td:nth-child(5) { width: 10%; } /* TVA */
+        
+        .items-table th:nth-child(6),
+        .items-table td:nth-child(6) { width: 22%; } /* Total TTC */
         .items-table tbody td.center { text-align: center; }
         .items-table tbody td.right { text-align: right; }
         
@@ -640,6 +643,7 @@
                         <th>Description</th>
                         <th class="center">Qté</th>
                         <th class="right">Prix unit. HT</th>
+                        <th class="center">Remise</th>
                         <th class="center">TVA</th>
                         <th class="right">Total TTC</th>
                     </tr>
@@ -653,6 +657,7 @@
                             </td>
                             <td class="center">{{ item.quantity }}</td>
                             <td class="right amount-cell">{{ item.unit_price|floatformat:2 }} €</td>
+                            <td class="center">{% if item.line_discount %}{{ item.line_discount|floatformat:2 }}%{% else %}—{% endif %}</td>
                             <td class="center">{{ item.tax_rate|default:"20"|floatformat:2 }}%</td>
                             <td class="right amount-cell">{{ item.total_ttc|floatformat:2 }} €</td>
                         </tr>
@@ -665,13 +670,14 @@
                             </td>
                             <td class="center">{{ item.quantity }}</td>
                             <td class="right amount-cell">{{ item.unit_price|floatformat:2 }} €</td>
+                            <td class="center">{% if item.line_discount %}{{ item.line_discount|floatformat:2 }}%{% else %}—{% endif %}</td>
                             <td class="center">{{ item.tax_rate|default:"20"|floatformat:2 }}%</td>
                             <td class="right amount-cell">{{ item.total_ttc|floatformat:2 }} €</td>
                         </tr>
                         {% endfor %}
                     {% else %}
                     <tr>
-                        <td colspan="5" style="text-align: center; color: var(--tus-gray); padding: 20px;">
+                        <td colspan="6" style="text-align: center; color: var(--tus-gray); padding: 20px;">
                             Aucun élément dans cette facture
                         </td>
                     </tr>

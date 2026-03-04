@@ -1,0 +1,752 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Simulateur de Devis & Facture | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Créez gratuitement un aperçu de devis ou facture : ajoutez votre logo, vos lignes, remises et conditions. 5 simulations offertes sans inscription.{% endblock %}
+
+{% block extra_head %}
+<style>
+    :root {
+        --sim-ink: #111827;
+        --sim-muted: rgba(17, 24, 39, 0.68);
+        --sim-card-bg: #ffffff;
+        --sim-card-border: #e5e7eb;
+        --sim-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --sim-glow: rgba(11, 45, 255, 0.08);
+    }
+
+    [x-cloak] { display: none !important; }
+
+    .sim-shell {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .sim-shell::before,
+    .sim-shell::after {
+        content: "";
+        position: absolute;
+        filter: blur(54px);
+        opacity: 0.08;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    .sim-shell::before {
+        width: 340px;
+        height: 340px;
+        top: 40px;
+        left: -100px;
+        background: radial-gradient(circle, #0b2dff 0%, transparent 70%);
+    }
+
+    .sim-shell::after {
+        width: 300px;
+        height: 300px;
+        top: 420px;
+        right: -120px;
+        background: radial-gradient(circle, #22c55e 0%, transparent 70%);
+    }
+
+    .sim-card {
+        background: var(--sim-card-bg);
+        border: 1px solid var(--sim-card-border);
+        border-radius: 16px;
+        box-shadow: var(--sim-card-shadow);
+        transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+    }
+
+    .sim-card:hover {
+        border-color: #0b2dff;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(11, 45, 255, 0.12);
+    }
+
+    #simulator-form label {
+        letter-spacing: .02em;
+        color: #374151;
+    }
+
+    #simulator-form input,
+    #simulator-form select,
+    #simulator-form textarea {
+        border-radius: 10px;
+        background-color: #f9fafb;
+        color: #111827;
+        border-color: #e5e7eb;
+    }
+
+    #simulator-form input::placeholder,
+    #simulator-form select,
+    #simulator-form textarea::placeholder {
+        color: #9ca3af;
+    }
+
+    #simulator-form input:focus,
+    #simulator-form select:focus,
+    #simulator-form textarea:focus {
+        background-color: #ffffff;
+        border-color: #0b2dff;
+        box-shadow: 0 0 0 3px rgba(11, 45, 255, 0.1);
+    }
+
+    .sim-toggle-btn {
+        border: 1px solid #e5e7eb;
+        color: #6b7280;
+        background-color: #ffffff;
+    }
+
+    .sim-toggle-btn:hover {
+        transform: translateY(-1px);
+        border-color: #0b2dff;
+        color: #111827;
+    }
+
+    .sim-add-line {
+        border: 1px solid #dbeafe;
+        background: linear-gradient(135deg, rgba(11,45,255,.04), rgba(11,45,255,.02));
+        color: #0b2dff;
+    }
+
+    .sim-primary-btn {
+        background: linear-gradient(135deg, #0b2dff 0%, #315dff 100%);
+        box-shadow: 0 4px 12px rgba(11, 45, 255, 0.24);
+    }
+
+    .sim-primary-btn:hover {
+        box-shadow: 0 6px 16px rgba(11, 45, 255, 0.32);
+        transform: translateY(-1px);
+    }
+
+    .sim-secondary-btn {
+        background: #ffffff;
+        color: #6b7280;
+        border-color: #e5e7eb;
+    }
+
+    .sim-secondary-btn:hover {
+        border-color: #0b2dff;
+        color: #111827;
+    }
+
+    .sim-preview-wrap {
+        position: relative;
+    }
+
+    .sim-preview-wrap::before {
+        content: "";
+        position: absolute;
+        inset: -12px;
+        border-radius: 16px;
+        background: linear-gradient(90deg, rgba(11,45,255,.06), rgba(34,197,94,.04));
+        filter: blur(24px);
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    #doc-preview {
+        position: relative;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        z-index: 1;
+    }
+
+    #doc-preview::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        pointer-events: none;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.5);
+    }
+
+    input[type="color"] {
+        -webkit-appearance: none; border: none; padding: 0;
+        width: 40px; height: 40px; border-radius: 8px; cursor: pointer;
+        background: transparent;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+    input[type="color"]::-webkit-color-swatch { border: 2px solid #e5e7eb; border-radius: 6px; }
+    
+    .items-header { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; font-weight: 600; }
+    
+    /* Sticky footer buttons */
+    #simulator-form > .flex {
+        position: sticky;
+        bottom: 0;
+        background: linear-gradient(to top, #ffffff 60%, rgba(255,255,255,0.95) 100%);
+        margin: 1.5rem -1.5rem -1.5rem -1.5rem;
+        padding: 1rem 1.5rem 1.5rem 1.5rem;
+        z-index: 20;
+    }
+    
+    @supports (padding-safe: safe) {
+        #simulator-form > .flex {
+            margin-left: calc(-1.5rem - env(safe-area-inset-left, 0));
+            margin-right: calc(-1.5rem - env(safe-area-inset-right, 0));
+            padding-left: calc(1.5rem + env(safe-area-inset-left, 0));
+            padding-right: calc(1.5rem + env(safe-area-inset-right, 0));
+        }
+    }
+
+    /* Line items styling */
+    .sim-card:has(> .flex > h2) + .sim-card {
+        padding: 0;
+    }
+    
+    .sim-card .space-y-2 > div {
+        background-color: #f9fafb;
+        border-color: #e5e7eb;
+    }
+    
+    .sim-card .space-y-2 > div input {
+        background-color: transparent;
+        color: #111827;
+        border-color: #d1d5db;
+    }
+    
+    .sim-card .space-y-2 > div input:focus {
+        border-color: #0b2dff;
+        background-color: #ffffff;
+    }
+    
+    .sim-card .space-y-2 > div:hover {
+        border-color: #d1d5db;
+    }
+    
+    .sim-card .space-y-2 > div:hover button {
+        opacity: 100 !important;
+    }
+    
+    .sim-card .space-y-2 > div button[type="button"] {
+        color: #ef4444;
+    }
+
+    @media (max-width: 1024px) {
+        .sim-shell::before,
+        .sim-shell::after {
+            opacity: .06;
+        }
+
+        .sim-card {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="relative pt-32 pb-12 px-4 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/5 to-transparent"></div>
+    <div class="max-w-6xl mx-auto relative z-10">
+        <h1 class="font-display text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            Simulateur de Devis & Facture
+        </h1>
+        <p class="text-lg text-gray-700 max-w-2xl">
+            Composez votre document en temps réel : logo, items, remises et conditions.
+            {% if simulations_remaining >= 0 %}
+                <span class="text-tus-blue-a11y font-semibold">{{ simulations_remaining }} génération{{ simulations_remaining|pluralize }} restante{{ simulations_remaining|pluralize }}.</span>
+            {% else %}
+                <span class="text-tus-green font-semibold">Générations illimitées (connecté).</span>
+            {% endif %}
+        </p>
+    </div>
+</section>
+
+<!-- Simulator -->
+<section class="pb-24 px-4 sim-shell" x-data="simulator()" x-cloak>
+<div class="max-w-[1400px] mx-auto grid lg:grid-cols-[1fr_520px] gap-8 items-start">
+
+<!-- ═══════════ LEFT: FORM ═══════════ -->
+<div id="simulator-form" class="space-y-6">
+
+    <!-- Document type -->
+    <div class="sim-card p-6">
+        <label class="block text-sm font-semibold text-gray-700 mb-3">Type de document</label>
+        <div class="flex gap-3">
+            <button type="button" @click="docType='devis'"
+                :class="docType==='devis' ? 'bg-tus-blue-a11y text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-tus-blue-a11y'"
+                class="sim-toggle-btn flex-1 py-2.5 rounded-lg font-semibold text-sm transition-colors">Devis</button>
+            <button type="button" @click="docType='facture'"
+                :class="docType==='facture' ? 'bg-tus-blue-a11y text-white' : 'bg-white text-gray-700 border border-gray-200 hover:border-tus-blue-a11y'"
+                class="sim-toggle-btn flex-1 py-2.5 rounded-lg font-semibold text-sm transition-colors">Facture</button>
+        </div>
+    </div>
+
+    <!-- Logo + Accent -->
+    <div class="sim-card p-6">
+        <h2 class="font-display text-lg font-semibold text-gray-900 mb-4">Identité visuelle</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Votre logo</label>
+                <label class="flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-lg cursor-pointer hover:border-tus-blue-a11y transition-colors text-sm text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span x-text="logo ? 'Logo chargé ✓' : 'Charger un logo'"></span>
+                    <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" class="hidden" @change="handleLogo($event)">
+                </label>
+                <template x-if="logo">
+                    <div class="mt-2 flex items-center gap-2">
+                        <img :src="logo" alt="Logo" class="h-8 rounded">
+                        <button type="button" @click="logo=null" class="text-xs text-red-400 hover:text-red-300">Supprimer</button>
+                    </div>
+                </template>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">Couleur d'accent</label>
+                <div class="flex items-center gap-3">
+                    <input type="color" x-model="accentColor" class="shrink-0">
+                    <span class="text-xs text-gray-500 font-mono" x-text="accentColor"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emitter -->
+    <div class="sim-card p-6">
+        <h2 class="font-display text-lg font-semibold text-gray-900 mb-4">Vos coordonnées (émetteur)</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Raison sociale / Nom</label>
+                <input type="text" x-model="emitter.name" placeholder="Mon Entreprise SARL"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">SIRET / N° TVA</label>
+                <input type="text" x-model="emitter.siret" placeholder="123 456 789 00012"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+            <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+                <input type="text" x-model="emitter.address" placeholder="12 rue de la Liberté, 97300 Cayenne"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                <input type="tel" x-model="emitter.phone" placeholder="+594 694 00 00 00"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" x-model="emitter.email" placeholder="contact@exemple.gf"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+        </div>
+    </div>
+
+    <!-- Client -->
+    <div class="sim-card p-6">
+        <h2 class="font-display text-lg font-semibold text-gray-900 mb-4">Client (destinataire)</h2>
+        <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Nom / Raison sociale</label>
+                <input type="text" x-model="client.name" placeholder="Client SAS"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" x-model="client.email" placeholder="client@exemple.com"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+            <div class="sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
+                <input type="text" x-model="client.address" placeholder="45 avenue du Général de Gaulle, 97300 Cayenne"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                <input type="tel" x-model="client.phone" placeholder="+594 694 00 00 00"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ LINE ITEMS — TABLE ALIGNED ═══════════ -->
+    <div class="sim-card p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-display text-lg font-semibold text-gray-900">Lignes du document</h2>
+            <button type="button" @click="addItem()"
+                class="sim-add-line inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-tus-blue-a11y transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Ajouter
+            </button>
+        </div>
+
+        <!-- Table header (desktop) -->
+        <div class="hidden sm:grid grid-cols-[1fr_80px_110px_70px_70px_90px_32px] gap-2 px-1 mb-2">
+            <span class="items-header">Description</span>
+            <span class="items-header text-right">Qté</span>
+            <span class="items-header text-right">Prix unit. HT</span>
+            <span class="items-header text-right">Remise %</span>
+            <span class="items-header text-right">TVA %</span>
+            <span class="items-header text-right">Total HT</span>
+            <span></span>
+        </div>
+
+        <!-- Rows -->
+        <div class="space-y-2">
+            <template x-for="(item, idx) in items" :key="idx">
+                <div class="sm:grid sm:grid-cols-[1fr_80px_110px_70px_70px_90px_32px] gap-2 items-center bg-gray-50 rounded-lg p-3 sm:p-2 border border-gray-200 group">
+                    <input type="text" x-model="item.description" placeholder="Prestation…"
+                        class="w-full px-2.5 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+                    <div class="flex items-center gap-1 mt-2 sm:mt-0">
+                        <span class="sm:hidden text-[10px] text-gray-500 w-10">Qté</span>
+                        <input type="number" x-model.number="item.quantity" min="0" step="0.5"
+                            class="w-full px-2 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 text-right tabular-nums focus:border-tus-blue-a11y focus:outline-none transition-colors">
+                    </div>
+                    <div class="flex items-center gap-1 mt-1 sm:mt-0">
+                        <span class="sm:hidden text-[10px] text-gray-500 w-10">P.U.</span>
+                        <input type="number" x-model.number="item.unitPrice" min="0" step="0.01"
+                            class="w-full px-2 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 text-right tabular-nums focus:border-tus-blue-a11y focus:outline-none transition-colors">
+                    </div>
+                    <div class="flex items-center gap-1 mt-1 sm:mt-0">
+                        <span class="sm:hidden text-[10px] text-gray-500 w-10">Rem.</span>
+                        <input type="number" x-model.number="item.lineDiscount" min="0" max="100" step="0.5"
+                            class="w-full px-2 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 text-right tabular-nums focus:border-tus-blue-a11y focus:outline-none transition-colors">
+                    </div>
+                    <div class="flex items-center gap-1 mt-1 sm:mt-0">
+                        <span class="sm:hidden text-[10px] text-gray-500 w-10">TVA</span>
+                        <input type="number" x-model.number="item.taxRate" min="0" max="100" step="0.5"
+                            class="w-full px-2 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 text-right tabular-nums focus:border-tus-blue-a11y focus:outline-none transition-colors">
+                    </div>
+                    <div class="flex items-center justify-end mt-1 sm:mt-0">
+                        <span class="sm:hidden text-[10px] text-gray-500 mr-auto">Total</span>
+                        <span class="text-sm font-semibold text-gray-900 tabular-nums" x-text="fmt(lineHT(item)) + ' €'"></span>
+                    </div>
+                    <button type="button" @click="removeItem(idx)" x-show="items.length > 1"
+                        class="hidden sm:flex w-7 h-7 items-center justify-center rounded text-red-400/60 hover:text-red-400 hover:bg-red-400/10 transition-colors opacity-0 group-hover:opacity-100"
+                        aria-label="Supprimer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                    <button type="button" @click="removeItem(idx)" x-show="items.length > 1"
+                        class="sm:hidden mt-2 text-xs text-red-400/80 hover:text-red-400">Supprimer</button>
+                </div>
+            </template>
+        </div>
+
+        <!-- Subtotal -->
+        <div class="mt-3 pt-3 border-t border-gray-200 flex justify-end">
+            <div class="text-right text-sm tabular-nums text-gray-600">
+                Total HT : <span class="text-gray-900 font-semibold" x-text="fmt(totalHT()) + ' €'"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Discount -->
+    <div class="sim-card p-6">
+        <h2 class="font-display text-lg font-semibold text-gray-900 mb-4">Remise</h2>
+        <div class="grid sm:grid-cols-3 gap-4 items-end">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                <select x-model="discount.type"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:border-tus-blue-a11y focus:outline-none transition-colors">
+                    <option value="percent">Pourcentage (%)</option>
+                    <option value="fixed">Montant fixe (€)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Valeur</label>
+                <input type="number" x-model.number="discount.value" min="0" step="0.01"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 text-right focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+            <div class="text-sm text-gray-700 pb-1">
+                Remise : <span class="text-gray-900 font-semibold" x-text="fmt(computedDiscount()) + ' €'"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conditions & Notes -->
+    <div class="sim-card p-6">
+        <h2 class="font-display text-lg font-semibold text-gray-900 mb-4">Conditions & Notes</h2>
+        <div class="space-y-4">
+            <div x-show="docType === 'devis'">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Validité du devis (jours)</label>
+                <input type="number" x-model.number="validityDays" min="1" max="365"
+                    class="w-full sm:w-32 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 text-right focus:border-tus-blue-a11y focus:outline-none transition-colors">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Conditions de paiement</label>
+                <textarea x-model="conditions" rows="2" placeholder="Paiement à 30 jours fin de mois. Acompte de 30 % à la commande…"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors resize-y"></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Notes libres</label>
+                <textarea x-model="notes" rows="2" placeholder="Remarques, exclusions, mentions particulières…"
+                    class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors resize-y"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generate -->
+    <div class="flex flex-col sm:flex-row gap-3 sticky bottom-0 bg-gradient-to-t from-white to-white/95 pt-4 pb-4 -mx-6 px-6">
+        <button type="button" @click="generate()"
+            :disabled="blocked || generating"
+            :class="blocked ? 'opacity-50 cursor-not-allowed' : generating ? 'opacity-75 cursor-wait' : 'hover:shadow-md'"
+            class="sim-primary-btn flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 text-white font-semibold rounded-lg transition-all text-sm">
+            <template x-if="generating">
+                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+            </template>
+            <template x-if="!generating">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </template>
+            <span x-text="blocked ? 'Limite atteinte' : generating ? 'Génération PDF…' : 'Télécharger le PDF'"></span>
+        </button>
+        <button type="button" @click="resetForm()"
+            class="sim-secondary-btn px-6 py-3.5 text-gray-700 font-semibold rounded-lg border border-gray-200 hover:border-tus-blue-a11y transition-colors text-sm">
+            Réinitialiser
+        </button>
+    </div>
+
+    <template x-if="blocked">
+        <div class="sim-card rounded-xl border border-tus-blue-a11y/40 p-6 text-center">
+            <p class="text-gray-700 mb-3">Vous avez utilisé vos <strong class="text-gray-900">5 simulations gratuites</strong>.</p>
+            <a href="{% url 'clients:dashboard' %}"
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-tus-blue-a11y text-white font-semibold rounded-lg hover:bg-tus-blue-dark transition-colors text-sm">
+                Créer un compte gratuit
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </a>
+            <p class="text-xs text-gray-500 mt-2">Un compte vous donne des générations illimitées.</p>
+        </div>
+    </template>
+</div>
+
+<!-- ═══════════ RIGHT: LIVE PREVIEW ═══════════ -->
+<div class="sim-preview-wrap lg:sticky lg:top-24">
+    <div class="text-sm font-semibold text-gray-600 mb-2">Aperçu en direct</div>
+    <div id="doc-preview" class="bg-white rounded-xl shadow-2xl overflow-hidden text-gray-900 text-[11px] leading-relaxed" style="min-height:700px">
+
+        <!-- Header band -->
+        <div class="flex items-center justify-between px-5 py-3" style="background:linear-gradient(135deg, #07080A 0%, #1a1d23 100%)">
+            <div>
+                <template x-if="logo"><img :src="logo" alt="Logo" class="h-8 object-contain"></template>
+                <template x-if="!logo"><div class="text-white/60 text-[10px] italic">Votre logo</div></template>
+            </div>
+            <div class="text-right">
+                <div class="font-bold text-[16px] tracking-tight text-white" x-text="docType === 'devis' ? 'DEVIS' : 'FACTURE'"></div>
+                <div class="text-[10px] font-semibold" :style="`color:${accentColor}`" x-text="docRef()"></div>
+            </div>
+        </div>
+
+        <!-- Meta bar -->
+        <div class="flex items-center justify-between px-5 py-2 bg-gray-50" :style="`border-bottom:3px solid ${accentColor}`">
+            <div class="flex gap-5 text-[9px]">
+                <div>
+                    <span class="text-[7px] uppercase tracking-wider text-gray-400 block">Date d'émission</span>
+                    <strong class="text-gray-800" x-text="todayFr()"></strong>
+                </div>
+                <div x-show="docType === 'devis'">
+                    <span class="text-[7px] uppercase tracking-wider text-gray-400 block">Validité</span>
+                    <strong class="text-gray-800" x-text="validityDays + ' jours'"></strong>
+                </div>
+            </div>
+            <div class="text-center text-white px-3 py-1.5 rounded-md text-[10px]" :style="`background:linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`">
+                <div class="text-[7px] uppercase tracking-wider opacity-90">Total TTC</div>
+                <div class="font-bold text-[13px]" x-text="fmt(totalTTC()) + ' €'"></div>
+            </div>
+        </div>
+
+        <div class="p-5 space-y-4">
+            <!-- Parties -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-gray-50 rounded-md p-2.5 border-l-[3px] border-l-blue-600 border border-gray-200">
+                    <div class="text-[7px] font-bold uppercase tracking-[1.5px] text-blue-600 mb-1">Émetteur</div>
+                    <div class="font-bold text-[11px] text-gray-900" x-text="emitter.name || 'Votre entreprise'"></div>
+                    <div class="text-gray-500 text-[9px] mt-0.5 whitespace-pre-line" x-text="emitter.address || 'Adresse…'"></div>
+                    <div class="text-gray-500 text-[9px]" x-text="[emitter.phone, emitter.email].filter(Boolean).join(' · ') || 'Tél · Email'"></div>
+                    <div class="text-gray-400 text-[8px]" x-show="emitter.siret" x-text="'SIRET : ' + emitter.siret"></div>
+                </div>
+                <div class="bg-white rounded-md p-2.5 border-l-[3px] border border-gray-200" :style="`border-left-color:${accentColor}`">
+                    <div class="text-[7px] font-bold uppercase tracking-[1.5px] mb-1" :style="`color:${accentColor}`">Destinataire</div>
+                    <div class="font-bold text-[11px] text-gray-900" x-text="client.name || 'Nom du client'"></div>
+                    <div class="text-gray-500 text-[9px] mt-0.5" x-text="client.address || 'Adresse client'"></div>
+                    <div class="text-gray-500 text-[9px]" x-text="[client.phone, client.email].filter(Boolean).join(' · ')"></div>
+                </div>
+            </div>
+
+            <!-- Items table (same layout as quote_pdf.html) -->
+            <table class="w-full text-[9px] border-collapse" style="table-layout:fixed">
+                <colgroup>
+                    <col style="width:34%"><col style="width:10%"><col style="width:14%"><col style="width:10%"><col style="width:10%"><col style="width:22%">
+                </colgroup>
+                <thead>
+                    <tr class="bg-gray-900 text-white text-[8px] font-semibold uppercase tracking-wider">
+                        <th class="px-2 py-1.5 text-left border border-gray-600">Description</th>
+                        <th class="px-2 py-1.5 text-center border border-gray-600">Qté</th>
+                        <th class="px-2 py-1.5 text-right border border-gray-600">Prix unit. HT</th>
+                        <th class="px-2 py-1.5 text-center border border-gray-600">Remise</th>
+                        <th class="px-2 py-1.5 text-center border border-gray-600">TVA</th>
+                        <th class="px-2 py-1.5 text-right border border-gray-600">Total TTC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template x-for="(item, i) in items" :key="i">
+                        <tr class="border-b border-gray-200" :class="i === items.length - 1 && 'border-b-2'" :style="i === items.length - 1 ? `border-bottom-color:${accentColor}` : ''">
+                            <td class="px-2 py-2 font-semibold text-gray-900 border border-gray-100 break-words" x-text="item.description || '—'"></td>
+                            <td class="px-2 py-2 text-center border border-gray-100 tabular-nums" x-text="fmtQty(item.quantity)"></td>
+                            <td class="px-2 py-2 text-right border border-gray-100 font-semibold tabular-nums" x-text="fmt(item.unitPrice) + ' €'"></td>
+                            <td class="px-2 py-2 text-center border border-gray-100 tabular-nums" x-text="item.lineDiscount ? item.lineDiscount + ' %' : '—'"></td>
+                            <td class="px-2 py-2 text-center border border-gray-100 tabular-nums" x-text="item.taxRate + ' %'"></td>
+                            <td class="px-2 py-2 text-right border border-gray-100 font-semibold tabular-nums" x-text="fmt(itemTTC(item)) + ' €'"></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+
+            <!-- Totals box -->
+            <div class="flex justify-end">
+                <div class="w-52 bg-gray-50 rounded-md p-3 space-y-1 text-[10px]">
+                    <div class="flex justify-between pb-1.5 border-b border-dashed border-gray-200">
+                        <span class="text-gray-500">Sous-total HT</span>
+                        <span class="font-semibold tabular-nums" x-text="fmt(totalHT()) + ' €'"></span>
+                    </div>
+                    <template x-if="computedDiscount() > 0">
+                        <div class="flex justify-between text-red-600">
+                            <span>Remise</span>
+                            <span class="tabular-nums" x-text="'- ' + fmt(computedDiscount()) + ' €'"></span>
+                        </div>
+                    </template>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">TVA</span>
+                        <span class="font-semibold tabular-nums" x-text="fmt(totalTVA()) + ' €'"></span>
+                    </div>
+                    <div class="flex justify-between text-white rounded-md px-2.5 py-2 mt-1.5 text-[12px] font-bold" :style="`background:linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`">
+                        <span>Total TTC</span>
+                        <span class="tabular-nums" x-text="fmt(totalTTC()) + ' €'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conditions -->
+            <template x-if="conditions">
+                <div class="bg-gray-50 rounded-md p-2.5 border-l-[3px] border-l-blue-600">
+                    <div class="text-[8px] font-bold text-gray-900 mb-0.5">Conditions de paiement</div>
+                    <div class="text-gray-500 text-[9px] whitespace-pre-line" x-text="conditions"></div>
+                </div>
+            </template>
+
+            <!-- Notes -->
+            <template x-if="notes">
+                <div class="text-gray-500 text-[9px] border-t border-gray-100 pt-2 whitespace-pre-line" x-text="notes"></div>
+            </template>
+
+            <!-- Signature boxes (devis) -->
+            <template x-if="docType === 'devis'">
+                <div class="grid grid-cols-2 gap-3 mt-2">
+                    <div class="border border-dashed border-gray-200 rounded-md p-3 text-center min-h-[50px]">
+                        <div class="text-[9px] font-semibold text-gray-800">Bon pour accord</div>
+                        <div class="text-[8px] text-gray-400 mt-1">Date et signature du client</div>
+                    </div>
+                    <div class="border border-dashed border-gray-200 rounded-md p-3 text-center min-h-[50px]">
+                        <div class="text-[9px] font-semibold text-gray-800" x-text="emitter.name || 'Émetteur'"></div>
+                        <div class="text-[8px] text-gray-400 mt-1">Signature de l'émetteur</div>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Footer -->
+            <div class="border-t-2 border-gray-200 pt-2 mt-3 text-center text-[8px] text-gray-400">
+                Document généré via le simulateur Trait d'Union Studio — traitdunion.it
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function simulator() {
+    const CSRF = '{{ csrf_token }}';
+    return {
+        docType: 'devis',
+        logo: null,
+        accentColor: '#22C55E',
+        emitter: { name: '', address: '', phone: '', email: '', siret: '' },
+        client:  { name: '', address: '', phone: '', email: '' },
+        items: [{ description: '', quantity: 1, unitPrice: 0, taxRate: 0, lineDiscount: 0 }],
+        discount: { type: 'percent', value: 0 },
+        conditions: '',
+        notes: '',
+        validityDays: 30,
+        remaining: {{ simulations_remaining }},
+        generating: false,
+
+        get blocked() { return this.remaining === 0; },
+
+        lineHT(item) { const brut = (item.quantity||0)*(item.unitPrice||0); return brut - brut*(item.lineDiscount||0)/100; },
+        totalHT() { return this.items.reduce((s, i) => s + this.lineHT(i), 0); },
+        computedDiscount() {
+            if (!this.discount.value) return 0;
+            return this.discount.type === 'percent'
+                ? this.totalHT() * this.discount.value / 100
+                : Math.min(this.discount.value, this.totalHT());
+        },
+        totalTVA() {
+            const ht = this.totalHT(), disc = this.computedDiscount();
+            if (ht === 0) return 0;
+            const rawTVA = this.items.reduce((s, i) => s + this.lineHT(i)*(i.taxRate||0)/100, 0);
+            return rawTVA * ((ht - disc) / ht);
+        },
+        totalTTC() { return this.totalHT() - this.computedDiscount() + this.totalTVA(); },
+        itemTTC(item) { const ht = this.lineHT(item); return ht + ht*(item.taxRate||0)/100; },
+
+        fmt(v) { return (v||0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0'); },
+        fmtQty(v) { return Number(v||0)%1===0 ? String(Math.round(v||0)) : (v||0).toFixed(2); },
+        todayFr() { return new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'}); },
+        validUntilFr() { const d=new Date(); d.setDate(d.getDate()+(this.validityDays||30)); return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}); },
+        docRef() { const y=new Date().getFullYear(); return `${this.docType==='devis'?'DEV':'FAC'}-${y}-XXX`; },
+
+        handleLogo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 2*1024*1024) { alert('Le logo ne doit pas dépasser 2 Mo.'); return; }
+            const reader = new FileReader();
+            reader.onload = (e) => { this.logo = e.target.result; };
+            reader.readAsDataURL(file);
+        },
+        addItem() { this.items.push({ description: '', quantity: 1, unitPrice: 0, taxRate: 0, lineDiscount: 0 }); },
+        removeItem(idx) { if (this.items.length > 1) this.items.splice(idx, 1); },
+
+        async generate() {
+            if (this.blocked || this.generating) return;
+            this.generating = true;
+            try {
+                const res = await fetch('{% url "pages:simulateur_pdf" %}', {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        doc_type: this.docType, logo: this.logo, accent_color: this.accentColor,
+                        emitter: this.emitter, client: this.client, items: this.items,
+                        discount: this.discount, conditions: this.conditions, notes: this.notes,
+                        validity_days: this.validityDays,
+                    }),
+                });
+                if (res.status === 429) { this.remaining = 0; return; }
+                if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.error||'Erreur lors de la génération.'); return; }
+                const rem = res.headers.get('X-Simulations-Remaining');
+                if (rem !== null && parseInt(rem) >= 0) this.remaining = parseInt(rem);
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = (this.docType==='devis'?'devis':'facture') + '_simulation.pdf';
+                document.body.appendChild(a); a.click(); a.remove();
+                URL.revokeObjectURL(url);
+            } catch (_) { alert('Erreur réseau. Veuillez réessayer.'); }
+            finally { this.generating = false; }
+        },
+
+        resetForm() {
+            this.docType = 'devis'; this.logo = null; this.accentColor = '#22C55E';
+            this.emitter = { name:'', address:'', phone:'', email:'', siret:'' };
+            this.client  = { name:'', address:'', phone:'', email:'' };
+            this.items = [{ description:'', quantity:1, unitPrice:0, taxRate:0, lineDiscount:0 }];
+            this.discount = { type:'percent', value:0 };
+            this.conditions = ''; this.notes = ''; this.validityDays = 30;
+        },
+    };
+}
+</script>
+{% endblock %}

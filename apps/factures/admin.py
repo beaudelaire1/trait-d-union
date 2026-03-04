@@ -64,6 +64,7 @@ class InvoiceAdmin(admin.ModelAdmin):
             "quantity",
             "unit_price",
             "tax_rate",
+            "line_discount",
             "total_ht",
             "total_tva",
             "total_ttc",

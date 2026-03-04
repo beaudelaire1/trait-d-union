@@ -4,6 +4,7 @@ from django.urls import path
 from .views import (
     HomeView, ServicesView, MethodView,
     FAQView, MentionsLegalesView, ConfidentialiteView, CGVView, LegalView,
+    SimulateurView, simulateur_increment, simulateur_pdf,
 )
 
 
@@ -18,4 +19,7 @@ urlpatterns = [
     path('confidentialite/', ConfidentialiteView.as_view(), name='confidentialite'),
     path('cgv/', CGVView.as_view(), name='cgv'),
     path('legal/', LegalView.as_view(), name='legal'),
+    path('simulateur/', SimulateurView.as_view(), name='simulateur'),
+    path('simulateur/increment/', simulateur_increment, name='simulateur_increment'),
+    path('simulateur/pdf/', simulateur_pdf, name='simulateur_pdf'),
 ]
