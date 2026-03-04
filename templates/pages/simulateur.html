@@ -17,13 +17,6 @@
 
     [x-cloak] { display: none !important; }
 
-    /* Light background — starts BELOW the fixed navbar (pt-20 = 5rem)
-       so the semi-transparent navbar still blurs the dark body, not white */
-    #main-content {
-        background: linear-gradient(to bottom, transparent 5rem, #ffffff 5rem);
-        color: #111827;
-    }
-
     .sim-shell {
         position: relative;
         isolation: isolate;
@@ -244,7 +237,7 @@
 
 {% block content %}
 <!-- Hero -->
-<section class="relative pt-32 pb-12 px-4 overflow-hidden">
+<section class="relative pt-32 pb-12 px-4 overflow-hidden bg-white">
     <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/5 to-transparent"></div>
     <div class="max-w-6xl mx-auto relative z-10">
         <h1 class="font-display text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -262,7 +255,7 @@
 </section>
 
 <!-- Simulator -->
-<section class="pb-24 px-4 sim-shell" x-data="simulator()" x-cloak>
+<section class="pb-24 px-4 sim-shell bg-white" x-data="simulator()" x-cloak>
 <div class="max-w-[1400px] mx-auto grid lg:grid-cols-[1fr_520px] gap-8 items-start">
 
 <!-- ═══════════ LEFT: FORM ═══════════ -->
