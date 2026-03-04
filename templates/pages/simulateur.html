@@ -17,9 +17,10 @@
 
     [x-cloak] { display: none !important; }
 
-    /* Light background scoped to content area only — navbar/footer untouched */
+    /* Light background — starts BELOW the fixed navbar (pt-20 = 5rem)
+       so the semi-transparent navbar still blurs the dark body, not white */
     #main-content {
-        background-color: #ffffff;
+        background: linear-gradient(to bottom, transparent 5rem, #ffffff 5rem);
         color: #111827;
     }
 
