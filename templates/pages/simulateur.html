@@ -197,16 +197,6 @@
         color: var(--sim-accent);
     }
 
-    .sim-primary-btn {
-        background: linear-gradient(135deg, #0b2dff 0%, #315dff 100%);
-        box-shadow: 0 4px 12px rgba(11, 45, 255, 0.24);
-    }
-
-    .sim-primary-btn:hover {
-        box-shadow: 0 6px 16px rgba(11, 45, 255, 0.32);
-        transform: translateY(-1px);
-    }
-
     .sim-secondary-btn {
         background: var(--sim-card-bg);
         color: var(--sim-sublabel);
@@ -411,11 +401,6 @@
         </h1>
         <p class="text-lg text-gray-700 max-w-2xl">
             Composez votre document en temps réel : logo, items, remises et conditions.
-            {% if simulations_remaining >= 0 %}
-                <span class="text-tus-blue-a11y font-semibold">{{ simulations_remaining }} génération{{ simulations_remaining|pluralize }} restante{{ simulations_remaining|pluralize }}.</span>
-            {% else %}
-                <span class="text-tus-green font-semibold">Générations illimitées (connecté).</span>
-            {% endif %}
         </p>
     </div>
 </section>
@@ -629,37 +614,13 @@
         </div>
     </div>
 
-    <!-- Generate -->
+    <!-- Actions -->
     <div class="flex flex-col sm:flex-row gap-3 sticky bottom-0 pt-4 pb-4 -mx-6 px-6" style="background:linear-gradient(to top, var(--sim-sticky-from) 60%, var(--sim-sticky-to) 100%)">
-        <button type="button" @click="generate()"
-            :disabled="blocked || generating"
-            :class="blocked ? 'opacity-50 cursor-not-allowed' : generating ? 'opacity-75 cursor-wait' : 'hover:shadow-md'"
-            class="sim-primary-btn flex-1 inline-flex items-center justify-center gap-2 px-6 py-3.5 text-white font-semibold rounded-lg transition-all text-sm">
-            <template x-if="generating">
-                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-            </template>
-            <template x-if="!generating">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            </template>
-            <span x-text="blocked ? 'Limite atteinte' : generating ? 'Génération PDF…' : 'Télécharger le PDF'"></span>
-        </button>
         <button type="button" @click="resetForm()"
-            class="sim-secondary-btn px-6 py-3.5 text-gray-700 font-semibold rounded-lg border border-gray-200 hover:border-tus-blue-a11y transition-colors text-sm">
+            class="sim-secondary-btn flex-1 px-6 py-3.5 text-gray-700 font-semibold rounded-lg border border-gray-200 hover:border-tus-blue-a11y transition-colors text-sm">
             Réinitialiser
         </button>
     </div>
-
-    <template x-if="blocked">
-        <div class="sim-card rounded-xl border border-tus-blue-a11y/40 p-6 text-center">
-            <p class="text-gray-700 mb-3">Vous avez utilisé vos <strong class="text-gray-900">5 simulations gratuites</strong>.</p>
-            <a href="{% url 'clients:dashboard' %}"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-tus-blue-a11y text-white font-semibold rounded-lg hover:bg-tus-blue-dark transition-colors text-sm">
-                Créer un compte gratuit
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-            </a>
-            <p class="text-xs text-gray-500 mt-2">Un compte vous donne des générations illimitées.</p>
-        </div>
-    </template>
 </div>
 
 <!-- ═══════════ RIGHT: LIVE PREVIEW ═══════════ -->
@@ -823,11 +784,6 @@ function simulator() {
         conditions: '',
         notes: '',
         validityDays: 30,
-        remaining: {{ simulations_remaining }},
-        generating: false,
-
-        get blocked() { return this.remaining === 0; },
-
         lineHT(item) { const brut = (item.quantity||0)*(item.unitPrice||0); return brut - brut*(item.lineDiscount||0)/100; },
         totalHT() { return this.items.reduce((s, i) => s + this.lineHT(i), 0); },
         computedDiscount() {
@@ -861,35 +817,6 @@ function simulator() {
         },
         addItem() { this.items.push({ description: '', quantity: 1, unitPrice: 0, taxRate: 0, lineDiscount: 0 }); },
         removeItem(idx) { if (this.items.length > 1) this.items.splice(idx, 1); },
-
-        async generate() {
-            if (this.blocked || this.generating) return;
-            this.generating = true;
-            try {
-                const res = await fetch('{% url "pages:simulateur_pdf" %}', {
-                    method: 'POST',
-                    headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        doc_type: this.docType, logo: this.logo, accent_color: this.accentColor,
-                        emitter: this.emitter, client: this.client, items: this.items,
-                        discount: this.discount, conditions: this.conditions, notes: this.notes,
-                        validity_days: this.validityDays,
-                    }),
-                });
-                if (res.status === 429) { this.remaining = 0; return; }
-                if (!res.ok) { const e = await res.json().catch(()=>({})); alert(e.error||'Erreur lors de la génération.'); return; }
-                const rem = res.headers.get('X-Simulations-Remaining');
-                if (rem !== null && parseInt(rem) >= 0) this.remaining = parseInt(rem);
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = (this.docType==='devis'?'devis':'facture') + '_simulation.pdf';
-                document.body.appendChild(a); a.click(); a.remove();
-                URL.revokeObjectURL(url);
-            } catch (_) { alert('Erreur réseau. Veuillez réessayer.'); }
-            finally { this.generating = false; }
-        },
 
         resetForm() {
             this.docType = 'devis'; this.logo = null; this.accentColor = '#22C55E';
