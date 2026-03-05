@@ -76,4 +76,7 @@ skills.md
 
 # One-off scripts
 _migrate_*.py
-deploy_*.shpytest_output.txt
+deploy_*.sh
+pytest_output.txt
+test_output.txt
+templates/pdf/poc_*.html
