@@ -281,12 +281,15 @@ def simulateur_pdf(request: HttpRequest) -> HttpResponse:
     if not _HEX_COLOR_RE.match(str(accent_color)):
         accent_color = '#22C55E'
 
-    # Logo: only accept data-URI images (PNG/JPEG/SVG/WebP) up to ~2 Mo
+    # Logo: only accept data-URI raster images (PNG/JPEG/WebP) up to ~2 Mo
+    # SVG is rejected server-side to prevent embedded <script> execution
+    _SAFE_LOGO_PREFIXES = ('data:image/png', 'data:image/jpeg', 'data:image/webp')
     logo = None
     raw_logo = data.get('logo') or ''
-    if raw_logo and isinstance(raw_logo, str) and raw_logo.startswith('data:image/'):
-        if len(raw_logo) <= _MAX_LOGO_BYTES * 4 // 3 + 100:
-            logo = raw_logo
+    if (raw_logo and isinstance(raw_logo, str)
+            and raw_logo.startswith(_SAFE_LOGO_PREFIXES)
+            and len(raw_logo) <= _MAX_LOGO_BYTES * 4 // 3 + 100):
+        logo = raw_logo
 
     emitter_raw = data.get('emitter') or {}
     emitter = {
@@ -353,6 +356,7 @@ def simulateur_pdf(request: HttpRequest) -> HttpResponse:
             'unit_price_display': _fmt(up),
             'line_discount_display': ld_display,
             'tax_rate': str(tax.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)).rstrip('0').rstrip('.'),
+            'subtotal_ht_display': _fmt(line_ht),
             'total_ttc_display': _fmt(line_ttc),
         })
 

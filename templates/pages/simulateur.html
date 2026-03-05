@@ -5,7 +5,7 @@
 {% block meta_description %}Créez gratuitement un aperçu de devis ou facture : ajoutez votre logo, vos lignes, remises et conditions. 5 simulations offertes sans inscription.{% endblock %}
 
 {% block extra_head %}
-<style>
+<style nonce="{{ request.csp_nonce }}">
     /* ── Theme-responsive tokens — dark mode by default ── */
     :root {
         --sim-bg: rgb(var(--tus-black-rgb));
@@ -148,9 +148,11 @@
     }
 
     .sim-toggle-btn {
-        border: 1px solid var(--sim-card-border);
+        border: 2px solid var(--sim-card-border);
         color: var(--sim-sublabel);
         background-color: var(--sim-card-bg);
+        position: relative;
+        transition: all 0.25s ease;
     }
 
     .sim-toggle-btn:hover {
@@ -158,6 +160,35 @@
         transform: translateY(-1px);
         border-color: var(--sim-accent);
         color: var(--sim-ink);
+        box-shadow: 0 4px 12px rgba(11, 45, 255, 0.12);
+    }
+
+    /* ACTIVE STATE: Strong visual feedback */
+    .sim-toggle-btn.active {
+        border: 2px solid var(--sim-accent) !important;
+        background: linear-gradient(135deg, rgba(11, 45, 255, 0.08), rgba(11, 45, 255, 0.04));
+        color: var(--sim-accent);
+        font-weight: 700;
+        box-shadow: 0 0 0 3px rgba(11, 45, 255, 0.1), 0 4px 16px rgba(11, 45, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .sim-toggle-btn.active::after {
+        content: "✓";
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: linear-gradient(135deg, #0b2dff 0%, #315dff 100%);
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        box-shadow: 0 2px 8px rgba(11, 45, 255, 0.3);
     }
 
     .sim-add-line {
@@ -226,8 +257,112 @@
     input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
     input[type="color"]::-webkit-color-swatch { border: 2px solid var(--sim-field-border); border-radius: 6px; }
     
-    .items-header { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--sim-sublabel); font-weight: 600; }
-    
+    .items-header {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* ── Line-items grid ─────────────────────────────── */
+    /*  9 cols : Desc | Qté | P.U.HT | Brut | Rem% | Net | TVA% | TTC | ✕  */
+    /*  Computed cols (Brut, Net, TTC) get a subtle bg   */
+    .sim-line-grid {
+        display: grid;
+        grid-template-columns:
+            minmax(110px, 1.6fr)   /* Description */
+            minmax(46px, .45fr)    /* Qté */
+            minmax(64px, .7fr)     /* P.U. HT */
+            minmax(68px, .75fr)    /* Brut (computed) */
+            minmax(46px, .45fr)    /* Rem % */
+            minmax(68px, .75fr)    /* Net (computed) */
+            minmax(46px, .45fr)    /* TVA % */
+            minmax(72px, .8fr)     /* TTC (computed) */
+            28px;                  /* Delete btn */
+        gap: 5px;
+        align-items: center;
+        padding: 7px 10px;
+    }
+
+    .sim-line-header {
+        background: var(--sim-surface);
+        border: 1px solid var(--sim-card-border);
+        border-radius: 8px;
+        margin-bottom: 6px;
+    }
+
+    .sim-line-row {
+        background: var(--sim-surface);
+        border: 1px solid var(--sim-card-border);
+        border-radius: 8px;
+        transition: border-color 0.2s;
+    }
+    .sim-line-row:hover {
+        border-color: var(--sim-accent);
+    }
+    .sim-line-row:hover .sim-del-btn { opacity: 1; }
+
+    /* Editable inputs */
+    .sim-line-input {
+        width: 100%;
+        padding: 5px 6px;
+        background: var(--sim-field-bg);
+        color: var(--sim-ink);
+        border: 1px solid var(--sim-field-border);
+        border-radius: 6px;
+        font-size: 0.75rem;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        transition: border-color 0.2s, background 0.2s;
+    }
+    .sim-line-input:focus {
+        outline: none;
+        border-color: var(--sim-accent);
+        background: var(--sim-field-focus-bg);
+        box-shadow: 0 0 0 2px rgba(11, 45, 255, 0.1);
+    }
+    .sim-line-input.desc { text-align: left; font-size: 0.8rem; }
+
+    /* Computed read-only cells — visually distinct */
+    .sim-line-computed {
+        display: block;
+        padding: 5px 6px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--sim-ink);
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        background: rgba(11, 45, 255, 0.04);
+        border-radius: 5px;
+        border: 1px dashed var(--sim-field-border);
+    }
+
+    .sim-del-btn {
+        display: flex; width: 22px; height: 22px;
+        align-items: center; justify-content: center;
+        border-radius: 4px; color: #ef4444;
+        opacity: 0; transition: opacity 0.2s;
+        background: none; border: none; cursor: pointer;
+    }
+    .sim-del-btn:hover { background: rgba(239,68,68,0.1); }
+    @media (max-width: 767px) {
+        .sim-line-header { display: none; }
+        .sim-line-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            padding: 10px;
+        }
+        .sim-line-grid .sim-desc-cell { grid-column: 1 / -1; }
+        .sim-line-grid .sim-computed-cell { grid-column: 1 / -1; }
+        .sim-line-grid .sim-computed-cell .sim-line-computed {
+            display: flex;
+            justify-content: space-between;
+        }
+        .sim-del-btn { opacity: 1; grid-column: 1 / -1; justify-self: end; }
+    }
+
     /* Sticky footer buttons */
     #simulator-form > .flex {
         position: sticky;
@@ -252,34 +387,6 @@
         padding: 0;
     }
     
-    .sim-card .space-y-2 > div {
-        background-color: var(--sim-surface);
-        border-color: var(--sim-card-border);
-    }
-    
-    .sim-card .space-y-2 > div input {
-        background-color: transparent;
-        color: var(--sim-ink);
-        border-color: var(--sim-field-border);
-    }
-    
-    .sim-card .space-y-2 > div input:focus {
-        border-color: var(--sim-accent);
-        background-color: var(--sim-field-focus-bg);
-    }
-    
-    .sim-card .space-y-2 > div:hover {
-        border-color: var(--sim-field-border);
-    }
-    
-    .sim-card .space-y-2 > div:hover button {
-        opacity: 100 !important;
-    }
-    
-    .sim-card .space-y-2 > div button[type="button"] {
-        color: #ef4444;
-    }
-
     @media (max-width: 1024px) {
         .sim-shell::before,
         .sim-shell::after {
@@ -325,11 +432,11 @@
         <label class="block text-sm font-semibold text-gray-700 mb-3">Type de document</label>
         <div class="flex gap-3">
             <button type="button" @click="docType='devis'"
-                :class="docType==='devis' ? 'bg-tus-blue-a11y text-white border-transparent' : ''"
-                class="sim-toggle-btn flex-1 py-2.5 rounded-lg font-semibold text-sm transition-colors">Devis</button>
+                :class="docType==='devis' ? 'active' : ''"
+                class="sim-toggle-btn flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all">Devis</button>
             <button type="button" @click="docType='facture'"
-                :class="docType==='facture' ? 'bg-tus-blue-a11y text-white border-transparent' : ''"
-                class="sim-toggle-btn flex-1 py-2.5 rounded-lg font-semibold text-sm transition-colors">Facture</button>
+                :class="docType==='facture' ? 'active' : ''"
+                class="sim-toggle-btn flex-1 py-2.5 rounded-lg font-semibold text-sm transition-all">Facture</button>
         </div>
     </div>
 
@@ -342,7 +449,7 @@
                 <label class="flex items-center justify-center gap-2 px-4 py-3 border rounded-lg cursor-pointer hover:border-tus-blue-a11y transition-colors text-sm" style="background-color:var(--sim-card-bg);border-color:var(--sim-card-border);color:var(--sim-sublabel)">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     <span x-text="logo ? 'Logo chargé ✓' : 'Charger un logo'"></span>
-                    <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" class="hidden" @change="handleLogo($event)">
+                    <input type="file" accept="image/png,image/jpeg,image/webp" class="hidden" @change="handleLogo($event)">
                 </label>
                 <template x-if="logo">
                     <div class="mt-2 flex items-center gap-2">
@@ -431,54 +538,40 @@
             </button>
         </div>
 
-        <!-- Table header (desktop) -->
-        <div class="hidden lg:grid grid-cols-[1fr_80px_110px_70px_70px_90px_32px] gap-2 px-1 mb-2">
-            <span class="items-header">Description</span>
-            <span class="items-header text-right">Qté</span>
-            <span class="items-header text-right">Prix unit. HT</span>
-            <span class="items-header text-right">Remise %</span>
-            <span class="items-header text-right">TVA %</span>
-            <span class="items-header text-right">Total HT</span>
+        <!-- Header -->
+        <div class="sim-line-header sim-line-grid" style="background:#1e2130;border:1px solid #2d3348">
+            <span class="items-header" style="color:#a0aec0">Description</span>
+            <span class="items-header" style="color:#a0aec0;text-align:right">Qté</span>
+            <span class="items-header" style="color:#a0aec0;text-align:right">P.U. HT</span>
+            <span class="items-header" style="color:#a0aec0;text-align:right">Brut</span>
+            <span class="items-header" style="color:#a0aec0;text-align:right">Rem %</span>
+            <span class="items-header" style="color:#a0aec0;text-align:right">Net</span>
+            <span class="items-header" style="color:#a0aec0;text-align:right">TVA %</span>
+            <span class="items-header" style="color:#a0aec0;text-align:right">TTC</span>
             <span></span>
         </div>
 
         <!-- Rows -->
-        <div class="space-y-2">
+        <div style="display:flex;flex-direction:column;gap:6px">
             <template x-for="(item, idx) in items" :key="idx">
-                <div class="lg:grid lg:grid-cols-[1fr_80px_110px_70px_70px_90px_32px] gap-2 items-center bg-gray-50 rounded-lg p-3 lg:p-2 border border-gray-200 group">
-                    <input type="text" x-model="item.description" placeholder="Prestation…"
-                        class="w-full px-2.5 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 placeholder-gray-400 focus:border-tus-blue-a11y focus:outline-none transition-colors">
-                    <div class="flex items-center gap-1 mt-2 lg:mt-0">
-                        <span class="lg:hidden text-[10px] text-gray-500 w-10">Qté</span>
-                        <input type="number" x-model.number="item.quantity" min="0" step="0.5"
-                            class="w-full px-2 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 text-right tabular-nums focus:border-tus-blue-a11y focus:outline-none transition-colors">
+                <div class="sim-line-row">
+                    <div class="sim-line-grid">
+                        <div class="sim-desc-cell">
+                            <input type="text" x-model="item.description" placeholder="Prestation…" class="sim-line-input desc">
+                        </div>
+                        <div><input type="number" x-model.number="item.quantity" min="0" step="0.5" class="sim-line-input"></div>
+                        <div><input type="number" x-model.number="item.unitPrice" min="0" step="0.01" class="sim-line-input"></div>
+                        <div class="sim-computed-cell"><span class="sim-line-computed" x-text="fmt(item.quantity * item.unitPrice) + ' €'"></span></div>
+                        <div><input type="number" x-model.number="item.lineDiscount" min="0" max="100" step="0.5" class="sim-line-input"></div>
+                        <div class="sim-computed-cell"><span class="sim-line-computed" x-text="fmt(item.quantity * item.unitPrice * (1 - item.lineDiscount / 100)) + ' €'"></span></div>
+                        <div><input type="number" x-model.number="item.taxRate" min="0" max="100" step="0.5" class="sim-line-input"></div>
+                        <div class="sim-computed-cell"><span class="sim-line-computed" x-text="fmt(itemTTC(item)) + ' €'"></span></div>
+                        <div>
+                            <button type="button" @click="removeItem(idx)" x-show="items.length > 1" class="sim-del-btn" aria-label="Supprimer">
+                                <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-1 mt-1 lg:mt-0">
-                        <span class="lg:hidden text-[10px] text-gray-500 w-10">P.U.</span>
-                        <input type="number" x-model.number="item.unitPrice" min="0" step="0.01"
-                            class="w-full px-2 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 text-right tabular-nums focus:border-tus-blue-a11y focus:outline-none transition-colors">
-                    </div>
-                    <div class="flex items-center gap-1 mt-1 lg:mt-0">
-                        <span class="lg:hidden text-[10px] text-gray-500 w-10">Rem.</span>
-                        <input type="number" x-model.number="item.lineDiscount" min="0" max="100" step="0.5"
-                            class="w-full px-2 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 text-right tabular-nums focus:border-tus-blue-a11y focus:outline-none transition-colors">
-                    </div>
-                    <div class="flex items-center gap-1 mt-1 lg:mt-0">
-                        <span class="lg:hidden text-[10px] text-gray-500 w-10">TVA</span>
-                        <input type="number" x-model.number="item.taxRate" min="0" max="100" step="0.5"
-                            class="w-full px-2 py-2 sm:py-1.5 bg-white border border-gray-300 rounded text-sm text-gray-900 text-right tabular-nums focus:border-tus-blue-a11y focus:outline-none transition-colors">
-                    </div>
-                    <div class="flex items-center justify-end mt-1 lg:mt-0">
-                        <span class="lg:hidden text-[10px] text-gray-500 mr-auto">Total</span>
-                        <span class="text-sm font-semibold text-gray-900 tabular-nums" x-text="fmt(lineHT(item)) + ' €'"></span>
-                    </div>
-                    <button type="button" @click="removeItem(idx)" x-show="items.length > 1"
-                        class="hidden lg:flex w-7 h-7 items-center justify-center rounded text-red-400/60 hover:text-red-400 hover:bg-red-400/10 transition-colors opacity-0 group-hover:opacity-100"
-                        aria-label="Supprimer">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                    </button>
-                    <button type="button" @click="removeItem(idx)" x-show="items.length > 1"
-                        class="lg:hidden mt-2 text-xs text-red-400/80 hover:text-red-400">Supprimer</button>
                 </div>
             </template>
         </div>
@@ -628,13 +721,13 @@
                     <col style="width:34%"><col style="width:10%"><col style="width:14%"><col style="width:10%"><col style="width:10%"><col style="width:22%">
                 </colgroup>
                 <thead>
-                    <tr class="bg-gray-900 text-white text-[8px] font-semibold uppercase tracking-wider">
-                        <th class="px-2 py-1.5 text-left border border-gray-600">Description</th>
-                        <th class="px-2 py-1.5 text-center border border-gray-600">Qté</th>
-                        <th class="px-2 py-1.5 text-right border border-gray-600">Prix unit. HT</th>
-                        <th class="px-2 py-1.5 text-center border border-gray-600">Remise</th>
-                        <th class="px-2 py-1.5 text-center border border-gray-600">TVA</th>
-                        <th class="px-2 py-1.5 text-right border border-gray-600">Total TTC</th>
+                    <tr style="background:#111827;color:#ffffff;font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em">
+                        <th style="padding:6px 8px;text-align:left;border:1px solid #4b5563">Description</th>
+                        <th style="padding:6px 8px;text-align:center;border:1px solid #4b5563">Qté</th>
+                        <th style="padding:6px 8px;text-align:right;border:1px solid #4b5563">Prix unit. HT</th>
+                        <th style="padding:6px 8px;text-align:center;border:1px solid #4b5563">Remise</th>
+                        <th style="padding:6px 8px;text-align:center;border:1px solid #4b5563">TVA</th>
+                        <th style="padding:6px 8px;text-align:right;border:1px solid #4b5563">Total TTC</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -716,7 +809,7 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
+<script nonce="{{ request.csp_nonce }}">
 function simulator() {
     const CSRF = '{{ csrf_token }}';
     return {

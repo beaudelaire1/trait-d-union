@@ -79,9 +79,11 @@ class SimulatorQuotaUsage(models.Model):
         return self.generation_count >= quota and self.last_generation > cutoff
     
     def increment_and_save(self):
-        """Increment counter and save."""
-        self.generation_count += 1
+        """Atomically increment counter to prevent TOCTOU race conditions."""
+        from django.db.models import F
+        self.generation_count = F('generation_count') + 1
         self.save(update_fields=['generation_count', 'last_generation'])
+        self.refresh_from_db(fields=['generation_count'])
     """Client testimonial for the home page."""
     
     client_name = models.CharField("Nom du client", max_length=200)
