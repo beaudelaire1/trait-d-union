@@ -205,14 +205,24 @@ class SimulateurView(TemplateView):
 
 @require_POST
 def simulateur_increment(request: HttpRequest) -> JsonResponse:
-    """Incrémente le compteur de simulations (session) et renvoie le solde."""
+    """Incrémente le compteur de simulations (IP+User-Agent) et renvoie le solde."""
+    from apps.pages.models import SimulatorQuotaUsage
+    
     if request.user.is_authenticated:
         return JsonResponse({'allowed': True, 'remaining': -1})
-    count = request.session.get('sim_count', 0)
-    if count >= 5:
+    
+    # Get or create tracker for this IP + User-Agent
+    tracker = SimulatorQuotaUsage.get_or_create_for_request(request)
+    
+    # Check quota (5 per 24 hours)
+    if tracker.is_quota_exceeded(quota=5, window_hours=24):
         return JsonResponse({'allowed': False, 'remaining': 0}, status=429)
-    request.session['sim_count'] = count + 1
-    return JsonResponse({'allowed': True, 'remaining': 4 - count})
+    
+    # Increment and save
+    tracker.increment_and_save()
+    remaining = max(0, 5 - tracker.generation_count)
+    
+    return JsonResponse({'allowed': True, 'remaining': remaining})
 
 
 # ---------- Helpers for simulateur_pdf ----------
@@ -244,14 +254,15 @@ def _fmt_qty(value: Decimal) -> str:
 def simulateur_pdf(request: HttpRequest) -> HttpResponse:
     """Generate a simulation PDF using WeasyPrint and return it."""
     from core.services.document_generator import DocumentGenerator
+    from apps.pages.models import SimulatorQuotaUsage
 
-    # --- Rate limit (same logic as simulateur_increment) ---
+    # --- Rate limit (IP+User-Agent tracking) ---
     if not request.user.is_authenticated:
-        count = request.session.get('sim_count', 0)
-        if count >= 5:
+        tracker = SimulatorQuotaUsage.get_or_create_for_request(request)
+        if tracker.is_quota_exceeded(quota=5, window_hours=24):
             return JsonResponse({'error': 'Limite de simulations atteinte.'}, status=429)
-        request.session['sim_count'] = count + 1
-        remaining = 4 - count
+        tracker.increment_and_save()
+        remaining = max(0, 5 - tracker.generation_count)
     else:
         remaining = -1
 
