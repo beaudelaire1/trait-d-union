@@ -47,7 +47,7 @@ métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
             <!-- Bouton principal ULTRA premium -->
             {% include 'partials/btn_cta_primary.html' with url='/contact/' text='Démarrer un projet' %}
             <!-- Bouton secondaire -->
-            <a href="/portfolio/"
+            <a href="{% url 'portfolio:list' %}"
                 class="group relative inline-flex items-center justify-center px-10 py-5 overflow-hidden rounded-2xl transition-all duration-micro ease-standard hover:scale-[0.98] active:scale-95 border border-tus-white/20 hover:border-tus-blue/50 hover:bg-tus-blue/10 btn-magnetic">
                 <span
                     class="relative z-10 font-display font-bold text-lg text-tus-white/90 group-hover:text-tus-white transition-colors duration-micro ease-standard">Voir
@@ -291,7 +291,7 @@ métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
                             une charge.</p>
                     </div>
                 </div>
-                <a href="/portfolio/"
+                <a href="{% url 'portfolio:list' %}"
                     class="mt-8 inline-flex items-center gap-2 text-tus-blue-a11y hover:text-cyan-400 font-semibold transition-colors duration-micro ease-standard reveal">
                     Voir les études de cas
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
