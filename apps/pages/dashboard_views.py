@@ -30,10 +30,11 @@ def dashboard_view(request):
     if cached:
         return render(request, 'admin/dashboard.html', cached)
 
-    today = timezone.now().date()
-    current_month_start = today.replace(day=1)
+    now = timezone.now()
+    today = now.date()
+    current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     last_month_start = (current_month_start - timedelta(days=1)).replace(day=1)
-    year_start = today.replace(month=1, day=1)
+    year_start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
     
     # ===================
     # KPIs principaux

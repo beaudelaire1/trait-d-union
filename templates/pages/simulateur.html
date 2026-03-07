@@ -240,7 +240,7 @@
     }
 
     input[type="color"] {
-        -webkit-appearance: none; border: none; padding: 0;
+        -webkit-appearance: none; appearance: none; border: none; padding: 0;
         width: 40px; height: 40px; border-radius: 8px; cursor: pointer;
         background: transparent;
     }
@@ -387,6 +387,65 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
     }
+
+    /* ── Extracted inline styles ── */
+    .sim-logo-upload {
+        background-color: var(--sim-card-bg);
+        border-color: var(--sim-card-border);
+        color: var(--sim-sublabel);
+    }
+    .sim-line-header.sim-line-grid {
+        background: #1e2130;
+        border: 1px solid #2d3348;
+    }
+    .sim-line-header .items-header {
+        color: #a0aec0;
+        text-align: right;
+    }
+    .sim-line-header .items-header:first-child {
+        text-align: left;
+    }
+    .sim-items-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+    .sim-actions-sticky {
+        background: linear-gradient(to top, var(--sim-sticky-from) 60%, var(--sim-sticky-to) 100%);
+    }
+    .sim-preview-doc {
+        min-height: 700px;
+    }
+    .sim-preview-header {
+        background: linear-gradient(135deg, #07080A 0%, #1a1d23 100%);
+    }
+    .sim-preview-table {
+        table-layout: fixed;
+    }
+    .sim-preview-table col:nth-child(1) { width: 34%; }
+    .sim-preview-table col:nth-child(2) { width: 10%; }
+    .sim-preview-table col:nth-child(3) { width: 14%; }
+    .sim-preview-table col:nth-child(4) { width: 10%; }
+    .sim-preview-table col:nth-child(5) { width: 10%; }
+    .sim-preview-table col:nth-child(6) { width: 22%; }
+    .sim-preview-table thead tr {
+        background: #111827;
+        color: #ffffff;
+        font-size: 8px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .sim-preview-table th {
+        padding: 6px 8px;
+        border: 1px solid #4b5563;
+    }
+    .sim-preview-table th:first-child { text-align: left; }
+    .sim-preview-table th:nth-child(2),
+    .sim-preview-table th:nth-child(4),
+    .sim-preview-table th:nth-child(5) { text-align: center; }
+    .sim-preview-table th:nth-child(3),
+    .sim-preview-table th:last-child { text-align: right; }
 </style>
 {% endblock %}
 
@@ -431,7 +490,7 @@
         <div class="grid sm:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-600 mb-1">Votre logo</label>
-                <label class="flex items-center justify-center gap-2 px-4 py-3 border rounded-lg cursor-pointer hover:border-tus-blue-a11y transition-colors text-sm" style="background-color:var(--sim-card-bg);border-color:var(--sim-card-border);color:var(--sim-sublabel)">
+                <label class="sim-logo-upload flex items-center justify-center gap-2 px-4 py-3 border rounded-lg cursor-pointer hover:border-tus-blue-a11y transition-colors text-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                     <span x-text="logo ? 'Logo chargé ✓' : 'Charger un logo'"></span>
                     <input type="file" accept="image/png,image/jpeg,image/webp" class="hidden" @change="handleLogo($event)">
@@ -524,20 +583,20 @@
         </div>
 
         <!-- Header -->
-        <div class="sim-line-header sim-line-grid" style="background:#1e2130;border:1px solid #2d3348">
-            <span class="items-header" style="color:#a0aec0">Description</span>
-            <span class="items-header" style="color:#a0aec0;text-align:right">Qté</span>
-            <span class="items-header" style="color:#a0aec0;text-align:right">P.U. HT</span>
-            <span class="items-header" style="color:#a0aec0;text-align:right">Brut</span>
-            <span class="items-header" style="color:#a0aec0;text-align:right">Rem %</span>
-            <span class="items-header" style="color:#a0aec0;text-align:right">Net</span>
-            <span class="items-header" style="color:#a0aec0;text-align:right">TVA %</span>
-            <span class="items-header" style="color:#a0aec0;text-align:right">TTC</span>
+        <div class="sim-line-header sim-line-grid">
+            <span class="items-header">Description</span>
+            <span class="items-header">Qté</span>
+            <span class="items-header">P.U. HT</span>
+            <span class="items-header">Brut</span>
+            <span class="items-header">Rem %</span>
+            <span class="items-header">Net</span>
+            <span class="items-header">TVA %</span>
+            <span class="items-header">TTC</span>
             <span></span>
         </div>
 
         <!-- Rows -->
-        <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="sim-items-list">
             <template x-for="(item, idx) in items" :key="idx">
                 <div class="sim-line-row">
                     <div class="sim-line-grid">
@@ -615,7 +674,7 @@
     </div>
 
     <!-- Actions -->
-    <div class="flex flex-col sm:flex-row gap-3 sticky bottom-0 pt-4 pb-4 -mx-6 px-6" style="background:linear-gradient(to top, var(--sim-sticky-from) 60%, var(--sim-sticky-to) 100%)">
+    <div class="sim-actions-sticky flex flex-col sm:flex-row gap-3 sticky bottom-0 pt-4 pb-4 -mx-6 px-6">
         <button type="button" @click="resetForm()"
             class="sim-secondary-btn flex-1 px-6 py-3.5 text-gray-700 font-semibold rounded-lg border border-gray-200 hover:border-tus-blue-a11y transition-colors text-sm">
             Réinitialiser
@@ -626,10 +685,10 @@
 <!-- ═══════════ RIGHT: LIVE PREVIEW ═══════════ -->
 <div class="sim-preview-wrap lg:sticky lg:top-24">
     <div class="text-sm font-semibold sim-preview-label mb-2">Aperçu en direct</div>
-    <div id="doc-preview" class="bg-white rounded-xl shadow-2xl overflow-hidden text-gray-900 text-[11px] leading-relaxed" style="min-height:700px">
+    <div id="doc-preview" class="sim-preview-doc bg-white rounded-xl shadow-2xl overflow-hidden text-gray-900 text-[11px] leading-relaxed">
 
         <!-- Header band -->
-        <div class="flex items-center justify-between px-5 py-3" style="background:linear-gradient(135deg, #07080A 0%, #1a1d23 100%)">
+        <div class="sim-preview-header flex items-center justify-between px-5 py-3">
             <div>
                 <template x-if="logo"><img :src="logo" alt="Logo" class="h-8 object-contain"></template>
                 <template x-if="!logo"><div class="text-white/60 text-[10px] italic">Votre logo</div></template>
@@ -677,18 +736,18 @@
             </div>
 
             <!-- Items table (same layout as quote_pdf.html) -->
-            <table class="w-full text-[9px] border-collapse" style="table-layout:fixed">
+            <table class="sim-preview-table w-full text-[9px] border-collapse">
                 <colgroup>
-                    <col style="width:34%"><col style="width:10%"><col style="width:14%"><col style="width:10%"><col style="width:10%"><col style="width:22%">
+                    <col><col><col><col><col><col>
                 </colgroup>
                 <thead>
-                    <tr style="background:#111827;color:#ffffff;font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em">
-                        <th style="padding:6px 8px;text-align:left;border:1px solid #4b5563">Description</th>
-                        <th style="padding:6px 8px;text-align:center;border:1px solid #4b5563">Qté</th>
-                        <th style="padding:6px 8px;text-align:right;border:1px solid #4b5563">Prix unit. HT</th>
-                        <th style="padding:6px 8px;text-align:center;border:1px solid #4b5563">Remise</th>
-                        <th style="padding:6px 8px;text-align:center;border:1px solid #4b5563">TVA</th>
-                        <th style="padding:6px 8px;text-align:right;border:1px solid #4b5563">Total TTC</th>
+                    <tr>
+                        <th>Description</th>
+                        <th>Qté</th>
+                        <th>Prix unit. HT</th>
+                        <th>Remise</th>
+                        <th>TVA</th>
+                        <th>Total TTC</th>
                     </tr>
                 </thead>
                 <tbody>

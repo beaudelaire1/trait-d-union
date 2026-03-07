@@ -56,13 +56,16 @@ select::-webkit-scrollbar-thumb {
     animation: fade-in 0.35s ease-out forwards;
 }
 
-/* Transitions personnalisées pour le contenu principal */
+/* Transitions personnalisées pour le contenu principal
+   Crossfade (not slide) — prevents the old page snapshot from lingering
+   visually on the destination page during navigation. */
 ::view-transition-old(main-content) {
-    animation: slide-out-left 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fade-out 0.25s ease-out forwards;
 }
 
 ::view-transition-new(main-content) {
-    animation: slide-in-right 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fade-in 0.3s ease-out 0.05s forwards;
+    opacity: 0;
 }
 
 /* Navbar reste fixe pendant les transitions */
