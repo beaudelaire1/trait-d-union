@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     'apps.chroniques',
     'apps.clients',
     'apps.messaging',
+    'apps.simulateur',
     'apps.audit',
     'services',
     'core',
