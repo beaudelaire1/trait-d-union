@@ -1,0 +1,275 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Indice de Fragmentation — Le Piège du Multi-SaaS | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Mesurez le coût caché de l'empilement d'outils génériques. Comparez location éternelle vs actif propriétaire.{% endblock %}
+
+{% block tool_color %}#a855f7{% endblock %}
+{% block tool_tag %}Multi-SaaS{% endblock %}
+{% block tool_title %}Indice de Fragmentation{% endblock %}
+{% block tool_description %}Combien d'outils empilés font tourner votre entreprise ? Calculez votre dette technique et le coût de la location éternelle.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Un écosystème unifié, ça ressemble à quoi ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur ce que TUS peut construire pour remplacer vos abonnements fragmentés par un outil central adapté à votre activité.{% endblock %}
+
+{% block tool_content %}
+<div x-data="fragmentationSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── Formulaire ── #}
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-5 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Vos abonnements actuels</h2>
+
+                <div>
+                    <label class="tool-label">Nombre d'outils / abonnements SaaS</label>
+                    <input type="range" class="tool-range" x-model.number="nbOutils" min="1" max="30" step="1">
+                    <div class="flex justify-between mt-1">
+                        <span class="tool-sublabel">CRM, devis, compta, signature, emailing…</span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="nbOutils + ' outils'"></span>
+                    </div>
+                </div>
+                <div>
+                    <label class="tool-label">Coût total mensuel de ces licences (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutMensuel" min="0" step="50" placeholder="500">
+                </div>
+                <div>
+                    <label class="tool-label">Investissement écosystème unifié (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutEcosysteme" min="0" step="500" placeholder="12 000">
+                    <p class="tool-sublabel">Développement + mise en place initiale</p>
+                </div>
+                <div>
+                    <label class="tool-label">Hébergement mensuel (€)</label>
+                    <input type="number" class="tool-input" x-model.number="hebergement" min="0" step="5" placeholder="30">
+                    <p class="tool-sublabel">Serveur, DNS, CDN, backups…</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Maintenance annuelle</label>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="maintenance + '% / an'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="maintenance" min="0" max="30" step="1">
+                    <p class="tool-sublabel">Mises à jour, corrections, évolutions (typiquement 10-20%)</p>
+                </div>
+                <div>
+                    <label class="tool-label">Horizon de projection (années)</label>
+                    <input type="range" class="tool-range" x-model.number="horizon" min="1" max="10" step="1">
+                    <div class="flex justify-between mt-1">
+                        <span class="tool-sublabel">Durée de comparaison</span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="horizon + ' ans'"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ── Résultats ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# Indice de fragmentation #}
+            <div class="result-block text-center py-6 mo-scale-in">
+                <p class="result-label mb-2">Indice de fragmentation</p>
+                <div class="flex items-center justify-center gap-6">
+                    <div>
+                        <p class="result-big text-4xl" :style="'color:' + niveauColor()" x-text="nbOutils"></p>
+                        <p class="text-xs mt-1" style="color: var(--sim-muted);">outils empilés</p>
+                    </div>
+                    <div class="text-4xl" style="color: var(--sim-divider);">→</div>
+                    <div>
+                        <p class="result-big text-4xl" :style="'color:' + niveauColor()" x-text="niveauLabel()"></p>
+                        <p class="text-xs mt-1" style="color: var(--sim-muted);">dette technique</p>
+                    </div>
+                </div>
+            </div>
+
+            {# KPIs #}
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Total SaaS sur <span x-text="horizon"></span> ans</p>
+                    <p class="result-big text-2xl" style="color: #ef4444;" x-text="fmt(totalSaas()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">sans capitalisation d'actif</p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">TCO propriétaire sur <span x-text="horizon"></span> ans</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(totalPropre()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">invest. + serveur + maintenance</p>
+                </div>
+            </div>
+
+            {# Économie nette #}
+            <div class="result-block text-center py-5 mo-fade-up" data-delay="175">
+                <p class="result-label mb-1">Économie nette sur <span x-text="horizon"></span> ans</p>
+                <p class="result-big text-3xl" :style="'color:' + (economie() > 0 ? '#22c55e' : '#ef4444')" x-text="(economie() > 0 ? '+' : '') + fmt(economie()) + ' €'"></p>
+                <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="economie() > 0 ? 'après serveurs et maintenance inclus' : 'le SaaS reste moins cher sur cet horizon'"></p>
+            </div>
+
+            {# Point de bascule + Décision #}
+            <div class="result-block mo-fade-up" data-delay="200">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">⚖️</span>
+                    <div>
+                        <p class="font-semibold" style="color: var(--sim-ink);">Point de bascule</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);">
+                            Vos SaaS vous coûtent
+                            <strong x-text="fmt(coutMensuel) + ' €/mois'" style="color: var(--sim-ink);"></strong>.
+                            L'écosystème propre revient à
+                            <strong x-text="fmt(Math.round(coutPropreMensuel())) + ' €/mois'" style="color: var(--sim-ink);"></strong>
+                            (hébergement <span x-text="fmt(hebergement)"></span> € + maintenance <span x-text="fmt(Math.round(maintenanceMensuelle()))"></span> €).
+                        </p>
+
+                        {# Cas 1 : le propre coûte plus cher mensuellement → jamais amorti #}
+                        <template x-if="moisAmortissement() >= 999">
+                            <div class="mt-3 p-3 rounded-xl" style="background: rgba(239,68,68,0.1);">
+                                <p class="text-sm" style="color: #ef4444;">
+                                    <strong>Pas d'amortissement possible.</strong>
+                                    Votre coût propre mensuel (<span x-text="fmt(Math.round(coutPropreMensuel()))"></span> €)
+                                    dépasse le coût SaaS (<span x-text="fmt(coutMensuel)"></span> €).
+                                    Vous payeriez <strong x-text="fmt(Math.round(coutPropreMensuel() - coutMensuel)) + ' €/mois de plus'"></strong>,
+                                    soit <strong x-text="fmt(Math.abs(Math.round(economie()))) + ' € de surcoût sur ' + horizon + ' ans'"></strong>.
+                                </p>
+                                <p class="text-sm mt-2 font-semibold" style="color: #ef4444;">
+                                    → Conservez vos SaaS actuels ou renégociez le devis propriétaire.
+                                </p>
+                            </div>
+                        </template>
+
+                        {# Cas 2 : amorti mais au-delà de l'horizon #}
+                        <template x-if="moisAmortissement() < 999 && moisAmortissement() > horizon * 12">
+                            <div class="mt-3 p-3 rounded-xl" style="background: rgba(245,158,11,0.1);">
+                                <p class="text-sm" style="color: #f59e0b;">
+                                    L'investissement de <strong x-text="fmt(coutEcosysteme) + ' €'"></strong>
+                                    sera amorti en <strong x-text="moisAmortissement() + ' mois'" style="color: var(--tool-glow);"></strong>
+                                    (<span x-text="(moisAmortissement() / 12).toFixed(1)"></span> ans),
+                                    mais c'est au-delà de votre horizon de <span x-text="horizon"></span> ans.
+                                    Sur cet horizon, le SaaS reste moins cher de
+                                    <strong x-text="fmt(Math.abs(Math.round(economie()))) + ' €'"></strong>.
+                                </p>
+                                <p class="text-sm mt-2 font-semibold" style="color: #f59e0b;">
+                                    → Conservez les SaaS à court terme, ou allongez votre horizon si vous comptez garder l'outil plus longtemps.
+                                </p>
+                            </div>
+                        </template>
+
+                        {# Cas 3 : amorti dans l'horizon → bon investissement #}
+                        <template x-if="moisAmortissement() < 999 && moisAmortissement() <= horizon * 12">
+                            <div class="mt-3 p-3 rounded-xl" style="background: rgba(34,197,94,0.1);">
+                                <p class="text-sm" style="color: #22c55e;">
+                                    L'investissement de <strong x-text="fmt(coutEcosysteme) + ' €'"></strong>
+                                    sera amorti en <strong x-text="moisAmortissement() + ' mois'" style="color: var(--tool-glow);"></strong>.
+                                    Après ça, vous économisez
+                                    <strong x-text="fmt(Math.round(coutMensuel - coutPropreMensuel())) + ' €/mois'"></strong> net.
+                                    Sur <span x-text="horizon"></span> ans, c'est
+                                    <strong x-text="'+' + fmt(Math.round(economie())) + ' €'"></strong> d'économie totale.
+                                </p>
+                                <p class="text-sm mt-2 font-semibold" style="color: #22c55e;">
+                                    → L'investissement est rentable sur votre horizon. Plus vous conservez l'outil longtemps, plus l'avantage se creuse.
+                                </p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            {# Graphique projection #}
+            <div class="result-block mo-fade-up" data-delay="250">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Coût total de possession : SaaS vs Propriétaire</h3>
+                <div class="chart-container">
+                    <canvas id="fragChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+
+    function fragmentationSim() {
+        return {
+            nbOutils: 8,
+            coutMensuel: 500,
+            coutEcosysteme: 12000,
+            hebergement: 30,
+            maintenance: 15,
+            horizon: 5,
+
+            totalSaas() { return this.coutMensuel * 12 * this.horizon; },
+            maintenanceMensuelle() { return (this.coutEcosysteme * this.maintenance / 100) / 12; },
+            coutPropreMensuel() { return this.hebergement + this.maintenanceMensuelle(); },
+            totalPropre() { return this.coutEcosysteme + this.coutPropreMensuel() * 12 * this.horizon; },
+            economie() { return this.totalSaas() - this.totalPropre(); },
+            moisAmortissement() {
+                const delta = this.coutMensuel - this.coutPropreMensuel();
+                return delta > 0 ? Math.ceil(this.coutEcosysteme / delta) : 999;
+            },
+            niveauColor() {
+                if (this.nbOutils <= 3) return '#22c55e';
+                if (this.nbOutils <= 7) return '#f59e0b';
+                return '#ef4444';
+            },
+            niveauLabel() {
+                if (this.nbOutils <= 3) return 'Faible';
+                if (this.nbOutils <= 7) return 'Modérée';
+                return 'Élevée';
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+
+            init() {
+                ['nbOutils','coutMensuel','coutEcosysteme','hebergement','maintenance','horizon'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+
+            updateChart() {
+                const ctx = document.getElementById('fragChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+
+                const totalMonths = this.horizon * 12;
+                const cpm = this.coutPropreMensuel();
+                const labels = [];
+                const saas = [];
+                const propre = [];
+                for (let m = 0; m <= totalMonths; m++) {
+                    if (m % 3 === 0 || m === totalMonths) {
+                        labels.push(m === 0 ? 'Départ' : 'M' + m);
+                        saas.push(this.coutMensuel * m);
+                        propre.push(this.coutEcosysteme + cpm * m);
+                    }
+                }
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'Abonnements SaaS (cumulé)', data: saas, borderColor: '#a855f7', backgroundColor: 'rgba(168,85,247,0.08)', fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2 },
+                            { label: 'Propriétaire (investissement + TCO)', data: propre, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.08)', fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: { legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } } },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { color: textColor, maxTicksLimit: 10 } },
+                            y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') + ' €' } }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.fragmentationSim = fragmentationSim;
+})();
+</script>
+{% endblock %}

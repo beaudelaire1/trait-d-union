@@ -1,0 +1,355 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Effet Composé de la Rétention | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Visualisez l'impact exponentiel de quelques points de rétention sur votre CA à 5 ans. Le levier le plus sous-estimé de la croissance.{% endblock %}
+
+{% block tool_color %}#8b5cf6{% endblock %}
+{% block tool_tag %}Croissance{% endblock %}
+{% block tool_title %}Effet Composé de la Rétention{% endblock %}
+{% block tool_description %}+5% de rétention = +25 à +95% de profit. Visualisez l'effet boule de neige sur 5 ans.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Quels outils pour fidéliser vos clients ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les outils que TUS peut construire — espace client, onboarding automatisé, suivi — pour améliorer chaque point de contact.{% endblock %}
+
+{% block tool_content %}
+<div x-data="retentionSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── Formulaire ── #}
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Vos paramètres</h2>
+
+                <div>
+                    <label class="tool-label">Nombre de clients actifs</label>
+                    <input type="number" class="tool-input" x-model.number="clientsActifs" min="1" step="10" placeholder="200">
+                </div>
+
+                <div>
+                    <label class="tool-label">Revenu moyen par client / an (€)</label>
+                    <input type="number" class="tool-input" x-model.number="revenuMoyen" min="10" step="100" placeholder="1200">
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Taux de rétention actuel</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="retentionActuelle + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="retentionActuelle" min="30" max="99" step="1">
+                    <p class="tool-sublabel">% de clients qui restent d'une année sur l'autre</p>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Amélioration visée</label>
+                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="'+' + amelioration + ' pts'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="amelioration" min="1" max="20" step="1">
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Nouveaux clients / an</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="nouveauxParAn"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="nouveauxParAn" min="0" max="200" step="5">
+                </div>
+            </div>
+
+            {# ── Coût du programme de rétention ── #}
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Coût du programme de rétention</h2>
+                <p class="text-xs" style="color: var(--sim-muted);">CRM, fidélisation, service client, communication… Estimez le budget nécessaire pour atteindre l'amélioration visée.</p>
+
+                <div>
+                    <label class="tool-label">Budget annuel du programme (€)</label>
+                    <input type="number" class="tool-input" x-model.number="budgetAnnuel" min="0" step="500" placeholder="6000">
+                </div>
+            </div>
+        </div>
+
+        {# ── Résultats ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# KPI principal — ROI net à 5 ans #}
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #8b5cf6;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #8b5cf6;">
+                    ROI net à 5 ans
+                </p>
+                <p class="result-big text-5xl" :style="'color:' + (roiNet5Ans() >= 0 ? '#22c55e' : '#ef4444')" x-text="(roiNet5Ans() >= 0 ? '+' : '') + fmt(roiNet5Ans()) + ' €'"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">
+                    Gain brut <strong x-text="'+' + fmt(ecart5Ans()) + ' €'" style="color: #8b5cf6;"></strong>
+                    − Coût programme <strong x-text="fmt(coutProgramme5Ans()) + ' €'" style="color: #ef4444;"></strong>
+                </p>
+            </div>
+
+            {# KPIs secondaires #}
+            <div class="grid sm:grid-cols-4 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Clients an 5 (actuel)</p>
+                    <p class="result-big text-2xl" style="color: var(--sim-muted);" x-text="clientsAn5Actuel()"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">Clients an 5 (amélioré)</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="clientsAn5Ameliore()"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">Gain annuel en année 5</p>
+                    <p class="result-big text-2xl" style="color: #8b5cf6;" x-text="'+' + fmt(gainAn5()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
+                    <p class="result-label mb-1">Mois d'amortissement</p>
+                    <p class="result-big text-2xl" :style="'color:' + (moisAmortissement() <= 12 ? '#22c55e' : moisAmortissement() <= 24 ? '#f59e0b' : '#ef4444')" x-text="moisAmortissement() === '∞' ? '∞' : moisAmortissement() + ' mois'"></p>
+                </div>
+            </div>
+
+            {# Graphique courbes divergentes #}
+            <div class="result-block mo-fade-up" data-delay="250">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Revenu cumulé sur 5 ans</h3>
+                <div class="chart-container">
+                    <canvas id="retentionChart"></canvas>
+                </div>
+            </div>
+
+            {# Tableau annuel #}
+            <div class="result-block mo-fade-up" data-delay="300">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Détail par année</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm" style="color: var(--sim-ink);">
+                        <thead>
+                            <tr style="color: var(--sim-muted); border-bottom: 1px solid var(--sim-border);">
+                                <th class="text-left py-2 pr-4">Année</th>
+                                <th class="text-right py-2 px-2">Clients (act.)</th>
+                                <th class="text-right py-2 px-2">CA actuel</th>
+                                <th class="text-right py-2 px-2">Clients (amél.)</th>
+                                <th class="text-right py-2 px-2">CA amélioré</th>
+                                <th class="text-right py-2 px-2" style="color: #8b5cf6;">Δ CA</th>
+                                <th class="text-right py-2 px-2" style="color: #ef4444;">Coût prog.</th>
+                                <th class="text-right py-2 pl-2" style="color: #22c55e;">Net</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="row in tableau()" :key="row.annee">
+                                <tr style="border-bottom: 1px solid var(--sim-border);">
+                                    <td class="py-2 pr-4 font-semibold" x-text="'An ' + row.annee"></td>
+                                    <td class="text-right py-2 px-2" x-text="row.clientsAct"></td>
+                                    <td class="text-right py-2 px-2" x-text="fmt(row.caAct) + ' €'"></td>
+                                    <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="row.clientsAmel"></td>
+                                    <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="fmt(row.caAmel) + ' €'"></td>
+                                    <td class="text-right py-2 px-2 font-semibold" style="color: #8b5cf6;" x-text="'+' + fmt(row.delta) + ' €'"></td>
+                                    <td class="text-right py-2 px-2" style="color: #ef4444;" x-text="fmt(budgetAnnuel) + ' €'"></td>
+                                    <td class="text-right py-2 pl-2 font-semibold" :style="'color:' + (row.delta - budgetAnnuel >= 0 ? '#22c55e' : '#ef4444')" x-text="(row.delta - budgetAnnuel >= 0 ? '+' : '') + fmt(row.delta - budgetAnnuel) + ' €'"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            {# Insight #}
+            <div class="result-block mo-fade-up" data-delay="350" style="border-color: #8b5cf6;">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🔄</span>
+                    <div>
+                        <p class="font-semibold" style="color: #8b5cf6;">L'effet composé en action</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+
+    function retentionSim() {
+        return {
+            clientsActifs: 200,
+            revenuMoyen: 1200,
+            retentionActuelle: 75,
+            amelioration: 5,
+            nouveauxParAn: 50,
+            budgetAnnuel: 6000,
+
+            /* Projection d'un scénario */
+            projeter(retPct) {
+                const ret = retPct / 100;
+                let clients = this.clientsActifs;
+                const annees = [];
+                let cumul = 0;
+                for (let a = 1; a <= 5; a++) {
+                    clients = Math.round(clients * ret) + this.nouveauxParAn;
+                    const ca = clients * this.revenuMoyen;
+                    cumul += ca;
+                    annees.push({ a, clients, ca, cumul });
+                }
+                return annees;
+            },
+            tableau() {
+                const act = this.projeter(this.retentionActuelle);
+                const amel = this.projeter(this.retentionActuelle + this.amelioration);
+                return act.map((r, i) => ({
+                    annee: r.a,
+                    clientsAct: r.clients,
+                    caAct: r.ca,
+                    clientsAmel: amel[i].clients,
+                    caAmel: amel[i].ca,
+                    delta: amel[i].ca - r.ca
+                }));
+            },
+            ecart5Ans() {
+                const act = this.projeter(this.retentionActuelle);
+                const amel = this.projeter(this.retentionActuelle + this.amelioration);
+                return amel[4].cumul - act[4].cumul;
+            },
+            coutProgramme5Ans() {
+                return this.budgetAnnuel * 5;
+            },
+            roiNet5Ans() {
+                return this.ecart5Ans() - this.coutProgramme5Ans();
+            },
+            moisAmortissement() {
+                const act = this.projeter(this.retentionActuelle);
+                const amel = this.projeter(this.retentionActuelle + this.amelioration);
+                const coutMensuel = this.budgetAnnuel / 12;
+                let cumulGain = 0;
+                let cumulCout = 0;
+                for (let a = 0; a < 5; a++) {
+                    const gainMoisCetteAnnee = (amel[a].ca - act[a].ca) / 12;
+                    for (let m = 0; m < 12; m++) {
+                        cumulGain += gainMoisCetteAnnee;
+                        cumulCout += coutMensuel;
+                        if (cumulGain >= cumulCout) {
+                            return a * 12 + m + 1;
+                        }
+                    }
+                }
+                return '∞';
+            },
+            pctEcart5Ans() {
+                const act = this.projeter(this.retentionActuelle);
+                const cumAct = act[4].cumul;
+                return cumAct > 0 ? Math.round(this.ecart5Ans() / cumAct * 100) : 0;
+            },
+            clientsAn5Actuel() { return this.projeter(this.retentionActuelle)[4].clients; },
+            clientsAn5Ameliore() { return this.projeter(this.retentionActuelle + this.amelioration)[4].clients; },
+            gainAn5() {
+                const act = this.projeter(this.retentionActuelle);
+                const amel = this.projeter(this.retentionActuelle + this.amelioration);
+                return amel[4].ca - act[4].ca;
+            },
+            insight() {
+                const ecart = this.ecart5Ans();
+                const net = this.roiNet5Ans();
+                const cout = this.coutProgramme5Ans();
+                const pts = this.amelioration;
+                if (net <= 0) return `Attention : avec un budget de ${this.fmt(this.budgetAnnuel)} €/an, le coût du programme (${this.fmt(cout)} € sur 5 ans) dépasse le gain brut de ${this.fmt(ecart)} €. Réduisez le budget ou visez une amélioration plus forte pour rentabiliser l'investissement.`;
+                if (net > 500000) return `+${pts} points de rétention génèrent ${this.fmt(ecart)} € de CA brut sur 5 ans. Après déduction du programme (${this.fmt(cout)} €), le ROI net est de +${this.fmt(net)} € — un levier extrêmement rentable.`;
+                if (net > 100000) return `L'écart de ${pts} points crée ${this.fmt(ecart)} € de CA supplémentaire en 5 ans. Net du coût programme (${this.fmt(cout)} €), il reste +${this.fmt(net)} € de bénéfice réel.`;
+                return `+${pts} points de rétention ajoutent ${this.fmt(ecart)} € de CA cumulé. Après ${this.fmt(cout)} € d'investissement programme, le gain net est de ${this.fmt(net)} €. L'effet composé récompense la patience.`;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+
+            init() {
+                ['clientsActifs','revenuMoyen','retentionActuelle','amelioration','nouveauxParAn','budgetAnnuel'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+
+            updateChart() {
+                const ctx = document.getElementById('retentionChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+
+                const act = this.projeter(this.retentionActuelle);
+                const amel = this.projeter(this.retentionActuelle + this.amelioration);
+                const labels = act.map(r => 'Année ' + r.a);
+
+                /* Courbe du gain net = écart CA cumulé − coût programme cumulé */
+                const gainNetData = amel.map((r, i) => {
+                    const ecartCumul = r.cumul - act[i].cumul;
+                    const coutCumul = this.budgetAnnuel * (i + 1);
+                    return ecartCumul - coutCumul;
+                });
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: 'CA cumulé (rétention améliorée)',
+                                data: amel.map(r => r.cumul),
+                                borderColor: '#8b5cf6',
+                                backgroundColor: 'rgba(139,92,246,0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#8b5cf6',
+                                borderWidth: 2.5
+                            },
+                            {
+                                label: 'CA cumulé (rétention actuelle)',
+                                data: act.map(r => r.cumul),
+                                borderColor: '#6b7280',
+                                backgroundColor: 'rgba(107,114,128,0.05)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#6b7280',
+                                borderWidth: 2,
+                                borderDash: [6, 4]
+                            },
+                            {
+                                label: 'Gain net (après coût programme)',
+                                data: gainNetData,
+                                borderColor: '#22c55e',
+                                backgroundColor: 'rgba(34,197,94,0.08)',
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#22c55e',
+                                borderWidth: 2,
+                                borderDash: [3, 3]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(item) {
+                                        return item.dataset.label + ': ' + item.formattedValue + ' €';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { color: textColor } },
+                            y: { title: { display: true, text: 'Montant (€)', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor, callback: v => (v / 1000).toLocaleString('fr-FR') + 'k €' } }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.retentionSim = retentionSim;
+})();
+</script>
+{% endblock %}

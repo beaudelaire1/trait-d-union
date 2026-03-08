@@ -1,0 +1,330 @@
+{# Base layout shared by all simulator tool pages #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style nonce="{{ request.csp_nonce }}">
+    :root {
+        --sim-bg: rgb(var(--tus-black-rgb));
+        --sim-ink: rgb(var(--tus-white-rgb));
+        --sim-ink-secondary: rgb(var(--tus-white-rgb) / 0.82);
+        --sim-muted: rgb(var(--tus-white-rgb) / 0.68);
+        --sim-card-bg: rgb(var(--tus-white-rgb) / 0.03);
+        --sim-card-border: rgb(var(--tus-white-rgb) / 0.08);
+        --sim-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        --sim-surface: rgb(var(--tus-white-rgb) / 0.04);
+        --sim-field-bg: rgb(var(--tus-white-rgb) / 0.05);
+        --sim-field-border: rgb(var(--tus-white-rgb) / 0.1);
+        --sim-field-focus-bg: rgb(var(--tus-white-rgb) / 0.08);
+        --sim-label: rgb(var(--tus-white-rgb) / 0.7);
+        --sim-sublabel: rgb(var(--tus-white-rgb) / 0.55);
+        --sim-placeholder: rgb(var(--tus-white-rgb) / 0.3);
+        --sim-divider: rgb(var(--tus-white-rgb) / 0.08);
+        --sim-accent: #6B8AFF;
+    }
+    [data-theme="light"] {
+        --sim-bg: #ffffff;
+        --sim-ink: #111827;
+        --sim-ink-secondary: rgba(17, 24, 39, 0.85);
+        --sim-muted: rgba(17, 24, 39, 0.68);
+        --sim-card-bg: #ffffff;
+        --sim-card-border: #e5e7eb;
+        --sim-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --sim-surface: #f9fafb;
+        --sim-field-bg: #f9fafb;
+        --sim-field-border: #e5e7eb;
+        --sim-field-focus-bg: #ffffff;
+        --sim-label: #374151;
+        --sim-sublabel: #6b7280;
+        --sim-placeholder: #9ca3af;
+        --sim-divider: #e5e7eb;
+        --sim-accent: #0b2dff;
+    }
+    [x-cloak] { display: none !important; }
+
+    .tool-page { background-color: var(--sim-bg); min-height: 100vh; }
+    .tool-shell { position: relative; isolation: isolate; overflow: clip; }
+    .tool-shell::before {
+        content: ""; position: absolute; filter: blur(54px); opacity: 0.08;
+        z-index: -1; pointer-events: none;
+        width: 340px; height: 340px; top: 40px; left: -100px;
+        background: radial-gradient(circle, var(--tool-glow, #0b2dff) 0%, transparent 70%);
+    }
+
+    .tool-input {
+        width: 100%;
+        padding: 0.65rem 0.85rem;
+        background: var(--sim-field-bg);
+        border: 1px solid var(--sim-field-border);
+        border-radius: 10px;
+        color: var(--sim-ink);
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        appearance: textfield;
+    }
+    .tool-input:focus {
+        outline: none;
+        background: var(--sim-field-focus-bg);
+        border-color: var(--sim-accent);
+        box-shadow: 0 0 0 3px rgba(107, 138, 255, 0.12);
+    }
+    .tool-input::placeholder { color: var(--sim-placeholder); }
+
+    .tool-label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--sim-label);
+        margin-bottom: 0.35rem;
+    }
+    .tool-sublabel {
+        font-size: 0.72rem;
+        color: var(--sim-sublabel);
+        margin-top: 0.2rem;
+    }
+
+    .tool-card {
+        background: var(--sim-card-bg);
+        border: 1px solid var(--sim-card-border);
+        border-radius: 16px;
+        padding: 1.5rem;
+    }
+
+    .result-block {
+        background: var(--sim-card-bg);
+        border: 1px solid var(--sim-card-border);
+        border-radius: 16px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .result-block::before {
+        content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--tool-glow, var(--sim-accent)), transparent);
+    }
+
+    .result-big {
+        font-size: 2.5rem;
+        font-weight: 800;
+        font-family: 'JetBrains Mono', monospace;
+        line-height: 1.1;
+    }
+
+    .result-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 600;
+        color: var(--sim-muted);
+    }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 360px;
+        max-height: 360px;
+    }
+    .chart-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+    }
+
+    .tool-cta {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.75rem 1.5rem; border-radius: 12px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600; font-size: 0.9rem;
+        color: #F6F7FB; transition: all 0.3s;
+        background: #0B2DFF;
+    }
+    .tool-cta:hover { transform: translateY(-1px); background: rgba(11,45,255,0.9); box-shadow: 0 8px 24px rgba(11,45,255,0.3); }
+
+    .back-link {
+        display: inline-flex; align-items: center; gap: 0.4rem;
+        font-size: 0.85rem; font-weight: 500;
+        color: var(--sim-muted); transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--sim-accent); }
+
+    /* Range slider styling */
+    .tool-range {
+        appearance: none; width: 100%; height: 6px;
+        border-radius: 3px; outline: none;
+        background: var(--sim-field-border);
+    }
+    .tool-range::-webkit-slider-thumb {
+        appearance: none; width: 20px; height: 20px;
+        border-radius: 50%; cursor: pointer;
+        background: var(--tool-glow, var(--sim-accent));
+        border: 2px solid var(--sim-bg);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .tool-range::-moz-range-thumb {
+        width: 20px; height: 20px;
+        border-radius: 50%; cursor: pointer;
+        background: var(--tool-glow, var(--sim-accent));
+        border: 2px solid var(--sim-bg);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    /* ── Auto Animate smooth transitions ── */
+    [data-animate] { transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+
+    /* ── Motion One entrance animations ── */
+    .mo-fade-up {
+        opacity: 0; transform: translateY(20px);
+    }
+    .mo-fade-up.mo-visible {
+        opacity: 1; transform: translateY(0);
+        transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .mo-scale-in {
+        opacity: 0; transform: scale(0.92);
+    }
+    .mo-scale-in.mo-visible {
+        opacity: 1; transform: scale(1);
+        transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .mo-slide-right {
+        opacity: 0; transform: translateX(-24px);
+    }
+    .mo-slide-right.mo-visible {
+        opacity: 1; transform: translateX(0);
+        transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+                    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── Result number count-up pulse ── */
+    .result-big {
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .result-pulse {
+        transform: scale(1.06);
+    }
+
+    /* ── Mobile responsive ── */
+    @media (max-width: 639px) {
+        .result-big { font-size: 1.75rem; }
+        .result-big.text-5xl { font-size: 2.25rem; }
+        .result-big.text-4xl { font-size: 2rem; }
+        .result-big.text-3xl { font-size: 1.5rem; }
+        .result-block { padding: 1.25rem; }
+        .tool-card { padding: 1rem; }
+        .chart-container { height: 260px; max-height: 260px; }
+        .tool-range::-webkit-slider-thumb { width: 28px; height: 28px; }
+        .tool-range::-moz-range-thumb { width: 28px; height: 28px; }
+        .tool-range { height: 8px; }
+        .tool-cta { width: 100%; justify-content: center; padding: 1rem 1.5rem; }
+    }
+
+    {% block tool_css %}{% endblock %}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tool-page" style="--tool-glow: {% block tool_color %}#6B8AFF{% endblock %};">
+<div class="tool-shell">
+
+    {# ── Back link + breadcrumbs ── #}
+    <div class="pt-28 pb-4 px-6">
+        <div class="max-w-5xl mx-auto">
+            <a href="{% url 'simulateur:hub' %}" class="back-link">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Tous les simulateurs
+            </a>
+        </div>
+    </div>
+
+    {# ── Hero ── #}
+    <section class="pb-8 px-6">
+        <div class="max-w-5xl mx-auto">
+            <div class="flex items-center gap-3 mb-3">
+                {% block tool_icon %}{% endblock %}
+                <span class="text-xs font-semibold tracking-widest uppercase" style="color: var(--tool-glow);">
+                    {% block tool_tag %}Outil{% endblock %}
+                </span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-display font-bold mb-3" style="color: var(--sim-ink);">
+                {% block tool_title %}Simulateur{% endblock %}
+            </h1>
+            <p class="text-base md:text-lg max-w-2xl" style="color: var(--sim-muted);">
+                {% block tool_description %}{% endblock %}
+            </p>
+        </div>
+    </section>
+
+    {# ── Tool content ── #}
+    <section class="pb-24 px-6">
+        <div class="max-w-5xl mx-auto">
+            {% block tool_content %}{% endblock %}
+        </div>
+    </section>
+
+    {# ── CTA ── #}
+    <section class="pb-20 px-6">
+        <div class="max-w-3xl mx-auto text-center py-10 px-8 rounded-2xl"
+             style="background: linear-gradient(135deg, rgba(107,138,255,0.06), rgba(34,197,94,0.04)); border: 1px solid var(--sim-card-border);">
+            <h2 class="text-xl md:text-2xl font-display font-bold mb-3" style="color: var(--sim-ink);">
+                {% block tool_cta_title %}Envie d'en discuter ?{% endblock %}
+            </h2>
+            <p class="mb-6 text-sm" style="color: var(--sim-muted);">
+                {% block tool_cta_text %}Échangeons sur les outils digitaux que TUS peut mettre en place pour votre activité.{% endblock %}
+            </p>
+            <a href="{% url 'leads:contact' %}" class="tool-cta">
+                Parlons-en
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </div>
+    </section>
+
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" nonce="{{ request.csp_nonce }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/@formkit/auto-animate@0.8.2/index.min.js" defer nonce="{{ request.csp_nonce }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/motion@11.15.0/dist/motion.js" defer nonce="{{ request.csp_nonce }}"></script>
+<script nonce="{{ request.csp_nonce }}">
+document.addEventListener('DOMContentLoaded', function() {
+    /* ── Auto Animate: auto-apply to [data-animate] containers ── */
+    if (window.autoAnimate) {
+        document.querySelectorAll('[data-animate]').forEach(function(el) {
+            autoAnimate(el, { duration: 300, easing: 'ease-in-out' });
+        });
+    }
+
+    /* ── Intersection Observer for entrance animations ── */
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                const delay = entry.target.dataset.delay || 0;
+                setTimeout(function() {
+                    entry.target.classList.add('mo-visible');
+                }, Number(delay));
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.mo-fade-up, .mo-scale-in, .mo-slide-right').forEach(function(el) {
+        observer.observe(el);
+    });
+
+    /* ── Motion One: animate result numbers with spring ── */
+    if (window.Motion) {
+        document.querySelectorAll('.result-big').forEach(function(el) {
+            const mo = new MutationObserver(function() {
+                el.classList.add('result-pulse');
+                setTimeout(function() { el.classList.remove('result-pulse'); }, 250);
+            });
+            mo.observe(el, { childList: true, characterData: true, subtree: true });
+        });
+    }
+});
+</script>
+{% block tool_js %}{% endblock %}
+{% endblock %}

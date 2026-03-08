@@ -1,0 +1,427 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Vallée de la Mort — BFR Dynamique | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Visualisez le creux de trésorerie caché dans votre croissance. Anticipez la vallée de la mort avant qu'elle ne vous rattrape.{% endblock %}
+
+{% block tool_color %}#ef4444{% endblock %}
+{% block tool_tag %}Trésorerie{% endblock %}
+{% block tool_title %}Vallée de la Mort{% endblock %}
+{% block tool_description %}Chaque euro de croissance peut creuser un trou de trésorerie. Visualisez la zone de danger avant qu'il ne soit trop tard.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Quels outils pour traverser cette phase ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les outils que TUS peut mettre en place — facturation automatique, relances, suivi de trésorerie — pour fluidifier vos encaissements.{% endblock %}
+
+{% block tool_content %}
+<div x-data="valleeMortSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── Formulaire ── #}
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Paramètres trésorerie</h2>
+
+                <div>
+                    <label class="tool-label">CA mensuel actuel (€)</label>
+                    <input type="number" class="tool-input" x-model.number="caActuel" min="1000" step="1000" placeholder="30 000">
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Croissance mensuelle visée</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="croissance + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="croissance" min="1" max="30" step="1">
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Délai paiement clients (jours)</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="delaiClients + 'j'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="delaiClients" min="0" max="120" step="5">
+                    <p class="tool-sublabel">Quand vos clients vous paient (0 = comptant)</p>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Délai paiement fournisseurs (jours)</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="delaiFournisseurs + 'j'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="delaiFournisseurs" min="0" max="90" step="5">
+                    <p class="tool-sublabel">Quand vous payez vos fournisseurs</p>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Marge brute</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="marge + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="marge" min="5" max="80" step="5">
+                    <p class="tool-sublabel">(CA − achats variables) / CA</p>
+                </div>
+
+                <div>
+                    <label class="tool-label">Charges fixes mensuelles (€)</label>
+                    <input type="number" class="tool-input" x-model.number="chargesFixes" min="0" step="500" placeholder="12 000">
+                    <p class="tool-sublabel">Loyer, salaires, abonnements, assurances…</p>
+                </div>
+
+                <div>
+                    <label class="tool-label">Trésorerie initiale (€)</label>
+                    <input type="number" class="tool-input" x-model.number="tresoInit" min="0" step="1000" placeholder="15 000">
+                </div>
+            </div>
+        </div>
+
+        {# ── Résultats ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# KPI principal — Creux max #}
+            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + (besoinFinancement() > 0 ? '#ef4444' : '#22c55e')">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + (besoinFinancement() > 0 ? '#ef4444' : '#22c55e')">
+                    <span x-text="besoinFinancement() > 0 ? 'Besoin de financement' : 'Trésorerie suffisante'"></span>
+                </p>
+                <p class="result-big text-5xl" :style="'color:' + (besoinFinancement() > 0 ? '#ef4444' : '#22c55e')"
+                   x-text="besoinFinancement() > 0 ? fmt(besoinFinancement()) + ' €' : '0 €'"></p>
+                <p class="text-sm mt-2" style="color: var(--sim-muted);"
+                   x-text="besoinFinancement() > 0
+                       ? 'Cash minimum à sécuriser pour traverser le creux (mois ' + moisCreux() + ')'
+                       : 'Votre trésorerie reste positive sur les 18 mois de projection'"></p>
+            </div>
+
+            {# KPIs secondaires #}
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Décalage BFR</p>
+                    <p class="result-big text-2xl" :style="'color:' + (bfrGap() > 0 ? '#ef4444' : '#22c55e')" x-text="bfrGap() + ' jours'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="bfrGap() > 0 ? 'vous payez avant d\'encaisser' : 'fournisseurs financent votre cycle'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">Creux le plus bas</p>
+                    <p class="result-big text-2xl" :style="'color:' + (creuxMin() < 0 ? '#ef4444' : '#22c55e')" x-text="fmt(creuxMin()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">mois <span x-text="moisCreux()"></span></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">Retour au positif</p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);"
+                       x-text="moisRetour() ? 'Mois ' + moisRetour() : (creuxMin() >= 0 ? 'Toujours positif' : 'Jamais sur 18 mois')"></p>
+                </div>
+            </div>
+
+            {# Graphique Vallée de la Mort #}
+            <div class="result-block mo-fade-up" data-delay="250">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Trésorerie sur 18 mois</h3>
+                <div class="chart-container">
+                    <canvas id="valleeChart"></canvas>
+                </div>
+                <div class="mt-4 pt-3" style="border-top: 1px solid var(--sim-divider);">
+                    <p class="text-xs leading-relaxed" style="color: var(--sim-sublabel);">
+                        <strong style="color: var(--sim-muted);">Lecture :</strong>
+                        La courbe rouge représente votre solde de trésorerie réel, en tenant compte du décalage entre
+                        les encaissements clients (reçus à J+<span x-text="delaiClients"></span>) et les décaissements
+                        fournisseurs (payés à J+<span x-text="delaiFournisseurs"></span>), plus vos charges fixes mensuelles.
+                        La zone sous la ligne jaune (zéro) est la <strong style="color: var(--sim-muted);">vallée de la mort</strong>.
+                    </p>
+                </div>
+            </div>
+
+            {# Diagnostic détaillé #}
+            <div class="result-block mo-fade-up" data-delay="300" :style="'border-color:' + diagnosticColor()">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl" x-text="diagnosticIcon()"></span>
+                    <div>
+                        <p class="font-semibold" :style="'color:' + diagnosticColor()" x-text="diagnosticTitre()"></p>
+                        <p class="text-sm mt-2 leading-relaxed" style="color: var(--sim-muted);" x-html="diagnostic()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+
+    function valleeMortSim() {
+        return {
+            /* ── Inputs ── */
+            caActuel: 30000,
+            croissance: 10,
+            delaiClients: 60,
+            delaiFournisseurs: 30,
+            marge: 30,
+            chargesFixes: 12000,
+            tresoInit: 15000,
+
+            /* ── Calculs intermédiaires ── */
+
+            /** Décalage net en jours (positif = vous avancez du cash) */
+            bfrGap() { return this.delaiClients - this.delaiFournisseurs; },
+
+            /**
+             * CA d'un mois donné.
+             * Mois ≤ 0 = régime permanent (avant la phase de croissance).
+             * Mois > 0 = croissance composée.
+             */
+            caOfMonth(m) {
+                if (m <= 0) return this.caActuel;
+                return this.caActuel * Math.pow(1 + this.croissance / 100, m);
+            },
+
+            /**
+             * PROJECTION TRÉSORERIE SUR 18 MOIS
+             *
+             * Modèle cash-flow à décalage temporel :
+             *
+             * Chaque mois m on comptabilise les FLUX RÉELS entrants et sortants :
+             *
+             * 1. ENCAISSEMENTS = CA du mois (m − delaiClients/30)
+             *    → Le client paie la prestation facturée il y a delaiClients jours.
+             *    → Si m − dC ≤ 0, on encaisse le CA d'avant la croissance (régime permanent).
+             *
+             * 2. DÉCAISSEMENTS VARIABLES = Charges variables du mois (m − delaiFournisseurs/30)
+             *    → Charges variables = CA × (1 − marge%)
+             *    → On les paie delaiFournisseurs jours après les avoir engagées.
+             *
+             * 3. CHARGES FIXES = loyer + salaires + outils + assurances
+             *    → Payées chaque mois, indépendantes du CA.
+             *
+             * Flux net = Encaissements − Décaissements variables − Charges fixes
+             * Trésorerie(m) = Trésorerie(m−1) + Flux net(m)
+             *
+             * C'est ce décalage entre encaissements retardés et décaissements
+             * immédiats qui CREUSE la vallée de la mort en phase de croissance.
+             */
+            projection() {
+                const results = [];
+                let treso = this.tresoInit;
+                const dC = this.delaiClients / 30;   /* décalage clients en mois */
+                const dF = this.delaiFournisseurs / 30; /* décalage fournisseurs en mois */
+                const tauxCharges = 1 - this.marge / 100;
+
+                for (let m = 1; m <= 18; m++) {
+                    const ca = this.caOfMonth(m);
+
+                    /* Encaissements : on reçoit le paiement du CA facturé il y a dC mois */
+                    const encaissements = this.caOfMonth(m - dC);
+
+                    /* Décaissements variables : on paie les fournisseurs de dF mois plus tôt */
+                    const decaisVar = this.caOfMonth(m - dF) * tauxCharges;
+
+                    /* Charges fixes : mensuelles, incompressibles */
+                    const decaisFix = this.chargesFixes;
+
+                    const fluxNet = encaissements - decaisVar - decaisFix;
+                    treso += fluxNet;
+
+                    results.push({
+                        m,
+                        ca: Math.round(ca),
+                        treso: Math.round(treso),
+                        encaissements: Math.round(encaissements),
+                        decaissements: Math.round(decaisVar + decaisFix),
+                        fluxNet: Math.round(fluxNet)
+                    });
+                }
+                return results;
+            },
+
+            /* ── KPIs dérivés ── */
+
+            /** Solde le plus bas atteint sur 18 mois */
+            creuxMin() {
+                const proj = this.projection();
+                return Math.min(...proj.map(p => p.treso));
+            },
+
+            /** Mois où le creux est atteint */
+            moisCreux() {
+                const proj = this.projection();
+                const min = this.creuxMin();
+                const idx = proj.findIndex(p => p.treso === min);
+                return idx >= 0 ? idx + 1 : '-';
+            },
+
+            /** Somme à financer pour ne jamais passer en négatif */
+            besoinFinancement() { return Math.max(0, -this.creuxMin()); },
+
+            /** Premier mois où la trésorerie redevient ≥ 0 après avoir été négative */
+            moisRetour() {
+                const proj = this.projection();
+                let aEteNegatif = false;
+                for (const p of proj) {
+                    if (p.treso < 0) aEteNegatif = true;
+                    if (aEteNegatif && p.treso >= 0) return p.m;
+                }
+                return null; /* jamais négatif OU jamais remonté */
+            },
+
+            /* ── Diagnostic ── */
+
+            diagnosticColor() {
+                const besoin = this.besoinFinancement();
+                if (besoin === 0) return '#22c55e';
+                const ret = this.moisRetour();
+                if (ret) return '#f59e0b';
+                return '#ef4444';
+            },
+            diagnosticIcon() {
+                const besoin = this.besoinFinancement();
+                if (besoin === 0) return '✅';
+                return this.moisRetour() ? '⚠️' : '🚨';
+            },
+            diagnosticTitre() {
+                const besoin = this.besoinFinancement();
+                if (besoin === 0) return 'Trésorerie saine';
+                return this.moisRetour() ? 'Vallée de la mort traversable' : 'Danger critique — vallée sans sortie';
+            },
+
+            diagnostic() {
+                const besoin = this.besoinFinancement();
+                const gap = this.bfrGap();
+                const mc = this.moisCreux();
+                const creux = this.creuxMin();
+                const ret = this.moisRetour();
+
+                /* Détail du cash-flow mensuel au pire mois */
+                const proj = this.projection();
+                const pire = proj[mc - 1] || {};
+
+                if (besoin === 0) {
+                    if (gap <= 0) {
+                        return 'Vos fournisseurs (J+' + this.delaiFournisseurs + ') vous financent en payant plus tard que vos clients (J+' + this.delaiClients + '). '
+                            + 'Avec ' + this.fmt(this.chargesFixes) + ' € de charges fixes et ' + this.marge + ' % de marge, '
+                            + 'la trésorerie reste positive sur 18 mois. '
+                            + '<strong>→ Pas de financement externe nécessaire.</strong>';
+                    }
+                    return 'Malgré un décalage de ' + gap + ' jours, votre trésorerie initiale de ' + this.fmt(this.tresoInit) + ' € '
+                        + 'et votre marge de ' + this.marge + ' % absorbent les ' + this.fmt(this.chargesFixes) + ' €/mois de charges fixes. '
+                        + 'Le solde minimum atteint est ' + this.fmt(creux) + ' € (mois ' + mc + '). '
+                        + '<strong>→ Croissance finançable en interne. Surveillez les charges fixes si elles augmentent.</strong>';
+                }
+
+                /* Il y a un creux négatif */
+                let txt = 'Au mois ' + mc + ', votre trésorerie touche ' + this.fmt(creux) + ' €. '
+                    + 'À ce moment-là, vous encaissez ' + this.fmt(pire.encaissements) + ' € '
+                    + '(CA d\'il y a ' + Math.round(this.delaiClients / 30 * 10) / 10 + ' mois) '
+                    + 'mais décaissez ' + this.fmt(pire.decaissements) + ' € '
+                    + '(charges variables + ' + this.fmt(this.chargesFixes) + ' € fixes). ';
+
+                if (ret) {
+                    /* Vallée traversable */
+                    txt += 'La trésorerie remonte au positif au mois ' + ret + '. ';
+                    txt += '<br><strong>→ Décisions :</strong> (1) sécurisez ' + this.fmt(besoin) + ' € '
+                        + 'de ligne de trésorerie ou apport avant le mois ' + Math.max(1, mc - 2) + ' ; ';
+                    if (gap > 15) {
+                        txt += '(2) réduisez le délai clients de ' + this.delaiClients + 'j → '
+                            + Math.max(0, this.delaiClients - 15) + 'j (chaque jour gagné libère ~'
+                            + this.fmt(Math.round(this.caActuel / 30)) + ' € de cash) ; ';
+                    }
+                    txt += '(3) augmentez le délai fournisseurs si possible.';
+                } else {
+                    /* Vallée sans sortie */
+                    txt += 'La trésorerie ne remonte <strong>jamais</strong> au positif sur 18 mois. ';
+                    txt += '<br><strong>→ Décisions :</strong> (1) cette croissance de ' + this.croissance + ' %/mois est insoutenable '
+                        + 'avec ' + this.fmt(this.chargesFixes) + ' €/mois de fixes et ' + this.marge + ' % de marge ; ';
+                    txt += '(2) réduisez la cadence de croissance ou augmentez la marge avant de scaler ; ';
+                    txt += '(3) si ce rythme est stratégique, il faut un financement externe d\'au moins '
+                        + this.fmt(besoin) + ' €.';
+                }
+                return txt;
+            },
+
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+
+            /* ── Init & Chart ── */
+
+            init() {
+                ['caActuel','croissance','delaiClients','delaiFournisseurs','marge','chargesFixes','tresoInit'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+
+            updateChart() {
+                const ctx = document.getElementById('valleeChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+
+                const proj = this.projection();
+                const labels = proj.map(p => 'M' + p.m);
+                const tresoData = proj.map(p => p.treso);
+                const zeroLine = proj.map(() => 0);
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Trésorerie',
+                                data: tresoData,
+                                borderColor: '#ef4444',
+                                backgroundColor: function() {
+                                    const c = ctx.getContext('2d');
+                                    const g = c.createLinearGradient(0, 0, 0, 300);
+                                    g.addColorStop(0, 'rgba(239,68,68,0.15)');
+                                    g.addColorStop(1, 'rgba(239,68,68,0)');
+                                    return g;
+                                }(),
+                                fill: true,
+                                tension: 0.3,
+                                pointRadius: 3,
+                                borderWidth: 2.5
+                            },
+                            {
+                                label: 'Seuil zéro',
+                                data: zeroLine,
+                                borderColor: '#f59e0b',
+                                borderWidth: 1.5,
+                                borderDash: [3, 3],
+                                pointRadius: 0,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(item) {
+                                        if (item.datasetIndex === 1) return null;
+                                        return item.dataset.label + ': ' + item.formattedValue + ' €';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { color: textColor } },
+                            y: {
+                                title: { display: true, text: 'Trésorerie (€)', color: textColor },
+                                grid: { color: gridColor },
+                                ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') + ' €' }
+                            }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.valleeMortSim = valleeMortSim;
+})();
+</script>
+{% endblock %}

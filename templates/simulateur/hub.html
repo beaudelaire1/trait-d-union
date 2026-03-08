@@ -1,0 +1,420 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Simulateurs & Outils Stratégiques | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Suite d'outils interactifs pour entrepreneurs : simulateur de devis, point mort, coût d'acquisition, friction opérationnelle, indice de fragmentation, flux A.C.S.E et plafond de verre.{% endblock %}
+
+{% block extra_head %}
+<style nonce="{{ request.csp_nonce }}">
+    :root {
+        --sim-bg: rgb(var(--tus-black-rgb));
+        --sim-ink: rgb(var(--tus-white-rgb));
+        --sim-muted: rgb(var(--tus-white-rgb) / 0.68);
+        --sim-card-bg: rgb(var(--tus-white-rgb) / 0.03);
+        --sim-card-border: rgb(var(--tus-white-rgb) / 0.08);
+        --sim-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        --sim-accent: #6B8AFF;
+        --sim-divider: rgb(var(--tus-white-rgb) / 0.08);
+    }
+    [data-theme="light"] {
+        --sim-bg: #ffffff;
+        --sim-ink: #111827;
+        --sim-muted: rgba(17, 24, 39, 0.68);
+        --sim-card-bg: #ffffff;
+        --sim-card-border: #e5e7eb;
+        --sim-card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --sim-accent: #0b2dff;
+        --sim-divider: #e5e7eb;
+    }
+    [x-cloak] { display: none !important; }
+    .hub-page { background-color: var(--sim-bg); }
+
+    .hub-shell {
+        position: relative;
+        isolation: isolate;
+        overflow: clip;
+    }
+    .hub-shell::before,
+    .hub-shell::after {
+        content: "";
+        position: absolute;
+        filter: blur(54px);
+        opacity: 0.08;
+        z-index: -1;
+        pointer-events: none;
+    }
+    .hub-shell::before {
+        width: 400px; height: 400px;
+        top: 60px; left: -120px;
+        background: radial-gradient(circle, #0b2dff 0%, transparent 70%);
+    }
+    .hub-shell::after {
+        width: 300px; height: 300px;
+        bottom: 100px; right: -80px;
+        background: radial-gradient(circle, #22c55e 0%, transparent 70%);
+    }
+
+    .tool-card {
+        background: var(--sim-card-bg);
+        border: 1px solid var(--sim-card-border);
+        border-radius: 16px;
+        padding: 2rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    .tool-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--sim-card-shadow), 0 0 40px rgba(107, 138, 255, 0.08);
+        border-color: var(--sim-accent);
+    }
+    .tool-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--tool-color, var(--sim-accent)), transparent);
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .tool-card:hover::before { opacity: 1; }
+
+    .tool-icon {
+        width: 56px; height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        transition: transform 0.3s;
+    }
+    .tool-card:hover .tool-icon { transform: scale(1.08); }
+
+    .tool-tag {
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        line-height: 1;
+    }
+
+    .hub-hero-line {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--sim-accent), #22c55e);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* ── Entrance animations ── */
+    .mo-fade-up { opacity: 0; transform: translateY(24px); }
+    .mo-fade-up.mo-visible {
+        opacity: 1; transform: translateY(0);
+        transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .mo-scale-in { opacity: 0; transform: scale(0.92); }
+    .mo-scale-in.mo-visible {
+        opacity: 1; transform: scale(1);
+        transition: opacity 0.4s cubic-bezier(0.4,0,0.2,1), transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* ── Section divider labels ── */
+    .section-label {
+        font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.12em; padding: 0.3rem 0.8rem;
+        border-radius: 8px; display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hub-page min-h-screen">
+<div class="hub-shell">
+
+    {# ── Hero ── #}
+    <section class="pt-32 pb-16 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <p class="text-sm font-semibold tracking-widest uppercase mb-4"
+               style="color: var(--sim-accent);">
+                Boîte à outils stratégique
+            </p>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight mb-6"
+                style="color: var(--sim-ink);">
+                Simulez. <span class="hub-hero-line">Mesurez.</span> Décidez.
+            </h1>
+            <p class="text-lg md:text-xl max-w-2xl mx-auto" style="color: var(--sim-muted);">
+                10 outils interactifs gratuits pour piloter votre activité, identifier vos angles morts
+                et prendre des décisions éclairées.
+            </p>
+        </div>
+    </section>
+
+    {# ── Tool Grid ── #}
+    <section class="pb-24 px-6">
+        <div class="max-w-6xl mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+            {# ─ Simulateur Devis/Facture ─ #}
+            <a href="{% url 'simulateur:devis' %}" class="tool-card block group" style="--tool-color: #6B8AFF;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(107,138,255,0.12); color: #6B8AFF;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Simulateur Devis</h3>
+                            <span class="tool-tag" style="background: rgba(107,138,255,0.12); color: #6B8AFF;">Existant</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            Créez un aperçu de devis ou facture avec logo, lignes, remises et preview live.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: var(--sim-accent);">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {# ─ Seuil de Rentabilité ─ #}
+            <a href="{% url 'simulateur:point-mort' %}" class="tool-card block group" style="--tool-color: #22c55e;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(34,197,94,0.12); color: #22c55e;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Seuil de Rentabilité</h3>
+                            <span class="tool-tag" style="background: rgba(34,197,94,0.12); color: #22c55e;">Business</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            Visualisez le point d'intersection entre vos coûts et votre chiffre d'affaires.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: #22c55e;">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {# ─ Coût d'Acquisition Client ─ #}
+            <a href="{% url 'simulateur:cac' %}" class="tool-card block group" style="--tool-color: #f59e0b;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(245,158,11,0.12); color: #f59e0b;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Coût d'Acquisition</h3>
+                            <span class="tool-tag" style="background: rgba(245,158,11,0.12); color: #f59e0b;">Marketing</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            Mesurez votre CAC, ratio LTV/CAC et identifiez les fuites dans votre entonnoir.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: #f59e0b;">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {# ─ Friction Opérationnelle ─ #}
+            <a href="{% url 'simulateur:friction' %}" class="tool-card block group" style="--tool-color: #ef4444;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(239,68,68,0.12); color: #ef4444;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Friction Opérationnelle</h3>
+                            <span class="tool-tag" style="background: rgba(239,68,68,0.12); color: #ef4444;">Statu Quo</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            Chiffrez l'angle mort financier lié aux tâches répétitives et à la désorganisation.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: #ef4444;">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {# ─ Indice de Fragmentation ─ #}
+            <a href="{% url 'simulateur:fragmentation' %}" class="tool-card block group" style="--tool-color: #a855f7;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(168,85,247,0.12); color: #a855f7;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Indice de Fragmentation</h3>
+                            <span class="tool-tag" style="background: rgba(168,85,247,0.12); color: #a855f7;">Multi-SaaS</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            Mesurez le coût caché de l'empilement d'outils génériques vs un écosystème unifié.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: #a855f7;">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {# ─ Flux A.C.S.E ─ #}
+            <a href="{% url 'simulateur:acse' %}" class="tool-card block group" style="--tool-color: #06b6d4;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(6,182,212,0.12); color: #06b6d4;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Flux A.C.S.E</h3>
+                            <span class="tool-tag" style="background: rgba(6,182,212,0.12); color: #06b6d4;">Diagnostic</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            Évaluez Attirer, Convertir, Structurer, Exécuter — identifiez votre goulot d'étranglement.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: #06b6d4;">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {# ─ Plafond de Verre ─ #}
+            <a href="{% url 'simulateur:plafond' %}" class="tool-card block group" style="--tool-color: #ec4899;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(236,72,153,0.12); color: #ec4899;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Plafond de Verre</h3>
+                            <span class="tool-tag" style="background: rgba(236,72,153,0.12); color: #ec4899;">Scalabilité</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            Calculez le CA refusé parce que votre équipe ne peut gérer plus de dossiers.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: #ec4899;">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {# ─ Élasticité-Prix ─ #}
+            <a href="{% url 'simulateur:elasticite' %}" class="tool-card block group mo-fade-up" data-delay="450" style="--tool-color: #14b8a6;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(20,184,166,0.12); color: #14b8a6;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Élasticité-Prix</h3>
+                            <span class="tool-tag" style="background: rgba(20,184,166,0.12); color: #14b8a6;">Tarification</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            Combien de clients pouvez-vous perdre en augmentant vos prix sans perdre 1 € de bénéfice ?
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: #14b8a6;">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {# ─ Vallée de la Mort ─ #}
+            <a href="{% url 'simulateur:vallee-mort' %}" class="tool-card block group mo-fade-up" data-delay="500" style="--tool-color: #dc2626;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(220,38,38,0.12); color: #dc2626;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Vallée de la Mort</h3>
+                            <span class="tool-tag" style="background: rgba(220,38,38,0.12); color: #dc2626;">Trésorerie</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            Simulez le creux de trésorerie lié à votre croissance. La croissance peut tuer.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: #dc2626;">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+            {# ─ Effet Rétention ─ #}
+            <a href="{% url 'simulateur:retention' %}" class="tool-card block group mo-fade-up" data-delay="550" style="--tool-color: #8b5cf6;">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="tool-icon" style="background: rgba(139,92,246,0.12); color: #8b5cf6;">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="text-lg font-semibold" style="color: var(--sim-ink);">Effet Rétention</h3>
+                            <span class="tool-tag" style="background: rgba(139,92,246,0.12); color: #8b5cf6;">Fidélisation</span>
+                        </div>
+                        <p class="text-sm leading-relaxed" style="color: var(--sim-muted);">
+                            +5% de fidélité transforme radicalement vos revenus à 5 ans. Visualisez l'effet composé.
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-xs font-medium" style="color: #8b5cf6;">
+                    Ouvrir l'outil
+                    <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    {# ── CTA Section ── #}
+    <section class="pb-20 px-6">
+        <div class="max-w-3xl mx-auto text-center py-12 px-8 rounded-2xl"
+             style="background: linear-gradient(135deg, rgba(107,138,255,0.08), rgba(34,197,94,0.06)); border: 1px solid var(--sim-card-border);">
+            <h2 class="text-2xl md:text-3xl font-display font-bold mb-4" style="color: var(--sim-ink);">
+                Prêt à transformer vos résultats ?
+            </h2>
+            <p class="mb-8" style="color: var(--sim-muted);">
+                Chaque simulateur révèle un angle mort. L'Écosystème TUS les résout tous.
+            </p>
+            <a href="{% url 'leads:contact' %}"
+               class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-white transition-all hover:scale-105"
+               style="background: linear-gradient(135deg, var(--sim-accent), #22c55e);">
+                Discutons de votre projet
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </div>
+    </section>
+
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script nonce="{{ request.csp_nonce }}">
+document.addEventListener('DOMContentLoaded', function() {
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+                const delay = entry.target.dataset.delay || 0;
+                setTimeout(function() { entry.target.classList.add('mo-visible'); }, Number(delay));
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+    document.querySelectorAll('.mo-fade-up, .mo-scale-in').forEach(function(el) { observer.observe(el); });
+});
+</script>
+{% endblock %}

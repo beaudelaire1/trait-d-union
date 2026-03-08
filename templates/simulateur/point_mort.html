@@ -1,0 +1,242 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Seuil de Rentabilité — Point Mort | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Calculez votre point mort : visualisez l'intersection entre vos coûts et votre chiffre d'affaires pour savoir quand vous devenez rentable.{% endblock %}
+
+{% block tool_color %}#22c55e{% endblock %}
+{% block tool_tag %}Business{% endblock %}
+{% block tool_title %}Seuil de Rentabilité{% endblock %}
+{% block tool_description %}Visualisez le point exact où votre activité devient rentable. Combien de ventes pour couvrir vos charges ?{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Et si vos outils accéléraient l'atteinte de ce seuil ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les outils digitaux qui peuvent réduire vos charges fixes — automatisation, facturation, suivi client.{% endblock %}
+
+{% block tool_content %}
+<div x-data="pointMort()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── Formulaire ── #}
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-5">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Vos paramètres</h2>
+
+                <div>
+                    <label class="tool-label">Charges fixes mensuelles (€)</label>
+                    <input type="number" class="tool-input" x-model.number="chargesFixes" min="0" step="100" placeholder="3 000">
+                    <p class="tool-sublabel">Loyer, salaires, assurances, abonnements…</p>
+                </div>
+
+                <div>
+                    <label class="tool-label">Coût variable unitaire (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutVariable" min="0" step="1" placeholder="50">
+                    <p class="tool-sublabel">Coût de production par unité vendue</p>
+                </div>
+
+                <div>
+                    <label class="tool-label">Prix de vente unitaire (€)</label>
+                    <input type="number" class="tool-input" x-model.number="prixVente" min="0" step="1" placeholder="150">
+                    <p class="tool-sublabel">Prix moyen facturé par vente / prestation</p>
+                </div>
+
+                <div>
+                    <label class="tool-label">Ventes estimées par mois</label>
+                    <input type="number" class="tool-input" x-model.number="ventesEstimees" min="0" step="1" placeholder="30">
+                    <p class="tool-sublabel">Volume de ventes mensuel prévu</p>
+                </div>
+            </div>
+        </div>
+
+        {# ── Résultats ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# KPI Cards #}
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5">
+                    <p class="result-label mb-1">Point mort</p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="seuilUnites() + ' ventes'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">par mois</p>
+                </div>
+                <div class="result-block text-center py-5">
+                    <p class="result-label mb-1">CA minimum</p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="fmt(seuilCA()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">par mois</p>
+                </div>
+                <div class="result-block text-center py-5">
+                    <p class="result-label mb-1">Marge de contribution</p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="fmt(margeContrib()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">par unité</p>
+                </div>
+            </div>
+
+            {# Verdict #}
+            <div class="result-block" x-show="ventesEstimees > 0 || margeContrib() <= 0">
+                <template x-if="ventesEstimees >= seuilUnites() && margeContrib() > 0">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">✅</span>
+                        <div>
+                            <p class="font-semibold" style="color: #22c55e;">Vous êtes au-dessus du seuil</p>
+                            <p class="text-sm mt-1" style="color: var(--sim-muted);">
+                                Avec <span x-text="ventesEstimees"></span> ventes/mois, vous dégagez un bénéfice mensuel estimé de
+                                <strong x-text="fmt(benefice()) + ' €'" style="color: var(--sim-ink);"></strong>.
+                            </p>
+                        </div>
+                    </div>
+                </template>
+                <template x-if="ventesEstimees < seuilUnites() && margeContrib() > 0">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">⚠️</span>
+                        <div>
+                            <p class="font-semibold" style="color: #f59e0b;">Sous le seuil — il manque <span x-text="seuilUnites() - ventesEstimees"></span> ventes</p>
+                            <p class="text-sm mt-1" style="color: var(--sim-muted);">
+                                Déficit mensuel estimé : <strong x-text="fmt(benefice()) + ' €'" style="color: #ef4444;"></strong>
+                            </p>
+                        </div>
+                    </div>
+                </template>
+                <template x-if="margeContrib() <= 0">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🚫</span>
+                        <div>
+                            <p class="font-semibold" style="color: #ef4444;">Marge de contribution négative ou nulle</p>
+                            <p class="text-sm mt-1" style="color: var(--sim-muted);">
+                                Votre prix de vente ne couvre pas le coût variable unitaire. Aucun volume de ventes ne permettra d'atteindre la rentabilité sans réviser vos prix ou vos coûts.
+                            </p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            {# Graphique #}
+            <div class="result-block">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Coûts vs Chiffre d'affaires</h3>
+                <div class="chart-container">
+                    <canvas id="pointMortChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+
+    function pointMort() {
+        return {
+            chargesFixes: 3000,
+            coutVariable: 50,
+            prixVente: 150,
+            ventesEstimees: 30,
+
+            margeContrib() {
+                return Math.max(0, this.prixVente - this.coutVariable);
+            },
+            seuilUnites() {
+                const mc = this.margeContrib();
+                return mc > 0 ? Math.ceil(this.chargesFixes / mc) : 0;
+            },
+            seuilCA() {
+                return this.seuilUnites() * this.prixVente;
+            },
+            benefice() {
+                return (this.ventesEstimees * this.margeContrib()) - this.chargesFixes;
+            },
+            fmt(v) {
+                return Math.round(v).toLocaleString('fr-FR');
+            },
+
+            init() {
+                this.$watch('chargesFixes', () => this.updateChart());
+                this.$watch('coutVariable', () => this.updateChart());
+                this.$watch('prixVente', () => this.updateChart());
+                this.$watch('ventesEstimees', () => this.updateChart());
+                this.$nextTick(() => this.updateChart());
+            },
+
+            updateChart() {
+                const mc = this.margeContrib();
+                const seuil = this.seuilUnites();
+                const maxX = Math.max(seuil * 2, this.ventesEstimees * 1.5, 10);
+                const steps = 50;
+                const labels = [];
+                const couts = [];
+                const ca = [];
+
+                for (let i = 0; i <= steps; i++) {
+                    const x = Math.round((maxX / steps) * i);
+                    labels.push(x);
+                    couts.push(this.chargesFixes + (this.coutVariable * x));
+                    ca.push(this.prixVente * x);
+                }
+
+                const ctx = document.getElementById('pointMortChart');
+                if (!ctx) return;
+
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Coûts totaux',
+                                data: couts,
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239,68,68,0.08)',
+                                fill: true,
+                                tension: 0.1,
+                                pointRadius: 0,
+                                borderWidth: 2
+                            },
+                            {
+                                label: 'Chiffre d\'affaires',
+                                data: ca,
+                                borderColor: '#22c55e',
+                                backgroundColor: 'rgba(34,197,94,0.08)',
+                                fill: true,
+                                tension: 0.1,
+                                pointRadius: 0,
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: {
+                            legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } },
+                            annotation: seuil > 0 ? {
+                                annotations: {
+                                    line1: {
+                                        type: 'line', xMin: seuil, xMax: seuil,
+                                        borderColor: '#f59e0b', borderWidth: 2, borderDash: [6, 4],
+                                        label: { display: true, content: 'Point mort', position: 'start', backgroundColor: '#f59e0b', color: '#fff', font: { size: 11 } }
+                                    }
+                                }
+                            } : {}
+                        },
+                        scales: {
+                            x: { title: { display: true, text: 'Nombre de ventes', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor, maxTicksLimit: 10 } },
+                            y: { title: { display: true, text: 'Euros (€)', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') + ' €' } }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.pointMort = pointMort;
+})();
+</script>
+{% endblock %}

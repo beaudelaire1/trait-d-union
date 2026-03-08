@@ -1,0 +1,273 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Flux A.C.S.E — Détecteur de Goulot d'Étranglement | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Évaluez votre entreprise sur 4 piliers : Attirer, Convertir, Structurer, Exécuter. Identifiez votre rupture de charge.{% endblock %}
+
+{% block tool_color %}#06b6d4{% endblock %}
+{% block tool_tag %}Diagnostic{% endblock %}
+{% block tool_title %}Flux A.C.S.E{% endblock %}
+{% block tool_description %}Attirer, Convertir, Structurer, Exécuter — votre chaîne est aussi solide que son maillon le plus faible. Trouvez-le.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Quel outil pour renforcer votre maillon faible ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les outils digitaux que TUS peut construire pour agir concrètement sur le pilier qui freine votre croissance.{% endblock %}
+
+{% block tool_content %}
+<div x-data="acseSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── Sliders ── #}
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Auto-évaluation (1 à 10)</h2>
+
+                <template x-for="(pilier, idx) in piliers" :key="idx">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="tool-label mb-0" x-text="pilier.label"></label>
+                            <span class="text-lg font-bold font-mono" :style="'color:' + pilier.color" x-text="pilier.score + '/10'"></span>
+                        </div>
+                        <input type="range" class="tool-range" x-model.number="pilier.score" min="1" max="10" step="1"
+                               :style="'--tool-glow:' + pilier.color">
+                        <p class="tool-sublabel" x-text="pilier.help + ' • Coef: ' + pilier.importance.toFixed(1) + 'x • Impact: ' + prioritePilier(pilier).toFixed(1)"></p>
+                    </div>
+                </template>
+            </div>
+
+            <div class="tool-card mo-fade-up" data-delay="120">
+                <h3 class="text-sm font-semibold mb-3" style="color: var(--sim-ink);">Transparence du modele</h3>
+                <p class="text-xs mb-3" style="color: var(--sim-sublabel);">
+                    Les coefficients d'importance sont definis par TUS et ne sont pas modifiables dans l'outil.
+                </p>
+                <div class="space-y-2 text-xs" style="color: var(--sim-muted);">
+                    <template x-for="pilier in piliers" :key="'coef-' + pilier.label">
+                        <div class="flex items-center justify-between">
+                            <span x-text="pilier.label"></span>
+                            <span class="font-mono font-semibold" :style="'color:' + pilier.color" x-text="pilier.importance.toFixed(1) + 'x'"></span>
+                        </div>
+                    </template>
+                </div>
+                <p class="text-xs mt-3" style="color: var(--sim-sublabel);">
+                    Formule: impact pilier = (10 - score) x coefficient.
+                </p>
+                <p class="text-xs mt-1" style="color: var(--sim-sublabel);">
+                    Priorite = pilier avec l'impact le plus eleve (avec tolerance de proximite).
+                </p>
+            </div>
+        </div>
+
+        {# ── Résultats ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# Score global #}
+            <div class="result-block text-center py-6 mo-scale-in">
+                <p class="result-label mb-2">Score global (brut)</p>
+                <p class="result-big text-5xl" :style="'color:' + globalColor()" x-text="scoreGlobal() + '/40'"></p>
+                <p class="text-sm mt-2" :style="'color:' + globalColor()" x-text="globalVerdict()"></p>
+                <p class="text-xs mt-2" style="color: var(--sim-sublabel);" x-text="'Indice pondere: ' + scorePonderePct().toFixed(0) + '% (coef d\'importance applique)'"></p>
+            </div>
+
+            {# Radar Chart #}
+            <div class="result-block mo-fade-up" data-delay="100">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Cartographie de flux</h3>
+                <div class="chart-container">
+                    <canvas id="acseChart"></canvas>
+                </div>
+            </div>
+
+            {# Goulot identifié #}
+            <div class="result-block mo-fade-up" data-delay="200">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🔍</span>
+                    <div>
+                        <p class="font-semibold" style="color: var(--sim-ink);">
+                            Zone prioritaire :
+                            <span :style="'color:' + goulot().color" x-text="goulot().label"></span>
+                        </p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="goulot().diagnostic"></p>
+                        <p class="text-xs mt-3" style="color: var(--sim-sublabel);" x-text="prioritesResume()"></p>
+                    </div>
+                </div>
+            </div>
+
+            {# Pistes d'amélioration #}
+            <div class="result-block mo-fade-up" data-delay="300" style="border-color: #06b6d4;">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">💡</span>
+                    <div>
+                        <p class="font-semibold" style="color: #06b6d4;">Pistes d'amélioration</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="recommandation()"></p>
+                        <p class="text-xs mt-3" style="color: var(--sim-sublabel);" x-text="logiquePriorisation()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+
+    function acseSim() {
+        const IMPORTANCE = Object.freeze({
+            Attirer: 1.5,
+            Convertir: 2.0,
+            Structurer: 1.3,
+            'Exécuter': 1.0
+        });
+
+        return {
+            piliers: [
+                { label: 'Attirer', score: 5, color: '#f59e0b', help: 'Visibilité, SEO, réseaux, bouche-à-oreille, publicité',
+                    importance: IMPORTANCE['Attirer'],
+                    diagnostics: { low: 'Votre visibilité est insuffisante. Peu de prospects vous trouvent — c\'est le frein principal à votre croissance.', mid: 'Visibilité correcte mais irrégulière. Vous dépendez probablement d\'un seul canal d\'acquisition.', high: 'Bonne visibilité multicanal. Les prospects arrivent régulièrement.' },
+                    reco: { low: 'Priorité : diversifiez vos canaux d\'acquisition (SEO, réseaux, partenariats, contenu). Mesurez le coût par lead de chaque canal.', mid: 'Identifiez votre canal le plus rentable et doublez l\'investissement dessus. Ajoutez un second canal pour réduire la dépendance.', high: 'Optimisez le coût par lead et testez des canaux secondaires pour anticiper l\'essoufflement du canal principal.' } },
+                { label: 'Convertir', score: 5, color: '#22c55e', help: 'Devis, propositions, tunnel de vente, suivi commercial',
+                    importance: IMPORTANCE['Convertir'],
+                    diagnostics: { low: 'Les prospects arrivent mais ne signent pas. Votre tunnel de conversion fuit à plusieurs étapes.', mid: 'Conversion moyenne. Certains prospects sont perdus faute de relance ou de proposition claire.', high: 'Bonne conversion. Votre processus commercial est structuré et les prospects deviennent clients.' },
+                    reco: { low: 'Cartographiez votre tunnel de vente étape par étape. Identifiez où les prospects décrochent (premier contact, devis, relance). Mettez en place un CRM même basique.', mid: 'Automatisez les relances et standardisez vos propositions commerciales. Mesurez votre taux de conversion à chaque étape.', high: 'Affinez vos scripts de vente et testez des variantes de proposition. Surveillez le délai moyen de conversion.' } },
+                { label: 'Structurer', score: 5, color: '#06b6d4', help: 'Organisation, process, documentation, outils internes',
+                    importance: IMPORTANCE['Structurer'],
+                    diagnostics: { low: 'Vos processus sont manuels et désorganisés. L\'information est dispersée entre emails, fichiers et mémoire.', mid: 'Des processus existent mais sont incomplets ou peu suivis. La dépendance aux personnes-clés est forte.', high: 'Bonne structure interne. Les processus sont documentés et les outils bien intégrés.' },
+                    reco: { low: 'Documentez vos 3 processus les plus critiques. Centralisez l\'information dans un outil unique (Notion, Google Workspace, etc.). Éliminez les doubles saisies.', mid: 'Formalisez les processus restants et créez des check-lists. Réduisez la dépendance aux personnes-clés en documentant leur savoir-faire.', high: 'Automatisez les tâches répétitives et mettez en place des indicateurs de suivi pour chaque processus.' } },
+                { label: 'Exécuter', score: 5, color: '#a855f7', help: 'Livraison, qualité, délais, satisfaction client',
+                    importance: IMPORTANCE['Exécuter'],
+                    diagnostics: { low: 'La livraison est chaotique. Les délais dérapent et la satisfaction client en souffre.', mid: 'La qualité est au rendez-vous mais les délais sont tendus. La charge est mal anticipée.', high: 'Bonne exécution. Les projets sont livrés dans les temps avec un bon niveau de qualité.' },
+                    reco: { low: 'Mettez en place un suivi de projet simple (Trello, Asana, tableur). Définissez des jalons clairs et des alertes sur les dérapages. Communiquez proactivement avec les clients.', mid: 'Améliorez la planification de charge et créez des buffers. Mesurez la satisfaction client systématiquement après chaque livraison.', high: 'Optimisez vos marges en industrialisant les livrables récurrents. Mettez en place un processus d\'amélioration continue basé sur les retours clients.' } }
+            ],
+
+            scoreGlobal() { return this.piliers.reduce((s, p) => s + p.score, 0); },
+            sommeImportance() { return this.piliers.reduce((s, p) => s + p.importance, 0); },
+            scorePondere() {
+                const total = this.piliers.reduce((s, p) => s + (p.score * p.importance), 0);
+                return this.sommeImportance() > 0 ? (total / this.sommeImportance()) : 0;
+            },
+            scorePonderePct() {
+                return (this.scorePondere() / 10) * 100;
+            },
+            globalColor() {
+                const s = this.scorePondere();
+                if (s < 4) return '#ef4444';
+                if (s < 7) return '#f59e0b';
+                return '#22c55e';
+            },
+            globalVerdict() {
+                const s = this.scorePondere();
+                if (s < 4) return 'Flux critique — plusieurs ruptures de charge détectées';
+                if (s < 7) return 'Flux fragile — des optimisations prioritaires identifiées';
+                return 'Flux solide — quelques ajustements pour l\'excellence';
+            },
+            prioritePilier(p) {
+                return (10 - p.score) * p.importance;
+            },
+            priorites() {
+                const withImpact = this.piliers.map((p, i) => ({ ...p, index: i, impact: this.prioritePilier(p) }));
+                const maxImpact = Math.max(...withImpact.map(p => p.impact));
+                const tolerance = Math.max(0.6, maxImpact * 0.15);
+                return withImpact
+                    .filter(p => p.impact >= maxImpact - tolerance)
+                    .sort((a, b) => (b.impact - a.impact) || (a.score - b.score) || (a.index - b.index));
+            },
+            goulot() {
+                const zone = this.priorites();
+                const principal = zone[0] || this.piliers[0];
+                const maxImpact = this.prioritePilier(principal);
+                const exAequo = zone.filter(p => Math.abs(this.prioritePilier(p) - maxImpact) < 0.001);
+                const niveau = principal.score <= 4 ? 'low' : principal.score <= 7 ? 'mid' : 'high';
+                return {
+                    ...principal,
+                    diagnostic: principal.diagnostics[niveau],
+                    niveau,
+                    impact: this.prioritePilier(principal),
+                    exAequo: exAequo.length > 1,
+                    exAequoLabels: exAequo.map(p => p.label),
+                    zoneLabels: zone.map(p => p.label)
+                };
+            },
+            recommandation() {
+                const g = this.goulot();
+                if (g.exAequo) {
+                    const noms = g.exAequoLabels.join(', ');
+                    return 'Pas de priorite unique: ' + noms + ' ont un impact equivalent (' + g.impact.toFixed(1) + '). Traitez d\'abord celui qui bloque le plus votre execution quotidienne, puis re-mesurez.';
+                }
+                if (g.zoneLabels.length > 1) {
+                    const secondaires = g.zoneLabels.filter(n => n !== g.label).join(', ');
+                    return g.reco[g.niveau] + ' Pilier principal: ' + g.label + ' (impact ' + g.impact.toFixed(1) + '). Paliers proches a traiter ensuite: ' + secondaires + '.';
+                }
+                if (g.score > 7) return 'Votre flux est équilibré. Concentrez-vous sur l\'amélioration continue de chaque pilier. Identifiez les petits gains incrémentaux qui composent sur la durée.';
+                return g.reco[g.niveau] || 'Optimisez ce pilier pour débloquer votre flux.';
+            },
+            logiquePriorisation() {
+                const g = this.goulot();
+                if (g.exAequo) {
+                    return 'Lecture: priorisation sur l\'impact (ecart a 10 x coefficient d\'importance), pas sur le score brut seul.';
+                }
+                if (g.zoneLabels.length > 1) {
+                    return 'Lecture: la recommandation fonctionne par zone d\'impact proche, pour eviter un basculement artificiel a chaque ajustement mineur.';
+                }
+                return 'Lecture: un pilier a un impact nettement superieur, il devient la priorite.';
+            },
+            prioritesResume() {
+                const zone = this.priorites();
+                if (zone.length <= 1) return 'Un pilier se detache clairement comme contrainte principale.';
+                return 'Piliers dans la zone prioritaire (impact proche): ' + zone.map(p => p.label).join(', ') + '.';
+            },
+
+            init() {
+                this.piliers.forEach((_, i) => {
+                    this.$watch('piliers[' + i + '].score', () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+
+            updateChart() {
+                const ctx = document.getElementById('acseChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.12)';
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: this.piliers.map(p => p.label),
+                        datasets: [{
+                            label: 'Votre score',
+                            data: this.piliers.map(p => p.score),
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6,182,212,0.15)',
+                            borderWidth: 2,
+                            pointBackgroundColor: this.piliers.map(p => p.color),
+                            pointBorderColor: this.piliers.map(p => p.color),
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            r: {
+                                min: 0, max: 10,
+                                ticks: { stepSize: 2, color: textColor, backdropColor: 'transparent' },
+                                grid: { color: gridColor },
+                                angleLines: { color: gridColor },
+                                pointLabels: { color: textColor, font: { size: 13, weight: '600' } }
+                            }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.acseSim = acseSim;
+})();
+</script>
+{% endblock %}

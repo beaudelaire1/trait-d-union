@@ -1,0 +1,230 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Plafond de Verre — Scalabilité Opérationnelle | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Calculez le chiffre d'affaires refusé à cause de vos limites administratives. Combien de projets supplémentaires pourriez-vous absorber ?{% endblock %}
+
+{% block tool_color %}#ec4899{% endblock %}
+{% block tool_tag %}Scalabilité{% endblock %}
+{% block tool_title %}Plafond de Verre{% endblock %}
+{% block tool_description %}Calculez la capacité supplémentaire que l'automatisation admin pourrait libérer, et évaluez la rentabilité de l'investissement.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Quels outils pour repousser ce plafond ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les automatisations et les outils digitaux que TUS peut mettre en place pour libérer du temps facturable.{% endblock %}
+
+{% block tool_content %}
+<div x-data="plafondSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── Formulaire ── #}
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-5 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Votre capacité actuelle</h2>
+
+                <div>
+                    <label class="tool-label">Projets gérés par mois</label>
+                    <input type="number" class="tool-input" x-model.number="projetsActuels" min="1" step="1" placeholder="8">
+                </div>
+                <div>
+                    <label class="tool-label">Temps admin moyen par projet (heures)</label>
+                    <input type="range" class="tool-range" x-model.number="tempsAdmin" min="1" max="40" step="1">
+                    <div class="flex justify-between mt-1">
+                        <span class="tool-sublabel">Devis, factures, relances, suivi, emails…</span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="tempsAdmin + 'h'"></span>
+                    </div>
+                </div>
+                <div>
+                    <label class="tool-label">Panier moyen par projet (€)</label>
+                    <input type="number" class="tool-input" x-model.number="panierMoyen" min="0" step="500" placeholder="4 000">
+                </div>
+                <div>
+                    <label class="tool-label">Heures admin disponibles par mois</label>
+                    <input type="number" class="tool-input" x-model.number="heuresDisponibles" min="0" step="10" placeholder="160">
+                    <p class="tool-sublabel">Total d'heures que l'équipe peut consacrer à l'admin</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Marge brute par projet</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="margeBrute + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="margeBrute" min="10" max="80" step="5">
+                    <p class="tool-sublabel">(Panier − coûts directs) / Panier. Services : 40-70 %, commerce : 20-40 %</p>
+                </div>
+                <div>
+                    <label class="tool-label">Gain de temps avec automatisation (%)</label>
+                    <input type="range" class="tool-range" x-model.number="gainAutomation" min="20" max="80" step="5">
+                    <div class="flex justify-between mt-1">
+                        <span class="tool-sublabel">Réduction du temps admin par projet</span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="gainAutomation + '%'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-card space-y-5 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Coût de l'automatisation</h2>
+                <div>
+                    <label class="tool-label">Investissement initial (€)</label>
+                    <input type="number" class="tool-input" x-model.number="investAuto" min="0" step="500" placeholder="8 000">
+                    <p class="tool-sublabel">Outils, développement, intégration</p>
+                </div>
+                <div>
+                    <label class="tool-label">Coût mensuel des outils (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutMensuelAuto" min="0" step="10" placeholder="100">
+                    <p class="tool-sublabel">Licences, hébergement, maintenance</p>
+                </div>
+            </div>
+        </div>
+
+        {# ── Résultats ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# Jauge de capacité #}
+            <div class="result-block text-center py-6 mo-scale-in">
+                <p class="result-label mb-3">Capacité libérée</p>
+                <div class="relative mx-auto" style="width: 200px; height: 200px;">
+                    <svg viewBox="0 0 200 200" class="w-full h-full">
+                        <circle cx="100" cy="100" r="85" fill="none" stroke="var(--sim-field-border)" stroke-width="12"/>
+                        <circle cx="100" cy="100" r="85" fill="none" stroke="#ec4899" stroke-width="12"
+                                stroke-linecap="round"
+                                :stroke-dasharray="2 * Math.PI * 85"
+                                :stroke-dashoffset="2 * Math.PI * 85 * (1 - jauge())"
+                                transform="rotate(-90 100 100)"
+                                style="transition: stroke-dashoffset 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);"/>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span class="text-3xl font-bold font-mono" style="color: #ec4899;" x-text="'+' + projetsGagnes()"></span>
+                        <span class="text-xs" style="color: var(--sim-muted);">projets/mois</span>
+                    </div>
+                </div>
+            </div>
+
+            {# KPIs #}
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">CA suppl. / mois</p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(caSupp()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">chiffre d'affaires brut</p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">Profit suppl. / mois</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(profitMensuelSupp()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">après coûts directs</p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">Profit potentiel / an</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(profitAnnuelSupp()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">sous réserve de demande</p>
+                </div>
+            </div>
+
+            {# ROI net #}
+            <div class="result-block mo-fade-up" data-delay="175" :style="'border-color:' + (roiNetAn1() > 0 ? '#22c55e' : '#f59e0b')">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl" x-text="roiNetAn1() > 0 ? '💡' : '⚖️'"></span>
+                    <div>
+                        <p class="font-semibold" :style="'color:' + (roiNetAn1() > 0 ? '#22c55e' : '#f59e0b')" x-text="roiNetAn1() > 0 ? 'ROI net positif dès l\'année 1' : 'Amortissement en cours'"></p>
+                        <p class="text-sm mt-1" style="color: var(--sim-muted);">
+                            Profit suppl. : <strong x-text="fmt(profitAnnuelSupp()) + ' €/an'" style="color: #22c55e;"></strong>
+                            — Coût automatisation : <strong x-text="fmt(coutAutoAn1()) + ' € (an 1)'" style="color: #ef4444;"></strong>
+                        </p>
+                        <p class="text-sm mt-1" style="color: var(--sim-muted);">
+                            <strong>ROI net année 1 :</strong>
+                            <strong :style="'color:' + (roiNetAn1() > 0 ? '#22c55e' : '#ef4444')" x-text="(roiNetAn1() > 0 ? '+' : '') + fmt(roiNetAn1()) + ' €'"></strong>
+                            — Amortissement en <strong x-text="moisAmortissement() < 999 ? moisAmortissement() + ' mois' : '—'" style="color: var(--tool-glow);"></strong>
+                        </p>
+                        <p class="text-xs mt-2" style="color: var(--sim-sublabel);">
+                            Ce calcul suppose que la capacité libérée se traduit en projets réels. Le profit additionnel dépend de votre capacité à capter la demande.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {# Comparatif avant/après #}
+            <div class="result-block mo-fade-up" data-delay="200">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Capacité mensuelle : Avant vs Après</h3>
+                <div class="chart-container">
+                    <canvas id="plafondChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+
+    function plafondSim() {
+        return {
+            projetsActuels: 8,
+            tempsAdmin: 12,
+            panierMoyen: 4000,
+            margeBrute: 40,
+            heuresDisponibles: 160,
+            gainAutomation: 50,
+            investAuto: 8000,
+            coutMensuelAuto: 100,
+
+            tempsOptimise() { return this.tempsAdmin * (1 - this.gainAutomation / 100); },
+            capaciteActuelle() { return this.tempsAdmin > 0 ? Math.floor(this.heuresDisponibles / this.tempsAdmin) : 0; },
+            capaciteOptimisee() { const t = this.tempsOptimise(); return t > 0 ? Math.floor(this.heuresDisponibles / t) : 0; },
+            projetsGagnes() { return Math.max(0, this.capaciteOptimisee() - this.capaciteActuelle()); },
+            caSupp() { return this.projetsGagnes() * this.panierMoyen; },
+            profitMensuelSupp() { return this.caSupp() * (this.margeBrute / 100); },
+            profitAnnuelSupp() { return this.profitMensuelSupp() * 12; },
+            manqueAGagner() { return this.caSupp() * 12; },
+            coutAutoAn1() { return this.investAuto + this.coutMensuelAuto * 12; },
+            roiNetAn1() { return this.profitAnnuelSupp() - this.coutAutoAn1(); },
+            moisAmortissement() {
+                const gainMensuel = this.profitMensuelSupp() - this.coutMensuelAuto;
+                return gainMensuel > 0 ? Math.ceil(this.investAuto / gainMensuel) : 999;
+            },
+            jauge() { const cap = this.capaciteOptimisee(); return cap > 0 ? Math.min(this.projetsGagnes() / cap, 1) : 0; },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+
+            init() {
+                ['projetsActuels','tempsAdmin','panierMoyen','margeBrute','heuresDisponibles','gainAutomation','investAuto','coutMensuelAuto'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+
+            updateChart() {
+                const ctx = document.getElementById('plafondChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Aujourd\'hui', 'Avec automatisation'],
+                        datasets: [
+                            { label: 'Projets gérables', data: [this.capaciteActuelle(), this.capaciteOptimisee()], backgroundColor: ['rgba(236,72,153,0.3)', 'rgba(236,72,153,0.8)'], borderColor: ['#ec4899', '#ec4899'], borderWidth: 2, borderRadius: 10, barPercentage: 0.5 },
+                            { label: 'CA potentiel (€)', data: [this.capaciteActuelle() * this.panierMoyen, this.capaciteOptimisee() * this.panierMoyen], backgroundColor: ['rgba(34,197,94,0.2)', 'rgba(34,197,94,0.6)'], borderColor: ['#22c55e', '#22c55e'], borderWidth: 2, borderRadius: 10, barPercentage: 0.5, yAxisID: 'y1' }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: textColor, font: { weight: '600' } } },
+                            y: { position: 'left', title: { display: true, text: 'Projets', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor } },
+                            y1: { position: 'right', title: { display: true, text: 'CA (€)', color: textColor }, grid: { display: false }, ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') + ' €' } }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.plafondSim = plafondSim;
+})();
+</script>
+{% endblock %}

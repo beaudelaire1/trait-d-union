@@ -1,0 +1,217 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Friction Opérationnelle — Le Coût du Statu Quo | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Chiffrez l'angle mort financier lié aux tâches répétitives, copier-coller et désorganisation. Le coût de ne rien faire.{% endblock %}
+
+{% block tool_color %}#ef4444{% endblock %}
+{% block tool_tag %}Statu Quo{% endblock %}
+{% block tool_title %}Friction Opérationnelle{% endblock %}
+{% block tool_description %}Combien vous coûtent vos fichiers Excel, vos emails non centralisés et vos processus manuels ? Chiffrons l'invisible.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Quelles frictions vos outils pourraient-ils absorber ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les automatisations et les outils que TUS peut construire pour réduire le temps consacré aux tâches répétitives.{% endblock %}
+
+{% block tool_content %}
+<div x-data="frictionSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── Formulaire ── #}
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-5 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Vos paramètres</h2>
+
+                <div>
+                    <label class="tool-label">Heures/semaine en tâches répétitives</label>
+                    <input type="range" class="tool-range" x-model.number="heuresRepetitives" min="1" max="40" step="1">
+                    <div class="flex justify-between mt-1">
+                        <span class="tool-sublabel">Copier-coller, relances, recherche de docs…</span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="heuresRepetitives + 'h'"></span>
+                    </div>
+                </div>
+                <div>
+                    <label class="tool-label">Taux horaire moyen (€/h)</label>
+                    <input type="number" class="tool-input" x-model.number="tauxHoraire" min="0" step="5" placeholder="45">
+                    <p class="tool-sublabel">Coût chargé de la personne effectuant ces tâches</p>
+                </div>
+                <div>
+                    <label class="tool-label">Nombre de collaborateurs concernés</label>
+                    <input type="range" class="tool-range" x-model.number="collaborateurs" min="1" max="50" step="1">
+                    <div class="flex justify-between mt-1">
+                        <span class="tool-sublabel">Personnes impactées par ces processus</span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="collaborateurs"></span>
+                    </div>
+                </div>
+                <div>
+                    <label class="tool-label">% de ces tâches automatisables</label>
+                    <input type="range" class="tool-range" x-model.number="automatisable" min="10" max="90" step="5">
+                    <div class="flex justify-between mt-1">
+                        <span class="tool-sublabel">Estimation réaliste : 40-70%</span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="automatisable + '%'"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tool-card space-y-5 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Coût de l'automatisation</h2>
+
+                <div>
+                    <label class="tool-label">Investissement initial (€)</label>
+                    <input type="number" class="tool-input" x-model.number="investAuto" min="0" step="500" placeholder="5 000">
+                    <p class="tool-sublabel">Développement, intégration, formation</p>
+                </div>
+                <div>
+                    <label class="tool-label">Coût mensuel des outils (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutMensuelAuto" min="0" step="10" placeholder="50">
+                    <p class="tool-sublabel">Licences, hébergement, maintenance</p>
+                </div>
+            </div>
+        </div>
+
+        {# ── Résultats ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# Angle Mort Financier ── le résultat principal #}
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #ef4444;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ef4444;">
+                    L'angle mort financier
+                </p>
+                <p class="result-big text-4xl md:text-5xl" style="color: #ef4444;" x-text="fmt(perteAnnuelle()) + ' €/an'"></p>
+                <p class="text-sm mt-3" style="color: var(--sim-muted);">
+                    consacrés aux tâches manuelles répétitives
+                </p>
+            </div>
+
+            {# Détail #}
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Par semaine</p>
+                    <p class="result-big text-xl" style="color: var(--sim-ink);" x-text="fmt(perteSemaine()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">Par mois</p>
+                    <p class="result-big text-xl" style="color: var(--sim-ink);" x-text="fmt(perteMois()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">Heures perdues / an</p>
+                    <p class="result-big text-xl" style="color: var(--sim-ink);" x-text="fmt(heuresPerduesAn())"></p>
+                </div>
+            </div>
+
+            {# Gain potentiel #}
+            <div class="result-block mo-fade-up" data-delay="250" :style="'border-color:' + (roiNet() > 0 ? '#22c55e' : '#f59e0b')">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl" x-text="roiNet() > 0 ? '💡' : '⚖️'"></span>
+                    <div>
+                        <p class="font-semibold" :style="'color:' + (roiNet() > 0 ? '#22c55e' : '#f59e0b')" x-text="roiNet() > 0 ? 'ROI net positif' : 'Amortissement en cours'"></p>
+                        <p class="text-sm mt-1" style="color: var(--sim-muted);">
+                            Gain brut : <strong x-text="fmt(gainPotentiel()) + ' €/an'" style="color: #22c55e;"></strong>
+                            — Coût automatisation : <strong x-text="fmt(coutAutoAn1()) + ' € (an 1)'" style="color: #ef4444;"></strong>
+                        </p>
+                        <p class="text-sm mt-1" style="color: var(--sim-muted);">
+                            <strong>ROI net année 1 :</strong>
+                            <strong :style="'color:' + (roiNet() > 0 ? '#22c55e' : '#ef4444')" x-text="(roiNet() > 0 ? '+' : '') + fmt(roiNet()) + ' €'"></strong>
+                            — Amortissement en <strong x-text="moisAmortissement() < 999 ? moisAmortissement() + ' mois' : '—'" style="color: var(--tool-glow);"></strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {# Graphique #}
+            <div class="result-block mo-fade-up" data-delay="300">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Coût cumulé du statu quo sur 3 ans</h3>
+                <div class="chart-container">
+                    <canvas id="frictionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+
+    function frictionSim() {
+        return {
+            heuresRepetitives: 8,
+            tauxHoraire: 45,
+            collaborateurs: 3,
+            automatisable: 60,
+            investAuto: 5000,
+            coutMensuelAuto: 50,
+
+            perteSemaine() { return this.heuresRepetitives * this.tauxHoraire * this.collaborateurs; },
+            perteMois() { return this.perteSemaine() * 4.33; },
+            perteAnnuelle() { return this.perteSemaine() * 52; },
+            heuresPerduesAn() { return this.heuresRepetitives * this.collaborateurs * 52; },
+            gainPotentiel() { return this.perteAnnuelle() * (this.automatisable / 100); },
+            heuresRecuperees() { return Math.round(this.heuresPerduesAn() * (this.automatisable / 100)); },
+            coutAutoAn1() { return this.investAuto + this.coutMensuelAuto * 12; },
+            coutAutoAnSuivant() { return this.coutMensuelAuto * 12; },
+            roiNet() { return this.gainPotentiel() - this.coutAutoAn1(); },
+            moisAmortissement() {
+                const gainMensuel = this.gainPotentiel() / 12 - this.coutMensuelAuto;
+                return gainMensuel > 0 ? Math.ceil(this.investAuto / gainMensuel) : 999;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+
+            init() {
+                ['heuresRepetitives','tauxHoraire','collaborateurs','automatisable','investAuto','coutMensuelAuto'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+
+            updateChart() {
+                const ctx = document.getElementById('frictionChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+
+                const labels = [];
+                const statuQuo = [];
+                const optimise = [];
+                const annuel = this.perteAnnuelle();
+                const gain = this.gainPotentiel();
+                const invest = this.investAuto;
+                const mensuelAuto = this.coutMensuelAuto;
+                for (let m = 0; m <= 36; m++) {
+                    labels.push('M' + m);
+                    statuQuo.push(Math.round(annuel / 12 * m));
+                    optimise.push(Math.round(invest + ((annuel - gain) / 12 + mensuelAuto) * m));
+                }
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'Coût du statu quo', data: statuQuo, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)', fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2 },
+                            { label: 'Avec automatisation (investissement inclus)', data: optimise, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.08)', fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2 }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: { legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } } },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { color: textColor, maxTicksLimit: 12 } },
+                            y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') + ' €' } }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.frictionSim = frictionSim;
+})();
+</script>
+{% endblock %}

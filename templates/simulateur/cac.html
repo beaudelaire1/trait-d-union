@@ -1,0 +1,201 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Coût d'Acquisition Client (CAC) | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Mesurez votre coût d'acquisition client, ratio LTV/CAC et identifiez les fuites dans votre entonnoir de conversion.{% endblock %}
+
+{% block tool_color %}#f59e0b{% endblock %}
+{% block tool_tag %}Marketing{% endblock %}
+{% block tool_title %}Coût d'Acquisition Client{% endblock %}
+{% block tool_description %}Combien vous coûte chaque nouveau client ? Mesurez votre CAC, analysez votre entonnoir et comparez avec la valeur vie client.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Vos outils d'acquisition sont-ils à la hauteur ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les outils que TUS peut mettre en place pour capter et convertir vos prospects plus efficacement.{% endblock %}
+
+{% block tool_content %}
+<div x-data="cacSimulator()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── Formulaire ── #}
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-5 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Votre entonnoir</h2>
+
+                <div>
+                    <label class="tool-label">Budget marketing mensuel (€)</label>
+                    <input type="number" class="tool-input" x-model.number="budgetMarketing" min="0" step="100" placeholder="2 000">
+                    <p class="tool-sublabel">Pub, SEO, contenu, salons, networking…</p>
+                </div>
+                <div>
+                    <label class="tool-label">Visiteurs mensuels</label>
+                    <input type="number" class="tool-input" x-model.number="visiteurs" min="0" step="100" placeholder="5 000">
+                </div>
+                <div>
+                    <label class="tool-label">Taux de conversion visiteur → lead (%)</label>
+                    <input type="number" class="tool-input" x-model.number="tauxLead" min="0" max="100" step="0.5" placeholder="3">
+                </div>
+                <div>
+                    <label class="tool-label">Taux de conversion lead → client (%)</label>
+                    <input type="number" class="tool-input" x-model.number="tauxClient" min="0" max="100" step="1" placeholder="20">
+                </div>
+                <div>
+                    <label class="tool-label">Valeur vie client — LTV (€)</label>
+                    <input type="number" class="tool-input" x-model.number="ltv" min="0" step="100" placeholder="5 000">
+                    <p class="tool-sublabel">Revenu total moyen généré par un client sur sa durée de vie</p>
+                </div>
+            </div>
+        </div>
+
+        {# ── Résultats ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# KPI Row #}
+            <div class="grid sm:grid-cols-3 gap-4" data-animate>
+                <div class="result-block text-center py-5 mo-scale-in">
+                    <p class="result-label mb-1">Leads / mois</p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="leadsParMois()"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-scale-in" data-delay="100">
+                    <p class="result-label mb-1">Clients / mois</p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="clientsParMois()"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-scale-in" data-delay="200">
+                    <p class="result-label mb-1">CAC</p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="clientsParMois() > 0 ? fmt(cac()) + ' \u20ac' : '\u2014'"></p>
+                </div>
+            </div>
+
+            {# LTV/CAC Ratio #}
+            <div class="result-block mo-fade-up" data-delay="150">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold" style="color: var(--sim-ink);">Ratio LTV / CAC</h3>
+                    <span class="text-2xl font-bold font-mono" :style="'color:' + ratioColor()" x-text="ratioLtv().toFixed(1) + 'x'"></span>
+                </div>
+                <div class="w-full h-4 rounded-full overflow-hidden" style="background: var(--sim-field-bg);">
+                    <div class="h-full rounded-full transition-all duration-700" :style="'width:' + Math.min(ratioLtv()/5*100, 100) + '%; background:' + ratioColor()"></div>
+                </div>
+                <div class="flex justify-between mt-2 text-xs" style="color: var(--sim-sublabel);">
+                    <span>Danger &lt; 1x</span><span>Fragile 1-3x</span><span>Sain &gt; 3x</span>
+                </div>
+                <div class="mt-4 p-3 rounded-xl" :style="'background:' + ratioColor() + '12'">
+                    <p class="text-sm" :style="'color:' + ratioColor()" x-text="ratioVerdict()"></p>
+                </div>
+            </div>
+
+            {# Waterfall Funnel #}
+            <div class="result-block mo-fade-up" data-delay="200">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Entonnoir de conversion</h3>
+                <div class="chart-container">
+                    <canvas id="cacChart"></canvas>
+                </div>
+            </div>
+
+            {# Coût par étape #}
+            <div class="result-block mo-fade-up" data-delay="250">
+                <h3 class="text-sm font-semibold mb-3" style="color: var(--sim-ink);">Coût par étape</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm" style="color: var(--sim-muted);">Coût par visiteur</span>
+                        <span class="font-mono font-semibold text-sm" style="color: var(--sim-ink);" x-text="coutParVisiteur() + ' €'"></span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm" style="color: var(--sim-muted);">Coût par lead</span>
+                        <span class="font-mono font-semibold text-sm" style="color: var(--sim-ink);" x-text="coutParLead() + ' €'"></span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm" style="color: var(--sim-muted);">Coût par client (CAC)</span>
+                        <span class="font-mono font-bold" style="color: var(--tool-glow);" x-text="clientsParMois() > 0 ? fmt(cac()) + ' \u20ac' : '\u2014'"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+
+    function cacSimulator() {
+        return {
+            budgetMarketing: 2000,
+            visiteurs: 5000,
+            tauxLead: 3,
+            tauxClient: 20,
+            ltv: 5000,
+
+            leadsParMois() { return Math.round(this.visiteurs * (this.tauxLead || 0) / 100); },
+            clientsParMois() { return Math.round(this.leadsParMois() * (this.tauxClient || 0) / 100); },
+            cac() { const c = this.clientsParMois(); return c > 0 ? this.budgetMarketing / c : 0; },
+            ratioLtv() { const c = this.cac(); return c > 0 ? this.ltv / c : 0; },
+            coutParVisiteur() { return this.visiteurs > 0 ? (this.budgetMarketing / this.visiteurs).toFixed(2) : '0'; },
+            coutParLead() { const l = this.leadsParMois(); return l > 0 ? (this.budgetMarketing / l).toFixed(2) : '0'; },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+
+            ratioColor() {
+                const r = this.ratioLtv();
+                if (r < 1) return '#ef4444';
+                if (r < 3) return '#f59e0b';
+                return '#22c55e';
+            },
+            ratioVerdict() {
+                const c = this.clientsParMois();
+                if (c === 0) return 'Aucun client acquis avec ces paramètres. Votre entonnoir ne produit pas de conversion — vérifiez vos taux.';
+                const r = this.ratioLtv();
+                const cacVal = this.fmt(this.cac());
+                const ltvVal = this.fmt(this.ltv);
+                const delta = this.fmt(Math.abs(this.ltv - this.cac()));
+                if (r < 1) return 'Danger : vous dépensez ' + cacVal + ' € pour acquérir un client qui en rapporte ' + ltvVal + ' € (LTV). Déficit de ' + delta + ' € par client. Revoyez votre stratégie d\'acquisition ou augmentez la LTV.';
+                if (r < 3) return 'Fragile : votre CAC est de ' + cacVal + ' € pour une LTV de ' + ltvVal + ' € — marge nette de ' + delta + ' € par client. Optimisez votre entonnoir ou augmentez la valeur client pour sécuriser la rentabilité.';
+                return 'Sain : votre CAC de ' + cacVal + ' € génère ' + ltvVal + ' € de valeur vie (×' + r.toFixed(1) + '). Soit ' + delta + ' € de marge nette par client. L\'acquisition est rentable à ces niveaux.';
+            },
+
+            init() {
+                ['budgetMarketing','visiteurs','tauxLead','tauxClient','ltv'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+
+            updateChart() {
+                const ctx = document.getElementById('cacChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Visiteurs', 'Leads', 'Clients'],
+                        datasets: [{
+                            data: [this.visiteurs, this.leadsParMois(), this.clientsParMois()],
+                            backgroundColor: ['rgba(245,158,11,0.25)', 'rgba(245,158,11,0.5)', 'rgba(245,158,11,0.85)'],
+                            borderColor: ['#f59e0b', '#f59e0b', '#f59e0b'],
+                            borderWidth: 2,
+                            borderRadius: 8,
+                            barPercentage: 0.6
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') } },
+                            x: { grid: { display: false }, ticks: { color: textColor, font: { weight: '600' } } }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.cacSimulator = cacSimulator;
+})();
+</script>
+{% endblock %}
