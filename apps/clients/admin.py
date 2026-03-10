@@ -60,6 +60,9 @@ class ClientProfileCreationForm(forms.ModelForm):
         )
         # Stocker le résultat pour le message admin
         self._account_result = result
+        # Django admin appelle form.save_m2m() dans save_related() ;
+        # comme on bypass super().save(), on doit exposer save_m2m nous-mêmes.
+        self.save_m2m = lambda: None
         return result.client_profile
 
 
