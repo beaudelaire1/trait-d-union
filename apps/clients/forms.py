@@ -162,6 +162,16 @@ class ClientProfileForm(forms.ModelForm):
         if commit:
             profile.user.save()
             profile.save()
+            self._save_m2m()
+        else:
+            # Expose save_m2m so callers (e.g. Django admin) can call it later
+            old_save_m2m = self.save_m2m
+
+            def save_m2m():
+                old_save_m2m()
+                profile.user.save()
+
+            self.save_m2m = save_m2m
         return profile
 
 
