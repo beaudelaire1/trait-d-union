@@ -929,20 +929,30 @@
                 <div class="footer-info">
                     <div class="footer-col">
                         <h5>Contact</h5>
-                        <p>{% if branding.address %}{{ branding.address }}<br>{% endif %}{% if branding.zip_code or
-                            branding.city %}{{ branding.zip_code }} {{ branding.city }}<br>{% endif %}{% if
-                            branding.phone %}{{ branding.phone }}{% endif %}</p>
+                        <p>
+                            {% if branding.address %}{{ branding.address }}<br>{% endif %}
+                            {% if branding.zip_code %}{{ branding.zip_code }}{% endif %}
+                            {% if branding.city %} {{ branding.city }}{% endif %}
+                            {% if branding.zip_code or branding.city %}<br>{% endif %}
+                            {% if branding.phone %}{{ branding.phone }}{% endif %}
+                        </p>
                     </div>
                     <div class="footer-col">
                         <h5>Légal</h5>
-                        <p>{% if branding.siret %}<span class="highlight">SIRET:</span> {{ branding.siret }}<br>{% endif
-                            %}{% if branding.tva_intra %}<span class="highlight">TVA:</span> {{ branding.tva_intra }}{%
-                            endif %}</p>
+                        <p>
+                            {% if branding.siret %}<span class="highlight">SIRET:</span> {{ branding.siret }}<br>{%
+                            endif %}
+                            {% if branding.tva_intra %}<span class="highlight">TVA:</span> {{ branding.tva_intra }}{%
+                            endif %}
+                        </p>
                     </div>
                     <div class="footer-col">
                         <h5>Banque</h5>
-                        <p>{% if branding.iban %}<span class="highlight">IBAN:</span> {{ branding.iban }}<br>{% endif
-                            %}{% if branding.bic %}<span class="highlight">BIC:</span> {{ branding.bic }}{% endif %}</p>
+                        <p>
+                            {% if branding.iban %}<span class="highlight">IBAN:</span> {{ branding.iban }}<br>{% endif
+                            %}
+                            {% if branding.bic %}<span class="highlight">BIC:</span> {{ branding.bic }}{% endif %}
+                        </p>
                     </div>
                 </div>
 
