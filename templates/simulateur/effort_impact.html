@@ -1,0 +1,190 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Matrice Effort / Impact | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Par quoi je commence ? Classez vos projets dans la matrice 2×2 Effort/Impact et obtenez un séquencement optimal.{% endblock %}
+
+{% block tool_color %}#a855f7{% endblock %}
+{% block tool_tag %}★ New{% endblock %}
+{% block tool_title %}Matrice Effort / Impact{% endblock %}
+{% block tool_description %}Par quoi je commence ? Classez vos projets par effort et impact pour un séquencement optimal sur 3 trimestres.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Besoin d'un plan d'action digital clair ?{% endblock %}
+{% block tool_cta_text %}TUS vous aide à prioriser vos investissements digitaux pour un impact maximum.{% endblock %}
+
+{% block tool_content %}
+<div x-data="effortImpactSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-4 mo-fade-up">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Vos projets</h2>
+                    <button @click="addProjet()" :disabled="projets.length >= 8"
+                        class="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                        :style="projets.length >= 8 ? 'opacity:.4;cursor:not-allowed;' : ''"
+                        style="background: var(--tool-glow); color: #fff;">+ Projet</button>
+                </div>
+                <template x-for="(p, i) in projets" :key="i">
+                    <div class="p-4 rounded-xl space-y-3" style="background: var(--sim-surface);">
+                        <div class="flex items-center justify-between gap-2">
+                            <input type="text" class="tool-input flex-1 !py-1.5 text-sm" x-model="p.nom" :placeholder="'Projet ' + (i+1)">
+                            <button @click="removeProjet(i)" class="text-xs opacity-50 hover:opacity-100 transition-opacity" title="Supprimer">&times;</button>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="tool-sublabel">Effort</span>
+                                <span class="text-xs font-mono font-bold" style="color: #ef4444;" x-text="p.effort + '/5'"></span>
+                            </div>
+                            <input type="range" class="tool-range" x-model.number="p.effort" min="1" max="5" step="1">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="tool-sublabel">Impact</span>
+                                <span class="text-xs font-mono font-bold" style="color: #22c55e;" x-text="p.impact + '/5'"></span>
+                            </div>
+                            <input type="range" class="tool-range" x-model.number="p.impact" min="1" max="5" step="1">
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block mo-scale-in" style="border-color: #a855f7;">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Matrice Effort / Impact</h3>
+                <div class="chart-container" style="min-height: 320px;">
+                    <canvas id="effortImpactChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="100">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Séquencement recommandé</h3>
+                <div class="space-y-4">
+                    <template x-for="(q, qi) in sequencement()" :key="qi">
+                        <div>
+                            <p class="text-xs font-bold tracking-widest uppercase mb-2" :style="'color:' + q.color" x-text="q.label"></p>
+                            <div class="space-y-1">
+                                <template x-for="(p, pi) in q.projets" :key="pi">
+                                    <div class="flex items-center gap-3 px-3 py-2 rounded-lg" style="background: var(--sim-surface);">
+                                        <span class="text-lg" x-text="q.icon"></span>
+                                        <span class="flex-1 text-sm font-medium" style="color: var(--sim-ink);" x-text="p.nom || 'Projet ' + (p.idx+1)"></span>
+                                        <span class="text-xs" style="color: var(--sim-muted);" x-text="'E:' + p.effort + ' I:' + p.impact"></span>
+                                    </div>
+                                </template>
+                                <p x-show="q.projets.length === 0" class="text-xs italic" style="color: var(--sim-muted);">Aucun projet dans ce quadrant</p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="200">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">💡</span>
+                    <div>
+                        <p class="font-semibold" style="color: #a855f7;">Analyse</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function effortImpactSim() {
+        return {
+            projets: [
+                { nom: 'Refonte site web', effort: 4, impact: 5 },
+                { nom: 'SEO local', effort: 2, impact: 4 },
+                { nom: 'Newsletter', effort: 2, impact: 3 },
+                { nom: 'App mobile', effort: 5, impact: 2 }
+            ],
+            addProjet() { if (this.projets.length < 8) this.projets.push({ nom: '', effort: 3, impact: 3 }); },
+            removeProjet(i) { if (this.projets.length > 1) this.projets.splice(i, 1); },
+            classify(p) {
+                if (p.effort <= 3 && p.impact >= 3) return 'quick';
+                if (p.effort >= 3 && p.impact >= 3) return 'strategic';
+                if (p.effort <= 3 && p.impact < 3) return 'fill';
+                return 'avoid';
+            },
+            sequencement() {
+                const idx = this.projets.map((p, i) => ({ ...p, idx: i }));
+                const quick = idx.filter(p => this.classify(p) === 'quick').sort((a, b) => b.impact - a.impact);
+                const strategic = idx.filter(p => this.classify(p) === 'strategic').sort((a, b) => b.impact - a.impact);
+                const fill = idx.filter(p => this.classify(p) === 'fill').sort((a, b) => a.effort - b.effort);
+                const avoid = idx.filter(p => this.classify(p) === 'avoid');
+                return [
+                    { label: 'T1 — Victoires rapides', color: '#22c55e', icon: '🚀', projets: quick },
+                    { label: 'T2 — Projets stratégiques', color: '#a855f7', icon: '🎯', projets: strategic },
+                    { label: 'T3 — Remplissage', color: '#f59e0b', icon: '📋', projets: fill },
+                    { label: 'À éviter / reporter', color: '#ef4444', icon: '⛔', projets: avoid }
+                ];
+            },
+            insight() {
+                const qw = this.projets.filter(p => this.classify(p) === 'quick').length;
+                const av = this.projets.filter(p => this.classify(p) === 'avoid').length;
+                const total = this.projets.length;
+                if (qw === 0) return `Aucune victoire rapide identifiée. Cherchez des projets à faible effort / fort impact pour créer de l'élan dans votre stratégie digitale.`;
+                if (av >= total / 2) return `${av} projets sur ${total} sont dans le quadrant "à éviter". Reconsidérez vos priorités ou reformulez ces projets pour réduire leur effort.`;
+                return `${qw} victoire(s) rapide(s) — commencez par celles-ci au T1 pour générer du momentum. Les projets stratégiques suivront au T2 avec les ressources libérées.`;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            init() {
+                this.$watch('projets', () => this.updateChart(), { deep: true });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('effortImpactChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                const colorMap = { quick: '#22c55e', strategic: '#a855f7', fill: '#f59e0b', avoid: '#ef4444' };
+                const points = this.projets.map((p, i) => ({
+                    x: p.effort, y: p.impact,
+                    backgroundColor: colorMap[this.classify(p)] + 'AA',
+                    borderColor: colorMap[this.classify(p)],
+                    label: p.nom || 'Projet ' + (i + 1)
+                }));
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: { datasets: [{
+                        data: points.map(p => ({ x: p.x, y: p.y })),
+                        backgroundColor: points.map(p => p.backgroundColor),
+                        borderColor: points.map(p => p.borderColor),
+                        borderWidth: 2, pointRadius: 12, pointHoverRadius: 16
+                    }] },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (c) => points[c.dataIndex].label + ' (E:' + c.raw.x + ' I:' + c.raw.y + ')' } },
+                            annotation: { annotations: {
+                                hLine: { type: 'line', yMin: 3, yMax: 3, borderColor: gridColor, borderWidth: 1, borderDash: [4, 4] },
+                                vLine: { type: 'line', xMin: 3, xMax: 3, borderColor: gridColor, borderWidth: 1, borderDash: [4, 4] }
+                            }}
+                        },
+                        scales: {
+                            x: { min: 0.5, max: 5.5, title: { display: true, text: 'Effort →', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1 } },
+                            y: { min: 0.5, max: 5.5, title: { display: true, text: '↑ Impact', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1 } }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.effortImpactSim = effortImpactSim;
+})();
+</script>
+{% endblock %}

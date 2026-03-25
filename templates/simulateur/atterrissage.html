@@ -1,0 +1,396 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Atterrissage Prévisionnel | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Projetez votre atterrissage CA et marge par service/produit, intégrez RFA, PPTG et taux de marge pour un pilotage financier précis.{% endblock %}
+
+{% block tool_color %}#f59e0b{% endblock %}
+{% block tool_tag %}Pilotage{% endblock %}
+{% block tool_title %}Atterrissage Prévisionnel{% endblock %}
+{% block tool_description %}Pilotage financier complet : CA réalisé vs objectif par service, taux de marge, RFA, PPTG — projetez votre atterrissage consolidé.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Besoin d'un tableau de bord sur mesure ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les dashboards de pilotage connectés à vos données — pour ne plus jamais piloter à l'aveugle.{% endblock %}
+
+{% block tool_content %}
+<div x-data="atterrissageSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── PANNEAU GAUCHE : SAISIE ── #}
+        <div class="lg:col-span-2 space-y-5">
+
+            {# Paramètres période #}
+            <div class="tool-card space-y-5 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Période</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="tool-label">Mois écoulés</label>
+                        <input type="number" class="tool-input" x-model.number="moisEcoules" min="1" max="12" step="1">
+                    </div>
+                    <div>
+                        <label class="tool-label">Mois restants</label>
+                        <input type="number" class="tool-input" x-model.number="moisRestants" min="1" max="12" step="1">
+                    </div>
+                </div>
+            </div>
+
+            {# Services / Produits #}
+            <div class="tool-card space-y-5 mo-fade-up" data-delay="100">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Services / Produits</h2>
+                    <button @click="addService()" class="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors" style="background: rgba(245,158,11,0.12); color: #f59e0b;" hover="background: rgba(245,158,11,0.2);">+ Ajouter</button>
+                </div>
+
+                <template x-for="(s, i) in services" :key="i">
+                    <div class="p-4 rounded-xl space-y-3" style="background: var(--sim-card-bg); border: 1px solid var(--sim-card-border);">
+                        <div class="flex items-center justify-between gap-2">
+                            <input type="text" class="tool-input flex-1 !py-1.5 text-sm font-semibold" x-model="s.nom" placeholder="Nom du service">
+                            <button @click="services.length > 1 && services.splice(i, 1)" x-show="services.length > 1" class="text-xs opacity-40 hover:opacity-100 transition-opacity" style="color: #ef4444;" title="Supprimer">&times;</button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="tool-label text-xs">CA Objectif (€)</label>
+                                <input type="number" class="tool-input !py-1.5 text-sm" x-model.number="s.objectif" min="0" step="1000">
+                            </div>
+                            <div>
+                                <label class="tool-label text-xs">CA Réalisé (€)</label>
+                                <input type="number" class="tool-input !py-1.5 text-sm" x-model.number="s.realise" min="0" step="1000">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="tool-label text-xs">Taux de marge (%)</label>
+                                <input type="number" class="tool-input !py-1.5 text-sm" x-model.number="s.tauxMarge" min="0" max="100" step="1">
+                            </div>
+                            <div>
+                                <label class="tool-label text-xs">Pipeline (€)</label>
+                                <input type="number" class="tool-input !py-1.5 text-sm" x-model.number="s.pipeline" min="0" step="1000">
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <label class="tool-label text-xs mb-0">Taux conversion pipeline</label>
+                                <span class="text-xs font-bold font-mono" style="color: var(--tool-glow);" x-text="s.tauxConv + '%'"></span>
+                            </div>
+                            <input type="range" class="tool-range" x-model.number="s.tauxConv" min="5" max="80" step="5">
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            {# RFA & PPTG #}
+            <div class="tool-card space-y-5 mo-fade-up" data-delay="200">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">RFA & PPTG</h2>
+                <p class="text-xs" style="color: var(--sim-muted);">Remises de fin d'année et participations promotionnelles tarifaires.</p>
+
+                <div>
+                    <label class="tool-label">Seuil RFA — CA annuel (€)</label>
+                    <input type="number" class="tool-input" x-model.number="rfaSeuil" min="0" step="5000">
+                    <p class="tool-sublabel">CA minimum pour déclencher la ristourne</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="tool-label mb-0">Taux RFA</label>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="rfaTaux + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="rfaTaux" min="0" max="10" step="0.5">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="tool-label mb-0">Taux PPTG</label>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="pptgTaux + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="pptgTaux" min="0" max="8" step="0.5">
+                    <p class="tool-sublabel">Participation promotionnelle sur taux garanti (0 = non applicable)</p>
+                </div>
+            </div>
+        </div>
+
+        {# ── PANNEAU DROIT : RÉSULTATS ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# Atterrissage consolidé #}
+            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + couleurStatut()">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + couleurStatut()">
+                    Atterrissage CA consolidé
+                </p>
+                <p class="result-big text-5xl" :style="'color:' + couleurStatut()" x-text="fmt(atterrissageCA()) + ' €'"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">
+                    Objectif total : <strong x-text="fmt(objectifTotal()) + ' €'"></strong>
+                    — Écart : <strong :style="'color:' + couleurStatut()" x-text="(ecartCA() >= 0 ? '+' : '') + fmt(ecartCA()) + ' €'"></strong>
+                </p>
+            </div>
+
+            {# KPIs consolidés #}
+            <div class="grid sm:grid-cols-4 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Marge atterrissage</p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="fmt(margeAtterrissage()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">RFA estimée</p>
+                    <p class="result-big text-2xl" :style="'color:' + (rfaEstimee() > 0 ? '#22c55e' : 'var(--sim-muted)')" x-text="fmt(rfaEstimee()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="rfaAtteint() ? '✓ Seuil atteint' : '✗ Seuil non atteint'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">PPTG estimé</p>
+                    <p class="result-big text-2xl" :style="'color:' + (pptgEstime() > 0 ? '#a855f7' : 'var(--sim-muted)')" x-text="fmt(pptgEstime()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
+                    <p class="result-label mb-1">Taux marge moyen</p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="tauxMargeMoyen().toFixed(1) + '%'"></p>
+                </div>
+            </div>
+
+            {# Tableau par service #}
+            <div class="result-block mo-fade-up overflow-x-auto" data-delay="300">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Détail par service / produit</h3>
+                <table class="w-full text-sm" style="color: var(--sim-muted);">
+                    <thead>
+                        <tr class="text-xs uppercase tracking-wider" style="color: var(--sim-muted); border-bottom: 1px solid var(--sim-card-border);">
+                            <th class="text-left py-2 pr-2">Service</th>
+                            <th class="text-right py-2 px-2">Objectif</th>
+                            <th class="text-right py-2 px-2">Réalisé</th>
+                            <th class="text-right py-2 px-2">Pipeline conv.</th>
+                            <th class="text-right py-2 px-2">Projection</th>
+                            <th class="text-right py-2 px-2">Atterrissage</th>
+                            <th class="text-right py-2 px-2">Marge</th>
+                            <th class="text-right py-2 pl-2">Écart</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(s, i) in services" :key="i">
+                            <tr style="border-bottom: 1px solid var(--sim-card-border);">
+                                <td class="py-2 pr-2 font-medium" style="color: var(--sim-ink);" x-text="s.nom || 'Service ' + (i+1)"></td>
+                                <td class="text-right py-2 px-2" x-text="fmt(s.objectif)"></td>
+                                <td class="text-right py-2 px-2" x-text="fmt(s.realise)"></td>
+                                <td class="text-right py-2 px-2" x-text="fmt(pipeConv(s))"></td>
+                                <td class="text-right py-2 px-2" style="color: var(--sim-muted);" x-text="fmt(projService(s))"></td>
+                                <td class="text-right py-2 px-2 font-bold" :style="'color:' + couleurService(s)" x-text="fmt(atterService(s))"></td>
+                                <td class="text-right py-2 px-2" x-text="fmt(margeService(s))"></td>
+                                <td class="text-right py-2 pl-2 font-semibold" :style="'color:' + couleurService(s)" x-text="(ecartService(s) >= 0 ? '+' : '') + fmt(ecartService(s))"></td>
+                            </tr>
+                        </template>
+                        <tr class="font-bold" style="border-top: 2px solid var(--sim-card-border);">
+                            <td class="py-2 pr-2" style="color: var(--sim-ink);">TOTAL</td>
+                            <td class="text-right py-2 px-2" style="color: var(--sim-ink);" x-text="fmt(objectifTotal())"></td>
+                            <td class="text-right py-2 px-2" style="color: var(--sim-ink);" x-text="fmt(realiseTotal())"></td>
+                            <td class="text-right py-2 px-2" x-text="fmt(pipeConvTotal())"></td>
+                            <td class="text-right py-2 px-2" x-text="fmt(projTotal())"></td>
+                            <td class="text-right py-2 px-2" :style="'color:' + couleurStatut()" x-text="fmt(atterrissageCA())"></td>
+                            <td class="text-right py-2 px-2" x-text="fmt(margeAtterrissage())"></td>
+                            <td class="text-right py-2 pl-2" :style="'color:' + couleurStatut()" x-text="(ecartCA() >= 0 ? '+' : '') + fmt(ecartCA())"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {# Graphiques #}
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="result-block mo-fade-up" data-delay="350">
+                    <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Atterrissage par service</h3>
+                    <div class="chart-container">
+                        <canvas id="atterBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="result-block mo-fade-up" data-delay="400">
+                    <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Projection mois par mois</h3>
+                    <div class="chart-container">
+                        <canvas id="atterLineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            {# Cadence nécessaire #}
+            <div class="result-block mo-fade-up" data-delay="450">
+                <h3 class="text-sm font-semibold mb-3" style="color: var(--sim-ink);">CA additionnel nécessaire par mois restant</h3>
+                <div class="grid sm:grid-cols-2 gap-3">
+                    <template x-for="(s, i) in services" :key="'cad'+i">
+                        <div class="flex items-center justify-between p-3 rounded-lg" style="background: var(--sim-card-bg); border: 1px solid var(--sim-card-border);">
+                            <span class="text-sm font-medium" style="color: var(--sim-ink);" x-text="s.nom || 'Service ' + (i+1)"></span>
+                            <span class="text-sm font-bold font-mono" :style="'color:' + (cadenceService(s) > cadenceMoyService(s) * 1.3 ? '#ef4444' : '#22c55e')" x-text="fmt(cadenceService(s)) + ' €/mois'"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            {# Insight #}
+            <div class="result-block mo-fade-up" data-delay="500" :style="'border-color:' + couleurStatut()">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🎯</span>
+                    <div>
+                        <p class="font-semibold" :style="'color:' + couleurStatut()" x-text="statut()"></p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    const COLORS = ['#f59e0b','#22c55e','#6B8AFF','#ec4899','#a855f7','#06b6d4','#14b8a6','#ef4444'];
+    let barChart = null, lineChart = null;
+
+    function atterrissageSim() {
+        return {
+            moisEcoules: 5, moisRestants: 7,
+            services: [
+                { nom: 'Conseil', objectif: 60000, realise: 22000, tauxMarge: 45, pipeline: 18000, tauxConv: 35 },
+                { nom: 'Développement', objectif: 90000, realise: 40000, tauxMarge: 35, pipeline: 30000, tauxConv: 40 },
+                { nom: 'Formation', objectif: 30000, realise: 12000, tauxMarge: 55, pipeline: 8000, tauxConv: 30 }
+            ],
+            rfaSeuil: 150000, rfaTaux: 2, pptgTaux: 1,
+
+            addService() {
+                this.services.push({ nom: '', objectif: 0, realise: 0, tauxMarge: 30, pipeline: 0, tauxConv: 30 });
+            },
+
+            /* ── Calculs par service ── */
+            pipeConv(s)       { return Math.round(s.pipeline * s.tauxConv / 100); },
+            cadenceMoyService(s) { return this.moisEcoules > 0 ? s.realise / this.moisEcoules : 0; },
+            projService(s)    { return Math.round(this.cadenceMoyService(s) * this.moisRestants); },
+            atterService(s)   { return s.realise + this.projService(s) + this.pipeConv(s); },
+            margeService(s)   { return Math.round(this.atterService(s) * s.tauxMarge / 100); },
+            ecartService(s)   { return this.atterService(s) - s.objectif; },
+            couleurService(s) {
+                const pct = s.objectif > 0 ? this.atterService(s) / s.objectif : 0;
+                if (pct >= 1) return '#22c55e'; if (pct >= 0.85) return '#f59e0b'; return '#ef4444';
+            },
+            cadenceService(s) {
+                const reste = s.objectif - s.realise - this.pipeConv(s);
+                return this.moisRestants > 0 ? Math.max(0, Math.round(reste / this.moisRestants)) : 0;
+            },
+
+            /* ── Totaux consolidés ── */
+            objectifTotal()   { return this.services.reduce((a,s) => a + (s.objectif||0), 0); },
+            realiseTotal()    { return this.services.reduce((a,s) => a + (s.realise||0), 0); },
+            pipeConvTotal()   { return this.services.reduce((a,s) => a + this.pipeConv(s), 0); },
+            projTotal()       { return this.services.reduce((a,s) => a + this.projService(s), 0); },
+            atterrissageCA()  { return this.services.reduce((a,s) => a + this.atterService(s), 0); },
+            margeAtterrissage() { return this.services.reduce((a,s) => a + this.margeService(s), 0); },
+            ecartCA()         { return this.atterrissageCA() - this.objectifTotal(); },
+
+            /* ── RFA & PPTG ── */
+            rfaAtteint()  { return this.atterrissageCA() >= this.rfaSeuil; },
+            rfaEstimee()  { return this.rfaAtteint() ? Math.round(this.atterrissageCA() * this.rfaTaux / 100) : 0; },
+            pptgEstime()  { return Math.round(this.atterrissageCA() * this.pptgTaux / 100); },
+
+            tauxMargeMoyen() {
+                const ca = this.atterrissageCA();
+                return ca > 0 ? (this.margeAtterrissage() / ca * 100) : 0;
+            },
+
+            couleurStatut() {
+                const pct = this.objectifTotal() > 0 ? this.atterrissageCA() / this.objectifTotal() : 0;
+                if (pct >= 1) return '#22c55e'; if (pct >= 0.85) return '#f59e0b'; return '#ef4444';
+            },
+            statut() {
+                const pct = this.objectifTotal() > 0 ? this.atterrissageCA() / this.objectifTotal() : 0;
+                if (pct >= 1) return 'Objectif atteignable ✓';
+                if (pct >= 0.85) return 'Objectif tendu ⚠';
+                return 'Objectif hors d\'atteinte ✗';
+            },
+            insight() {
+                const pct = this.objectifTotal() > 0 ? this.atterrissageCA() / this.objectifTotal() : 0;
+                const worst = [...this.services].sort((a,b) => (this.ecartService(a)/Math.max(1,a.objectif)) - (this.ecartService(b)/Math.max(1,b.objectif)))[0];
+                const rfaNote = this.rfaAtteint()
+                    ? ` RFA déjà sécurisée (${this.fmt(this.rfaEstimee())} €).`
+                    : this.rfaSeuil > 0
+                        ? ` Il manque ${this.fmt(Math.max(0, this.rfaSeuil - this.atterrissageCA()))} € pour déclencher la RFA.`
+                        : '';
+                if (pct >= 1) return `L'atterrissage dépasse l'objectif de ${this.fmt(this.ecartCA())} €.${rfaNote} Marge brute estimée : ${this.fmt(this.margeAtterrissage())} € (${this.tauxMargeMoyen().toFixed(1)}%).`;
+                if (pct >= 0.85) return `Objectif serré — le service "${worst ? worst.nom : '?'}" est le plus en retard (${this.fmt(this.ecartService(worst))} € d'écart). Concentrez les efforts sur la conversion du pipeline.${rfaNote}`;
+                return `L'écart global est de ${this.fmt(Math.abs(this.ecartCA()))} €. Le maillon faible est "${worst ? worst.nom : '?'}". Activez des leviers commerciaux exceptionnels ou revoyez les objectifs.${rfaNote}`;
+            },
+
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+
+            init() {
+                this.$watch('services', () => this.updateCharts(), { deep: true });
+                ['moisEcoules','moisRestants','rfaSeuil','rfaTaux','pptgTaux'].forEach(k => { this.$watch(k, () => this.updateCharts()); });
+                this.$nextTick(() => this.updateCharts());
+            },
+
+            updateCharts() {
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const txt = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const grid = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                this._renderBar(txt, grid);
+                this._renderLine(txt, grid);
+            },
+
+            _renderBar(txt, grid) {
+                const ctx = document.getElementById('atterBarChart');
+                if (!ctx) return;
+                const labels = this.services.map((s,i) => s.nom || 'Service '+(i+1));
+                const objData = this.services.map(s => s.objectif);
+                const attData = this.services.map(s => this.atterService(s));
+                const bgColors = this.services.map((_,i) => COLORS[i % COLORS.length]);
+                if (barChart) barChart.destroy();
+                barChart = new Chart(ctx, {
+                    type: 'bar', data: { labels, datasets: [
+                        { label: 'Objectif', data: objData, backgroundColor: 'rgba(107,138,255,0.15)', borderColor: '#6B8AFF', borderWidth: 1.5, borderDash: [4,4], barPercentage: 0.6 },
+                        { label: 'Atterrissage', data: attData, backgroundColor: bgColors.map(c => c + '33'), borderColor: bgColors, borderWidth: 2, barPercentage: 0.6 }
+                    ]}, options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: txt, usePointStyle: true, padding: 12 } },
+                            tooltip: { callbacks: { label: item => item.dataset.label + ': ' + Math.round(item.raw).toLocaleString('fr-FR') + ' €' } } },
+                        scales: { x: { grid: { display: false }, ticks: { color: txt } },
+                            y: { grid: { color: grid }, ticks: { color: txt, callback: v => (v/1000).toLocaleString('fr-FR')+'k' } } }
+                    }
+                });
+            },
+
+            _renderLine(txt, grid) {
+                const ctx = document.getElementById('atterLineChart');
+                if (!ctx) return;
+                const total = this.moisEcoules + this.moisRestants;
+                const labels = Array.from({length: total}, (_,i) => 'M'+(i+1));
+                const objLine = Array(total).fill(this.objectifTotal());
+
+                /* cumul réalisé + projection */
+                const cadenceTotale = this.moisEcoules > 0 ? this.realiseTotal() / this.moisEcoules : 0;
+                const realData = []; const projData = [];
+                let cumul = 0;
+                for (let m = 1; m <= total; m++) {
+                    if (m <= this.moisEcoules) { cumul += cadenceTotale; realData.push(Math.round(cumul)); projData.push(null); }
+                    else { realData.push(null); cumul += cadenceTotale; projData.push(Math.round(cumul)); }
+                }
+                if (this.moisEcoules > 0 && this.moisEcoules <= total) projData[this.moisEcoules - 1] = realData[this.moisEcoules - 1];
+
+                /* RFA seuil line */
+                const rfaLine = this.rfaSeuil > 0 ? Array(total).fill(this.rfaSeuil) : null;
+
+                const datasets = [
+                    { label: 'Réalisé', data: realData, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.08)', fill: true, tension: 0.3, pointRadius: 3, borderWidth: 2.5 },
+                    { label: 'Projection', data: projData, borderColor: '#f59e0b', borderDash: [6,4], tension: 0.3, pointRadius: 3, borderWidth: 2, pointBackgroundColor: '#f59e0b' },
+                    { label: 'Objectif', data: objLine, borderColor: '#ef4444', borderDash: [3,3], borderWidth: 1.5, pointRadius: 0, fill: false }
+                ];
+                if (rfaLine) datasets.push({ label: 'Seuil RFA', data: rfaLine, borderColor: '#22c55e', borderDash: [2,4], borderWidth: 1, pointRadius: 0, fill: false });
+
+                if (lineChart) lineChart.destroy();
+                lineChart = new Chart(ctx, {
+                    type: 'line', data: { labels, datasets }, options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { intersect: false, mode: 'index' },
+                        plugins: { legend: { labels: { color: txt, usePointStyle: true, padding: 12 } },
+                            tooltip: { callbacks: { label: item => item.dataset.label + ': ' + (item.raw !== null ? Math.round(item.raw).toLocaleString('fr-FR') + ' €' : '-') } } },
+                        scales: { x: { grid: { color: grid }, ticks: { color: txt } },
+                            y: { grid: { color: grid }, ticks: { color: txt, callback: v => (v/1000).toLocaleString('fr-FR')+'k' } } }
+                    }
+                });
+            }
+        };
+    }
+    window.atterrissageSim = atterrissageSim;
+})();
+</script>
+{% endblock %}

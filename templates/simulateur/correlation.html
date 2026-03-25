@@ -1,0 +1,182 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Corrélation Produits/Services | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Découvrez quelles offres vos clients achètent ensemble et identifiez les opportunités de bundle et vente croisée.{% endblock %}
+
+{% block tool_color %}#06b6d4{% endblock %}
+{% block tool_tag %}Intelligence{% endblock %}
+{% block tool_title %}Corrélation Produits/Services{% endblock %}
+{% block tool_description %}Qu'achètent vos clients ensemble sans que vous le voyiez ? Identifiez les paires à fort potentiel de bundle.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm0 8a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zm12 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Envie de créer des bundles intelligents ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur la meilleure façon de packager vos offres et d'automatiser la vente croisée.{% endblock %}
+
+{% block tool_content %}
+<div x-data="correlationSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-4 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Vos offres</h2>
+                <p class="text-xs" style="color: var(--sim-muted);">Listez vos offres puis estimez pour chaque paire le % de clients qui achètent les deux.</p>
+                <template x-for="(o, i) in offres" :key="i">
+                    <div class="flex gap-2 items-center">
+                        <input type="text" class="tool-input flex-1" x-model="offres[i]" :placeholder="'Offre ' + (i+1)">
+                        <button x-show="offres.length > 3" @click="removeOffre(i)" class="text-xs px-2 py-1 rounded" style="color: var(--sim-muted);">✕</button>
+                    </div>
+                </template>
+                <button x-show="offres.length < 8" @click="addOffre()"
+                        class="w-full py-1.5 rounded-xl text-xs font-semibold transition"
+                        style="border: 1px dashed var(--sim-card-border); color: var(--sim-muted);">
+                    + Ajouter une offre
+                </button>
+            </div>
+
+            <div class="tool-card space-y-4 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Corrélations estimées (%)</h2>
+                <p class="text-xs" style="color: var(--sim-muted);">Pour chaque paire, estimez le % de clients qui achètent les deux offres.</p>
+                <template x-for="(pair, k) in pairs()" :key="k">
+                    <div>
+                        <label class="tool-label" x-text="pair.labelA + ' ↔ ' + pair.labelB"></label>
+                        <div class="flex items-center gap-3">
+                            <input type="range" class="tool-range flex-1" x-model.number="matrix[pair.key]" min="0" max="100" step="5">
+                            <span class="text-sm font-bold font-mono w-12 text-right" style="color: var(--tool-glow);" x-text="(matrix[pair.key] || 0) + '%'"></span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #06b6d4;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #06b6d4;">Meilleur potentiel de bundle</p>
+                <p class="result-big text-3xl" style="color: #06b6d4;" x-text="bestPair()"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">Corrélation : <strong style="color: #22c55e;" x-text="bestPct() + '%'"></strong></p>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="150">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Matrice de corrélation</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs" style="color: var(--sim-ink);">
+                        <thead>
+                            <tr>
+                                <th class="py-2 pr-2 text-left" style="color: var(--sim-muted);"></th>
+                                <template x-for="(o, i) in offres" :key="'h'+i">
+                                    <th class="py-2 px-1 text-center" style="color: var(--sim-muted);" x-text="o || ('O'+(i+1))"></th>
+                                </template>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="(oA, a) in offres" :key="'r'+a">
+                                <tr style="border-top: 1px solid var(--sim-border);">
+                                    <td class="py-2 pr-2 font-semibold" x-text="oA || ('O'+(a+1))"></td>
+                                    <template x-for="(oB, b) in offres" :key="'c'+a+'-'+b">
+                                        <td class="py-2 px-1 text-center">
+                                            <span x-show="a === b" style="color: var(--sim-muted);">—</span>
+                                            <span x-show="a !== b" class="inline-block px-2 py-0.5 rounded-md text-xs font-bold"
+                                                  :style="'background:' + heatColor(cellVal(a,b)) + '; color: white;'"
+                                                  x-text="cellVal(a,b) + '%'"></span>
+                                        </td>
+                                    </template>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="result-block py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-2">Offres les plus connectées</p>
+                    <template x-for="(p, i) in topPairs(3)" :key="'tp'+i">
+                        <p class="text-sm mt-1" style="color: var(--sim-ink);">
+                            <span class="font-semibold" x-text="p.label"></span>
+                            <span class="font-mono ml-1" style="color: #22c55e;" x-text="p.val + '%'"></span>
+                        </p>
+                    </template>
+                </div>
+                <div class="result-block py-5 mo-fade-up" data-delay="250">
+                    <p class="result-label mb-2">Offres isolées</p>
+                    <template x-for="(name, i) in isolatedOffres()" :key="'iso'+i">
+                        <p class="text-sm mt-1" style="color: #ef4444;" x-text="name"></p>
+                    </template>
+                    <p x-show="isolatedOffres().length === 0" class="text-sm" style="color: #22c55e;">Aucune offre isolée ✓</p>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300" style="border-color: #06b6d4;">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🔗</span>
+                    <div>
+                        <p class="font-semibold" style="color: #06b6d4;">Opportunités identifiées</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    function correlationSim() {
+        return {
+            offres: ['Création de site', 'SEO', 'Identité visuelle', 'Maintenance', 'Formation'],
+            matrix: { '0-1': 60, '0-2': 75, '0-3': 40, '0-4': 20, '1-2': 30, '1-3': 50, '1-4': 15, '2-3': 10, '2-4': 25, '3-4': 35 },
+            addOffre() { this.offres.push(''); },
+            removeOffre(i) {
+                this.offres.splice(i, 1);
+                const nm = {};
+                this.pairs().forEach(p => { nm[p.key] = this.matrix[p.key] || 0; });
+                this.matrix = nm;
+            },
+            pairKey(a, b) { return Math.min(a,b) + '-' + Math.max(a,b); },
+            cellVal(a, b) { return this.matrix[this.pairKey(a,b)] || 0; },
+            pairs() {
+                const ps = [];
+                for (let a = 0; a < this.offres.length; a++)
+                    for (let b = a + 1; b < this.offres.length; b++)
+                        ps.push({ key: this.pairKey(a,b), a, b, labelA: this.offres[a] || ('O'+(a+1)), labelB: this.offres[b] || ('O'+(b+1)) });
+                return ps;
+            },
+            topPairs(n) {
+                return this.pairs().map(p => ({ label: p.labelA + ' ↔ ' + p.labelB, val: this.matrix[p.key] || 0 }))
+                    .sort((a,b) => b.val - a.val).slice(0, n);
+            },
+            bestPair() { const t = this.topPairs(1); return t.length ? t[0].label : '-'; },
+            bestPct() { const t = this.topPairs(1); return t.length ? t[0].val : 0; },
+            isolatedOffres() {
+                return this.offres.filter((_, i) => {
+                    const maxCorr = Math.max(0, ...this.offres.map((_, j) => i !== j ? (this.matrix[this.pairKey(i,j)] || 0) : 0));
+                    return maxCorr < 15;
+                }).map((o, i) => o || ('Offre ' + (i+1)));
+            },
+            heatColor(v) {
+                if (v >= 60) return '#22c55e';
+                if (v >= 30) return '#f59e0b';
+                return '#6b7280';
+            },
+            insight() {
+                const top = this.topPairs(1);
+                const iso = this.isolatedOffres();
+                let txt = '';
+                if (top.length && top[0].val >= 50) txt = `Le duo "${top[0].label}" avec ${top[0].val}% de corrélation est un candidat idéal pour un bundle packagé. `;
+                else if (top.length) txt = `Votre corrélation la plus forte est "${top[0].label}" à ${top[0].val}% — modérée. Testez un bundle pour valider. `;
+                if (iso.length > 0) txt += `Attention : ${iso.join(', ')} ${iso.length > 1 ? 'sont isolées' : 'est isolée'} — jamais vendue${iso.length > 1 ? 's' : ''} avec d'autres. Repensez le positionnement ou intégrez-${iso.length > 1 ? 'les' : 'la'} dans un pack.`;
+                else txt += 'Toutes vos offres sont bien connectées — bonne base pour la vente croisée.';
+                return txt;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); }
+        };
+    }
+    window.correlationSim = correlationSim;
+})();
+</script>
+{% endblock %}

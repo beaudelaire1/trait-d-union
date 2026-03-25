@@ -1,0 +1,195 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Simulateur Jumeaux Clients | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Comparez vos profils clients pour identifier lesquels cibler en priorité. Score de rentabilité nette par segment.{% endblock %}
+
+{% block tool_color %}#a855f7{% endblock %}
+{% block tool_tag %}Segmentation{% endblock %}
+{% block tool_title %}Simulateur de Jumeaux Clients{% endblock %}
+{% block tool_description %}Tous vos clients ne se ressemblent pas — lesquels valent vraiment le coup ? Comparez les profils et trouvez votre cœur de cible.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Besoin de mieux connaître vos clients ?{% endblock %}
+{% block tool_cta_text %}TUS vous aide à structurer votre CRM et vos segments pour mieux cibler et convertir.{% endblock %}
+
+{% block tool_content %}
+<div x-data="jumeauxSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <template x-for="(c, i) in clients" :key="i">
+                <div class="tool-card space-y-4 mo-fade-up" :data-delay="i*100">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-semibold" style="color: var(--sim-ink);" x-text="'Profil ' + (i+1)"></h2>
+                        <button x-show="clients.length > 2" @click="clients.splice(i, 1)" class="text-xs" style="color: var(--sim-muted);">✕</button>
+                    </div>
+                    <div>
+                        <label class="tool-label">Nom du segment</label>
+                        <input type="text" class="tool-input" x-model="c.nom" :placeholder="'Ex: PME locale'">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="tool-label">Panier moyen (€)</label>
+                            <input type="number" class="tool-input" x-model.number="c.panier" min="0" step="100" placeholder="2000">
+                        </div>
+                        <div>
+                            <label class="tool-label">Fréquence / an</label>
+                            <input type="number" class="tool-input" x-model.number="c.frequence" min="0.5" step="0.5" placeholder="3">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="tool-label">Coût d'acquisition (€)</label>
+                            <input type="number" class="tool-input" x-model.number="c.cac" min="0" step="50" placeholder="300">
+                        </div>
+                        <div>
+                            <label class="tool-label">Taux de réachat (%)</label>
+                            <input type="number" class="tool-input" x-model.number="c.reachat" min="0" max="100" placeholder="60">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="tool-label mb-0">Facilité de service</label>
+                            <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="c.facilite + '/5'"></span>
+                        </div>
+                        <input type="range" class="tool-range" x-model.number="c.facilite" min="1" max="5" step="1">
+                        <p class="tool-sublabel">1 = très chronophage, 5 = autonome</p>
+                    </div>
+                </div>
+            </template>
+
+            <button x-show="clients.length < 5" @click="clients.push({nom:'',panier:0,frequence:1,cac:0,reachat:50,facilite:3})"
+                    class="w-full py-2 rounded-xl text-sm font-semibold transition"
+                    style="border: 1px dashed var(--sim-card-border); color: var(--sim-muted);">
+                + Ajouter un profil
+            </button>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #a855f7;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #a855f7;">Meilleur profil à cibler</p>
+                <p class="result-big text-4xl" style="color: #a855f7;" x-text="bestNom()"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">Score : <strong style="color: #22c55e;" x-text="bestScore() + ' pts'"></strong></p>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="150">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Comparatif des profils</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm" style="color: var(--sim-ink);">
+                        <thead>
+                            <tr style="color: var(--sim-muted); border-bottom: 1px solid var(--sim-border);">
+                                <th class="text-left py-2 pr-3">Profil</th>
+                                <th class="text-right py-2 px-2">CA / an</th>
+                                <th class="text-right py-2 px-2">LTV 3 ans</th>
+                                <th class="text-right py-2 px-2">ROI acq.</th>
+                                <th class="text-right py-2 px-2" style="color: #a855f7;">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="(r, i) in ranking()" :key="r.nom">
+                                <tr style="border-bottom: 1px solid var(--sim-border);">
+                                    <td class="py-2 pr-3 font-semibold" x-text="r.nom || 'Profil ' + (r.idx+1)"></td>
+                                    <td class="text-right py-2 px-2" x-text="fmt(r.caAn) + ' €'"></td>
+                                    <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="fmt(r.ltv) + ' €'"></td>
+                                    <td class="text-right py-2 px-2" x-text="r.roi + 'x'"></td>
+                                    <td class="text-right py-2 px-2 font-bold" style="color: #a855f7;" x-text="r.score"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="250">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">LTV comparée (3 ans)</h3>
+                <div class="chart-container">
+                    <canvas id="jumeauxChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300" style="border-color: #a855f7;">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">👥</span>
+                    <div>
+                        <p class="font-semibold" style="color: #a855f7;">Recommandation 90 jours</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function jumeauxSim() {
+        return {
+            clients: [
+                { nom: 'PME locale', panier: 2000, frequence: 3, cac: 300, reachat: 60, facilite: 4 },
+                { nom: 'Grand compte', panier: 8000, frequence: 1, cac: 2000, reachat: 40, facilite: 2 },
+                { nom: 'Micro-entreprise', panier: 500, frequence: 6, cac: 50, reachat: 70, facilite: 5 }
+            ],
+            calcul(c) {
+                const caAn = c.panier * c.frequence;
+                const ret = c.reachat / 100;
+                const ltv = caAn + caAn * ret + caAn * ret * ret;
+                const roi = c.cac > 0 ? (ltv / c.cac).toFixed(1) : '∞';
+                const score = Math.round((ltv / 1000) * (c.facilite / 5) * (c.cac > 0 ? Math.min(ltv / c.cac, 20) : 20));
+                return { caAn, ltv: Math.round(ltv), roi, score };
+            },
+            ranking() {
+                return this.clients.map((c, idx) => {
+                    const r = this.calcul(c);
+                    return { idx, nom: c.nom, ...r };
+                }).sort((a, b) => b.score - a.score);
+            },
+            bestNom() { const r = this.ranking(); return r.length ? (r[0].nom || 'Profil ' + (r[0].idx+1)) : '-'; },
+            bestScore() { const r = this.ranking(); return r.length ? r[0].score : 0; },
+            insight() {
+                const r = this.ranking();
+                if (r.length < 2) return 'Ajoutez au moins 2 profils pour comparer.';
+                const best = r[0]; const worst = r[r.length - 1];
+                return `Concentrez vos efforts sur "${best.nom || 'Profil ' + (best.idx+1)}" (LTV : ${this.fmt(best.ltv)} €, ROI acquisition : ${best.roi}x). "${worst.nom || 'Profil ' + (worst.idx+1)}" arrive en dernier — sa LTV est de ${this.fmt(worst.ltv)} € pour un CAC de ${this.fmt(this.clients[worst.idx].cac)} €. Réduisez l'effort commercial sur ce segment et réallouez vers le premier.`;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            init() {
+                this.$watch('clients', () => this.updateChart(), { deep: true });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('jumeauxChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                const colors = ['#a855f7','#22c55e','#f59e0b','#06b6d4','#ec4899'];
+                const r = this.ranking();
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'bar', data: {
+                        labels: r.map(x => x.nom || 'Profil ' + (x.idx+1)),
+                        datasets: [{ label: 'LTV 3 ans (€)', data: r.map(x => x.ltv),
+                            backgroundColor: r.map((_, i) => colors[i % colors.length] + '33'),
+                            borderColor: r.map((_, i) => colors[i % colors.length]),
+                            borderWidth: 2, borderRadius: 8 }]
+                    }, options: {
+                        responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+                        plugins: { legend: { display: false } },
+                        scales: { x: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => (v/1000).toLocaleString('fr-FR') + 'k €' } },
+                            y: { grid: { display: false }, ticks: { color: textColor } } }
+                    }
+                });
+            }
+        };
+    }
+    window.jumeauxSim = jumeauxSim;
+})();
+</script>
+{% endblock %}

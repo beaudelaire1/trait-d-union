@@ -106,3 +106,105 @@ class ValleeMortView(_ToolView):
 class RetentionView(_ToolView):
     template_name = 'simulateur/retention.html'
     tool_name = 'Effet Rétention'
+
+
+# ── 20 Nouveaux Outils Stratégiques ──────────────────────────
+
+class MixProduitsView(_ToolView):
+    template_name = 'simulateur/mix_produits.html'
+    tool_name = 'Optimiseur de Mix Produits/Services'
+
+
+class AtterrissageView(_ToolView):
+    template_name = 'simulateur/atterrissage.html'
+    tool_name = 'Atterrissage Trimestriel / Annuel'
+
+
+class TresorerieView(_ToolView):
+    template_name = 'simulateur/tresorerie.html'
+    tool_name = 'Atterrissage Mensuel Trésorerie'
+
+
+class JumeauxClientsView(_ToolView):
+    template_name = 'simulateur/jumeaux_clients.html'
+    tool_name = 'Simulateur de Jumeaux Clients'
+
+
+class CorrelationView(_ToolView):
+    template_name = 'simulateur/correlation.html'
+    tool_name = 'Corrélation Produits/Services'
+
+
+class DelegationView(_ToolView):
+    template_name = 'simulateur/delegation.html'
+    tool_name = 'Seuil de Délégation'
+
+
+class PrixPsychologiqueView(_ToolView):
+    template_name = 'simulateur/prix_psychologique.html'
+    tool_name = 'Prix Psychologique'
+
+
+class DependanceView(_ToolView):
+    template_name = 'simulateur/dependance.html'
+    tool_name = 'Radar de Dépendance Commerciale'
+
+
+class CapaciteView(_ToolView):
+    template_name = 'simulateur/capacite.html'
+    tool_name = 'Capacité Maximale Facturable'
+
+
+class SaisonnaliteView(_ToolView):
+    template_name = 'simulateur/saisonnalite.html'
+    tool_name = 'Impact Saisonnalité'
+
+
+class CoutPromotionView(_ToolView):
+    template_name = 'simulateur/cout_promotion.html'
+    tool_name = 'Vrai Coût d\'une Promotion'
+
+
+class ValeurSortieView(_ToolView):
+    template_name = 'simulateur/valeur_sortie.html'
+    tool_name = 'Valeur de Sortie'
+
+
+class EffortImpactView(_ToolView):
+    template_name = 'simulateur/effort_impact.html'
+    tool_name = 'Matrice Effort / Impact'
+
+
+class CoutInactionView(_ToolView):
+    template_name = 'simulateur/cout_inaction.html'
+    tool_name = 'Coût d\'Inaction'
+
+
+class ScenarioPivotView(_ToolView):
+    template_name = 'simulateur/scenario_pivot.html'
+    tool_name = 'Scénario Pivot'
+
+
+class RoiMarketingView(_ToolView):
+    template_name = 'simulateur/roi_marketing.html'
+    tool_name = 'ROI Campagne Marketing'
+
+
+class PricingPaliersView(_ToolView):
+    template_name = 'simulateur/pricing_paliers.html'
+    tool_name = 'Pricing par Paliers'
+
+
+class TailleMarcheView(_ToolView):
+    template_name = 'simulateur/taille_marche.html'
+    tool_name = 'Taille de Marché Accessible'
+
+
+class VulnerabileFournisseurView(_ToolView):
+    template_name = 'simulateur/vulnerabilite_fournisseur.html'
+    tool_name = 'Vulnérabilité Fournisseur'
+
+
+class CoutNonQualiteView(_ToolView):
+    template_name = 'simulateur/cout_non_qualite.html'
+    tool_name = 'Coût de la Non-Qualité'

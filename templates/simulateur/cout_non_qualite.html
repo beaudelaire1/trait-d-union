@@ -1,0 +1,214 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Coût de Non-Qualité | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Combien coûtent vos erreurs ? Calculez le coût visible et caché de la non-qualité, et le ROI d'un plan d'amélioration.{% endblock %}
+
+{% block tool_color %}#dc2626{% endblock %}
+{% block tool_tag %}★ New{% endblock %}
+{% block tool_title %}Coût de Non-Qualité{% endblock %}
+{% block tool_description %}Combien coûtent vos erreurs ? Coûts visibles + cachés de la non-qualité et ROI d'un plan correctif.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Prêt à investir dans la qualité ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les processus digitaux qualité qui éliminent les coûts cachés de la non-qualité.{% endblock %}
+
+{% block tool_content %}
+<div x-data="coutNonQualiteSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Coûts visibles (mensuels)</h2>
+                <div>
+                    <label class="tool-label">Retouches / reprises (€)</label>
+                    <input type="number" class="tool-input" x-model.number="retouches" min="0" step="100" placeholder="2 000">
+                </div>
+                <div>
+                    <label class="tool-label">Réclamations / SAV (€)</label>
+                    <input type="number" class="tool-input" x-model.number="reclamations" min="0" step="100" placeholder="500">
+                </div>
+                <div>
+                    <label class="tool-label">Pénalités / remboursements (€)</label>
+                    <input type="number" class="tool-input" x-model.number="penalites" min="0" step="100" placeholder="300">
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Coûts cachés (estimés/mois)</h2>
+                <div>
+                    <label class="tool-label">Clients perdus (CA perdu / mois)</label>
+                    <input type="number" class="tool-input" x-model.number="clientsPerdus" min="0" step="500" placeholder="3 000">
+                </div>
+                <div>
+                    <label class="tool-label">Temps perdu (heures / mois)</label>
+                    <input type="number" class="tool-input" x-model.number="heuresPerdu" min="0" step="5" placeholder="20">
+                </div>
+                <div>
+                    <label class="tool-label">Coût horaire (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutHoraire" min="0" step="5" placeholder="45">
+                </div>
+                <div>
+                    <label class="tool-label">Impact réputation (€ estimé / mois)</label>
+                    <input type="number" class="tool-input" x-model.number="reputation" min="0" step="200" placeholder="1 000">
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="200">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Plan d'amélioration</h2>
+                <div>
+                    <label class="tool-label">Investissement initial (€)</label>
+                    <input type="number" class="tool-input" x-model.number="investQualite" min="0" step="1000" placeholder="10 000">
+                    <p class="tool-sublabel">Formation, audit, refonte process, outillage…</p>
+                </div>
+                <div>
+                    <label class="tool-label">Coût récurrent qualité / mois (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutRecurrent" min="0" step="100" placeholder="500">
+                    <p class="tool-sublabel">Maintien des process, audits réguliers, outils…</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Réduction attendue</label>
+                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="reductionQualite + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="reductionQualite" min="10" max="90" step="5">
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #dc2626;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #dc2626;">Coût total de non-qualité / mois</p>
+                <p class="result-big text-5xl" style="color: #dc2626;" x-text="fmt(coutTotalMensuel()) + ' €'"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="fmt(coutTotalMensuel() * 12) + ' € / an'"></strong></p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Coûts visibles</p>
+                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="fmt(coutsVisibles()) + ' € / mois'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="pctVisible() + '% du total'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">Coûts cachés</p>
+                    <p class="result-big text-2xl" style="color: #dc2626;" x-text="fmt(coutsCaches()) + ' € / mois'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="(100 - pctVisible()) + '% du total'"></p>
+                </div>
+            </div>
+
+            <div class="result-block text-center py-6 mo-fade-up" data-delay="200" style="border-color: #22c55e;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #22c55e;">ROI du plan qualité</p>
+                <div class="grid sm:grid-cols-3 gap-4 mt-4">
+                    <div>
+                        <p class="result-label mb-1">Économie nette / mois</p>
+                        <p class="result-big text-xl" style="color: #22c55e;" x-text="fmt(economieNette()) + ' €'"></p>
+                        <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="'brute ' + fmt(economieMensuelle()) + ' € − maintien ' + fmt(coutRecurrent) + ' €'"></p>
+                    </div>
+                    <div>
+                        <p class="result-label mb-1">Amortissement</p>
+                        <p class="result-big text-xl" style="color: #06b6d4;" x-text="moisAmortissement() + ' mois'"></p>
+                    </div>
+                    <div>
+                        <p class="result-label mb-1">ROI à 12 mois</p>
+                        <p class="result-big text-xl" :style="'color:' + (roi12() >= 0 ? '#22c55e' : '#ef4444')" x-text="roi12() + '%'"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Décomposition des coûts</h3>
+                <div class="chart-container">
+                    <canvas id="qualiteChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="350">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🔍</span>
+                    <div>
+                        <p class="font-semibold" style="color: #dc2626;">Diagnostic qualité</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function coutNonQualiteSim() {
+        return {
+            retouches: 2000, reclamations: 500, penalites: 300,
+            clientsPerdus: 3000, heuresPerdu: 20, coutHoraire: 45, reputation: 1000,
+            investQualite: 10000, coutRecurrent: 500, reductionQualite: 60,
+            coutsVisibles() { return this.retouches + this.reclamations + this.penalites; },
+            coutsCaches() { return this.clientsPerdus + (this.heuresPerdu * this.coutHoraire) + this.reputation; },
+            coutTotalMensuel() { return this.coutsVisibles() + this.coutsCaches(); },
+            pctVisible() { const t = this.coutTotalMensuel(); return t > 0 ? Math.round(this.coutsVisibles() / t * 100) : 0; },
+            economieMensuelle() { return this.coutTotalMensuel() * this.reductionQualite / 100; },
+            /* Économie nette = économie brute − coût récurrent de maintien */
+            economieNette() { return Math.max(0, this.economieMensuelle() - this.coutRecurrent); },
+            moisAmortissement() {
+                const ecoNette = this.economieNette();
+                return ecoNette > 0 ? Math.ceil(this.investQualite / ecoNette) : '∞';
+            },
+            /* ROI = (économie nette × 12 − invest initial) / (invest initial + récurrent × 12) */
+            roi12() {
+                const coutTotal12 = this.investQualite + this.coutRecurrent * 12;
+                const gain12 = this.economieNette() * 12;
+                return coutTotal12 > 0 ? Math.round((gain12 - this.investQualite) / coutTotal12 * 100) : 0;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            insight() {
+                const total = this.coutTotalMensuel();
+                const pctC = 100 - this.pctVisible();
+                const roi = this.roi12();
+                const coutTotal12 = this.investQualite + this.coutRecurrent * 12;
+                const ecoNette = this.economieNette();
+                if (pctC > 70) return `${pctC}% de vos coûts de non-qualité sont cachés — c'est la partie immergée de l'iceberg. Les clients perdus et l'impact réputation coûtent ${this.fmt(this.coutsCaches())} €/mois. Un plan qualité (${this.fmt(coutTotal12)} € coût total sur 12 mois) serait amorti en ${this.moisAmortissement()} mois.`;
+                if (roi > 100) return `ROI de ${roi}% — l'investissement qualité (${this.fmt(this.investQualite)} € initial + ${this.fmt(this.coutRecurrent)} €/mois) se rembourse dès le mois ${this.moisAmortissement()}. Économie nette : ${this.fmt(ecoNette)} €/mois. La non-qualité vous coûte ${this.fmt(total * 12)} €/an.`;
+                if (roi > 0) return `ROI de ${roi}% sur 12 mois. Rentable mais modéré. Ciblez d'abord les retouches (${this.fmt(this.retouches)} €/mois) — c'est souvent le levier le plus rapide. Économie nette après maintien : ${this.fmt(ecoNette)} €/mois.`;
+                return `ROI négatif sur 12 mois. Le coût récurrent de ${this.fmt(this.coutRecurrent)} €/mois réduit l'économie. Ciblez les postes les plus coûteux ou réduisez le périmètre d'investissement.`;
+            },
+            init() {
+                ['retouches','reclamations','penalites','clientsPerdus','heuresPerdu','coutHoraire','reputation','investQualite','coutRecurrent','reductionQualite'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('qualiteChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const labels = ['Retouches','Réclamations','Pénalités','Clients perdus','Temps perdu','Réputation'];
+                const data = [this.retouches, this.reclamations, this.penalites, this.clientsPerdus, this.heuresPerdu * this.coutHoraire, this.reputation];
+                const colors = ['#f59e0b','#f97316','#ef4444','#dc2626','#b91c1c','#991b1b'];
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'bar', data: { labels, datasets: [{
+                        data, backgroundColor: colors.map(c => c + '44'), borderColor: colors, borderWidth: 2, borderRadius: 6
+                    }] }, options: {
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false },
+                            annotation: { annotations: { separator: { type: 'line', xMin: 0, xMax: 0, yMin: 2.5, yMax: 2.5, borderColor: textColor, borderWidth: 1, borderDash: [4,4],
+                                label: { display: true, content: '← Visibles | Cachés →', position: 'start', color: textColor, font: { size: 10 } } } } }
+                        },
+                        scales: { x: { grid: { color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)' }, ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') + ' €' } },
+                            y: { grid: { display: false }, ticks: { color: textColor } } }
+                    }
+                });
+            }
+        };
+    }
+    window.coutNonQualiteSim = coutNonQualiteSim;
+})();
+</script>
+{% endblock %}

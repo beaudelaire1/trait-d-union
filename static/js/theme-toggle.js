@@ -23,6 +23,8 @@
             root.removeAttribute('data-theme');
         }
         updateAllToggleIcons(theme);
+        // Emits an event customized for charts and simulators
+        document.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme }, bubbles: true }));
     }
 
     /**

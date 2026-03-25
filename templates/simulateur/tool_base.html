@@ -286,6 +286,43 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" nonce="{{ request.csp_nonce }}"></script>
+<script nonce="{{ request.csp_nonce }}">
+    // Écouteur global pour mettre à jour les graphiques à la volée
+    document.addEventListener('theme-changed', function(e) {
+        if (!window.Chart || !window.Chart.instances) return;
+        const isDark = e.detail.theme !== 'light';
+        const txt = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+        const grid = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+        
+        window.Chart.defaults.color = txt;
+        window.Chart.defaults.borderColor = grid;
+        
+        Object.values(window.Chart.instances).forEach(chart => {
+            if (!chart || !chart.options) return;
+            if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                chart.options.plugins.legend.labels.color = txt;
+            }
+            if (chart.options.scales) {
+                Object.values(chart.options.scales).forEach(scale => {
+                    if (scale.ticks) scale.ticks.color = txt;
+                    if (scale.grid) scale.grid.color = grid;
+                    if (scale.title) scale.title.color = txt;
+                    if (scale.pointLabels) scale.pointLabels.color = txt;
+                    if (scale.angleLines) scale.angleLines.color = grid;
+                });
+            }
+            if (chart.options.plugins && chart.options.plugins.annotation && chart.options.plugins.annotation.annotations) {
+                 Object.values(chart.options.plugins.annotation.annotations).forEach(anno => {
+                     if (anno.label && anno.label.content && anno.label.content.includes('Visibles | Cachés')) {
+                         anno.label.color = txt;
+                         anno.borderColor = txt;
+                     }
+                 });
+            }
+            chart.update();
+        });
+    });
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@formkit/auto-animate@0.8.2/index.min.js" defer nonce="{{ request.csp_nonce }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/motion@11.15.0/dist/motion.js" defer nonce="{{ request.csp_nonce }}"></script>
 <script nonce="{{ request.csp_nonce }}">
@@ -328,3 +365,4 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {% block tool_js %}{% endblock %}
 {% endblock %}
+

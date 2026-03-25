@@ -123,7 +123,14 @@ def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> 
         pass
 
     # Ensure we have a stable public token for links (backfill if legacy data)
-    if not getattr(quote, 'public_token', None):
+    if not getattr(quote, 'public_token', None) or not quote.public_token:
+        import secrets
+        for _ in range(10):
+            token = secrets.token_urlsafe(32)
+            from apps.devis.models import Quote as QuoteModel
+            if not QuoteModel.objects.filter(public_token=token).exists():
+                quote.public_token = token
+                break
         try:
             quote.save(update_fields=["public_token"])
         except Exception:
@@ -131,6 +138,9 @@ def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> 
                 quote.save()
             except Exception:
                 pass
+        if not quote.public_token:
+            logger.error(f"Impossible de générer un public_token pour le devis {quote.number}")
+            return
 
     base = _base_url(request)
     # Public PDF link uses Quote.public_token (stable).

@@ -1,0 +1,182 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Capacité Maximale Facturable | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Vous travaillez 60h mais facturez la moitié ? Mesurez le CA perdu par point d'inefficacité et identifiez le levier prioritaire.{% endblock %}
+
+{% block tool_color %}#22c55e{% endblock %}
+{% block tool_tag %}Opérationnel{% endblock %}
+{% block tool_title %}Capacité Maximale Facturable{% endblock %}
+{% block tool_description %}Vous travaillez 60h mais ne facturez que la moitié ? Mesurez le CA annuel perdu par point d'inefficacité.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Envie de récupérer du temps facturable ?{% endblock %}
+{% block tool_cta_text %}TUS automatise l'administratif et la gestion pour libérer vos heures les plus précieuses.{% endblock %}
+
+{% block tool_content %}
+<div x-data="capaciteSim()" @theme-changed.document="updateChart()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Votre semaine type</h2>
+                <div>
+                    <label class="tool-label">Heures totales travaillées / sem.</label>
+                    <input type="number" class="tool-input" x-model.number="heuresTotales" min="10" max="80" step="1" placeholder="50">
+                </div>
+                <div>
+                    <label class="tool-label">Tarif horaire moyen facturé (€/h)</label>
+                    <input type="number" class="tool-input" x-model.number="tarifHoraire" min="10" step="10" placeholder="80">
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Répartition du temps (%)</h2>
+                <p class="text-xs" style="color: var(--sim-muted);">Comment se découpe votre semaine ?</p>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Production facturable</label>
+                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="pctFacturable + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="pctFacturable" min="0" max="100" step="5">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Administration</label>
+                        <span class="text-sm font-bold font-mono" style="color: #f59e0b;" x-text="pctAdmin + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="pctAdmin" min="0" max="100" step="5">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Prospection / commercial</label>
+                        <span class="text-sm font-bold font-mono" style="color: #06b6d4;" x-text="pctProspection + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="pctProspection" min="0" max="100" step="5">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Management / réunions</label>
+                        <span class="text-sm font-bold font-mono" style="color: #a855f7;" x-text="pctManagement + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="pctManagement" min="0" max="100" step="5">
+                </div>
+
+                <p class="text-xs font-semibold" :style="'color:' + (totalPct() === 100 ? '#22c55e' : '#ef4444')" x-text="'Total : ' + totalPct() + '%'"></p>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="200">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Objectif</h2>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Taux de facturation cible</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="tauxCible + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="tauxCible" min="40" max="90" step="5">
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #22c55e;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ef4444;">CA annuel perdu</p>
+                <p class="result-big text-5xl" style="color: #ef4444;" x-text="fmt(caPerdu()) + ' €'"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">par écart entre <span x-text="pctFacturable + '%'"></span> réel et <span x-text="tauxCible + '%'"></span> cible</p>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Taux facturation réel</p>
+                    <p class="result-big text-2xl" :style="'color:' + (pctFacturable >= tauxCible ? '#22c55e' : '#ef4444')" x-text="pctFacturable + '%'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">CA réel / an</p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(caReel()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">CA potentiel / an</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(caPotentiel()) + ' €'"></p>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="250">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Répartition de votre semaine</h3>
+                <div class="chart-container">
+                    <canvas id="capaciteChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300" style="border-color: #22c55e;">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">⏱️</span>
+                    <div>
+                        <p class="font-semibold" style="color: #22c55e;">Levier prioritaire</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function capaciteSim() {
+        return {
+            heuresTotales: 50, tarifHoraire: 80,
+            pctFacturable: 40, pctAdmin: 25, pctProspection: 20, pctManagement: 15,
+            tauxCible: 65,
+            totalPct() { return this.pctFacturable + this.pctAdmin + this.pctProspection + this.pctManagement; },
+            heuresFacturables() { return this.heuresTotales * this.pctFacturable / 100; },
+            heuresCible() { return this.heuresTotales * this.tauxCible / 100; },
+            caReel() { return this.heuresFacturables() * this.tarifHoraire * 47; },
+            caPotentiel() { return this.heuresCible() * this.tarifHoraire * 47; },
+            caPerdu() { return Math.max(0, this.caPotentiel() - this.caReel()); },
+            caParPoint() { return this.heuresTotales * this.tarifHoraire * 47 / 100; },
+            insight() {
+                const max = Math.max(this.pctAdmin, this.pctProspection, this.pctManagement);
+                let levier = '';
+                if (this.pctAdmin === max) levier = `l'administration (${this.pctAdmin}%). Automatisez la facturation, les relances et le suivi.`;
+                else if (this.pctManagement === max) levier = `le management/réunions (${this.pctManagement}%). Réduisez les réunions inutiles et formalisez les process.`;
+                else levier = `la prospection (${this.pctProspection}%). Investissez dans un système d'acquisition digitale pour réduire le temps commercial.`;
+                return `Chaque point de facturation récupéré vaut ${this.fmt(Math.round(this.caParPoint()))} €/an. Votre premier levier : ${levier} Passer de ${this.pctFacturable}% à ${this.tauxCible}% libérerait ${this.fmt(this.caPerdu())} € de CA annuel.`;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            init() {
+                ['heuresTotales','tarifHoraire','pctFacturable','pctAdmin','pctProspection','pctManagement','tauxCible'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('capaciteChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'doughnut', data: {
+                        labels: ['Production facturable', 'Administration', 'Prospection', 'Management'],
+                        datasets: [{ data: [this.pctFacturable, this.pctAdmin, this.pctProspection, this.pctManagement],
+                            backgroundColor: ['rgba(34,197,94,0.6)', 'rgba(245,158,11,0.6)', 'rgba(6,182,212,0.6)', 'rgba(168,85,247,0.6)'],
+                            borderColor: ['#22c55e', '#f59e0b', '#06b6d4', '#a855f7'],
+                            borderWidth: 2 }]
+                    }, options: {
+                        responsive: true, maintainAspectRatio: false, cutout: '50%',
+                        plugins: { legend: { position: 'bottom', labels: { color: textColor, usePointStyle: true, padding: 12 } } }
+                    }
+                });
+            }
+        };
+    }
+    window.capaciteSim = capaciteSim;
+})();
+</script>
+{% endblock %}

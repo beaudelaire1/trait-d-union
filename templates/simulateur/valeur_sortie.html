@@ -1,0 +1,169 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Valeur de Sortie | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Si je vendais mon entreprise demain… Estimez la fourchette de valorisation selon les multiples sectoriels.{% endblock %}
+
+{% block tool_color %}#8b5cf6{% endblock %}
+{% block tool_tag %}Stratégie{% endblock %}
+{% block tool_title %}Valeur de Sortie{% endblock %}
+{% block tool_description %}Si je vendais demain, combien vaudrait mon entreprise ? Estimation par les multiples sectoriels.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Envie de maximiser votre valorisation ?{% endblock %}
+{% block tool_cta_text %}TUS structure votre présence digitale pour augmenter la valeur perçue de votre entreprise.{% endblock %}
+
+{% block tool_content %}
+<div x-data="valeurSortieSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Données financières</h2>
+                <div>
+                    <label class="tool-label">Chiffre d'affaires annuel (€)</label>
+                    <input type="number" class="tool-input" x-model.number="ca" min="0" step="10000" placeholder="500 000">
+                </div>
+                <div>
+                    <label class="tool-label">EBITDA annuel (€)</label>
+                    <input type="number" class="tool-input" x-model.number="ebitda" min="0" step="5000" placeholder="100 000">
+                </div>
+                <div>
+                    <label class="tool-label">Taux de croissance annuel (%)</label>
+                    <input type="number" class="tool-input" x-model.number="croissance" min="-50" max="200" step="5" placeholder="15">
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Secteur d'activité</h2>
+                <div>
+                    <label class="tool-label">Secteur</label>
+                    <select class="tool-input" x-model="secteur">
+                        <template x-for="s in secteurs" :key="s.nom">
+                            <option :value="s.nom" x-text="s.nom"></option>
+                        </template>
+                    </select>
+                </div>
+                <div class="text-xs space-y-1" style="color: var(--sim-muted);">
+                    <p>Multiple CA : <strong x-text="multCA()"></strong>x</p>
+                    <p>Multiple EBITDA : <strong x-text="multEBITDA()"></strong>x</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #8b5cf6;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #8b5cf6;">Fourchette de valorisation</p>
+                <p class="result-big text-4xl" style="color: #8b5cf6;" x-text="fmt(valorBasse()) + ' € — ' + fmt(valorHaute()) + ' €'"></p>
+                <p class="text-lg mt-2 font-semibold" style="color: var(--sim-ink);">Médiane : <span style="color: #8b5cf6;" x-text="fmt(valorMediane()) + ' €'"></span></p>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Basse (CA)</p>
+                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="fmt(valorBasse()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">Médiane (EBITDA)</p>
+                    <p class="result-big text-2xl" style="color: #8b5cf6;" x-text="fmt(valorMediane()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">Haute (croissance)</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(valorHaute()) + ' €'"></p>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Comparaison des méthodes</h3>
+                <div class="chart-container">
+                    <canvas id="valeurChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="350">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">💡</span>
+                    <div>
+                        <p class="font-semibold" style="color: #8b5cf6;">Analyse de valorisation</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function valeurSortieSim() {
+        return {
+            ca: 500000, ebitda: 100000, croissance: 15,
+            secteur: 'Services B2B / Conseil',
+            secteurs: [
+                { nom: 'Services B2B / Conseil', mCA: 1.2, mEBITDA: 6 },
+                { nom: 'E-commerce', mCA: 1.0, mEBITDA: 8 },
+                { nom: 'SaaS / Tech', mCA: 3.0, mEBITDA: 12 },
+                { nom: 'Agence digitale', mCA: 1.0, mEBITDA: 5 },
+                { nom: 'Architecture / BTP', mCA: 0.8, mEBITDA: 5 },
+                { nom: 'Commerce de détail', mCA: 0.5, mEBITDA: 4 },
+                { nom: 'Industrie', mCA: 0.7, mEBITDA: 6 },
+                { nom: 'Santé / Médical', mCA: 1.5, mEBITDA: 8 }
+            ],
+            getSecteur() { return this.secteurs.find(s => s.nom === this.secteur) || this.secteurs[0]; },
+            multCA() { return this.getSecteur().mCA; },
+            multEBITDA() { return this.getSecteur().mEBITDA; },
+            primeCroissance() {
+                if (this.croissance > 30) return 1.3;
+                if (this.croissance > 15) return 1.15;
+                if (this.croissance > 0) return 1.0;
+                return 0.85;
+            },
+            valorBasse() { return this.ca * this.multCA(); },
+            valorMediane() { return this.ebitda * this.multEBITDA(); },
+            valorHaute() { return this.ebitda * this.multEBITDA() * this.primeCroissance(); },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            insight() {
+                const med = this.valorMediane();
+                const ratio = this.ebitda / (this.ca || 1) * 100;
+                if (ratio < 10) return `Votre marge EBITDA de ${Math.round(ratio)}% est en dessous des standards. Améliorer la rentabilité de 5 points augmenterait la valorisation de ~${this.fmt(this.ca * 0.05 * this.multEBITDA())} €. Concentrez-vous sur la marge avant de vendre.`;
+                if (this.croissance > 20) return `Avec ${this.croissance}% de croissance, les acquéreurs appliqueront une prime significative. La fourchette haute (${this.fmt(this.valorHaute())} €) est réaliste si vous documentez cette trajectoire sur 3 ans.`;
+                return `Valorisation médiane de ${this.fmt(med)} € (${Math.round(med/this.ca*10)/10}x le CA). Pour maximiser la valeur : récurrence du CA, diversification clients, processus documentés, et un digital maîtrisé.`;
+            },
+            init() {
+                ['ca','ebitda','croissance','secteur'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('valeurChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                const data = [this.valorBasse(), this.valorMediane(), this.valorHaute()];
+                const colors = ['#f59e0b','#8b5cf6','#22c55e'];
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'bar', data: { labels: ['Multiple CA (basse)','Multiple EBITDA (médiane)','EBITDA + croissance (haute)'], datasets: [{
+                        data, backgroundColor: colors.map(c => c + '33'), borderColor: colors, borderWidth: 2, borderRadius: 8
+                    }] }, options: {
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => (v/1000).toLocaleString('fr-FR') + ' k€' } },
+                            y: { grid: { display: false }, ticks: { color: textColor } } }
+                    }
+                });
+            }
+        };
+    }
+    window.valeurSortieSim = valeurSortieSim;
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Scénario Pivot | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Et si je pivotais ? Comparez votre modèle actuel à un modèle alternatif sur 12 mois et identifiez le creux de transition.{% endblock %}
+
+{% block tool_color %}#06b6d4{% endblock %}
+{% block tool_tag %}★ New{% endblock %}
+{% block tool_title %}Scénario Pivot{% endblock %}
+{% block tool_description %}Et si je pivotais ? Comparez votre business model actuel à un scénario alternatif sur 12 mois.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Envie de pivoter sereinement ?{% endblock %}
+{% block tool_cta_text %}TUS vous accompagne dans la transition digitale de votre modèle économique.{% endblock %}
+
+{% block tool_content %}
+<div x-data="scenarioPivotSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Modèle actuel</h2>
+                <div>
+                    <label class="tool-label">CA mensuel actuel (€)</label>
+                    <input type="number" class="tool-input" x-model.number="caActuel" min="0" step="1000" placeholder="25 000">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Croissance mensuelle</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--sim-ink);" x-text="croissanceActuel + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="croissanceActuel" min="-10" max="10" step="0.5">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Marge nette</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--sim-ink);" x-text="margeActuel + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="margeActuel" min="5" max="80" step="5">
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Modèle alternatif (pivot)</h2>
+                <div>
+                    <label class="tool-label">CA mensuel cible (€)</label>
+                    <input type="number" class="tool-input" x-model.number="caCible" min="0" step="1000" placeholder="40 000">
+                    <p class="tool-sublabel mt-1">Objectif atteint au mois 12</p>
+                </div>
+                <div>
+                    <label class="tool-label">Investissement initial (€)</label>
+                    <input type="number" class="tool-input" x-model.number="investPivot" min="0" step="1000" placeholder="20 000">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Marge nette cible</label>
+                        <span class="text-lg font-bold font-mono" style="color: #06b6d4;" x-text="margePivot + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="margePivot" min="5" max="80" step="5">
+                </div>
+                <div>
+                    <label class="tool-label">Mois de montée en charge</label>
+                    <input type="number" class="tool-input" x-model.number="rampUp" min="1" max="12" step="1" placeholder="6">
+                    <p class="tool-sublabel mt-1">Mois pour atteindre le CA cible</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-scale-in">
+                    <p class="result-label mb-1">Creux de transition</p>
+                    <p class="result-big text-2xl" style="color: #ef4444;" x-text="fmt(creuxTransition()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="'au mois ' + moisCreux()"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-scale-in">
+                    <p class="result-label mb-1">Profit cumulé actuel (12m)</p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(profitCumuleActuel12()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-scale-in">
+                    <p class="result-label mb-1">Profit cumulé pivot (12m)</p>
+                    <p class="result-big text-2xl" style="color: #06b6d4;" x-text="fmt(profitCumulePivot12()) + ' €'"></p>
+                </div>
+            </div>
+
+            <div class="result-block text-center py-6 mo-fade-up" data-delay="100"
+                 :style="'border-color:' + (profitCumulePivot12() > profitCumuleActuel12() ? '#22c55e' : '#f59e0b')">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + (profitCumulePivot12() > profitCumuleActuel12() ? '#22c55e' : '#f59e0b')">Gain net du pivot à 12 mois</p>
+                <p class="result-big text-4xl" :style="'color:' + (gainNet12() >= 0 ? '#22c55e' : '#ef4444')" x-text="(gainNet12() >= 0 ? '+' : '') + fmt(gainNet12()) + ' €'"></p>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="200">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Profit cumulé : Actuel vs Pivot</h3>
+                <div class="chart-container">
+                    <canvas id="pivotChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🔀</span>
+                    <div>
+                        <p class="font-semibold" style="color: #06b6d4;">Analyse du pivot</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function scenarioPivotSim() {
+        return {
+            caActuel: 25000, croissanceActuel: 1, margeActuel: 25,
+            caCible: 40000, investPivot: 20000, margePivot: 35, rampUp: 6,
+            projActuel(m) {
+                return this.caActuel * Math.pow(1 + this.croissanceActuel / 100, m);
+            },
+            projPivot(m) {
+                const prog = Math.min(m / this.rampUp, 1);
+                const ca = this.caActuel + (this.caCible - this.caActuel) * prog;
+                return ca;
+            },
+            profitActuelMois(m) { return this.projActuel(m) * this.margeActuel / 100; },
+            profitPivotMois(m) {
+                const ca = this.projPivot(m);
+                const margeProgressive = this.margeActuel + (this.margePivot - this.margeActuel) * Math.min(m / this.rampUp, 1);
+                return ca * margeProgressive / 100;
+            },
+            serieActuel() {
+                let cumul = 0; const data = [0];
+                for (let m = 1; m <= 12; m++) { cumul += this.profitActuelMois(m); data.push(Math.round(cumul)); }
+                return data;
+            },
+            seriePivot() {
+                let cumul = -this.investPivot; const data = [Math.round(cumul)];
+                for (let m = 1; m <= 12; m++) { cumul += this.profitPivotMois(m); data.push(Math.round(cumul)); }
+                return data;
+            },
+            profitCumuleActuel12() { return this.serieActuel()[12]; },
+            profitCumulePivot12() { return this.seriePivot()[12]; },
+            gainNet12() { return this.profitCumulePivot12() - this.profitCumuleActuel12(); },
+            creuxTransition() {
+                const sp = this.seriePivot();
+                const sa = this.serieActuel();
+                let minDelta = 0;
+                for (let m = 0; m <= 12; m++) { const d = sp[m] - sa[m]; if (d < minDelta) minDelta = d; }
+                return minDelta;
+            },
+            moisCreux() {
+                const sp = this.seriePivot();
+                const sa = this.serieActuel();
+                let minDelta = 0; let mois = 0;
+                for (let m = 0; m <= 12; m++) { const d = sp[m] - sa[m]; if (d < minDelta) { minDelta = d; mois = m; } }
+                return mois;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            insight() {
+                const gain = this.gainNet12();
+                const creux = this.creuxTransition();
+                const mc = this.moisCreux();
+                if (gain > 0) return `Le pivot génère +${this.fmt(gain)} € sur 12 mois. Attention au creux de ${this.fmt(Math.abs(creux))} € au mois ${mc} — assurez-vous d'avoir la trésorerie pour tenir. Après la montée en charge, le modèle alternatif surpasse l'actuel.`;
+                if (gain > -this.investPivot / 2) return `Le pivot est légèrement négatif (${this.fmt(gain)} €) à 12 mois, mais la trajectoire pivot dépasse l'actuel. Sur 18-24 mois, le bi lan devrait s'inverser. Considérez un ramp-up plus rapide.`;
+                return `Le pivot coûte ${this.fmt(Math.abs(gain))} € de plus que le statu quo sur 12 mois. Revoyez le CA cible, réduisez l'investissement ou allongez l'horizon d'analyse.`;
+            },
+            init() {
+                ['caActuel','croissanceActuel','margeActuel','caCible','investPivot','margePivot','rampUp'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('pivotChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                const labels = Array.from({ length: 13 }, (_, i) => 'M' + i);
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'line', data: { labels, datasets: [
+                        { label: 'Profit cumulé (actuel)', data: this.serieActuel(), borderColor: '#94a3b8', borderWidth: 2, borderDash: [6, 4], tension: 0.3, pointRadius: 2 },
+                        { label: 'Profit cumulé (pivot)', data: this.seriePivot(), borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.08)', fill: true, tension: 0.3, pointRadius: 3, borderWidth: 2.5 }
+                    ]}, options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } } },
+                        scales: { x: { grid: { color: gridColor }, ticks: { color: textColor } },
+                            y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => (v/1000).toLocaleString('fr-FR') + ' k€' } } }
+                    }
+                });
+            }
+        };
+    }
+    window.scenarioPivotSim = scenarioPivotSim;
+})();
+</script>
+{% endblock %}

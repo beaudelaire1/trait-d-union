@@ -119,6 +119,9 @@
                                         </span>
                                         <span class="doc-name">{{ doc.title }}</span>
                                     </div>
+                                    {% if doc.notes %}
+                                    <p class="text-xs mt-1" style="color: var(--tus-muted, #6b7280); line-height: 1.4;">{{ doc.notes|truncatewords:30 }}</p>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     {% if doc.document_type == 'devis' %}

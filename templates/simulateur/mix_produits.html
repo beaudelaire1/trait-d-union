@@ -1,0 +1,359 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Optimisation Linéaire — Mix Produits/Services | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Programmation linéaire appliquée : trouvez la combinaison optimale de prestations qui maximise votre marge brute sous contrainte de capacité.{% endblock %}
+
+{% block tool_color %}#22c55e{% endblock %}
+{% block tool_tag %}Optimisation{% endblock %}
+{% block tool_title %}Optimisation Linéaire — Mix Produits{% endblock %}
+{% block tool_description %}Programmation linéaire appliquée : trouvez la combinaison optimale de prestations qui maximise votre marge brute sous contrainte de capacité et de demande.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Besoin d'aide pour structurer votre offre ?{% endblock %}
+{% block tool_cta_text %}TUS vous accompagne dans l'optimisation de votre portefeuille de services — pricing, packaging, priorisation.{% endblock %}
+
+{% block tool_content %}
+<div x-data="mixProduitsSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        {# ── Formulaire ── #}
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Contrainte de capacité</h2>
+                <div>
+                    <label class="tool-label">Heures disponibles ce trimestre</label>
+                    <input type="number" class="tool-input" x-model.number="heuresDispo" min="1" step="10" placeholder="500">
+                </div>
+            </div>
+
+            <template x-for="(p, i) in produits" :key="i">
+                <div class="tool-card space-y-4 mo-fade-up" :data-delay="(i+1)*100">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-base font-semibold" style="color: var(--sim-ink);" x-text="'Offre x' + (i+1)"></h2>
+                        <button x-show="produits.length > 2" @click="produits.splice(i, 1)" class="text-xs" style="color: var(--sim-muted);">✕ Retirer</button>
+                    </div>
+                    <div>
+                        <label class="tool-label">Nom</label>
+                        <input type="text" class="tool-input" x-model="p.nom" :placeholder="'Prestation ' + (i+1)">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="tool-label">Prix de vente (€)</label>
+                            <input type="number" class="tool-input" x-model.number="p.prix" min="0" step="50" placeholder="1500">
+                        </div>
+                        <div>
+                            <label class="tool-label">Coût direct (€)</label>
+                            <input type="number" class="tool-input" x-model.number="p.cout" min="0" step="50" placeholder="600">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="tool-label">Heures / unité</label>
+                            <input type="number" class="tool-input" x-model.number="p.heures" min="0.5" step="0.5" placeholder="8">
+                        </div>
+                        <div>
+                            <label class="tool-label">Demande max</label>
+                            <input type="number" class="tool-input" x-model.number="p.demande" min="1" step="1" placeholder="20">
+                            <p class="tool-sublabel mt-0.5">unités vendables ce trimestre</p>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
+            <button x-show="produits.length < 5" @click="produits.push({nom:'', prix:0, cout:0, heures:1, demande:10})"
+                    class="w-full py-2 rounded-xl text-sm font-semibold transition"
+                    style="border: 1px dashed var(--sim-card-border); color: var(--sim-muted);">
+                + Ajouter une offre
+            </button>
+        </div>
+
+        {# ── Résultats ── #}
+        <div class="lg:col-span-3 space-y-6">
+
+            {# Formulation LP #}
+            <div class="result-block mo-fade-up" style="border-color: #22c55e;">
+                <h3 class="text-xs font-bold tracking-widest uppercase mb-3" style="color: #22c55e;">Formulation du programme linéaire</h3>
+                <div class="space-y-2 text-sm font-mono" style="color: var(--sim-ink);">
+                    <p><span class="font-bold" style="color: #22c55e;">max</span> Z = <template x-for="(p, i) in validItems()" :key="i"><span><span x-text="fmt(p.marge)"></span>·x<sub x-text="i+1"></sub><span x-show="i < validItems().length - 1"> + </span></span></template></p>
+                    <p style="color: var(--sim-muted);">sous contraintes :</p>
+                    <p class="pl-4"><template x-for="(p, i) in validItems()" :key="i"><span><span x-text="p.heures"></span>·x<sub x-text="i+1"></sub><span x-show="i < validItems().length - 1"> + </span></span></template> ≤ <span x-text="heuresDispo"></span> <span style="color: var(--sim-muted);">(capacité)</span></p>
+                    <template x-for="(p, i) in validItems()" :key="i">
+                        <p class="pl-4">0 ≤ x<sub x-text="i+1"></sub> ≤ <span x-text="p.demande"></span> <span style="color: var(--sim-muted);" x-text="'(' + (p.nom || 'offre ' + (i+1)) + ')'"></span></p>
+                    </template>
+                </div>
+            </div>
+
+            {# Résultat principal #}
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #22c55e;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #22c55e;">Solution optimale entière (IP)</p>
+                <p class="result-big text-5xl" style="color: #22c55e;" x-text="fmt(ipSolution().totalMarge) + ' €'"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">marge maximale sur <span x-text="heuresDispo"></span> heures</p>
+            </div>
+
+            {# LP vs IP comparison #}
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Relaxation LP (borne sup.)</p>
+                    <p class="result-big text-2xl" style="color: #a855f7;" x-text="fmt(lpRelaxation().totalMarge) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">solution continue optimale</p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">Gap LP → IP</p>
+                    <p class="result-big text-2xl" :style="'color:' + (gapPct() < 2 ? '#22c55e' : '#f59e0b')" x-text="gapPct() + '%'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">perte due à la contrainte entière</p>
+                </div>
+            </div>
+
+            {# Allocation optimale #}
+            <div class="result-block mo-fade-up" data-delay="200">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Allocation optimale</h3>
+                <div class="space-y-3">
+                    <template x-for="(r, i) in ipSolution().items" :key="i">
+                        <div class="flex items-center gap-4 p-3 rounded-xl" style="background: var(--sim-surface);">
+                            <span class="text-2xl font-bold font-mono" :style="'color:' + (r.unites > 0 ? '#22c55e' : 'var(--sim-muted)')" x-text="'x' + (i+1)"></span>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-semibold text-sm" style="color: var(--sim-ink);" x-text="r.nom || 'Offre ' + (i+1)"></p>
+                                <p class="text-xs" style="color: var(--sim-muted);" x-text="fmt(r.margeH) + ' €/h · ' + r.heures + 'h/u · demande ' + r.demande"></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold" :style="'color:' + (r.unites > 0 ? '#22c55e' : 'var(--sim-muted)')" x-text="r.unites + ' / ' + r.demande + ' u'"></p>
+                                <p class="text-xs" style="color: var(--sim-muted);" x-text="fmt(r.margeTotale) + ' € · ' + r.heuresUtilisees + 'h'"></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            {# Métriques #}
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
+                    <p class="result-label mb-1">Heures utilisées</p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="ipSolution().totalHeures + ' / ' + heuresDispo"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="300">
+                    <p class="result-label mb-1">Taux d'occupation</p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="tauxOccupation() + '%'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="350">
+                    <p class="result-label mb-1">Marge moyenne / h</p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="fmt(margeMoyH()) + ' €'"></p>
+                </div>
+            </div>
+
+            {# Graphique #}
+            <div class="result-block mo-fade-up" data-delay="400">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Répartition des heures (IP optimal)</h3>
+                <div class="chart-container">
+                    <canvas id="mixChart"></canvas>
+                </div>
+            </div>
+
+            {# Insight #}
+            <div class="result-block mo-fade-up" data-delay="450" style="border-color: #22c55e;">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">⚖️</span>
+                    <div>
+                        <p class="font-semibold" style="color: #22c55e;">Recommandation du solveur</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+
+    function mixProduitsSim() {
+        return {
+            heuresDispo: 500,
+            produits: [
+                { nom: 'Création de site', prix: 3000, cout: 1200, heures: 40, demande: 8 },
+                { nom: 'Identité visuelle', prix: 1500, cout: 400, heures: 15, demande: 20 },
+                { nom: 'SEO mensuel', prix: 500, cout: 100, heures: 6, demande: 30 }
+            ],
+
+            /* ─── Items valides ─── */
+            validItems() {
+                return this.produits
+                    .map((p, idx) => ({
+                        idx, nom: p.nom, prix: p.prix, cout: p.cout,
+                        heures: p.heures, demande: Math.max(1, Math.round(p.demande || 1)),
+                        marge: p.prix - p.cout,
+                        margeH: p.heures > 0 ? (p.prix - p.cout) / p.heures : 0
+                    }))
+                    .filter(p => p.heures > 0 && p.marge > 0);
+            },
+
+            /* ─── LP Relaxation (fractional knapsack borné) ─── */
+            lpRelaxation() {
+                const items = this.validItems().map(p => ({ ...p }));
+                items.sort((a, b) => b.margeH - a.margeH);
+                let reste = this.heuresDispo;
+                items.forEach(it => {
+                    const maxH = it.demande * it.heures;
+                    const allocH = Math.min(reste, maxH);
+                    it.unites = allocH / it.heures;          // fractionnaire
+                    it.margeTotale = it.unites * it.marge;
+                    it.heuresUtilisees = allocH;
+                    reste -= allocH;
+                });
+                return {
+                    items,
+                    totalMarge: items.reduce((s, it) => s + it.margeTotale, 0),
+                    totalHeures: items.reduce((s, it) => s + it.heuresUtilisees, 0)
+                };
+            },
+
+            /* ─── IP Optimal (programmation dynamique — bounded knapsack) ─── */
+            ipSolution() {
+                const items = this.validItems();
+                const n = items.length;
+                if (n === 0) return { items: [], totalMarge: 0, totalHeures: 0 };
+
+                // Discrétiser en demi-heures pour gérer les pas de 0.5h
+                const scale = 2;
+                const W = Math.round(this.heuresDispo * scale);
+
+                // DP: dp[w] = meilleure marge pour capacité w
+                const dp = new Float64Array(W + 1).fill(0);
+                // Traçabilité: choice[i][w] = nb unités de l'item i choisies
+                const choice = [];
+
+                for (let i = 0; i < n; i++) {
+                    const wi = Math.round(items[i].heures * scale);
+                    const vi = items[i].marge;
+                    const maxU = items[i].demande;
+                    const prev = Float64Array.from(dp);
+                    const ci = new Uint16Array(W + 1);
+
+                    for (let w = 0; w <= W; w++) {
+                        let bestVal = prev[w];
+                        let bestK = 0;
+                        for (let k = 1; k <= maxU; k++) {
+                            const wk = k * wi;
+                            if (wk > w) break;
+                            const val = prev[w - wk] + k * vi;
+                            if (val > bestVal) { bestVal = val; bestK = k; }
+                        }
+                        dp[w] = bestVal;
+                        ci[w] = bestK;
+                    }
+                    choice.push(ci);
+                }
+
+                // Reconstruire la solution
+                let w = W;
+                const result = items.map(it => ({
+                    ...it, unites: 0, margeTotale: 0, heuresUtilisees: 0
+                }));
+                for (let i = n - 1; i >= 0; i--) {
+                    const k = choice[i][w];
+                    result[i].unites = k;
+                    result[i].margeTotale = k * items[i].marge;
+                    result[i].heuresUtilisees = k * items[i].heures;
+                    w -= k * Math.round(items[i].heures * scale);
+                }
+
+                return {
+                    items: result,
+                    totalMarge: result.reduce((s, r) => s + r.margeTotale, 0),
+                    totalHeures: result.reduce((s, r) => s + r.heuresUtilisees, 0)
+                };
+            },
+
+            gapPct() {
+                const lp = this.lpRelaxation().totalMarge;
+                const ip = this.ipSolution().totalMarge;
+                return lp > 0 ? Math.round((lp - ip) / lp * 1000) / 10 : 0;
+            },
+            tauxOccupation() {
+                const sol = this.ipSolution();
+                return this.heuresDispo > 0 ? Math.round(sol.totalHeures / this.heuresDispo * 100) : 0;
+            },
+            margeMoyH() {
+                const sol = this.ipSolution();
+                return sol.totalHeures > 0 ? Math.round(sol.totalMarge / sol.totalHeures) : 0;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+
+            insight() {
+                const sol = this.ipSolution();
+                if (sol.items.length === 0) return 'Renseignez au moins une offre avec un prix supérieur au coût.';
+                const active = sol.items.filter(r => r.unites > 0).sort((a, b) => b.margeTotale - a.margeTotale);
+                const saturated = sol.items.filter(r => r.unites === r.demande && r.unites > 0);
+                const gap = this.gapPct();
+                const taux = this.tauxOccupation();
+                let msg = `Le solveur alloue ${active.length} offre(s) active(s). `;
+                if (active.length > 0) msg += `"${active[0].nom || 'Offre ' + (active[0].idx+1)}" concentre ${this.fmt(active[0].margeTotale)} € de marge (${active[0].unites} unités). `;
+                if (saturated.length > 0) msg += `${saturated.length} offre(s) attei${saturated.length > 1 ? 'gnent' : 'nt'} leur demande max — augmenter la demande pourrait débloquer de la marge. `;
+                if (taux < 90) msg += `${100 - taux}% de capacité reste libre. `;
+                if (gap > 0) msg += `Gap LP/IP de ${gap}% — la contrainte d'unités entières coûte ${this.fmt(this.lpRelaxation().totalMarge - sol.totalMarge)} €.`;
+                return msg;
+            },
+
+            init() {
+                this.$watch('heuresDispo', () => this.updateChart());
+                this.$watch('produits', () => this.updateChart(), { deep: true });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('mixChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const sol = this.ipSolution();
+                const colors = ['#22c55e','#f59e0b','#06b6d4','#a855f7','#ec4899'];
+                const labels = sol.items.map((r, i) => r.nom || 'Offre ' + (i + 1));
+                const heuresData = sol.items.map(r => r.heuresUtilisees);
+                const margeData = sol.items.map(r => r.margeTotale);
+                const libre = Math.max(0, this.heuresDispo - sol.totalHeures);
+
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: [...labels, 'Libre'],
+                        datasets: [
+                            {
+                                label: 'Heures allouées',
+                                data: [...heuresData, libre],
+                                backgroundColor: [...colors.slice(0, sol.items.length).map(c => c + '55'), 'rgba(148,163,184,0.15)'],
+                                borderColor: [...colors.slice(0, sol.items.length), '#94a3b8'],
+                                borderWidth: 2, borderRadius: 6,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Marge (€)',
+                                data: [...margeData, 0],
+                                backgroundColor: [...colors.slice(0, sol.items.length).map(c => c + '22'), 'transparent'],
+                                borderColor: [...colors.slice(0, sol.items.length), 'transparent'],
+                                borderWidth: 2, borderDash: [4, 4], borderRadius: 4,
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: textColor } },
+                            y: { position: 'left', title: { display: true, text: 'Heures', color: textColor }, grid: { color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)' }, ticks: { color: textColor } },
+                            y1: { position: 'right', title: { display: true, text: 'Marge (€)', color: textColor }, grid: { display: false }, ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') + ' €' } }
+                        }
+                    }
+                });
+            }
+        };
+    }
+    window.mixProduitsSim = mixProduitsSim;
+})();
+</script>
+{% endblock %}

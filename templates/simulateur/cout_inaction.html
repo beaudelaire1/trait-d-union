@@ -1,0 +1,177 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Coût d'Inaction | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Combien coûte le statu quo ? Projetez le coût cumulé de ne rien faire sur 6, 12 et 24 mois.{% endblock %}
+
+{% block tool_color %}#ef4444{% endblock %}
+{% block tool_tag %}★ New{% endblock %}
+{% block tool_title %}Coût d'Inaction{% endblock %}
+{% block tool_description %}Combien coûte le statu quo ? Projetez le coût cumulé de ne rien faire vs. investir dans une solution.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Prêt à agir maintenant ?{% endblock %}
+{% block tool_cta_text %}TUS transforme votre inaction digitale en avantage compétitif — chaque mois compte.{% endblock %}
+
+{% block tool_content %}
+<div x-data="coutInactionSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Coût du problème actuel</h2>
+                <div>
+                    <label class="tool-label">Perte de CA mensuelle estimée (€)</label>
+                    <input type="number" class="tool-input" x-model.number="perteMensuelle" min="0" step="500" placeholder="3 000">
+                    <p class="tool-sublabel mt-1">Clients perdus, opportunités manquées, inefficacité…</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Aggravation mensuelle</label>
+                        <span class="text-lg font-bold font-mono" style="color: #ef4444;" x-text="aggravation + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="aggravation" min="0" max="20" step="1">
+                    <p class="tool-sublabel">% d'augmentation de la perte chaque mois</p>
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">La solution envisagée</h2>
+                <div>
+                    <label class="tool-label">Coût de la solution (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutSolution" min="0" step="1000" placeholder="15 000">
+                </div>
+                <div>
+                    <label class="tool-label">Délai de mise en place (mois)</label>
+                    <input type="number" class="tool-input" x-model.number="delaiMiseEnPlace" min="1" max="12" step="1" placeholder="3">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Réduction du problème</label>
+                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="reductionProbleme + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="reductionProbleme" min="10" max="100" step="10">
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #ef4444;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ef4444;">Coût cumulé de l'inaction à 24 mois</p>
+                <p class="result-big text-5xl" style="color: #ef4444;" x-text="fmt(coutInaction24()) + ' €'"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="fmt(Math.round(coutInaction24() / (coutSolution || 1) * 10) / 10) + 'x'"></strong> le coût de la solution</p>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">À 6 mois</p>
+                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="fmt(coutInactionN(6)) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">À 12 mois</p>
+                    <p class="result-big text-2xl" style="color: #ef4444;" x-text="fmt(coutInactionN(12)) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">Point de bascule</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="pointBascule() + ' mois'"></p>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Inaction vs Solution (coût cumulé)</h3>
+                <div class="chart-container">
+                    <canvas id="inactionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="350" style="border-color: #ef4444;">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">⏳</span>
+                    <div>
+                        <p class="font-semibold" style="color: #ef4444;">Chaque mois compte</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function coutInactionSim() {
+        return {
+            perteMensuelle: 3000, aggravation: 5, coutSolution: 15000, delaiMiseEnPlace: 3, reductionProbleme: 80,
+            coutInactionN(n) {
+                let total = 0; let perte = this.perteMensuelle;
+                for (let m = 1; m <= n; m++) { total += perte; perte *= (1 + this.aggravation / 100); }
+                return total;
+            },
+            coutInaction24() { return this.coutInactionN(24); },
+            coutSolutionN(n) {
+                let total = this.coutSolution;
+                let perte = this.perteMensuelle;
+                for (let m = 1; m <= n; m++) {
+                    if (m <= this.delaiMiseEnPlace) { total += perte; }
+                    else { total += perte * (1 - this.reductionProbleme / 100); }
+                    perte *= (1 + this.aggravation / 100);
+                }
+                return total;
+            },
+            pointBascule() {
+                for (let m = 1; m <= 36; m++) {
+                    if (this.coutInactionN(m) >= this.coutSolutionN(m)) return m;
+                }
+                return '>36';
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            insight() {
+                const pb = this.pointBascule();
+                const c24 = this.coutInaction24();
+                if (pb === '>36') return `Le point de bascule est au-delà de 36 mois. La solution semble trop coûteuse par rapport au problème. Réduisez le périmètre de la solution ou reconsidérez l'ampleur réelle du problème.`;
+                if (pb <= this.delaiMiseEnPlace + 1) return `Dès le mois ${pb}, la solution est plus rentable que l'inaction. Avec ${this.fmt(c24)} € de pertes cumulées sur 2 ans, chaque mois de retard est un mois de trop.`;
+                return `Le point de bascule est au mois ${pb}. D'ici là, vous aurez perdu ${this.fmt(this.coutInactionN(pb))} € supplémentaires. Le coût de l'inaction accélère : au mois 24, il atteint ${this.fmt(c24)} €.`;
+            },
+            init() {
+                ['perteMensuelle','aggravation','coutSolution','delaiMiseEnPlace','reductionProbleme'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('inactionChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                const labels = []; const inactionData = []; const solutionData = [];
+                for (let m = 0; m <= 24; m++) {
+                    labels.push('M' + m);
+                    inactionData.push(Math.round(this.coutInactionN(m)));
+                    solutionData.push(Math.round(this.coutSolutionN(m)));
+                }
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'line', data: { labels, datasets: [
+                        { label: 'Coût inaction', data: inactionData, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.08)', fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2.5 },
+                        { label: 'Coût avec solution', data: solutionData, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.08)', fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2.5 }
+                    ]}, options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } } },
+                        scales: { x: { grid: { color: gridColor }, ticks: { color: textColor } },
+                            y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => (v/1000).toLocaleString('fr-FR') + ' k€' } } }
+                    }
+                });
+            }
+        };
+    }
+    window.coutInactionSim = coutInactionSim;
+})();
+</script>
+{% endblock %}

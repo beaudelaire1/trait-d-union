@@ -1,0 +1,163 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Taille de Marché | Trait d'Union Studio{% endblock %}
+{% block meta_description %}TAM, SAM, SOM — Mon marché vaut combien ? Estimez votre marché total, adressable et réaliste.{% endblock %}
+
+{% block tool_color %}#6B8AFF{% endblock %}
+{% block tool_tag %}★ New{% endblock %}
+{% block tool_title %}Taille de Marché{% endblock %}
+{% block tool_description %}TAM, SAM, SOM — Mon marché vaut combien ? Estimez le potentiel réaliste de votre activité.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 004 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Besoin de valider votre marché ?{% endblock %}
+{% block tool_cta_text %}TUS vous aide à cartographier votre marché digital et identifier les segments à fort potentiel.{% endblock %}
+
+{% block tool_content %}
+<div x-data="tailleMarcheSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">TAM — Marché Total</h2>
+                <div>
+                    <label class="tool-label">Population cible totale</label>
+                    <input type="number" class="tool-input" x-model.number="populationTotale" min="0" step="1000" placeholder="100 000">
+                    <p class="tool-sublabel mt-1">Nombre total d'entreprises/personnes dans votre secteur</p>
+                </div>
+                <div>
+                    <label class="tool-label">Dépense moyenne / an (€)</label>
+                    <input type="number" class="tool-input" x-model.number="depenseMoyenne" min="0" step="100" placeholder="5 000">
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">SAM — Marché Adressable</h2>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">% du TAM que vous pouvez servir</label>
+                        <span class="text-lg font-bold font-mono" style="color: #f59e0b;" x-text="pctSAM + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="pctSAM" min="1" max="80" step="1">
+                    <p class="tool-sublabel">Filtré par zone géo, langue, segment</p>
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="200">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">SOM — Marché Réaliste</h2>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Part de marché visée (du SAM)</label>
+                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="pctSOM + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="pctSOM" min="0.5" max="30" step="0.5">
+                    <p class="tool-sublabel">Typiquement 1-5% pour un nouvel entrant</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-6 mo-scale-in" style="border-color: #6B8AFF;">
+                    <p class="text-xs font-bold tracking-widest uppercase mb-1" style="color: #6B8AFF;">TAM</p>
+                    <p class="result-big text-2xl" style="color: #6B8AFF;" x-text="fmtM(tam()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="fmt(populationTotale) + ' cibles'"></p>
+                </div>
+                <div class="result-block text-center py-6 mo-scale-in" style="border-color: #f59e0b;">
+                    <p class="text-xs font-bold tracking-widest uppercase mb-1" style="color: #f59e0b;">SAM</p>
+                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="fmtM(sam()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="fmt(Math.round(populationTotale * pctSAM / 100)) + ' cibles'"></p>
+                </div>
+                <div class="result-block text-center py-6 mo-scale-in" style="border-color: #22c55e;">
+                    <p class="text-xs font-bold tracking-widest uppercase mb-1" style="color: #22c55e;">SOM</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmtM(som()) + ' €'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="fmt(clientsSOM()) + ' clients'"></p>
+                </div>
+            </div>
+
+            <div class="result-block text-center py-6 mo-fade-up" data-delay="100" style="border-color: #22c55e;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #22c55e;">Objectif CA réaliste (SOM)</p>
+                <p class="result-big text-4xl" style="color: #22c55e;" x-text="fmtM(som()) + ' € / an'"></p>
+                <p class="text-base mt-2" style="color: var(--sim-muted);">soit ~<strong x-text="fmt(Math.round(som() / 12))"></strong> € / mois</p>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="200">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Entonnoir TAM → SAM → SOM</h3>
+                <div class="chart-container">
+                    <canvas id="marcheChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🌍</span>
+                    <div>
+                        <p class="font-semibold" style="color: #6B8AFF;">Analyse de marché</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function tailleMarcheSim() {
+        return {
+            populationTotale: 100000, depenseMoyenne: 5000, pctSAM: 20, pctSOM: 3,
+            tam() { return this.populationTotale * this.depenseMoyenne; },
+            sam() { return this.tam() * this.pctSAM / 100; },
+            som() { return this.sam() * this.pctSOM / 100; },
+            clientsSOM() { return Math.round(this.populationTotale * this.pctSAM / 100 * this.pctSOM / 100); },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            fmtM(v) {
+                if (v >= 1e9) return (Math.round(v / 1e8) / 10).toLocaleString('fr-FR') + ' Md';
+                if (v >= 1e6) return (Math.round(v / 1e5) / 10).toLocaleString('fr-FR') + ' M';
+                if (v >= 1e3) return (Math.round(v / 100) / 10).toLocaleString('fr-FR') + ' k';
+                return Math.round(v).toLocaleString('fr-FR');
+            },
+            insight() {
+                const somCA = this.som();
+                const clients = this.clientsSOM();
+                if (clients < 10) return `Seulement ${clients} clients potentiels dans votre SOM — le marché est très niche. Augmentez la dépense moyenne (upsell/cross-sell) ou élargissez votre zone SAM.`;
+                if (this.pctSOM > 10) return `${this.pctSOM}% de part de marché est ambitieux pour un acteur non dominant. Commencez par 2-5% puis augmentez progressivement avec la notoriété.`;
+                return `SOM de ${this.fmtM(somCA)} €/an avec ${clients} clients — c'est réaliste avec ${this.pctSOM}% du SAM. Pour atteindre cet objectif : ${Math.ceil(clients / 12)} nouveaux clients/mois à ${this.fmt(this.depenseMoyenne)} € de panier moyen.`;
+            },
+            init() {
+                ['populationTotale','depenseMoyenne','pctSAM','pctSOM'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('marcheChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const values = [this.tam(), this.sam(), this.som()];
+                const colors = ['#6B8AFF','#f59e0b','#22c55e'];
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'bar', data: { labels: ['TAM (Total)','SAM (Adressable)','SOM (Réaliste)'], datasets: [{
+                        data: values, backgroundColor: colors.map(c => c + '33'), borderColor: colors, borderWidth: 2, borderRadius: 8
+                    }] }, options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { grid: { display: false }, ticks: { color: textColor } },
+                            y: { type: 'logarithmic', grid: { color: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)' }, ticks: { color: textColor, callback: function(v) { if (v >= 1e9) return (v/1e9) + ' Md€'; if (v >= 1e6) return (v/1e6) + ' M€'; if (v >= 1e3) return (v/1e3) + ' k€'; return v + ' €'; } } } }
+                    }
+                });
+            }
+        };
+    }
+    window.tailleMarcheSim = tailleMarcheSim;
+})();
+</script>
+{% endblock %}

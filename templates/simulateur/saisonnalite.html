@@ -1,0 +1,178 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Impact Saisonnalité | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Activité saisonnière ? Simulez les stratégies de lissage vs capitalisation sur votre CA annuel.{% endblock %}
+
+{% block tool_color %}#f59e0b{% endblock %}
+{% block tool_tag %}Planification{% endblock %}
+{% block tool_title %}Impact Saisonnalité{% endblock %}
+{% block tool_description %}Activité saisonnière ? Simulez lissage vs capitalisation et chiffrez l'impact sur votre CA annuel.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Besoin de lisser votre activité ?{% endblock %}
+{% block tool_cta_text %}TUS met en place des stratégies d'acquisition digitale automatisées pour alimenter votre pipeline même en période creuse.{% endblock %}
+
+{% block tool_content %}
+<div x-data="saisonnaliteSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-4 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">CA mensuel estimé (€)</h2>
+                <p class="text-xs" style="color: var(--sim-muted);">Renseignez votre CA mensuel sur 12 mois.</p>
+                <template x-for="(m, i) in mois" :key="i">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-semibold w-8" style="color: var(--sim-muted);" x-text="labels[i]"></span>
+                        <input type="number" class="tool-input flex-1" x-model.number="mois[i]" min="0" step="500" placeholder="0">
+                    </div>
+                </template>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Stratégie de lissage</h2>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Budget marketing en creux (€/mois)</label>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="fmt(budgetLissage)"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="budgetLissage" min="0" max="5000" step="100">
+                    <p class="tool-sublabel">Investissement supplémentaire pour stimuler la demande en mois creux</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Effet estimé du lissage</label>
+                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="effetLissage + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="effetLissage" min="5" max="50" step="5">
+                    <p class="tool-sublabel">% d'augmentation du CA dans les mois creux</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block text-center py-8 mo-scale-in" style="border-color: #f59e0b;">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #f59e0b;">Indice de saisonnalité</p>
+                <p class="result-big text-5xl" style="color: #f59e0b;" x-text="indiceSaison().toFixed(2)"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">1.0 = parfaitement lisse, > 1.5 = très saisonnier</p>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">CA actuel / an</p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(caAnnuel()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">CA avec lissage</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(caLisse()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">Gain net lissage</p>
+                    <p class="result-big text-2xl" :style="'color:' + (gainNetLissage() >= 0 ? '#22c55e' : '#ef4444')" x-text="(gainNetLissage() >= 0 ? '+' : '') + fmt(gainNetLissage()) + ' €'"></p>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="250">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">CA mensuel : actuel vs lissé</h3>
+                <div class="chart-container">
+                    <canvas id="saisonChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300" style="border-color: #f59e0b;">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">📅</span>
+                    <div>
+                        <p class="font-semibold" style="color: #f59e0b;">Analyse saisonnière</p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function saisonnaliteSim() {
+        return {
+            labels: ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'],
+            mois: [8000,7000,12000,15000,18000,10000,5000,4000,14000,16000,13000,9000],
+            budgetLissage: 1000, effetLissage: 20,
+            caAnnuel() { return this.mois.reduce((s, m) => s + m, 0); },
+            moyenne() { return this.caAnnuel() / 12; },
+            indiceSaison() {
+                const moy = this.moyenne();
+                if (moy === 0) return 1;
+                const variance = this.mois.reduce((s, m) => s + Math.pow(m - moy, 2), 0) / 12;
+                return Math.sqrt(variance) / moy + 1;
+            },
+            moisCreux() {
+                const moy = this.moyenne();
+                return this.mois.map((m, i) => ({ idx: i, val: m, isBas: m < moy * 0.85 }));
+            },
+            caLisse() {
+                const moy = this.moyenne();
+                return this.mois.reduce((s, m) => {
+                    if (m < moy * 0.85) return s + m + m * this.effetLissage / 100;
+                    return s + m;
+                }, 0);
+            },
+            coutLissage() {
+                const moy = this.moyenne();
+                const nbCreux = this.mois.filter(m => m < moy * 0.85).length;
+                return this.budgetLissage * nbCreux;
+            },
+            gainNetLissage() { return Math.round(this.caLisse() - this.caAnnuel() - this.coutLissage()); },
+            insight() {
+                const idx = this.indiceSaison();
+                const moy = this.moyenne();
+                const creux = this.moisCreux().filter(m => m.isBas);
+                const creuxLabels = creux.map(c => this.labels[c.idx]).join(', ');
+                if (idx < 1.2) return `Votre activité est assez régulière (indice ${idx.toFixed(2)}). Pas de saisonnalité marquée à traiter.`;
+                if (idx < 1.5) return `Saisonnalité modérée (indice ${idx.toFixed(2)}). Mois creux : ${creuxLabels}. Le lissage avec ${this.fmt(this.budgetLissage)} €/mois d'investissement marketing rapporterait un gain net de ${this.fmt(this.gainNetLissage())} €.`;
+                return `Forte saisonnalité (indice ${idx.toFixed(2)}). Les mois creux (${creuxLabels}) sont en dessous de ${this.fmt(Math.round(moy * 0.85))} €. Deux approches : lissage (investir ${this.fmt(this.budgetLissage)} €/mois en creux) ou capitalisation (maximiser les marges en haute saison). Le lissage génère un gain net de ${this.fmt(this.gainNetLissage())} €.`;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            init() {
+                this.$watch('mois', () => this.updateChart(), { deep: true });
+                ['budgetLissage','effetLissage'].forEach(k => this.$watch(k, () => this.updateChart()));
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('saisonChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                const moy = this.moyenne();
+                const lisse = this.mois.map(m => m < moy * 0.85 ? m + m * this.effetLissage / 100 : m);
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'bar', data: {
+                        labels: this.labels,
+                        datasets: [
+                            { label: 'CA actuel', data: [...this.mois], backgroundColor: 'rgba(245,158,11,0.3)', borderColor: '#f59e0b', borderWidth: 2, borderRadius: 6 },
+                            { label: 'CA lissé', data: lisse, backgroundColor: 'rgba(34,197,94,0.3)', borderColor: '#22c55e', borderWidth: 2, borderRadius: 6 },
+                            { label: 'Moyenne', data: Array(12).fill(moy), type: 'line', borderColor: '#6b7280', borderDash: [3,3], borderWidth: 1.5, pointRadius: 0 }
+                        ]
+                    }, options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } } },
+                        scales: { x: { grid: { display: false }, ticks: { color: textColor } },
+                            y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => (v/1000).toLocaleString('fr-FR') + 'k €' } } }
+                    }
+                });
+            }
+        };
+    }
+    window.saisonnaliteSim = saisonnaliteSim;
+})();
+</script>
+{% endblock %}

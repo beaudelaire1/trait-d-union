@@ -1,0 +1,302 @@
+══════════════════════════════════════════════════════════════════
+            TRAIT D'UNION STUDIO — BOÎTE À OUTILS STRATÉGIQUE
+                    20 Simulateurs — De 1 à 20
+        12 outils validés + 8 nouveaux outils (★ NEW)
+        Sans chevauchement avec les 10 existants du site
+══════════════════════════════════════════════════════════════════
+
+
+─────────────────────────────────────────────────────────────
+RAPPEL : 10 OUTILS DÉJÀ EN LIGNE SUR LE SITE
+─────────────────────────────────────────────────────────────
+
+Simulateur Devis • Seuil de Rentabilité • Coût d'Acquisition (CAC)
+Friction Opérationnelle • Indice de Fragmentation • Flux ACSE
+Plafond de Verre • Élasticité-Prix • Vallée de la Mort • Effet Rétention
+
+→ Aucun des 20 outils ci-dessous ne chevauche ces 10 outils.
+
+
+══════════════════════════════════════════════════════════════════
+                  TABLEAU SYNOPTIQUE DES 20 OUTILS
+══════════════════════════════════════════════════════════════════
+
+N°  | Outil                                    | Catégorie                          | Question clé
+----|------------------------------------------|------------------------------------|-----------------------------------------
+ 1  | Optimiseur de Mix Produits/Services       | Optimisation linéaire              | J'ai 4-5 prestations, laquelle prioriser ?
+ 2  | Atterrissage Trimestriel ou Annuel        | Pilotage prévisionnel              | Va-t-on atteindre l'objectif ?
+ 3  | Atterrissage Mensuel Trésorerie           | Pilotage trésorerie court terme    | Est-ce que je vais passer le mois ?
+ 4  | Simulateur de Jumeaux Clients             | Segmentation                       | Quels clients valent vraiment le coup ?
+ 5  | Corrélation Produits/Services             | Intelligence commerciale           | Qu'achètent mes clients ensemble ?
+ 6  | Seuil de Délégation                       | Décision RH / Organisation         | Ça vaut le coup d'embaucher ?
+ 7  | Simulateur de Prix Psychologique          | Tarification                       | Où est le bon prix — le prix juste ?
+ 8  | Radar de Dépendance Commerciale           | Risque stratégique                 | Si mon client principal part, je coule ?
+ 9  | Simulateur de Capacité Maximale Facturable| Optimisation opérationnelle        | Je travaille 60h mais facture la moitié ?
+10  | Simulateur d'Impact Saisonnalité          | Planification                      | Comment lisser ou capitaliser ?
+11  | Calculateur de Vrai Coût d'une Promotion  | Tarification / Marketing           | -20%, c'est vraiment bon pour moi ?
+12  | Simulateur de Valeur de Sortie            | Vision long terme / Transmission   | Mon entreprise vaut combien ?
+----|------------------------------------------|------------------------------------|-----------------------------------------
+13  | ★ Matrice Effort / Impact des Projets     | Stratégie / Priorisation           | J'ai 6 projets, lequel en premier ?
+14  | ★ Calculateur du Coût d'Inaction          | Stratégie / Décision               | Attendre le bon moment, ça coûte combien ?
+15  | ★ Simulateur de Scénario Pivot            | Stratégie / Modèle économique      | Et si je changeais de modèle ?
+16  | ★ Calculateur de ROI Campagne Marketing   | Marketing / Performance            | Ma pub à 2 000 €, ça a rapporté ?
+17  | ★ Simulateur de Pricing par Paliers       | Tarification / Structuration offre | Comment calibrer Basic/Pro/Premium ?
+18  | ★ Estimateur de Taille de Marché          | Stratégie / Marché                 | Mon marché en Guyane, quelle taille ?
+19  | ★ Indice de Vulnérabilité Fournisseur     | Risque / Chaîne approvisionnement  | Si mon fournisseur fait défaut ?
+20  | ★ Calculateur de Coût de la Non-Qualité   | Opérationnel / Amélioration cont.  | Retours, SAV, reprises — ça pèse combien ?
+
+
+══════════════════════════════════════════════════════════════════
+              FICHES DÉTAILLÉES — OUTILS 1 À 12
+══════════════════════════════════════════════════════════════════
+
+
+──────────────────────────────────────────────────────────────
+🔷 1. Optimiseur de Mix Produits/Services
+──────────────────────────────────────────────────────────────
+Catégorie : Optimisation linéaire
+
+Problème PME : «J'ai 4 ou 5 prestations, laquelle prioriser ce trimestre ?»
+
+L'outil demande pour chaque offre (max 5) : prix de vente, coût direct, temps de production en heures, et capacité totale disponible. Il calcule la combinaison optimale qui maximise la marge brute sous contrainte de capacité — sans jamais demander plus de 15 paramètres. Résultat : un ranking clair.
+
+➔ Différenciation : Aucun outil existant sur le site ne traite l'allocation sous contrainte.
+
+
+──────────────────────────────────────────────────────────────
+🔷 2. Atterrissage Trimestriel ou Annuel
+──────────────────────────────────────────────────────────────
+Catégorie : Pilotage prévisionnel
+
+Problème PME : «On est mi-trimestre ou mi-année, va-t-on atteindre l'objectif ?»
+
+L'utilisateur saisit : objectif CA du trimestre ou de l'année, réalisé à date, nombre de semaines ou mois restants, taux de conversion moyen, pipeline actuel en valeur. L'outil projette l'atterrissage probable, l'écart, et affiche le chiffre d'affaires additionnel à aller chercher chaque semaine restante. Il signale si l'objectif est atteignable, tendu ou hors d'atteinte — avec le seuil de bascule.
+
+➔ Différenciation : Différence avec le Plafond de Verre existant : ici c'est dynamique dans le temps, pas statique.
+
+
+──────────────────────────────────────────────────────────────
+🔷 3. Atterrissage Mensuel Trésorerie
+──────────────────────────────────────────────────────────────
+Catégorie : Pilotage trésorerie court terme
+
+Problème PME : «Est-ce que je vais passer le mois ?»
+
+Entrées attendues (clients), décaissements certains (loyer, salaires, charges fixes), décaissements variables (fournisseurs estimés), solde actuel. L'outil projette le solde jour par jour sur 30 jours et identifie le point de tension critique — la «date de rupture» si rien ne rentre.
+
+➔ Différenciation : Plus concret que la Vallée de la Mort (outil de croissance) — celui-ci est un outil de survie opérationnelle mensuelle.
+
+
+──────────────────────────────────────────────────────────────
+🔷 4. Simulateur de Jumeaux Clients
+──────────────────────────────────────────────────────────────
+Catégorie : Segmentation
+
+Problème PME : «Tous mes clients ne se ressemblent pas — lesquels valent vraiment le coup ?»
+
+L'utilisateur décrit 3 profils clients type ou plus en renseignant : panier moyen, fréquence d'achat annuelle, coût d'acquisition, taux de réachat estimé, facilité de service (1 à 5). L'outil calcule la valeur vie réelle de chaque profil et les classe. Il produit un score de rentabilité nette par segment et recommande lequel cibler en priorité dans les prochains 90 jours.
+
+➔ Différenciation : Différent du CAC existant : ici on compare des profils entre eux, pas juste un entonnoir global.
+
+
+──────────────────────────────────────────────────────────────
+🔷 5. Corrélation Produits/Services
+──────────────────────────────────────────────────────────────
+Catégorie : Intelligence commerciale
+
+Problème PME : «Qu'est-ce que mes clients achètent ensemble sans que je le voie ?»
+
+L'utilisateur liste ses 5 à 8 offres, puis indique pour chacune le % de clients qui l'ont achetée avec chaque autre offre (estimation à la louche). L'outil génère une matrice de corrélation visuelle (couleur froide/chaude) et identifie les paires à fort potentiel de bundle ou de vente croisée, ainsi que les offres isolées jamais vendues avec d'autres.
+
+➔ Différenciation : Outil inexistant sur le site, approche inédite pour une PME sans data.
+
+
+──────────────────────────────────────────────────────────────
+🔷 6. Seuil de Délégation
+──────────────────────────────────────────────────────────────
+Catégorie : Décision RH / Organisation
+
+Problème PME : «Est-ce que ça vaut le coup d'embaucher ou de sous-traiter ?»
+
+Inputs : taux horaire du dirigeant, heures/semaine consacrées à une tâche, coût estimé d'un recrutement ou d'un freelance pour cette tâche, impact estimé sur le CA si le dirigeant récupère ce temps. L'outil calcule le ROI de la délégation et le délai de retour sur investissement en semaines. Il répond à : «À partir de quand déléguer est rentable ?»
+
+➔ Différenciation : Différent de Friction existant : Friction quantifie le coût du désordre, ici on calcule le seuil de décision concret pour agir.
+
+
+──────────────────────────────────────────────────────────────
+🔷 7. Simulateur de Prix Psychologique
+──────────────────────────────────────────────────────────────
+Catégorie : Tarification
+
+Problème PME : «Où est le bon prix — pas le prix bas, le prix juste ?»
+
+Différent de l'Élasticité-Prix existant (qui raisonne sur pertes de clients en volume) : celui-ci part de la perception valeur. L'utilisateur positionne son offre sur 3 curseurs : niveau de complexité, unicité marché, durée de la relation client. L'outil calcule une fourchette de prix psychologiquement acceptable selon des ratios de valeur perçue, et compare avec le prix actuel pour indiquer si la PME est en sous-tarification structurelle.
+
+➔ Différenciation : Différent de l'Élasticité-Prix existant qui parle de hausse de prix en volume, pas de perception valeur.
+
+
+──────────────────────────────────────────────────────────────
+🔷 8. Radar de Dépendance Commerciale
+──────────────────────────────────────────────────────────────
+Catégorie : Risque stratégique
+
+Problème PME : «Si mon client principal part demain, je coule ?»
+
+L'utilisateur répartit son CA entre ses principaux clients en pourcentage. L'outil calcule un indice de concentration (Herfindahl simplifié), affiche visuellement le risque, et simule : «Si ce client représentant X % du CA disparaît, combien de nouveaux clients faut-il acquérir pour compenser — et en combien de temps à votre rythme actuel d'acquisition ?»
+
+➔ Différenciation : Angle mort total des PME guyanaises très exposées à 1 ou 2 donneurs d'ordre publics ou privés.
+
+
+──────────────────────────────────────────────────────────────
+🔷 9. Simulateur de Capacité Maximale Facturable
+──────────────────────────────────────────────────────────────
+Catégorie : Optimisation opérationnelle
+
+Problème PME : «Je travaille 60h par semaine mais je ne facture que la moitié — où part le reste ?»
+
+L'utilisateur déclare ses heures totales hebdomadaires, puis alloue des % à : production facturable, administration, prospection, management. L'outil calcule le taux de facturation réel, l'écart avec un taux cible (ex. 70 %), et projette le CA annuel perdu par point de pourcentage d'inefficacité. Il suggère le levier prioritaire (automatisation, délégation, tarification à la valeur).
+
+➔ Différenciation : Différent de Friction Opérationnelle : Friction mesure le coût du chaos organisationnel, ici on mesure le coût de la structure du temps du dirigeant.
+
+
+──────────────────────────────────────────────────────────────
+🔷 10. Simulateur d'Impact Saisonnalité
+──────────────────────────────────────────────────────────────
+Catégorie : Planification
+
+Problème PME : «Mon activité est saisonnière — comment lisser ou capitaliser ?»
+
+Adapté au contexte guyanais (saisons des pluies, périodes creuses). L'utilisateur indique son CA mensuel estimé sur 12 mois (ou les 4 trimestres). L'outil calcule un indice de saisonnalité par période, identifie les mois sous/sur la moyenne, et simule deux stratégies : lissage (investissement marketing en creux) vs capitalisation (maximiser les marges en haute saison). Il chiffre l'impact de chaque stratégie sur le CA annuel total.
+
+➔ Différenciation : Outil inexistant sur le site. Contextualisé Guyane.
+
+
+──────────────────────────────────────────────────────────────
+🔷 11. Calculateur de Vrai Coût d'une Promotion
+──────────────────────────────────────────────────────────────
+Catégorie : Tarification / Marketing
+
+Problème PME : «Je fais -20 %, est-ce que c'est vraiment bon pour moi ?»
+
+Inputs : prix normal, marge habituelle en %, taux de remise envisagée, volume habituel de ventes sur la période. L'outil calcule le volume additionnel exact à réaliser pour que la promo soit neutre en marge absolue. Il affiche le point mort de la promotion et répond à : «Ta promo est rentable seulement si tu vends X unités de plus — est-ce réaliste ?»
+
+➔ Différenciation : Très différent de l'Élasticité-Prix existant (qui parle de hausse de prix, pas de réduction).
+
+
+──────────────────────────────────────────────────────────────
+🔷 12. Simulateur de Valeur de Sortie
+──────────────────────────────────────────────────────────────
+Catégorie : Vision long terme / Transmission
+
+Problème PME : «Si je vends mon entreprise dans 3 ans, combien vaut-elle ?»
+
+Inputs : CA annuel, EBITDA estimé, secteur (commerce, service, artisanat, tech), taux de croissance annuel des 2 dernières années. L'outil applique les multiples de valorisation sectoriels adaptés aux PME et calcule une fourchette basse/médiane/haute. Il identifie les deux leviers qui augmentent le plus la valeur (réduction dépendance client, amélioration marge, récurrence du CA).
+
+➔ Différenciation : Outil inexistant en Guyane pour les PME.
+
+
+══════════════════════════════════════════════════════════════════
+         ★  8 NOUVEAUX OUTILS (N°13 À 20)  ★
+══════════════════════════════════════════════════════════════════
+
+
+──────────────────────────────────────────────────────────────
+🎯 13. Matrice Effort / Impact des Projets  ★ NOUVEAU
+──────────────────────────────────────────────────────────────
+Catégorie : Stratégie / Priorisation
+
+Problème PME : «J'ai 6 projets en tête mais pas le temps pour tous — lequel je lance en premier ?»
+
+L'utilisateur liste jusqu'à 8 projets et note chacun sur deux axes : effort estimé (temps + budget, de 1 à 5) et impact attendu (CA, marge ou valeur stratégique, de 1 à 5). L'outil génère une matrice 2×2 visuelle (Quick Wins / Projets stratégiques / À planifier / À abandonner) et classe les projets par ratio impact/effort. Il recommande un séquencement sur 3 trimestres.
+
+➔ Différenciation : Différent du Flux ACSE (qui diagnostique les goulots) et du Mix Produits (qui optimise l'offre existante, pas les projets futurs).
+
+
+──────────────────────────────────────────────────────────────
+⚠️ 14. Calculateur du Coût d'Inaction  ★ NOUVEAU
+──────────────────────────────────────────────────────────────
+Catégorie : Stratégie / Décision
+
+Problème PME : «Je sais que je devrais agir, mais j'attends le bon moment — ça me coûte combien ?»
+
+L'utilisateur décrit un problème identifié (ex. : site web obsolète, processus manuel, absence de CRM) et estime : perte de CA mensuelle liée au problème, heures perdues par semaine, coût de la solution envisagée. L'outil projette le coût cumulé de l'inaction sur 6, 12 et 24 mois, le compare au coût de la solution, et affiche le «point de bascule» : la date à partir de laquelle ne rien faire coûte plus cher qu'agir.
+
+➔ Différenciation : Différent de la Friction Opérationnelle (qui chiffre le désordre actuel sans comparer avec le coût d'une solution).
+
+
+──────────────────────────────────────────────────────────────
+🔀 15. Simulateur de Scénario Pivot  ★ NOUVEAU
+──────────────────────────────────────────────────────────────
+Catégorie : Stratégie / Modèle économique
+
+Problème PME : «Et si je changeais de modèle — abonnement, marketplace, licence ?»
+
+L'utilisateur décrit son modèle actuel (CA, marge, nombre de clients, panier moyen) et un modèle alternatif envisagé (nouveau prix, nouvelle fréquence, nouveau coût de délivrance). L'outil simule les deux modèles sur 12 mois en parallèle : CA, marge, trésorerie, point mort. Il identifie le «creux de transition» (la période où le nouveau modèle n'a pas encore rattrapé l'ancien) et le nombre de mois pour atteindre la rentabilité du pivot.
+
+➔ Différenciation : Différent du Seuil de Rentabilité (qui traite un seul modèle statique) et de la Valeur de Sortie (qui projette la valorisation, pas la transition opérationnelle).
+
+
+──────────────────────────────────────────────────────────────
+📢 16. Calculateur de ROI d'une Campagne Marketing  ★ NOUVEAU
+──────────────────────────────────────────────────────────────
+Catégorie : Marketing / Performance
+
+Problème PME : «J'ai mis 2 000 € en pub — est-ce que ça a rapporté ?»
+
+Inputs : budget investi, nombre de leads générés, taux de conversion en clients, panier moyen, marge moyenne. L'outil calcule le coût par lead, le coût par client acquis, le ROI net de la campagne, et le ROAS (Return On Ad Spend). Il compare avec les benchmarks sectoriels et répond à : «Faut-il doubler le budget, l'optimiser, ou arrêter ?»
+
+➔ Différenciation : Différent du CAC existant (qui mesure le coût d'acquisition global, pas le ROI d'une campagne spécifique) et du Coût de la Promotion (qui traite les remises, pas la publicité).
+
+
+──────────────────────────────────────────────────────────────
+📦 17. Simulateur de Pricing par Paliers  ★ NOUVEAU
+──────────────────────────────────────────────────────────────
+Catégorie : Tarification / Structuration d'offre
+
+Problème PME : «Je veux proposer 3 formules (Basic / Pro / Premium) mais je ne sais pas les calibrer.»
+
+L'utilisateur décrit son offre de base (contenu, prix, coût), puis définit les éléments additionnels pour chaque palier supérieur et leur coût marginal. L'outil applique les ratios d'ancrage psychologique (1x / 2,2x / 4x) pour suggérer les prix, calcule la marge par palier, et simule la répartition probable des ventes entre formules (ancrage sur le milieu). Il affiche le CA et la marge projetés par scénario de mix.
+
+➔ Différenciation : Différent du Prix Psychologique (qui trouve le juste prix d'une seule offre) et de l'Élasticité-Prix (qui mesure la tolérance à la hausse, pas la structure multi-paliers).
+
+
+──────────────────────────────────────────────────────────────
+🏢 18. Estimateur de Taille de Marché Accessible  ★ NOUVEAU
+──────────────────────────────────────────────────────────────
+Catégorie : Stratégie / Marché
+
+Problème PME : «Mon marché en Guyane, il fait quelle taille concrètement ?»
+
+L'utilisateur saisit : population cible (nombre d'entreprises ou de particuliers), taux de pénétration réaliste, panier moyen, fréquence d'achat annuelle. L'outil calcule le TAM (marché total), le SAM (marché adressable) et le SOM (marché capturable à court terme). Il affiche la part de marché actuelle de la PME et le potentiel de croissance en valeur absolue. Particulièrement utile pour les petits marchés ultramarins.
+
+➔ Différenciation : Différent du Plafond de Verre (qui mesure le CA refusé par manque de capacité, pas la taille du marché) et des Jumeaux Clients (qui segmentent les profils, pas le marché global).
+
+
+──────────────────────────────────────────────────────────────
+🛡️ 19. Indice de Vulnérabilité Fournisseur  ★ NOUVEAU
+──────────────────────────────────────────────────────────────
+Catégorie : Risque / Chaîne d'approvisionnement
+
+Problème PME : «Si mon fournisseur principal fait défaut, je suis bloqué combien de temps ?»
+
+L'utilisateur liste ses 3 à 6 fournisseurs clés et renseigne pour chacun : % des achats, délai de remplacement estimé (en semaines), existence d'un fournisseur alternatif (oui/non), criticité (bloquant / ralentissant / mineur). L'outil calcule un indice de vulnérabilité pondéré et simule l'impact financier d'une rupture sur les 2 fournisseurs les plus critiques. Il recommande des actions de sécurisation.
+
+➔ Différenciation : Différent du Radar de Dépendance Commerciale (qui traite la concentration clients, pas fournisseurs) et de la Fragmentation (qui analyse les outils SaaS, pas la supply chain).
+
+
+──────────────────────────────────────────────────────────────
+❌ 20. Calculateur de Coût de la Non-Qualité  ★ NOUVEAU
+──────────────────────────────────────────────────────────────
+Catégorie : Opérationnel / Amélioration continue
+
+Problème PME : «J'ai des retours clients, du SAV, des reprises — ça pèse combien ?»
+
+L'utilisateur estime : taux de réclamation ou de retour (en %), coût moyen d'un traitement SAV, heures de reprise par incident, nombre de clients perdus suite à un problème qualité (par trimestre). L'outil calcule le coût total annuel de la non-qualité (coûts visibles + coûts cachés : réputation, CA perdu par attrition). Il compare ce coût avec l'investissement nécessaire pour améliorer la qualité et calcule le ROI de la démarche qualité.
+
+➔ Différenciation : Différent de la Friction Opérationnelle (qui traite l'inefficacité organisationnelle) et de l'Effet Rétention (qui mesure l'impact de la fidélité sans en analyser les causes négatives).
+
+
+══════════════════════════════════════════════════════════════════
+Trait d'Union Studio — www.traitdunion.it — Cayenne, Guyane
+20 outils = 12 validés + 8 nouveaux — 0 chevauchement avec les 10 existants du site.
+══════════════════════════════════════════════════════════════════

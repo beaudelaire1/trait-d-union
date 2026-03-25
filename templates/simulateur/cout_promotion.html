@@ -1,0 +1,180 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Vrai Coût d'une Promotion | Trait d'Union Studio{% endblock %}
+{% block meta_description %}-20% c'est bon pour vous ? Calculez le volume additionnel exact pour rester neutre en marge absolue.{% endblock %}
+
+{% block tool_color %}#ec4899{% endblock %}
+{% block tool_tag %}Tarification{% endblock %}
+{% block tool_title %}Vrai Coût d'une Promotion{% endblock %}
+{% block tool_description %}-20%, c'est vraiment bon pour moi ? Calculez le volume additionnel exact pour que la promo soit neutre en marge.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Besoin d'optimiser vos promotions ?{% endblock %}
+{% block tool_cta_text %}TUS conçoit des stratégies promotionnelles digitales calibrées pour votre rentabilité.{% endblock %}
+
+{% block tool_content %}
+<div x-data="coutPromoSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Votre offre</h2>
+                <div>
+                    <label class="tool-label">Prix normal (€)</label>
+                    <input type="number" class="tool-input" x-model.number="prixNormal" min="1" step="10" placeholder="100">
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Marge habituelle</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="margeHabituelle + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="margeHabituelle" min="5" max="90" step="5">
+                </div>
+                <div>
+                    <label class="tool-label">Volume habituel sur la période</label>
+                    <input type="number" class="tool-input" x-model.number="volumeHabituel" min="1" step="1" placeholder="50">
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">La promotion envisagée</h2>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Taux de remise</label>
+                        <span class="text-lg font-bold font-mono" style="color: #ef4444;" x-text="'-' + tauxRemise + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="tauxRemise" min="5" max="60" step="5">
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + (estRealiste() ? '#22c55e' : '#ef4444')">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ec4899;">Volume additionnel requis</p>
+                <p class="result-big text-5xl" style="color: #ec4899;" x-text="volumeAdditionnel() === '∞' ? '∞' : '+' + volumeAdditionnel() + ' unités'"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="pctAugmentation() + '% de ventes en plus'"></strong> pour être neutre en marge</p>
+            </div>
+
+            <div class="grid sm:grid-cols-4 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Prix promo</p>
+                    <p class="result-big text-2xl" style="color: #ec4899;" x-text="fmt(prixPromo()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">Marge/unité promo</p>
+                    <p class="result-big text-2xl" :style="'color:' + (margeUnitairePromo() > 0 ? '#f59e0b' : '#ef4444')" x-text="fmt(margeUnitairePromo()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">Marge sans promo</p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(margeTotaleSansPromo()) + ' €'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
+                    <p class="result-label mb-1">Point mort (unités)</p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="pointMort() === '∞' ? '∞' : pointMort()"></p>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Marge totale selon le volume promo</h3>
+                <div class="chart-container">
+                    <canvas id="promoChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="350" :style="'border-color:' + (estRealiste() ? '#22c55e' : '#ef4444')">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl" x-text="estRealiste() ? '✅' : '⚠️'"></span>
+                    <div>
+                        <p class="font-semibold" :style="'color:' + (estRealiste() ? '#22c55e' : '#ef4444')" x-text="estRealiste() ? 'Promo potentiellement rentable' : 'Promo risquée'"></p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function coutPromoSim() {
+        return {
+            prixNormal: 100, margeHabituelle: 40, volumeHabituel: 50, tauxRemise: 20,
+            prixPromo() { return this.prixNormal * (1 - this.tauxRemise / 100); },
+            coutUnitaire() { return this.prixNormal * (1 - this.margeHabituelle / 100); },
+            margeUnitaireNormale() { return this.prixNormal - this.coutUnitaire(); },
+            margeUnitairePromo() { return this.prixPromo() - this.coutUnitaire(); },
+            margeTotaleSansPromo() { return this.margeUnitaireNormale() * this.volumeHabituel; },
+            volumeAdditionnel() {
+                const mup = this.margeUnitairePromo();
+                if (mup <= 0) return '∞';
+                return Math.ceil(this.margeTotaleSansPromo() / mup - this.volumeHabituel);
+            },
+            pointMort() {
+                const mup = this.margeUnitairePromo();
+                if (mup <= 0) return '∞';
+                return Math.ceil(this.margeTotaleSansPromo() / mup);
+            },
+            pctAugmentation() {
+                const va = this.volumeAdditionnel();
+                if (va === '∞') return '∞';
+                return this.volumeHabituel > 0 ? Math.round(va / this.volumeHabituel * 100) : '∞';
+            },
+            estRealiste() {
+                const pct = this.pctAugmentation();
+                return pct !== '∞' && pct <= 100;
+            },
+            insight() {
+                const pct = this.pctAugmentation();
+                const va = this.volumeAdditionnel();
+                if (va === '∞') return `La remise de ${this.tauxRemise}% absorbe toute la marge — il est mathématiquement impossible d'être rentable. Réduisez le taux de remise ou trouvez un autre levier commercial.`;
+                if (pct <= 30) return `Il faut +${va} unités (+${pct}%) pour être neutre. C'est réaliste si votre marché est réceptif. La promo peut fonctionner.`;
+                if (pct <= 100) return `+${pct}% de volume requis — c'est ambitieux. Assurez-vous d'avoir la capacité de livrer ${this.pointMort()} unités et que la demande existe.`;
+                return `+${pct}% de ventes en plus est très difficile à atteindre. Cette promo vous coûtera probablement de l'argent. Réduisez la remise à 10-15% ou ciblez un segment précis.`;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            init() {
+                ['prixNormal','margeHabituelle','volumeHabituel','tauxRemise'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('promoChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                const mup = this.margeUnitairePromo();
+                const base = this.margeTotaleSansPromo();
+                const labels = []; const promoData = []; const baseData = [];
+                for (let v = this.volumeHabituel; v <= this.volumeHabituel * 3; v += Math.max(1, Math.round(this.volumeHabituel / 10))) {
+                    labels.push(v);
+                    promoData.push(Math.round(mup * v));
+                    baseData.push(Math.round(base));
+                }
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'line', data: { labels, datasets: [
+                        { label: 'Marge avec promo', data: promoData, borderColor: '#ec4899', backgroundColor: 'rgba(236,72,153,0.08)', fill: true, tension: 0.3, pointRadius: 2, borderWidth: 2.5 },
+                        { label: 'Marge sans promo', data: baseData, borderColor: '#22c55e', borderDash: [6,4], borderWidth: 2, pointRadius: 0 }
+                    ]}, options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: textColor, usePointStyle: true, padding: 16 } } },
+                        scales: { x: { title: { display: true, text: 'Volume (unités)', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor } },
+                            y: { title: { display: true, text: 'Marge (€)', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') + ' €' } } }
+                    }
+                });
+            }
+        };
+    }
+    window.coutPromoSim = coutPromoSim;
+})();
+</script>
+{% endblock %}

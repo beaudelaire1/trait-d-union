@@ -68,25 +68,11 @@ def auto_provision_client_on_quote_accepted_or_validated(
         )
 
 
-@receiver(post_save, sender=Quote)
-def send_quote_with_pdf(sender, instance, created, **kwargs):
-    """
-    Envoi automatique du devis au client par e-mail avec le PDF joint.
-    """
-    # Skip email sending during tests
-    if getattr(settings, 'TESTING', False):
-        return
-        
-    if not created:
-        return
-
-    # Use async dispatch — ⚡ PERFORMANCE: PDF generation (WeasyPrint, 1-5s) is now
-    # dispatched to qcluster worker instead of blocking the request cycle.
-    try:
-        from core.tasks import async_send_quote_pdf_email
-        async_send_quote_pdf_email(instance.pk)  # worker handles PDF generation + send
-    except Exception as e:
-        logger.error(f"Erreur lors de l'envoi automatique du devis {instance.pk}: {e}")
+# NOTE: L'envoi automatique du devis à la création a été supprimé.
+# L'admin contrôle l'envoi manuellement via les actions dans l'admin Django :
+# - action_send_quote_email (envoi email)
+# - action_send_quote_email_and_publish (email + publication portail)
+# Cela permet à l'admin de vérifier le devis avant envoi au client.
 
 
 from django.contrib.auth.signals import user_logged_in as django_user_logged_in

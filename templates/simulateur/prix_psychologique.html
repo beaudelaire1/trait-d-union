@@ -1,0 +1,194 @@
+{% extends 'simulateur/tool_base.html' %}
+
+{% block title %}Prix Psychologique | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Trouvez le prix juste basé sur la valeur perçue. Détectez la sous-tarification structurelle de vos offres.{% endblock %}
+
+{% block tool_color %}#14b8a6{% endblock %}
+{% block tool_tag %}Tarification{% endblock %}
+{% block tool_title %}Simulateur de Prix Psychologique{% endblock %}
+{% block tool_description %}Pas le prix bas, le prix juste. Positionnez votre offre par la valeur perçue et détectez la sous-tarification structurelle.{% endblock %}
+
+{% block tool_icon %}
+<svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+{% endblock %}
+
+{% block tool_cta_title %}Besoin d'une stratégie tarifaire ?{% endblock %}
+{% block tool_cta_text %}TUS vous aide à repositionner votre pricing en cohérence avec votre marque et la valeur que vous délivrez.{% endblock %}
+
+{% block tool_content %}
+<div x-data="prixPsychoSim()" x-cloak>
+    <div class="grid lg:grid-cols-5 gap-8">
+
+        <div class="lg:col-span-2 space-y-5">
+            <div class="tool-card space-y-6 mo-fade-up">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Votre offre</h2>
+                <div>
+                    <label class="tool-label">Nom de l'offre</label>
+                    <input type="text" class="tool-input" x-model="nomOffre" placeholder="Ex: Pack création de site">
+                </div>
+                <div>
+                    <label class="tool-label">Prix actuel (€)</label>
+                    <input type="number" class="tool-input" x-model.number="prixActuel" min="0" step="50" placeholder="1500">
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Perception de valeur</h2>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Complexité technique</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="complexite + '/10'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="complexite" min="1" max="10" step="1">
+                    <p class="tool-sublabel">1 = simple, 10 = très technique / expertise rare</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Unicité sur le marché</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="unicite + '/10'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="unicite" min="1" max="10" step="1">
+                    <p class="tool-sublabel">1 = beaucoup de concurrents, 10 = vous êtes seul</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Durée de la relation client</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="duree + '/10'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="duree" min="1" max="10" step="1">
+                    <p class="tool-sublabel">1 = one-shot, 10 = accompagnement long</p>
+                </div>
+            </div>
+
+            <div class="tool-card space-y-6 mo-fade-up" data-delay="200">
+                <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Contexte marché</h2>
+                <div>
+                    <label class="tool-label">Prix moyen du marché (€)</label>
+                    <input type="number" class="tool-input" x-model.number="prixMarche" min="0" step="50" placeholder="1200">
+                    <p class="tool-sublabel">L'estimation de ce que facturent vos concurrents</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+
+            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + couleur()">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + couleur()">Prix psychologique recommandé</p>
+                <p class="result-big text-5xl" :style="'color:' + couleur()" x-text="fmt(prixRecommande()) + ' €'"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">
+                    Fourchette : <strong x-text="fmt(fourchetteBas()) + ' € — ' + fmt(fourchetteHaut()) + ' €'"></strong>
+                </p>
+            </div>
+
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
+                    <p class="result-label mb-1">Écart vs prix actuel</p>
+                    <p class="result-big text-2xl" :style="'color:' + (ecart() >= 0 ? '#22c55e' : '#ef4444')" x-text="(ecart() >= 0 ? '+' : '') + ecart() + '%'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
+                    <p class="result-label mb-1">Score de valeur</p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="scoreValeur() + '/30'"></p>
+                </div>
+                <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
+                    <p class="result-label mb-1">Diagnostic</p>
+                    <p class="text-base font-bold" :style="'color:' + couleur()" x-text="diagnostic()"></p>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="250">
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);">Positionnement tarifaire</h3>
+                <div class="chart-container">
+                    <canvas id="prixPsychoChart"></canvas>
+                </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="300" :style="'border-color:' + couleur()">
+                <div class="flex items-start gap-3">
+                    <span class="text-2xl">🏷️</span>
+                    <div>
+                        <p class="font-semibold" :style="'color:' + couleur()" x-text="diagnostic()"></p>
+                        <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+(function() {
+    let chart = null;
+    function prixPsychoSim() {
+        return {
+            nomOffre: '', prixActuel: 1500, complexite: 6, unicite: 5, duree: 4, prixMarche: 1200,
+            scoreValeur() { return this.complexite + this.unicite + this.duree; },
+            multiplicateur() {
+                const s = this.scoreValeur();
+                if (s >= 24) return 2.5;
+                if (s >= 18) return 1.8;
+                if (s >= 12) return 1.3;
+                return 1.0;
+            },
+            prixRecommande() { return Math.round(this.prixMarche * this.multiplicateur()); },
+            fourchetteBas() { return Math.round(this.prixRecommande() * 0.85); },
+            fourchetteHaut() { return Math.round(this.prixRecommande() * 1.15); },
+            ecart() { return this.prixActuel > 0 ? Math.round((this.prixRecommande() - this.prixActuel) / this.prixActuel * 100) : 0; },
+            diagnostic() {
+                const e = this.ecart();
+                if (e >= 20) return 'Sous-tarification structurelle';
+                if (e >= 5) return 'Marge d\'optimisation';
+                if (e <= -20) return 'Sur-tarification';
+                return 'Prix cohérent';
+            },
+            couleur() {
+                const e = this.ecart();
+                if (e >= 20) return '#ef4444';
+                if (e >= 5) return '#f59e0b';
+                if (e <= -20) return '#ef4444';
+                return '#22c55e';
+            },
+            insight() {
+                const e = this.ecart();
+                const reco = this.prixRecommande();
+                if (e >= 20) return `Votre prix actuel (${this.fmt(this.prixActuel)} €) est nettement en dessous de la valeur perçue (${this.fmt(reco)} €). Avec un score de ${this.scoreValeur()}/30 en complexité + unicité + durée, vous sous-vendez votre expertise. Augmentez progressivement de 10-15% par trimestre.`;
+                if (e >= 5) return `Une légère marge d'optimisation existe. Le marché peut accepter ${this.fmt(reco)} € pour un score de valeur de ${this.scoreValeur()}/30. Testez une augmentation de prix sur vos prochains devis.`;
+                if (e <= -20) return `Votre prix (${this.fmt(this.prixActuel)} €) dépasse sensiblement la valeur perçue (${this.fmt(reco)} €). Soit renforcez la perception de valeur (positionnement, packaging), soit ajustez le tarif.`;
+                return `Votre prix est bien aligné avec la valeur perçue. Score de ${this.scoreValeur()}/30 pour un prix recommandé de ${this.fmt(reco)} €. Continuez à renforcer l'unicité pour justifier de futures augmentations.`;
+            },
+            fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+            init() {
+                ['prixActuel','complexite','unicite','duree','prixMarche'].forEach(k => {
+                    this.$watch(k, () => this.updateChart());
+                });
+                this.$nextTick(() => this.updateChart());
+            },
+            updateChart() {
+                const ctx = document.getElementById('prixPsychoChart');
+                if (!ctx) return;
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+                const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
+                const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
+                if (chart) chart.destroy();
+                chart = new Chart(ctx, {
+                    type: 'bar', data: {
+                        labels: ['Prix marché', 'Votre prix', 'Prix recommandé', 'Fourchette haute'],
+                        datasets: [{ data: [this.prixMarche, this.prixActuel, this.prixRecommande(), this.fourchetteHaut()],
+                            backgroundColor: ['rgba(107,114,128,0.3)', 'rgba(239,68,68,0.3)', 'rgba(20,184,166,0.3)', 'rgba(34,197,94,0.3)'],
+                            borderColor: ['#6b7280', '#ef4444', '#14b8a6', '#22c55e'],
+                            borderWidth: 2, borderRadius: 8 }]
+                    }, options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: { x: { grid: { display: false }, ticks: { color: textColor } },
+                            y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => v.toLocaleString('fr-FR') + ' €' } } }
+                    }
+                });
+            }
+        };
+    }
+    window.prixPsychoSim = prixPsychoSim;
+})();
+</script>
+{% endblock %}
