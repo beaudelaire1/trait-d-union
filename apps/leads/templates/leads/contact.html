@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}Contact – Trait d'Union Studio{% endblock %}
 {% block meta_description %}Contactez Trait d'Union Studio pour votre projet digital en Guyane, Martinique ou Guadeloupe. Devis gratuit sous 48h.{% endblock %}
+{% block extra_head %}
+<style>
+    /* Style natif des <option> dans le select indicatif pays */
+    select[name="phone_0"] option {
+        color: #111827;
+        background-color: #fff;
+    }
+</style>
+{% endblock %}
 {% block content %}
 <div class="min-h-screen py-16 px-6 relative overflow-hidden">
     <!-- Arrière-plan avec effets lumineux -->
@@ -93,6 +102,17 @@
                     {% if form.email.errors %}<p id="email-error" class="text-red-400 text-sm mt-1" role="alert">{{ form.email.errors.0 }}</p>{% endif %}
                 </div>
             </div>
+                
+            <!-- Téléphone -->
+            <div class="space-y-2">
+                <label for="id_phone_0" class="block text-sm font-medium text-tus-white/80">{{ form.phone.label }}</label>
+                <div class="input-wrapper flex gap-2 w-full">
+                    {{ form.phone }}
+                </div>
+                <p id="phone-help" class="input-helper">Optionnel, mais cela peut accélérer notre réponse</p>
+                {% if form.phone.errors %}<p id="phone-error" class="text-red-400 text-sm mt-1" role="alert">{{ form.phone.errors.0 }}</p>{% endif %}
+            </div>
+
 
             <!-- Type de projet -->
             <div class="space-y-2">

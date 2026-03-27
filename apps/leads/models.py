@@ -5,6 +5,8 @@ from django.core.validators import FileExtensionValidator
 from django.db import models
 
 
+from phonenumber_field.modelfields import PhoneNumberField
+
 class ProjectTypeChoice(models.TextChoices):
     SITE = 'site', 'Site'
     COMMERCE = 'commerce', 'Commerce'
@@ -33,6 +35,7 @@ class Lead(models.Model):
 
     name = models.CharField("Nom complet", max_length=100)
     email = models.EmailField("Email", max_length=254)
+    phone = PhoneNumberField("Téléphone", blank=True)
     project_type = models.CharField("Type de projet", max_length=20, choices=ProjectTypeChoice.choices)
     message = models.TextField("Message")
     budget = models.CharField("Budget estimé", max_length=20, choices=BudgetRange.choices, blank=True)

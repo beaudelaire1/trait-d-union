@@ -781,8 +781,7 @@
                         </td>
                         <td class="center">{{ item.quantity }}</td>
                         <td class="right amount-cell">{{ item.unit_price|floatformat:2 }} €</td>
-                        <td class="center">{% if item.line_discount %}{{ item.line_discount|floatformat:2 }}%{% else
-                            %}—{% endif %}</td>
+                        <td class="center">{% if item.line_discount %}{{ item.line_discount|floatformat:2 }}%{% else %}—{% endif %}</td>
                         <td class="center">{{ item.tax_rate|default:"20"|floatformat:2 }}%</td>
                         <td class="right amount-cell">{{ item.total_ttc|floatformat:2 }} €</td>
                     </tr>
@@ -940,17 +939,14 @@
                     <div class="footer-col">
                         <h5>Légal</h5>
                         <p>
-                            {% if branding.siret %}<span class="highlight">SIRET:</span> {{ branding.siret }}<br>{%
-                            endif %}
-                            {% if branding.tva_intra %}<span class="highlight">TVA:</span> {{ branding.tva_intra }}{%
-                            endif %}
+                            {% if branding.siret %}<span class="highlight">SIRET:</span> {{ branding.siret }}<br>{% endif %}
+                            {% if branding.tva_intra %}<span class="highlight">TVA:</span> {{ branding.tva_intra }}{% endif %}
                         </p>
                     </div>
                     <div class="footer-col">
                         <h5>Banque</h5>
                         <p>
-                            {% if branding.iban %}<span class="highlight">IBAN:</span> {{ branding.iban }}<br>{% endif
-                            %}
+                            {% if branding.iban %}<span class="highlight">IBAN:</span> {{ branding.iban }}<br>{% endif %}
                             {% if branding.bic %}<span class="highlight">BIC:</span> {{ branding.bic }}{% endif %}
                         </p>
                     </div>
