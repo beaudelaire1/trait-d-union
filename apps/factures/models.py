@@ -12,6 +12,7 @@ from typing import List
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from core.utils import raw_media_storage
 
 
 # =========================
@@ -76,7 +77,7 @@ class Invoice(models.Model):
     # Contenu & sortie
     notes = models.TextField(blank=True, default="")
     payment_terms = models.TextField(blank=True, default="")
-    pdf = models.FileField(upload_to="factures", blank=True, null=True)
+    pdf = models.FileField(upload_to="factures", blank=True, null=True, storage=raw_media_storage)
 
     # ===========================================
     # PHASE 3 : Paiement en ligne
@@ -121,6 +122,7 @@ class Invoice(models.Model):
         upload_to='factures/proofs/',
         blank=True,
         null=True,
+        storage=raw_media_storage,
         verbose_name="Preuve de paiement",
         help_text="Document/reçu de paiement (virement, chèque, etc.)"
     )

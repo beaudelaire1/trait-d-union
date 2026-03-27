@@ -4,6 +4,26 @@ from __future__ import annotations
 from decimal import Decimal
 
 
+def raw_media_storage():
+    """Return a Cloudinary *raw* storage (resource_type='raw') when available.
+
+    ``MediaCloudinaryStorage`` uses ``resource_type='image'`` and rejects
+    non-image files (PDF, ZIP, DOCX …).  ``RawMediaCloudinaryStorage`` handles
+    **any** file type.  When Cloudinary is not configured the default
+    Django file-system storage is returned instead.
+
+    Usage on a model field::
+
+        file = models.FileField(upload_to='…', storage=raw_media_storage)
+    """
+    try:
+        from cloudinary_storage.storage import RawMediaCloudinaryStorage
+        return RawMediaCloudinaryStorage()
+    except Exception:
+        from django.core.files.storage import default_storage
+        return default_storage
+
+
 def get_client_ip(request) -> str:
     """Extract client IP from request, handling reverse proxies.
 

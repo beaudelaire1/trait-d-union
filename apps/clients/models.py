@@ -9,6 +9,7 @@ milestone management.
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from core.utils import raw_media_storage
 
 # Import workflow models
 from .models_workflow import WorkflowTemplate, MilestoneTemplate
@@ -610,7 +611,8 @@ class ClientDocument(models.Model):
     )
     file = models.FileField(
         "Fichier",
-        upload_to='clients/documents/%Y/%m/'
+        upload_to='clients/documents/%Y/%m/',
+        storage=raw_media_storage,
     )
     uploaded_by_client = models.BooleanField(
         "Uploadé par le client",
