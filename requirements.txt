@@ -49,3 +49,4 @@ qrcode>=7.4
 # Redis client for health checks
 redis>=5.0.0
 django-phonenumber-field[phonenumbers]==8.4.0
+babel>=2.14
