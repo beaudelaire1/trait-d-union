@@ -64,6 +64,7 @@ class ClientProfile(models.Model):
     class Meta:
         verbose_name = "Client"
         verbose_name_plural = "Clients"
+        ordering = ['-created_at']
         indexes = [
             models.Index(fields=['email'], name='idx_client_email'),
         ]
