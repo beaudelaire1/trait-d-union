@@ -19,7 +19,7 @@ class LeadAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
     date_hierarchy = 'created_at'
     list_editable = ('status',)
-    actions = ['action_convert_to_client', 'action_mark_contacted', 'action_mark_lost']
+    actions = ['action_convert_to_client', 'action_convert_to_client_no_portal', 'action_mark_contacted', 'action_mark_lost']
 
     def attachment_link(self, obj):
         if obj.attachment:
@@ -136,7 +136,48 @@ class LeadAdmin(admin.ModelAdmin):
                 level=messages.ERROR,
             )
 
-    @admin.action(description="📧 Marquer comme contacté")
+    @admin.action(description="� Convertir en client (sans portail)")
+    def action_convert_to_client_no_portal(self, request, queryset):
+        """Crée une fiche ClientProfile sans compte User (pas d'accès portail)."""
+        from apps.clients.models import ClientProfile
+
+        converted = 0
+        skipped = 0
+
+        for lead in queryset:
+            if lead.is_converted:
+                skipped += 1
+                continue
+
+            client_profile = ClientProfile.objects.create(
+                full_name=lead.name,
+                email=lead.email,
+                phone=str(lead.phone) if lead.phone else '',
+            )
+
+            lead.converted_to_client = client_profile
+            lead.converted_at = timezone.now()
+            lead.status = LeadStatus.CONVERTED
+            lead.is_processed = True
+            lead.save(update_fields=[
+                'converted_to_client', 'converted_at', 'status', 'is_processed',
+            ])
+            converted += 1
+
+        if converted:
+            self.message_user(
+                request,
+                f"📇 {converted} lead(s) converti(s) en fiche client (sans portail).",
+                level=messages.SUCCESS,
+            )
+        if skipped:
+            self.message_user(
+                request,
+                f"⏭️ {skipped} lead(s) déjà converti(s), ignoré(s).",
+                level=messages.WARNING,
+            )
+
+    @admin.action(description="�📧 Marquer comme contacté")
     def action_mark_contacted(self, request, queryset):
         updated = queryset.exclude(status=LeadStatus.CONVERTED).update(status=LeadStatus.CONTACTED)
         self.message_user(request, f"{updated} lead(s) marqué(s) comme contacté(s).", level=messages.SUCCESS)

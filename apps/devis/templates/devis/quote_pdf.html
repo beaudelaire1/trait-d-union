@@ -748,13 +748,11 @@
 
             <div class="party client">
                 <div class="party-label">Destinataire</div>
-                <div class="party-name">{% if quote.client.company %}{{ quote.client.company }}{% else %}{{
-                    quote.client.full_name }}{% endif %}</div>
+                <div class="party-name">{% if quote.client.company %}{{ quote.client.company }}{% else %}{{ quote.client.full_name }}{% endif %}</div>
                 <div class="party-details">
                     {% if quote.client.company and quote.client.full_name %}{{ quote.client.full_name }}<br>{% endif %}
                     {% if quote.client.address_line %}{{ quote.client.address_line }}<br>{% endif %}
-                    {% if quote.client.zip_code or quote.client.city %}{{ quote.client.zip_code }} {{ quote.client.city
-                    }}<br>{% endif %}
+                    {% if quote.client.zip_code or quote.client.city %}{{ quote.client.zip_code }} {{ quote.client.city }}<br>{% endif %}
                     {{ quote.client.email }}{% if quote.client.phone %}<br>{{ quote.client.phone }}{% endif %}
                 </div>
             </div>
