@@ -193,13 +193,22 @@
              * Hausse : % de clients qu'on peut PERDRE  → positif
              * Baisse : % de clients qu'on doit GAGNER  → positif
              */
+            /*
+             * Seuil de volume (en %)
+             *
+             * Hausse : on cherche la perte de volume max pour maintenir le profit.
+             *   Profit actuel = V × P × M     (M = marge en fraction)
+             *   Profit nouveau = V_new × (P(1+d) − P(1−M)) = V_new × P(M+d)
+             *   Break-even ⟹ V_new/V = M/(M+d)
+             *   ⟹ % perte admissible = d/(M+d) × 100
+             *
+             * Baisse : volume supplémentaire requis = d/(M−d) × 100
+             */
             seuilVolume() {
                 const M = this.margeBrute;
                 const d = this.variation;
                 if (this.direction === 'hausse') {
-                    const ancienneMarge = M / 100;
-                    const nouvMarge = (ancienneMarge + d / 100) / (1 + d / 100);
-                    return nouvMarge > 0 ? (1 - ancienneMarge / nouvMarge) * 100 : 0;
+                    return (M + d) > 0 ? (d / (M + d)) * 100 : 0;
                 }
                 // Baisse : besoin d / (M - d) × 100 clients en plus
                 if (d >= M) return Infinity;

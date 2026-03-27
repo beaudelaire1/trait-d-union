@@ -133,16 +133,17 @@
         return {
             budget: 2000, visiteurs: 5000, tauxLead: 3, tauxClient: 20, panierMoyen: 1500, marge: 40,
             leads() { return Math.round(this.visiteurs * this.tauxLead / 100); },
-            clients() { return Math.max(1, Math.round(this.leads() * this.tauxClient / 100)); },
+            clients() { return Math.round(this.leads() * this.tauxClient / 100); },
             caGenere() { return this.clients() * this.panierMoyen; },
-            margeNette() { return this.caGenere() * this.marge / 100 - this.budget; },
-            roas() { return this.budget > 0 ? Math.round(this.caGenere() / this.budget * 10) / 10 : 0; },
+            margeNette() { return this.clients() > 0 ? this.caGenere() * this.marge / 100 - this.budget : -this.budget; },
+            roas() { return (this.budget > 0 && this.clients() > 0) ? Math.round(this.caGenere() / this.budget * 10) / 10 : 0; },
             coutParLead() { return this.leads() > 0 ? Math.round(this.budget / this.leads()) : '∞'; },
             coutParClient() { return this.clients() > 0 ? Math.round(this.budget / this.clients()) : '∞'; },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             insight() {
                 const r = this.roas();
                 const cpl = this.coutParLead();
+                if (this.clients() === 0) return `Aucun client généré avec ces paramètres. Votre entonnoir ne produit pas de conversion — vérifiez vos taux ou augmentez votre trafic.`;
                 if (r < 1) return `ROAS de ${r}x — votre marketing perd de l'argent. Deux leviers : augmenter le taux de conversion (SEO, landing pages) ou augmenter le panier moyen (upsell, bundles).`;
                 if (r < 3) return `ROAS de ${r}x — correct mais optimisable. Coût par lead de ${cpl} €. Améliorez le taux lead→client (nurturing, automation) pour passer au-dessus de 3x.`;
                 return `ROAS de ${r}x — excellent ! Votre marketing est rentable avec un coût d'acquisition client de ${this.coutParClient()} €. Envisagez de scaler le budget pour accélérer la croissance.`;

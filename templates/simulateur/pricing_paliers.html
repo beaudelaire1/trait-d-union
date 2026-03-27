@@ -31,6 +31,14 @@
                     <label class="tool-label">Coût de revient Pro (€)</label>
                     <input type="number" class="tool-input" x-model.number="coutPro" min="0" step="10" placeholder="200">
                 </div>
+                <div>
+                    <label class="tool-label">Coût de revient Basic (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutBasicVal" min="0" step="10" placeholder="120">
+                </div>
+                <div>
+                    <label class="tool-label">Coût de revient Premium (€)</label>
+                    <input type="number" class="tool-input" x-model.number="coutPremiumVal" min="0" step="10" placeholder="260">
+                </div>
             </div>
 
             <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
@@ -145,13 +153,13 @@
     let chart = null;
     function pricingPaliersSim() {
         return {
-            prixPro: 500, coutPro: 200, ratioBasic: 0.6, ratioPremium: 2.2,
+            prixPro: 500, coutPro: 200, coutBasicVal: 120, coutPremiumVal: 260, ratioBasic: 0.6, ratioPremium: 2.2,
             pctBasic: 25, pctPremium: 15, volumeTotal: 100,
             pctPro() { return Math.max(0, 100 - this.pctBasic - this.pctPremium); },
             prixBasic() { return Math.round(this.prixPro * this.ratioBasic); },
             prixPremium() { return Math.round(this.prixPro * this.ratioPremium); },
-            coutBasic() { return this.coutPro * 0.6; },
-            coutPremium() { return this.coutPro * 1.3; },
+            coutBasic() { return this.coutBasicVal; },
+            coutPremium() { return this.coutPremiumVal; },
             margeBasic() { return this.prixBasic() - this.coutBasic(); },
             margePro() { return this.prixPro - this.coutPro; },
             margePremium() { return this.prixPremium() - this.coutPremium(); },
@@ -176,7 +184,7 @@
                 return tips.join(' ');
             },
             init() {
-                ['prixPro','coutPro','ratioBasic','ratioPremium','pctBasic','pctPremium','volumeTotal'].forEach(k => {
+                ['prixPro','coutPro','coutBasicVal','coutPremiumVal','ratioBasic','ratioPremium','pctBasic','pctPremium','volumeTotal'].forEach(k => {
                     this.$watch(k, () => this.updateChart());
                 });
                 this.$nextTick(() => this.updateChart());

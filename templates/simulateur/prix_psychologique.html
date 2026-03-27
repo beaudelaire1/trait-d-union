@@ -126,10 +126,9 @@
             scoreValeur() { return this.complexite + this.unicite + this.duree; },
             multiplicateur() {
                 const s = this.scoreValeur();
-                if (s >= 24) return 2.5;
-                if (s >= 18) return 1.8;
-                if (s >= 12) return 1.3;
-                return 1.0;
+                /* Fonction linéaire continue entre 1.0× (score 3) et 2.5× (score 30)
+                   pour éviter les sauts de prix discontinus. */
+                return Math.max(1.0, Math.min(2.5, 1.0 + (s - 3) * (1.5 / 27)));
             },
             prixRecommande() { return Math.round(this.prixMarche * this.multiplicateur()); },
             fourchetteBas() { return Math.round(this.prixRecommande() * 0.85); },
