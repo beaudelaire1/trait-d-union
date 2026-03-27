@@ -179,20 +179,20 @@ class DocumentUploadForm(forms.ModelForm):
     """Form for uploading documents."""
 
     # Limites de sécurité
-    MAX_FILE_SIZE_MB = 10
-    ALLOWED_EXTENSIONS = {'.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg', '.zip', '.svg', '.ai', '.psd'}
-
-    # 🛡️ SECURITY: Magic bytes signatures for file type validation (anti content-type spoofing)
-    _MAGIC_SIGNATURES = {
-        '.pdf': [b'%PDF'],
-        '.doc': [b'\xd0\xcf\x11\xe0'],  # OLE2 compound document
-        '.docx': [b'PK\x03\x04'],  # ZIP (OOXML)
-        '.png': [b'\x89PNG\r\n\x1a\n'],
-        '.jpg': [b'\xff\xd8\xff'],
-        '.jpeg': [b'\xff\xd8\xff'],
-        '.zip': [b'PK\x03\x04', b'PK\x05\x06'],
-        '.svg': [b'<?xml', b'<svg'],
-        # .ai and .psd have complex headers — skip magic check for these
+    MAX_FILE_SIZE_MB = 50
+    ALLOWED_EXTENSIONS = {
+        # Documents
+        '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
+        '.odt', '.ods', '.odp', '.txt', '.csv', '.rtf',
+        # Images
+        '.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.bmp', '.tiff', '.tif',
+        '.ai', '.psd', '.eps', '.indd',
+        # Vidéo
+        '.mp4', '.mov', '.avi', '.mkv', '.webm', '.wmv',
+        # Audio
+        '.mp3', '.wav', '.ogg', '.aac', '.flac',
+        # Archives
+        '.zip', '.rar', '.7z', '.tar', '.gz',
     }
 
     class Meta:
@@ -208,7 +208,6 @@ class DocumentUploadForm(forms.ModelForm):
             }),
             'file': forms.FileInput(attrs={
                 'class': 'form-input',
-                'accept': '.pdf,.doc,.docx,.png,.jpg,.jpeg,.zip,.svg,.ai,.psd'
             }),
             'notes': forms.Textarea(attrs={
                 'class': 'form-input',
@@ -218,9 +217,8 @@ class DocumentUploadForm(forms.ModelForm):
         }
 
     def clean_file(self):
-        """Valide le type, la taille et les magic bytes du fichier uploadé."""
+        """Valide le type et la taille du fichier uploadé."""
         import os
-        from core.utils import validate_file_magic
         uploaded = self.cleaned_data.get('file')
         if not uploaded:
             return uploaded
@@ -237,13 +235,6 @@ class DocumentUploadForm(forms.ModelForm):
                 f"Type de fichier non autorisé ({ext}). "
                 f"Extensions acceptées : {', '.join(sorted(self.ALLOWED_EXTENSIONS))}"
             )
-
-        # 🛡️ SECURITY: Validate magic bytes to prevent content-type spoofing
-        if not validate_file_magic(uploaded, ext):
-            raise forms.ValidationError(
-                'Le contenu du fichier ne correspond pas à son type déclaré.'
-            )
-
         return uploaded
 
 

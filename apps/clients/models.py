@@ -582,6 +582,11 @@ class ClientDocument(models.Model):
         ('contract', '📝 Contrat'),
         ('devis', '💰 Devis'),
         ('facture', '🧾 Facture'),
+        ('video', '🎬 Vidéo'),
+        ('audio', '🎵 Audio'),
+        ('spreadsheet', '📊 Tableur'),
+        ('presentation', '📽️ Présentation'),
+        ('archive', '📁 Archive'),
         ('other', '📎 Autre'),
     ]
     

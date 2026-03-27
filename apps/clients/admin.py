@@ -586,6 +586,11 @@ class ClientDocumentAdmin(admin.ModelAdmin):
             'brief': '#8B5CF6',
             'logo': '#EC4899',
             'asset': '#06B6D4',
+            'video': '#EF4444',
+            'audio': '#F97316',
+            'spreadsheet': '#10B981',
+            'presentation': '#6366F1',
+            'archive': '#78716C',
             'other': '#6B7280',
         }
         color = colors.get(obj.document_type, '#6B7280')
