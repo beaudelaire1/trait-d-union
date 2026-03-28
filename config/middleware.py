@@ -228,14 +228,14 @@ class SecurityAuditMiddleware(MiddlewareMixin):
 
 
 class CanonicalDomainMiddleware(MiddlewareMixin):
-    """🔍 SEO: Redirect www → non-www and Render subdomain → canonical domain.
+    """🔍 SEO: Redirect non-canonical hosts to canonical domain.
 
     Prevents duplicate content penalties from Google by enforcing a single
     canonical domain. Only active when CANONICAL_DOMAIN is set (production).
 
     Redirects:
-    - www.traitdunion.it → traitdunion.it (301)
-    - trait-d-union.onrender.com → traitdunion.it (301)
+    - traitdunion.it → www.traitdunion.it (301) when CANONICAL_DOMAIN=www.traitdunion.it
+    - trait-d-union.onrender.com → www.traitdunion.it (301)
 
     Protection anti-boucle :
     - Un cookie ``_canonical_ok`` est posé lors du redirect.

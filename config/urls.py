@@ -1,10 +1,16 @@
 """Root URL configuration for TUS website."""
+from types import SimpleNamespace
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.sitemaps.views import sitemap
+from django.contrib.sitemaps.views import x_robots_tag, _get_latest_lastmod
+from django.core.paginator import EmptyPage, PageNotAnInteger
+from django.http import Http404
+from django.template.response import TemplateResponse
 from django.urls import path, include, URLPattern, URLResolver
+from django.utils.http import http_date
 from django.views.generic import TemplateView
 
 
@@ -54,6 +60,61 @@ sitemaps = {
     'chroniques': ChroniquesSitemap,
 }
 
+
+def canonical_sitemap_view(request):
+    """Serve sitemap with canonical host to avoid indexing redirecting URLs."""
+    return _canonical_sitemap(request, sitemaps=sitemaps)
+
+
+@x_robots_tag
+def _canonical_sitemap(
+    request,
+    sitemaps,
+    section=None,
+    template_name='sitemap.xml',
+    content_type='application/xml',
+):
+    req_protocol = request.scheme
+    canonical_domain = getattr(settings, 'CANONICAL_DOMAIN', '') or request.get_host().split(':')[0]
+    req_site = SimpleNamespace(domain=canonical_domain, name='Trait d\'Union Studio')
+
+    if section is not None:
+        if section not in sitemaps:
+            raise Http404("No sitemap available for section: %r" % section)
+        maps = [sitemaps[section]]
+    else:
+        maps = sitemaps.values()
+
+    page = request.GET.get('p', 1)
+
+    lastmod = None
+    all_sites_lastmod = True
+    urls = []
+    for site in maps:
+        try:
+            if callable(site):
+                site = site()
+            urls.extend(site.get_urls(page=page, site=req_site, protocol=req_protocol))
+            if all_sites_lastmod:
+                site_lastmod = getattr(site, 'latest_lastmod', None)
+                if site_lastmod is not None:
+                    lastmod = _get_latest_lastmod(lastmod, site_lastmod)
+                else:
+                    all_sites_lastmod = False
+        except EmptyPage:
+            raise Http404('Page %s empty' % page)
+        except PageNotAnInteger:
+            raise Http404("No page '%s'" % page)
+
+    headers = {'Last-Modified': http_date(lastmod.timestamp())} if (all_sites_lastmod and lastmod) else None
+    return TemplateResponse(
+        request,
+        template_name,
+        {'urlset': urls},
+        content_type=content_type,
+        headers=headers,
+    )
+
 urlpatterns = [
     # Dashboard BI (Phase 5)
     path('tus-gestion-secure/dashboard/', include('apps.pages.dashboard_urls')),
@@ -79,7 +140,7 @@ urlpatterns = [
     # TinyMCE — 🛡️ SECURITY: restricted to authenticated staff only
     path('tinymce/', _staff_protected_include('tinymce.urls')),
     # SEO
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
+    path('sitemap.xml', canonical_sitemap_view, name='sitemap'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
     # Health check (Docker + uptime monitoring)
     path('healthz/', healthz, name='healthz'),

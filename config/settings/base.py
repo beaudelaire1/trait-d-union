@@ -348,7 +348,7 @@ INVOICE_BRANDING = {
     'country': 'Guyane française',
     'phone': '+594 695 35 80 41',
     'email': 'contact@traitdunion.it',
-    'website': 'https://traitdunion.it',
+    'website': 'https://www.traitdunion.it',
     'siret': '908 264 112 00016',
     'tva_intra': '',
     'iban': os.environ.get('INVOICE_IBAN', ''),
@@ -359,13 +359,13 @@ INVOICE_BRANDING = {
 QUOTE_BRANDING = INVOICE_BRANDING  # Alias pour les devis
 
 # Site URL (pour les emails) — garde-fou : jamais localhost en production
-_raw_site_url = os.environ.get('SITE_URL', 'https://traitdunion.it')
+_raw_site_url = os.environ.get('SITE_URL', 'https://www.traitdunion.it')
 if any(h in _raw_site_url for h in ('localhost', '127.0.0.1', '0.0.0.0')):
     import logging as _logging
     _logging.getLogger(__name__).warning(
-        "SITE_URL contient localhost (%r), fallback → https://traitdunion.it", _raw_site_url
+        "SITE_URL contient localhost (%r), fallback → https://www.traitdunion.it", _raw_site_url
     )
-    SITE_URL = 'https://traitdunion.it'
+    SITE_URL = 'https://www.traitdunion.it'
 else:
     SITE_URL = _raw_site_url.rstrip('/')
 
