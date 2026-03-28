@@ -112,6 +112,32 @@
     color: rgba(17, 24, 39, 0.92) !important;
 }
 
+/* ── Home: Simulateur showcase (guardrails lisibilité) ── */
+[data-theme="light"] .simulator-showcase [class*="text-tus-white"] {
+    color: rgba(17, 24, 39, 0.9) !important;
+}
+[data-theme="light"] .simulator-showcase [class*="text-tus-white/40"] {
+    color: rgba(17, 24, 39, 0.58) !important;
+}
+[data-theme="light"] .simulator-showcase [class*="text-tus-white/50"] {
+    color: rgba(17, 24, 39, 0.65) !important;
+}
+[data-theme="light"] .simulator-showcase [class*="text-tus-white/60"] {
+    color: rgba(17, 24, 39, 0.72) !important;
+}
+[data-theme="light"] .simulator-showcase [class*="text-tus-white/70"] {
+    color: rgba(17, 24, 39, 0.78) !important;
+}
+[data-theme="light"] .simulator-showcase [class*="text-tus-white/80"] {
+    color: rgba(17, 24, 39, 0.86) !important;
+}
+[data-theme="light"] .simulator-showcase .simulator-cta-primary,
+[data-theme="light"] .simulator-showcase .simulator-cta-primary *,
+[data-theme="light"] .simulator-showcase .simulator-mockup-cta,
+[data-theme="light"] .simulator-showcase .simulator-mockup-cta * {
+    color: #FFFFFF !important;
+}
+
 /* ── Navbar : bleu profond premium ── */
 [data-theme="light"] #navbar {
     background: linear-gradient(135deg, #0A1628 0%, #0F2044 100%);
@@ -320,8 +346,8 @@
    En light mode on veut un fond blanc net avec shadow premium. */
 [data-theme="light"] .backdrop-blur-sm {
     background-color: #FFFFFF !important;
-    backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
 }
 
