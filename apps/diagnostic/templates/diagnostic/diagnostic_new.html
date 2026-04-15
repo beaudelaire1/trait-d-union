@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Nouveau diagnostic — TUS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen" style="background: #0f0f12;">
+  <div class="max-w-2xl mx-auto px-4 py-10">
+
+    {# ── Back link ──────────────────────────────── #}
+    <a href="{% url 'diagnostic:diagnostic_list' %}" class="inline-flex items-center gap-1 text-sm font-medium mb-6 transition-colors hover:text-white" style="color: #8e8e93;">
+      ← Retour à l'historique
+    </a>
+
+    {# ── Card ───────────────────────────────────── #}
+    <div class="rounded-xl border p-8" style="background: #18181c; border-color: #2a2a30;">
+      <div class="text-center mb-8">
+        <div class="text-4xl mb-3">🔬</div>
+        <h1 class="text-2xl font-bold text-white">Diagnostiquer un site</h1>
+        <p class="text-sm mt-2" style="color: #8e8e93;">
+          Analyse complète : performance, SEO, sécurité, accessibilité, mobile, SSL, standards.
+        </p>
+      </div>
+
+      {% if error %}
+      <div class="rounded-lg px-4 py-3 mb-6 text-sm font-medium" style="background: #ff453a22; color: #ff453a; border: 1px solid #ff453a33;">
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'diagnostic:diagnostic_new' %}">
+        {% csrf_token %}
+        <div class="mb-6">
+          <label for="url" class="block text-sm font-semibold text-white mb-2">URL du site à analyser</label>
+          <input type="url" name="url" id="url" required
+                 placeholder="https://www.example.com"
+                 class="w-full px-4 py-3 rounded-lg text-white text-sm placeholder-gray-500 border focus:outline-none focus:ring-2 transition-all"
+                 style="background: #0f0f12; border-color: #2a2a30; focus: ring-color: #0B2DFF;"
+                 value="{{ request.POST.url|default:'' }}">
+          <p class="text-xs mt-2" style="color: #8e8e93;">
+            L'analyse prend en général 5 à 15 secondes.
+          </p>
+        </div>
+
+        <button type="submit"
+                class="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-semibold text-white text-sm transition-all hover:opacity-90"
+                style="background: #0B2DFF;">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          Lancer le diagnostic
+        </button>
+      </form>
+
+      {# ── What we check ─────────────────────────── #}
+      <div class="mt-8 pt-8 border-t" style="border-color: #2a2a30;">
+        <p class="text-xs uppercase tracking-wider font-medium mb-4" style="color: #8e8e93;">7 catégories analysées</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {% for icon, label in checks %}
+          <div class="flex items-center gap-2 text-xs rounded-lg px-3 py-2" style="background: #0f0f12; color: #f5f5f7;">
+            <span>{{ icon }}</span> {{ label }}
+          </div>
+          {% empty %}
+          <div class="flex items-center gap-2 text-xs rounded-lg px-3 py-2" style="background: #0f0f12; color: #f5f5f7;">
+            <span>⚡</span> Performance
+          </div>
+          <div class="flex items-center gap-2 text-xs rounded-lg px-3 py-2" style="background: #0f0f12; color: #f5f5f7;">
+            <span>🔍</span> SEO
+          </div>
+          <div class="flex items-center gap-2 text-xs rounded-lg px-3 py-2" style="background: #0f0f12; color: #f5f5f7;">
+            <span>🛡️</span> Sécurité
+          </div>
+          <div class="flex items-center gap-2 text-xs rounded-lg px-3 py-2" style="background: #0f0f12; color: #f5f5f7;">
+            <span>♿</span> Accessibilité
+          </div>
+          <div class="flex items-center gap-2 text-xs rounded-lg px-3 py-2" style="background: #0f0f12; color: #f5f5f7;">
+            <span>📱</span> Mobile
+          </div>
+          <div class="flex items-center gap-2 text-xs rounded-lg px-3 py-2" style="background: #0f0f12; color: #f5f5f7;">
+            <span>🔒</span> SSL
+          </div>
+          <div class="flex items-center gap-2 text-xs rounded-lg px-3 py-2" style="background: #0f0f12; color: #f5f5f7;">
+            <span>✅</span> Standards
+          </div>
+          <div class="flex items-center gap-2 text-xs rounded-lg px-3 py-2" style="background: #0f0f12; color: #f5f5f7;">
+            <span>🌐</span> Outils externes
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

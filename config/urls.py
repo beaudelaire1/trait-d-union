@@ -120,6 +120,7 @@ urlpatterns = [
     path('tus-gestion-secure/dashboard/', include('apps.pages.dashboard_urls')),
     path('tus-gestion-secure/messaging/', include('apps.messaging.urls', namespace='messaging')),
     path('tus-gestion-secure/emails/', include('apps.leads.email_urls', namespace='admin_emails')),
+    path('tus-gestion-secure/diagnostic/', include('apps.diagnostic.urls')),
     # 🛡️ TOTP QR code endpoint (credentials required via POST)
     path('tus-gestion-secure/totp-qr/', totp_qr_code, name='admin_totp_qr'),
     # 🛡️ Session keep-alive (heartbeat JS in admin calls this every few minutes)

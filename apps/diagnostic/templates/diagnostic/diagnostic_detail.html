@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Diagnostic {{ diag.url|truncatechars:40 }} — TUS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen" style="background: #0f0f12;">
+  <div class="max-w-6xl mx-auto px-4 py-10">
+
+    {# ── Back + actions ─────────────────────────── #}
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+      <a href="{% url 'diagnostic:diagnostic_list' %}" class="inline-flex items-center gap-1 text-sm font-medium transition-colors hover:text-white" style="color: #8e8e93;">
+        ← Historique
+      </a>
+      <div class="flex items-center gap-3">
+        <form method="post" action="{% url 'diagnostic:diagnostic_rerun' diag.pk %}">
+          {% csrf_token %}
+          <button type="submit"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90 border"
+                  style="border-color: #2a2a30; background: #1f1f24;">
+            🔄 Relancer
+          </button>
+        </form>
+        <a href="{% url 'diagnostic:diagnostic_json' diag.pk %}" target="_blank"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all hover:opacity-90 border"
+           style="border-color: #2a2a30; background: #1f1f24; color: #8e8e93;">
+          { } JSON
+        </a>
+      </div>
+    </div>
+
+    {% if diag.status == 'failed' %}
+    {# ── Error state ────────────────────────────── #}
+    <div class="rounded-xl border p-8 text-center" style="background: #18181c; border-color: #ff453a33;">
+      <div class="text-4xl mb-4">❌</div>
+      <h2 class="text-xl font-bold text-white mb-2">Diagnostic échoué</h2>
+      <p class="text-sm mb-4" style="color: #8e8e93;">{{ diag.url }}</p>
+      <p class="text-sm" style="color: #ff453a;">{{ diag.error_message }}</p>
+    </div>
+
+    {% else %}
+    {# ── Score hero ─────────────────────────────── #}
+    <div class="rounded-xl border p-8 mb-8" style="background: #18181c; border-color: #2a2a30;">
+      <div class="flex flex-col md:flex-row items-center gap-8">
+        {# Score circle #}
+        <div class="relative flex-shrink-0">
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="#2a2a30" stroke-width="10"/>
+            <circle cx="70" cy="70" r="60" fill="none"
+                    stroke="{{ diag.score_color }}"
+                    stroke-width="10"
+                    stroke-linecap="round"
+                    stroke-dasharray="{{ diag.overall_score|floatformat:0 }}% 999"
+                    transform="rotate(-90 70 70)"
+                    style="transition: stroke-dasharray 1s ease;"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-3xl font-bold" style="color: {{ diag.score_color }};">{{ diag.overall_score }}</span>
+            <span class="text-xs" style="color: #8e8e93;">/100</span>
+          </div>
+        </div>
+
+        {# Meta #}
+        <div class="flex-1 text-center md:text-left">
+          <h1 class="text-xl font-bold text-white mb-1 break-all">{{ diag.url }}</h1>
+          {% if diag.results.final_url and diag.results.final_url != diag.url %}
+          <p class="text-xs mb-2" style="color: #8e8e93;">→ Redirigé vers {{ diag.results.final_url }}</p>
+          {% endif %}
+          <div class="flex flex-wrap gap-4 mt-3 text-xs" style="color: #8e8e93;">
+            <span>📅 {{ diag.created_at|date:"d/m/Y H:i" }}</span>
+            <span>👤 {{ diag.created_by.get_short_name|default:diag.created_by.username }}</span>
+            <span>⏱ {{ diag.duration_seconds|floatformat:1 }}s</span>
+            <span>📡 HTTP {{ diag.results.status_code }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Category scores grid ──────────────────── #}
+    {% with cats=diag.results.categories %}
+    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
+      {% for key, cat in cats.items %}
+      <a href="#cat-{{ key }}"
+         class="rounded-xl border p-4 text-center transition-all hover:translate-y-[-2px] hover:shadow-lg"
+         style="background: #18181c; border-color: #2a2a30;">
+        <div class="text-2xl font-bold mb-1"
+             style="color: {% if cat.percent >= 80 %}#30d158{% elif cat.percent >= 50 %}#ff9f0a{% else %}#ff453a{% endif %};">
+          {{ cat.percent }}%
+        </div>
+        <div class="text-xs font-medium text-white">{{ cat.label }}</div>
+        <div class="text-xs mt-1" style="color: #8e8e93;">{{ cat.score }}/{{ cat.max }}</div>
+      </a>
+      {% endfor %}
+    </div>
+
+    {# ── Detailed results per category ─────────── #}
+    {% for key, cat in cats.items %}
+    <div id="cat-{{ key }}" class="rounded-xl border mb-6 overflow-hidden" style="background: #18181c; border-color: #2a2a30;">
+      {# Category header #}
+      <div class="flex items-center justify-between px-6 py-4 border-b" style="border-color: #2a2a30;">
+        <div class="flex items-center gap-3">
+          <span class="text-lg">
+            {% if key == 'performance' %}⚡{% elif key == 'seo' %}🔍{% elif key == 'securite' %}🛡️{% elif key == 'accessibilite' %}♿{% elif key == 'mobile' %}📱{% elif key == 'ssl' %}🔒{% else %}✅{% endif %}
+          </span>
+          <h2 class="text-base font-bold text-white">{{ cat.label }}</h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-24 h-2 rounded-full overflow-hidden" style="background: #2a2a30;">
+            <div class="h-full rounded-full transition-all" style="width: {{ cat.percent }}%; background: {% if cat.percent >= 80 %}#30d158{% elif cat.percent >= 50 %}#ff9f0a{% else %}#ff453a{% endif %};"></div>
+          </div>
+          <span class="text-sm font-bold" style="color: {% if cat.percent >= 80 %}#30d158{% elif cat.percent >= 50 %}#ff9f0a{% else %}#ff453a{% endif %};">
+            {{ cat.score }}/{{ cat.max }}
+          </span>
+        </div>
+      </div>
+
+      {# Check items #}
+      <div class="divide-y" style="border-color: #2a2a30;">
+        {% for item in cat.items %}
+        <div class="flex items-start gap-3 px-6 py-3 transition-colors hover:bg-white/[0.02]"
+             style="border-color: #1f1f24;">
+          <span class="flex-shrink-0 mt-0.5 text-sm">
+            {% if item.passed %}
+            <span style="color: #30d158;">✓</span>
+            {% else %}
+            <span style="color: #ff453a;">✗</span>
+            {% endif %}
+          </span>
+          <div class="min-w-0 flex-1">
+            <div class="text-sm font-medium text-white">{{ item.name }}</div>
+            <div class="text-xs mt-0.5 break-all" style="color: #8e8e93;">{{ item.detail }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+    {% endwith %}
+
+    {# ── External tools ─────────────────────────── #}
+    {% if diag.results.external_tools %}
+    <div class="rounded-xl border p-6 mb-8" style="background: #18181c; border-color: #2a2a30;">
+      <h2 class="text-base font-bold text-white mb-4">🌐 Approfondir avec les outils externes</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {% for tool in diag.results.external_tools %}
+        <a href="{{ tool.url }}" target="_blank" rel="noopener noreferrer"
+           class="flex items-center gap-3 rounded-lg border px-4 py-3 text-sm transition-all hover:translate-y-[-1px] hover:shadow-md"
+           style="background: #1f1f24; border-color: #2a2a30;">
+          <span class="text-xl">{{ tool.icon }}</span>
+          <div>
+            <div class="font-semibold text-white">{{ tool.name }}</div>
+            <div class="text-xs" style="color: #8e8e93;">{{ tool.category }}</div>
+          </div>
+          <svg class="w-4 h-4 ml-auto" style="color: #8e8e93;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% endif %}{# end status check #}
+  </div>
+</div>
+{% endblock %}

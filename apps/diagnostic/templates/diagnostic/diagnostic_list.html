@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Diagnostics — Outil interne TUS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen" style="background: #0f0f12;">
+  <div class="max-w-6xl mx-auto px-4 py-10">
+
+    {# ── Header ─────────────────────────────────── #}
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-white tracking-tight">🔬 Diagnostic de site</h1>
+        <p class="text-sm mt-1" style="color: #8e8e93;">Outil interne — analyse complète d'un site client</p>
+      </div>
+      <a href="{% url 'diagnostic:diagnostic_new' %}"
+         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-white text-sm transition-all hover:opacity-90"
+         style="background: #0B2DFF;">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Nouveau diagnostic
+      </a>
+    </div>
+
+    {# ── Table ──────────────────────────────────── #}
+    {% if diagnostics %}
+    <div class="rounded-xl overflow-hidden border" style="background: #18181c; border-color: #2a2a30;">
+      <table class="w-full text-sm">
+        <thead>
+          <tr style="background: #1f1f24; color: #8e8e93;" class="text-left text-xs uppercase tracking-wider">
+            <th class="px-5 py-3 font-medium">URL</th>
+            <th class="px-5 py-3 font-medium text-center">Score</th>
+            <th class="px-5 py-3 font-medium">Date</th>
+            <th class="px-5 py-3 font-medium">Par</th>
+            <th class="px-5 py-3 font-medium">Durée</th>
+            <th class="px-5 py-3 font-medium"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in diagnostics %}
+          <tr class="border-t transition-colors hover:bg-white/5" style="border-color: #2a2a30;">
+            <td class="px-5 py-3 text-white font-medium truncate max-w-xs">{{ d.url }}</td>
+            <td class="px-5 py-3 text-center">
+              {% if d.status == 'completed' %}
+              <span class="inline-flex items-center justify-center w-11 h-11 rounded-full text-sm font-bold"
+                    style="background: {{ d.score_color }}22; color: {{ d.score_color }};">
+                {{ d.overall_score }}
+              </span>
+              {% elif d.status == 'failed' %}
+              <span class="text-xs font-medium px-2 py-1 rounded" style="background: #ff453a22; color: #ff453a;">Erreur</span>
+              {% else %}
+              <span class="text-xs font-medium px-2 py-1 rounded" style="background: #ff9f0a22; color: #ff9f0a;">{{ d.get_status_display }}</span>
+              {% endif %}
+            </td>
+            <td class="px-5 py-3" style="color: #8e8e93;">{{ d.created_at|date:"d/m/Y H:i" }}</td>
+            <td class="px-5 py-3" style="color: #8e8e93;">{{ d.created_by.get_short_name|default:d.created_by.username }}</td>
+            <td class="px-5 py-3" style="color: #8e8e93;">{{ d.duration_seconds|floatformat:1 }}s</td>
+            <td class="px-5 py-3 text-right">
+              <a href="{% url 'diagnostic:diagnostic_detail' d.pk %}"
+                 class="text-xs font-semibold px-3 py-1.5 rounded transition-colors hover:bg-white/10" style="color: #0B2DFF;">
+                Voir →
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="text-center py-20 rounded-xl border" style="background: #18181c; border-color: #2a2a30;">
+      <div class="text-5xl mb-4">🔬</div>
+      <p class="text-lg font-semibold text-white mb-1">Aucun diagnostic</p>
+      <p class="text-sm mb-6" style="color: #8e8e93;">Lancez votre premier diagnostic de site client.</p>
+      <a href="{% url 'diagnostic:diagnostic_new' %}"
+         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-white text-sm"
+         style="background: #0B2DFF;">
+        Commencer
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

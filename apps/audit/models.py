@@ -159,9 +159,5 @@ class StripeEventLog(models.Model):
         return f"{self.event_type} — {self.event_id}"
 
     @classmethod
-    def is_already_processed(cls, event_id: str) -> bool:
-        return cls.objects.filter(event_id=event_id).exists()
-
-    @classmethod
     def mark_processed(cls, event_id: str, event_type: str = '') -> 'StripeEventLog':
         return cls.objects.create(event_id=event_id, event_type=event_type)

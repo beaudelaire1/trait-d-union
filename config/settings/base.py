@@ -105,6 +105,7 @@ INSTALLED_APPS = [
     'apps.messaging',
     'apps.simulateur',
     'apps.audit',
+    'apps.diagnostic',
     'services',
     'core',
     'django_q',
