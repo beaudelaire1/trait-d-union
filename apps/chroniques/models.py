@@ -42,6 +42,8 @@ class Article(models.Model):
     cover_image = models.ImageField(
         upload_to="chroniques/covers/", blank=True, null=True, verbose_name="Image"
     )
+    credits_image = models.CharField(
+        "Crédits image", max_length=255, blank=True, help_text="Crédits pour l'image de couverture")
 
     is_published = models.BooleanField("Publié", default=True)
     publish_date = models.DateTimeField("Date de publication", default=timezone.now)

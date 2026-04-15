@@ -81,6 +81,9 @@
             <img src="{{ article.cover_image.url }}" alt="{{ article.title }}" class="w-full h-full object-cover" fetchpriority="high">
         </div>
         {% endif %}
+        {% if article.credits_image %}
+        <p class="text-tus-white/50 text-xs mb-8">Crédits image : {{ article.credits_image }}</p>
+        {% endif %}
 
         <div class="article-content max-w-none">
             {{ article.body|safe_html }}
