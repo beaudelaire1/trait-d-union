@@ -396,62 +396,58 @@ if SENTRY_DSN:
     )
 
 # ==============================================================================
-# 🛡️ CONTENT SECURITY POLICY (django-csp with nonces)
+# 🛡️ CONTENT SECURITY POLICY (django-csp 4.x — dict format)
 # ==============================================================================
-# Replace custom middleware with django-csp for better security
-CSP_DEFAULT_SRC = ("'self'",)
-CSP_SCRIPT_SRC = (
-    "'self'",
-    # Nonces are injected via CSP_INCLUDE_NONCE_IN — no unsafe-inline needed
-    "https://cdn.jsdelivr.net",
-    "https://unpkg.com",
-    "https://www.googletagmanager.com",
-    "https://www.google-analytics.com",
-    "https://challenges.cloudflare.com",
-    "https://www.google.com",
-    "https://www.gstatic.com",
-)
-CSP_STYLE_SRC = (
-    "'self'",
-    # 🛡️ SECURITY: Removed 'unsafe-inline'. All inline styles are now protected
-    # by nonces via CSP_INCLUDE_NONCE_IN=['style-src'].
-    # Dynamic style="" attributes (progress bars, Alpine.js :style bindings)
-    # use 'unsafe-hashes' with specific hash values below instead.
-    # If a style breaks, add its SHA-256 hash here rather than re-enabling unsafe-inline.
-    "https://fonts.googleapis.com",
-    "https://cdn.jsdelivr.net",
-)
-CSP_FONT_SRC = (
-    "'self'",
-    "https://fonts.gstatic.com",
-    "data:",
-)
-CSP_IMG_SRC = (
-    "'self'",
-    "data:",
-    "blob:",
-    "https://res.cloudinary.com",
-    "https://www.google-analytics.com",
-    "https://*.stripe.com",
-)
-CSP_CONNECT_SRC = (
-    "'self'",
-    "https://www.google-analytics.com",
-    "https://challenges.cloudflare.com",
-    "https://api.stripe.com",
-)
-CSP_FRAME_SRC = (
-    "https://challenges.cloudflare.com",
-    "https://www.google.com",
-    "https://js.stripe.com",
-)
-CSP_OBJECT_SRC = ("'none'",)
-CSP_BASE_URI = ("'self'",)
-CSP_FORM_ACTION = ("'self'", "https://checkout.stripe.com")
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "default-src": ["'self'"],
+        "script-src": [
+            "'self'",
+            "https://cdn.jsdelivr.net",
+            "https://unpkg.com",
+            "https://www.googletagmanager.com",
+            "https://www.google-analytics.com",
+            "https://challenges.cloudflare.com",
+            "https://www.google.com",
+            "https://www.gstatic.com",
+        ],
+        "style-src": [
+            "'self'",
+            "https://fonts.googleapis.com",
+            "https://cdn.jsdelivr.net",
+        ],
+        "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
+        "img-src": [
+            "'self'",
+            "data:",
+            "blob:",
+            "https://res.cloudinary.com",
+            "https://www.google-analytics.com",
+            "https://*.stripe.com",
+        ],
+        "connect-src": [
+            "'self'",
+            "https://www.google-analytics.com",
+            "https://challenges.cloudflare.com",
+            "https://api.stripe.com",
+        ],
+        "frame-src": [
+            "https://challenges.cloudflare.com",
+            "https://www.google.com",
+            "https://js.stripe.com",
+        ],
+        "object-src": ["'none'"],
+        "base-uri": ["'self'"],
+        "form-action": ["'self'", "https://checkout.stripe.com"],
+        "upgrade-insecure-requests": True,
+    },
+    "EXCLUDE_URL_PREFIXES": ["/tus-gestion-secure/"],
+}
 
-# 🛡️ BANK-GRADE: CSP violation reporting — ENFORCED (not report-only)
-CSP_REPORT_URI = os.environ.get('CSP_REPORT_URI', '')  # e.g. https://sentry.io/api/.../csp-report/
-CSP_INCLUDE_NONCE_IN = ['script-src', 'style-src']  # 🛡️ Enable nonces for scripts AND styles
-CSP_UPGRADE_INSECURE_REQUESTS = True  # 🛡️ Force HTTPS for all sub-resources
-# 🛡️ BANK-GRADE: CSP is enforced by default (no CSP_REPORT_ONLY = True).
-# Set CSP_REPORT_URI to collect violation reports in Sentry.
+CONTENT_SECURITY_POLICY_NONCE_IN = ["script-src", "style-src"]
+
+_csp_report_uri = os.environ.get('CSP_REPORT_URI', '')
+if _csp_report_uri:
+    CONTENT_SECURITY_POLICY["DIRECTIVES"]["report-uri"] = _csp_report_uri
+# 🛡️ BANK-GRADE: CSP is enforced by default (no CONTENT_SECURITY_POLICY_REPORT_ONLY).
+# Set CSP_REPORT_URI env var to collect violation reports in Sentry.

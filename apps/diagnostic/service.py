@@ -325,7 +325,11 @@ def _check_accessibility(soup):
         "detail": f"{len(inputs)} champs, {len(no_label)} sans label/aria" if inputs else "Aucun formulaire",
     })
     # Skip navigation link
-    skip = soup.find("a", attrs={"href": "#main"}) or soup.find("a", attrs={"href": "#content"})
+    skip = (
+        soup.find("a", attrs={"href": "#main"})
+        or soup.find("a", attrs={"href": "#content"})
+        or soup.find("a", attrs={"href": "#main-content"})
+    )
     items.append({
         "name": "Skip navigation",
         "passed": skip is not None,

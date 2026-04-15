@@ -143,7 +143,7 @@ class CacheControlMiddleware(MiddlewareMixin):
             return response
 
         if 'text/html' in content_type:
-            response['Cache-Control'] = 'no-cache, must-revalidate'
+            response['Cache-Control'] = 'public, max-age=300, must-revalidate'
             if 'Last-Modified' not in response:
                 response['Last-Modified'] = http_date(time.time())
             return response
