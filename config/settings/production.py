@@ -397,12 +397,17 @@ if SENTRY_DSN:
 
 # ==============================================================================
 # 🛡️ CONTENT SECURITY POLICY (django-csp 4.x — dict format)
+# django-csp v4 uses a NONCE sentinel object inside directive lists.
+# CONTENT_SECURITY_POLICY_NONCE_IN does NOT exist in v4 — it's a no-op.
 # ==============================================================================
+from csp.constants import NONCE as _CSP_NONCE  # noqa: E402
+
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
         "default-src": ["'none'"],
         "script-src": [
             "'self'",
+            _CSP_NONCE,
             "'strict-dynamic'",
             "https://cdn.jsdelivr.net",
             "https://unpkg.com",
@@ -443,13 +448,10 @@ CONTENT_SECURITY_POLICY = {
         "object-src": ["'none'"],
         "base-uri": ["'self'"],
         "form-action": ["'self'", "https://checkout.stripe.com"],
-        "require-trusted-types-for": ["'script'"],
         "upgrade-insecure-requests": True,
     },
     "EXCLUDE_URL_PREFIXES": ["/tus-gestion-secure/"],
 }
-
-CONTENT_SECURITY_POLICY_NONCE_IN = ["script-src", "style-src"]
 
 _csp_report_uri = os.environ.get('CSP_REPORT_URI', '')
 if _csp_report_uri:
