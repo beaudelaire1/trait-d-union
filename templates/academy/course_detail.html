@@ -57,9 +57,8 @@
           <div class="border-b">
             <div class="flex overflow-x-auto">
               {% for lesson in lessons %}
-                <button onclick="selectLesson({{ lesson.id }})" 
-                        class="lesson-tab px-6 py-3 border-b-2 {% if forloop.first %}border-blue-600 bg-blue-50{% else %}border-transparent hover:border-slate-300{% endif %} whitespace-nowrap"
-                        data-lesson-id="{{ lesson.id }}">
+                <button data-action="select-lesson" data-lesson-id="{{ lesson.id }}" 
+                        class="lesson-tab px-6 py-3 border-b-2 {% if forloop.first %}border-blue-600 bg-blue-50{% else %}border-transparent hover:border-slate-300{% endif %} whitespace-nowrap">
                   Leçon {{ lesson.order }}: {{ lesson.title|truncatewords:5 }}
                 </button>
               {% endfor %}
@@ -140,7 +139,7 @@
               <ul class="space-y-2">
                 {% for lesson in lessons %}
                   <li class="text-sm">
-                    <button onclick="selectLesson({{ lesson.id }})" 
+                    <button data-action="select-lesson" data-lesson-id="{{ lesson.id }}" 
                             class="text-slate-600 hover:text-blue-600 transition-colors text-left">
                       {{ lesson.order }}. {{ lesson.title|truncatewords:4 }}
                     </button>
@@ -183,5 +182,11 @@
     document.getElementById('lesson-' + lessonId).classList.remove('hidden');
     document.querySelector(`[data-lesson-id="${lessonId}"]`).classList.add('border-blue-600', 'bg-blue-50');
   }
+
+  // Délégation d'événements pour les lessons (CSP-safe)
+  document.addEventListener('click', function(e) {
+    var target = e.target.closest('[data-action="select-lesson"]');
+    if (target) selectLesson(parseInt(target.dataset.lessonId));
+  });
 </script>
 {% endblock %}

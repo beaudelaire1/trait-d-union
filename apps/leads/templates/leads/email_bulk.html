@@ -138,12 +138,12 @@ Ou séparés par des virgules : email1@ex.com, email2@ex.com"
         <div class="form-group">
             <label>📋 Choisir un template (optionnel)</label>
             <div class="template-selector">
-                <div class="template-card" data-template="none" onclick="selectTemplate(null)">
+                <div class="template-card" data-template="none" data-action="select-template" data-template-id="">
                     <h5>✏️ Email personnalisé</h5>
                     <span>Rédiger manuellement</span>
                 </div>
                 {% for template in templates %}
-                <div class="template-card" data-template="{{ template.id }}" onclick="selectTemplate({{ template.id }})">
+                <div class="template-card" data-template="{{ template.id }}" data-action="select-template" data-template-id="{{ template.id }}">
                     <h5>{{ template.name }}</h5>
                     <span>{{ template.get_category_display }}</span>
                 </div>
@@ -271,6 +271,14 @@ Ou séparés par des virgules : email1@ex.com, email2@ex.com"
         // Désactiver le bouton et afficher la progression
         document.getElementById('submitBtn').disabled = true;
         document.getElementById('submitBtn').textContent = '⏳ Envoi en cours...';
+    });
+
+    // Délégation d'événements pour les template cards (CSP-safe)
+    document.addEventListener('click', function(e) {
+        var target = e.target.closest('[data-action="select-template"]');
+        if (!target) return;
+        var tid = target.dataset.templateId;
+        selectTemplate(tid ? parseInt(tid) : null);
     });
 </script>
 {% endblock %}

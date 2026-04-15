@@ -127,9 +127,10 @@
 
     <!-- 🔍 SEO: Pagination hints for crawlers -->
     {% block seo_pagination %}{% endblock %}
-    <link
+    <link id="google-fonts"
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap"
-        rel="stylesheet" media="print" onload="this.media='all'">
+        rel="stylesheet" media="print">
+    <script nonce="{{ request.csp_nonce }}">document.getElementById('google-fonts').addEventListener('load',function(){this.media='all'});</script>
     <noscript><link
         href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap"
         rel="stylesheet"></noscript>

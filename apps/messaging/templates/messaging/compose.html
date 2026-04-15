@@ -502,7 +502,7 @@ body { background: var(--tus-black) !important; }
                 <input type="text" id="quick-name" class="quick-input" placeholder="Nom complet">
                 <input type="email" id="quick-email" class="quick-input" placeholder="email@exemple.com">
                 <input type="text" id="quick-company" class="quick-input" placeholder="Entreprise">
-                <button class="btn-quick-add" onclick="quickAddProspect()">+ Ajouter</button>
+                <button class="btn-quick-add" data-action="quick-add-prospect">+ Ajouter</button>
             </div>
         </div>
 
@@ -541,27 +541,27 @@ body { background: var(--tus-black) !important; }
                 <span class="templates-hint">(cliquez pour charger)</span>
             </div>
             <div class="templates-grid">
-                <div class="template-card" onclick="loadTemplate('vide')" data-template="vide">
+                <div class="template-card" data-action="load-template" data-template="vide">
                     <span class="emoji">📝</span>
                     <span>Vide</span>
                 </div>
-                <div class="template-card active" onclick="loadTemplate('prospection')" data-template="prospection">
+                <div class="template-card active" data-action="load-template" data-template="prospection">
                     <span class="emoji">🎯</span>
                     <span>Prospection TUS</span>
                 </div>
-                <div class="template-card" onclick="loadTemplate('relance')" data-template="relance">
+                <div class="template-card" data-action="load-template" data-template="relance">
                     <span class="emoji">🔄</span>
                     <span>Relance douce</span>
                 </div>
-                <div class="template-card" onclick="loadTemplate('rdv')" data-template="rdv">
+                <div class="template-card" data-action="load-template" data-template="rdv">
                     <span class="emoji">🗓️</span>
                     <span>Invitation RDV</span>
                 </div>
-                <div class="template-card" onclick="loadTemplate('proposition')" data-template="proposition">
+                <div class="template-card" data-action="load-template" data-template="proposition">
                     <span class="emoji">💼</span>
                     <span>Proposition</span>
                 </div>
-                <div class="template-card" onclick="loadTemplate('remerciement')" data-template="remerciement">
+                <div class="template-card" data-action="load-template" data-template="remerciement">
                     <span class="emoji">🙏</span>
                     <span>Remerciement</span>
                 </div>
@@ -576,14 +576,14 @@ body { background: var(--tus-black) !important; }
         <!-- 6. Actions -->
         <div class="actions-bar">
             <div class="actions-left">
-                <button class="btn-secondary" onclick="saveDraft()">
+                <button class="btn-secondary" data-action="save-draft">
                     <span>💾</span> Brouillon
                 </button>
-                <button class="btn-secondary" onclick="previewEmail()">
+                <button class="btn-secondary" data-action="preview-email">
                     <span>👁️</span> Aperçu
                 </button>
             </div>
-            <button class="btn-send" id="btn-send" onclick="sendEmail()">
+            <button class="btn-send" id="btn-send" data-action="send-email">
                 <span>Envoyer</span>
                 <span>→</span>
             </button>
@@ -870,7 +870,7 @@ function renderRecipients() {
         tag.className = 'recipient-tag';
         tag.innerHTML = `
             <span>${r.name}</span>
-            <span class="remove" onclick="removeRecipient('${r.email}')">&times;</span>
+            <span class="remove" data-action="remove-recipient" data-email="${r.email}">&times;</span>
         `;
         area.insertBefore(tag, input);
     });
@@ -900,7 +900,7 @@ function setupAutocomplete() {
 
         if (matches.length > 0) {
             dropdown.innerHTML = matches.map(p => `
-                <div class="suggestion-item" onclick="selectSuggestion('${p.email}', '${p.contact_name || ''}')">
+                <div class="suggestion-item" data-action="select-suggestion" data-email="${p.email}" data-name="${p.contact_name || ''}">
                     <div class="suggestion-name">${p.contact_name || 'Sans nom'}</div>
                     <div class="suggestion-email">${p.email}</div>
                 </div>
@@ -1050,5 +1050,21 @@ function showToast(icon, message) {
         toast.classList.remove('show');
     }, 3000);
 }
+
+// ============================================================
+// CSP-SAFE EVENT DELEGATION
+// ============================================================
+document.addEventListener('click', function(e) {
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
+    const action = target.dataset.action;
+    if (action === 'quick-add-prospect') quickAddProspect();
+    else if (action === 'load-template') loadTemplate(target.dataset.template);
+    else if (action === 'save-draft') saveDraft();
+    else if (action === 'preview-email') previewEmail();
+    else if (action === 'send-email') sendEmail();
+    else if (action === 'remove-recipient') removeRecipient(target.dataset.email);
+    else if (action === 'select-suggestion') selectSuggestion(target.dataset.email, target.dataset.name);
+});
 </script>
 {% endblock %}

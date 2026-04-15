@@ -62,7 +62,7 @@
                  class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-center">
                 Configurer
               </a>
-              <button onclick="showDetails('{{ package.slug }}')" 
+              <button data-action="show-details" data-href="{% url 'clients:package_configurator' package.slug %}" 
                       class="w-full border-2 border-slate-300 hover:border-slate-400 text-slate-600 font-semibold py-2 px-4 rounded-lg transition-colors">
                 Détails
               </button>
@@ -84,4 +84,14 @@
 
   </div>
 </div>
+
+<script nonce="{{ request.csp_nonce }}">
+  // Délégation d'événements pour les boutons Détails (CSP-safe)
+  document.addEventListener('click', function(e) {
+    var target = e.target.closest('[data-action="show-details"]');
+    if (target && target.dataset.href) {
+      window.location.href = target.dataset.href;
+    }
+  });
+</script>
 {% endblock %}

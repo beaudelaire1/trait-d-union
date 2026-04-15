@@ -194,4 +194,11 @@
     window.openCookieSettings = function () {
         showModal();
     };
+
+    // CSP-safe: delegate click events for data-action="open-cookie-settings"
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('[data-action="open-cookie-settings"]')) {
+            showModal();
+        }
+    });
 })();

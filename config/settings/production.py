@@ -452,5 +452,6 @@ CSP_FORM_ACTION = ("'self'", "https://checkout.stripe.com")
 # 🛡️ BANK-GRADE: CSP violation reporting — ENFORCED (not report-only)
 CSP_REPORT_URI = os.environ.get('CSP_REPORT_URI', '')  # e.g. https://sentry.io/api/.../csp-report/
 CSP_INCLUDE_NONCE_IN = ['script-src', 'style-src']  # 🛡️ Enable nonces for scripts AND styles
+CSP_UPGRADE_INSECURE_REQUESTS = True  # 🛡️ Force HTTPS for all sub-resources
 # 🛡️ BANK-GRADE: CSP is enforced by default (no CSP_REPORT_ONLY = True).
 # Set CSP_REPORT_URI to collect violation reports in Sentry.
