@@ -42,7 +42,7 @@
     {# ── Score hero ─────────────────────────────── #}
     <div class="rounded-xl border p-8 mb-8" style="background: #18181c; border-color: #2a2a30;">
       <div class="flex flex-col md:flex-row items-center gap-8">
-        {# Score circle #}
+        {# Score circle — circumference = 2π×60 ≈ 377 #}
         <div class="relative flex-shrink-0">
           <svg width="140" height="140" viewBox="0 0 140 140">
             <circle cx="70" cy="70" r="60" fill="none" stroke="#2a2a30" stroke-width="10"/>
@@ -50,9 +50,11 @@
                     stroke="{{ diag.score_color }}"
                     stroke-width="10"
                     stroke-linecap="round"
-                    stroke-dasharray="{{ diag.overall_score|floatformat:0 }}% 999"
+                    stroke-dasharray="377 377"
+                    stroke-dashoffset="377"
                     transform="rotate(-90 70 70)"
-                    style="transition: stroke-dasharray 1s ease;"/>
+                    data-score="{{ diag.overall_score }}"
+                    style="transition: stroke-dashoffset 1s ease;"/>
           </svg>
           <div class="absolute inset-0 flex flex-col items-center justify-center">
             <span class="text-3xl font-bold" style="color: {{ diag.score_color }};">{{ diag.overall_score }}</span>
@@ -161,4 +163,17 @@
     {% endif %}{# end status check #}
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var c = document.querySelector('[data-score]');
+    if (c) {
+      var score = parseFloat(c.dataset.score) || 0;
+      var offset = 377 - (377 * score / 100);
+      requestAnimationFrame(function() { c.style.strokeDashoffset = offset; });
+    }
+  });
+</script>
 {% endblock %}
