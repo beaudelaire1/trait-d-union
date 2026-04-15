@@ -1,4 +1,4 @@
-<nav id="navbar" role="navigation" aria-label="Menu principal"
+<nav id="navbar" aria-label="Menu principal"
     class="px-6 py-4 border-b border-stroke-dark/50 backdrop-blur-xl bg-tus-black/70 fixed top-0 left-0 right-0 z-50 transition-all duration-150">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
         <!-- Logo SVG -->
@@ -195,4 +195,4 @@
 
 {% load static %}
 <!-- Mobile Menu Toggle Script (externalized for CSP compliance) -->
-<script defer src="{% static 'js/navbar.js' %}"></script>
+<script defer src="{% static 'js/navbar.js' %}" nonce="{{ request.csp_nonce }}"></script>

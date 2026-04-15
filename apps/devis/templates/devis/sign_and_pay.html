@@ -4,9 +4,9 @@
 {% block title %}Signer le devis {{ quote.number }} - Trait d'Union Studio{% endblock %}
 
 {% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js" nonce="{{ request.csp_nonce }}"></script>
 {% if stripe_configured and stripe_publishable_key %}
-<script src="https://js.stripe.com/v3/"></script>
+<script src="https://js.stripe.com/v3/" nonce="{{ request.csp_nonce }}"></script>
 {% endif %}
 <style nonce="{{ request.csp_nonce }}">
     .signature-container {

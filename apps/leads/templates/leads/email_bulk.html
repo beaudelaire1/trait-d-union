@@ -5,7 +5,7 @@
 
 {% block extrahead %}
 {{ block.super }}
-<script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.jsdelivr.net/npm/tinymce@6.8.2/tinymce.min.js" referrerpolicy="origin" nonce="{{ request.csp_nonce }}"></script>
 <style nonce="{{ request.csp_nonce }}">
     .bulk-form { max-width: 1000px; margin: 0 auto; }
     .form-group { margin-bottom: 20px; }

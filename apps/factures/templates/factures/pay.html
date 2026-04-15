@@ -5,7 +5,7 @@
 
 {% block extra_head %}
 {% if stripe_configured and stripe_publishable_key %}
-<script src="https://js.stripe.com/v3/"></script>
+<script src="https://js.stripe.com/v3/" nonce="{{ request.csp_nonce }}"></script>
 {% endif %}
 <style nonce="{{ request.csp_nonce }}">
     .loading-overlay {

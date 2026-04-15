@@ -140,13 +140,13 @@
     <link rel="stylesheet" href="{% static 'css/components.css' %}">
     <link rel="stylesheet" href="{% static 'css/light-mode.css' %}">
     <!-- Theme toggle (inline pour éviter le FOUC - applique data-theme avant le rendu) -->
-    <script>
+    <script nonce="{{ request.csp_nonce }}">
         (function(){var t=localStorage.getItem('tus-theme')||'dark';if(t==='light')document.documentElement.setAttribute('data-theme','light');})();
     </script>
     {% block extra_head %}{% endblock %}
 </head>
 
-<body class="bg-tus-black text-tus-white font-body antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body class="bg-tus-black text-tus-white font-body antialiased" data-hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <!-- Skip to main content — WCAG 2.4.1 (Level A) -->
     <a href="#main-content"
         class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-tus-blue focus:text-tus-white/80 focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-bold focus:outline-none focus:ring-2 focus:ring-tus-white">Aller
@@ -156,16 +156,16 @@
         {% block content %}{% endblock %}
     </main>
     {% include 'partials/footer.html' %}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js" nonce="{{ request.csp_nonce }}" integrity="sha384-X9kJyAubVxnP0hcA+AMMs21U445qsnqhnUF8EBlEpP3a42Kh/JwWjlv2ZcvGfphb" crossorigin="anonymous"></script>
     <!-- Lenis — premium smooth scroll (~5KB) -->
-    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" nonce="{{ request.csp_nonce }}" integrity="sha384-tKsJDT6PlUI0pSBt9/sBKJluKgA19/a6mBrDsZaXotLB4ZYfMGM6xt6/WgGpYhTm" crossorigin="anonymous"></script>
     <!-- HTMX with View Transitions support -->
     <script defer src="https://unpkg.com/htmx.org@2.0.0/dist/htmx.min.js"
         integrity="sha384-wS7Gv0yNGCJOC5uNPGFGaFJYgXXuGy3rMBgGY09MzXVBkWY9sMJ6oRR9v8awkgi"
-        crossorigin="anonymous"></script>
-    <script defer src="{% static 'js/app.js' %}"></script>
-    <script defer src="{% static 'js/theme-toggle.js' %}"></script>
-    <script defer src="{% static 'js/micro-interactions.js' %}"></script>
+        crossorigin="anonymous" nonce="{{ request.csp_nonce }}"></script>
+    <script defer src="{% static 'js/app.js' %}" nonce="{{ request.csp_nonce }}"></script>
+    <script defer src="{% static 'js/theme-toggle.js' %}" nonce="{{ request.csp_nonce }}"></script>
+    <script defer src="{% static 'js/micro-interactions.js' %}" nonce="{{ request.csp_nonce }}"></script>
     {% block extra_js %}{% endblock %}
 
     <!-- RGPD Cookie Consent Banner -->

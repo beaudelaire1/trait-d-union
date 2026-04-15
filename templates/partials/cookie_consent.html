@@ -116,9 +116,9 @@
                             <label class="relative inline-flex cursor-pointer" for="cookie-analytics">
                                 <input type="checkbox" id="cookie-analytics" class="sr-only peer"
                                     aria-label="Activer les cookies analytiques">
-                                <div
-                                    class="w-12 h-7 bg-white/20 peer-focus:ring-2 peer-focus:ring-tus-blue/50 rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-tus-blue">
-                                </div>
+                                <span
+                                    class="block w-12 h-7 bg-white/20 peer-focus:ring-2 peer-focus:ring-tus-blue/50 rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-tus-blue">
+                                </span>
                             </label>
                         </div>
                     </div>
@@ -163,4 +163,4 @@
 
 {% load static %}
 <!-- Cookie Consent Script (externalized for CSP compliance) -->
-<script defer src="{% static 'js/cookie-consent.js' %}"></script>
+<script defer src="{% static 'js/cookie-consent.js' %}" nonce="{{ request.csp_nonce }}"></script>

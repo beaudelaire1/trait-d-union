@@ -36,7 +36,7 @@ class ArticleAdmin(admin.ModelAdmin):
     date_hierarchy = "publish_date"
     fieldsets = (
         (None, {
-            'fields': ('title', 'subtitle', 'slug', 'category', 'author', 'cover_image', 'excerpt', 'body'),
+            'fields': ('title', 'subtitle', 'slug', 'category', 'author', 'cover_image', 'credits_image', 'excerpt', 'body'),
         }),
         ('🔍 SEO', {
             'fields': ('meta_description',),

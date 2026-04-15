@@ -400,9 +400,10 @@ if SENTRY_DSN:
 # ==============================================================================
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
-        "default-src": ["'self'"],
+        "default-src": ["'none'"],
         "script-src": [
             "'self'",
+            "'strict-dynamic'",
             "https://cdn.jsdelivr.net",
             "https://unpkg.com",
             "https://www.googletagmanager.com",
@@ -436,9 +437,13 @@ CONTENT_SECURITY_POLICY = {
             "https://www.google.com",
             "https://js.stripe.com",
         ],
+        "media-src": ["'self'"],
+        "manifest-src": ["'self'"],
+        "worker-src": ["'self'"],
         "object-src": ["'none'"],
         "base-uri": ["'self'"],
         "form-action": ["'self'", "https://checkout.stripe.com"],
+        "require-trusted-types-for": ["'script'"],
         "upgrade-insecure-requests": True,
     },
     "EXCLUDE_URL_PREFIXES": ["/tus-gestion-secure/"],

@@ -600,7 +600,7 @@ body { background: var(--tus-black) !important; }
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin" nonce="{{ request.csp_nonce }}"></script>
 <script nonce="{{ request.csp_nonce }}">
 // ============================================================
 // TRAIT D'UNION STUDIO - Logique Premium Compose
