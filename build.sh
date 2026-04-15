@@ -44,16 +44,22 @@ echo ""
 echo "📧 Vérification des EmailAddress allauth..."
 python manage.py fix_email_addresses --apply
 
-# 4. Fix: augmenter la tolérance TOTP (±60s) pour compenser le drift d'horloge cloud
+# 4. Fix: augmenter la tolérance TOTP (±90s) pour compenser le drift d'horloge cloud
 echo ""
 echo "🔐 Mise à jour tolérance TOTP..."
 python manage.py shell << 'EOFTOTP'
 from django_otp.plugins.otp_totp.models import TOTPDevice
-updated = TOTPDevice.objects.filter(tolerance__lt=2).update(tolerance=2)
+updated = TOTPDevice.objects.filter(tolerance__lt=3).update(tolerance=3)
 if updated:
-    print(f"✅ {updated} device(s) TOTP mis à jour (tolerance=2)")
+    print(f"✅ {updated} device(s) TOTP mis à jour (tolerance=3)")
 else:
-    print("ℹ️  Tous les devices TOTP ont déjà tolerance≥2")
+    print("ℹ️  Tous les devices TOTP ont déjà tolerance≥3")
+# Reset throttling au déploiement pour débloquer après échecs
+reset = TOTPDevice.objects.filter(throttling_failure_count__gt=0).update(
+    throttling_failure_count=0, throttling_failure_timestamp=None
+)
+if reset:
+    print(f"🔓 {reset} device(s) TOTP débloqué(s) (throttling reset)")
 EOFTOTP
 
 echo ""
