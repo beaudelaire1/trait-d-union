@@ -54,13 +54,13 @@ métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
 
         <!-- Diagnostic link -->
         <p class="mt-8 reveal td-400">
-            <a href="{% url 'simulateur:cout-inaction' %}"
+            <a href="{% url 'simulateur:acse' %}"
                 class="text-tus-white/50 hover:text-cyan-400 transition-colors duration-micro ease-standard text-sm inline-flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                        d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                Mesurez ce que l'inaction vous coûte — diagnostic gratuit, 2 min
+                Où se situe le maillon faible de votre activité ? — diagnostic gratuit, 2 min
             </a>
         </p>
     </div>
@@ -119,6 +119,68 @@ métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
         </div>
     </div>
 </div>
+
+<!-- PME/TPE — Structuration & Digitalisation -->
+<section class="py-20 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-tus-blue/3 to-transparent"></div>
+    <div class="max-w-5xl mx-auto px-6 relative z-10">
+        <div class="text-center mb-12">
+            <span
+                class="text-tus-blue-a11y font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">Structuration
+                & digitalisation</span>
+            <h2 class="text-3xl md:text-5xl font-display font-bold reveal">
+                La croissance exige<br>
+                <span class="text-tus-blue-a11y">une infrastructure</span>
+            </h2>
+            <p class="text-tus-white/60 mt-6 max-w-2xl mx-auto text-lg reveal">
+                Fichiers éparpillés, abonnements empilés, processus flous — la croissance
+                finit toujours par buter sur l'organisation. Nous construisons l'infrastructure
+                logicielle qui centralise, automatise et structure votre activité.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 reveal">
+            <div class="p-6 rounded-2xl border border-white/10 bg-white/[0.02] text-center">
+                <div
+                    class="w-12 h-12 rounded-xl bg-cyan-500/15 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Structurer</h3>
+                <p class="text-sm text-tus-white/60">Remplacez les fichiers dispersés et les process informels par
+                    un système centralisé adapté à votre métier.</p>
+            </div>
+            <div class="p-6 rounded-2xl border border-white/10 bg-white/[0.02] text-center">
+                <div
+                    class="w-12 h-12 rounded-xl bg-tus-blue/15 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-6 h-6 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Digitaliser</h3>
+                <p class="text-sm text-tus-white/60">Passez des outils génériques empilés à un écosystème
+                    unifié, conçu pour vos flux : commercial, opérationnel, administratif.</p>
+            </div>
+            <div class="p-6 rounded-2xl border border-white/10 bg-white/[0.02] text-center">
+                <div
+                    class="w-12 h-12 rounded-xl bg-tus-green/15 flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-display font-bold text-tus-white mb-2">Croître</h3>
+                <p class="text-sm text-tus-white/60">Libérez du temps facturable, absorbez plus de projets et
+                    pilotez votre croissance avec des données fiables.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Services Section - Clean Apple Style -->
 <section class="py-20 relative">
@@ -266,86 +328,87 @@ métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
     </div>
 </section>
 
-<!-- Diagnostic Stratégique — Simulateur Showcase -->
+<!-- Structurer & Digitaliser — Outils Dirigeant -->
 <section class="py-24 relative overflow-hidden simulator-showcase">
     <!-- Background effects -->
     <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-tus-blue/8 to-purple-500/5"></div>
     <div class="absolute right-0 top-1/3 w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-400/12 via-tus-blue/8 to-transparent rounded-full parallax-slow" data-speed="0.12"></div>
-    <div class="absolute left-0 bottom-0 w-[300px] h-[300px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-red-500/8 to-transparent rounded-full"></div>
+    <div class="absolute left-0 bottom-0 w-[300px] h-[300px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/8 to-transparent rounded-full"></div>
 
     <div class="max-w-6xl mx-auto px-6 relative z-10">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
             <!-- Content -->
             <div>
                 <span
-                    class="text-cyan-400 font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal-left">Diagnostic
-                    stratégique</span>
+                    class="text-cyan-400 font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal-left">Structuration
+                    & digitalisation</span>
                 <h2 class="text-3xl md:text-5xl font-display font-bold mb-6 reveal-left">
-                    Ce que vous ne<br>
-                    <span class="text-cyan-400">mesurez pas</span> vous coûte déjà
+                    Votre entreprise a<br>
+                    <span class="text-cyan-400">grandi</span> — vos outils, non.
                 </h2>
                 <p class="text-lg text-tus-white/70 mb-8 reveal">
-                    Avant de construire, il faut voir clair. Nos simulateurs révèlent les angles morts
-                    de votre activité — en moins de 2 minutes, sans engagement.
+                    Fichiers dispersés, outils empilés, processus flous :
+                    la croissance d'une PME ou TPE se heurte toujours aux mêmes murs.
+                    Nos outils de diagnostic révèlent où agir — en 2 minutes.
                 </p>
 
                 <!-- Diagnostic cards -->
                 <div class="space-y-3 mb-8">
-                    <a href="{% url 'simulateur:cout-inaction' %}"
+                    <a href="{% url 'simulateur:acse' %}"
                         class="flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.03] hover:border-cyan-400/30 hover:bg-cyan-400/5 transition-all duration-micro ease-standard reveal group">
                         <div
-                            class="w-10 h-10 rounded-lg bg-red-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-tus-white group-hover:text-cyan-400 transition-colors">Combien
-                                vous coûte chaque mois sans site performant ?</p>
-                            <p class="text-sm text-tus-white/60">Chiffrez l'impact réel de l'inaction sur votre
-                                chiffre d'affaires.</p>
-                        </div>
-                    </a>
-                    <a href="{% url 'simulateur:friction' %}"
-                        class="flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.03] hover:border-cyan-400/30 hover:bg-cyan-400/5 transition-all duration-micro ease-standard reveal group">
-                        <div
-                            class="w-10 h-10 rounded-lg bg-amber-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-tus-white group-hover:text-cyan-400 transition-colors">Où se
-                                cachent les frictions qui ralentissent votre croissance ?</p>
-                            <p class="text-sm text-tus-white/60">Identifiez les points de rupture dans votre parcours
-                                digital.</p>
-                        </div>
-                    </a>
-                    <a href="{% url 'simulateur:point-mort' %}"
-                        class="flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.03] hover:border-cyan-400/30 hover:bg-cyan-400/5 transition-all duration-micro ease-standard reveal group">
-                        <div
-                            class="w-10 h-10 rounded-lg bg-tus-blue/15 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <svg class="w-5 h-5 text-tus-blue-a11y" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            class="w-10 h-10 rounded-lg bg-cyan-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
                         </div>
                         <div>
-                            <p class="font-semibold text-tus-white group-hover:text-cyan-400 transition-colors">À quel
-                                moment votre investissement digital devient rentable ?</p>
-                            <p class="text-sm text-tus-white/60">Calculez votre seuil de rentabilité en quelques
-                                clics.</p>
+                            <p class="font-semibold text-tus-white group-hover:text-cyan-400 transition-colors">Où se
+                                situe la rupture dans votre chaîne de valeur ?</p>
+                            <p class="text-sm text-tus-white/60">Attirer, Convertir, Structurer, Exécuter — trouvez
+                                le maillon qui freine votre croissance.</p>
+                        </div>
+                    </a>
+                    <a href="{% url 'simulateur:fragmentation' %}"
+                        class="flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.03] hover:border-cyan-400/30 hover:bg-cyan-400/5 transition-all duration-micro ease-standard reveal group">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-purple-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-tus-white group-hover:text-cyan-400 transition-colors">Combien
+                                vous coûte l'empilement d'outils ?</p>
+                            <p class="text-sm text-tus-white/60">Mesurez le coût de la fragmentation SaaS et
+                                comparez avec un écosystème unifié.</p>
+                        </div>
+                    </a>
+                    <a href="{% url 'simulateur:plafond' %}"
+                        class="flex items-start gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.03] hover:border-cyan-400/30 hover:bg-cyan-400/5 transition-all duration-micro ease-standard reveal group">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-pink-500/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-tus-white group-hover:text-cyan-400 transition-colors">Votre
+                                organisation peut-elle supporter votre croissance ?</p>
+                            <p class="text-sm text-tus-white/60">Calculez le CA bloqué par vos limites
+                                administratives et le gain de l'automatisation.</p>
                         </div>
                     </a>
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-start gap-4 reveal">
-                    <a href="{% url 'simulateur:cout-inaction' %}"
+                    <a href="{% url 'simulateur:acse' %}"
                         class="group relative inline-flex items-center justify-center px-8 py-4 overflow-hidden rounded-2xl bg-gradient-to-r from-cyan-500 to-tus-blue font-display font-bold text-lg text-white transition-all duration-micro ease-standard hover:scale-[0.98] active:scale-95 btn-magnetic shadow-lg shadow-tus-blue/25 simulator-cta-primary">
-                        Lancer mon diagnostic gratuit
+                        Diagnostiquer mon activité
                     </a>
                     <a href="{% url 'simulateur:hub' %}"
                         class="inline-flex items-center gap-2 text-tus-white/60 hover:text-cyan-400 font-medium transition-colors duration-micro ease-standard text-sm py-4">
@@ -382,52 +445,60 @@ métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                                 d="M5 11h14v8H5z" />
                                         </svg>
-                                        traitdunion.it/simulateur
+                                        traitdunion.it/simulateur/acse
                                     </span>
                                 </div>
                             </div>
                         </div>
-                        <!-- Simulator Output Preview -->
+                        <!-- Simulator Output Preview — Flux A.C.S.E -->
                         <div class="p-6 space-y-4">
                             <!-- Result header -->
                             <div class="text-center pb-4 border-b border-white/10">
-                                <p class="text-xs uppercase tracking-wider text-tus-white/50 mb-2">Résultat de votre
-                                    diagnostic</p>
-                                <p class="text-3xl font-display font-bold text-red-400">– 18 400 € / an</p>
-                                <p class="text-sm text-tus-white/60 mt-1">Coût estimé de l'inaction</p>
+                                <p class="text-xs uppercase tracking-wider text-tus-white/50 mb-2">Diagnostic
+                                    A.C.S.E — Votre chaîne de valeur</p>
+                                <p class="text-2xl font-display font-bold text-cyan-400">Maillon faible : Structurer</p>
+                                <p class="text-sm text-tus-white/60 mt-1">Priorité d'action identifiée</p>
                             </div>
-                            <!-- Breakdown -->
+                            <!-- ACSE Breakdown -->
                             <div class="space-y-3">
                                 <div
                                     class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/10">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-2 h-2 rounded-full bg-red-400"></div>
-                                        <span class="text-sm text-tus-white/80">Clients perdus</span>
+                                        <div class="w-2 h-2 rounded-full bg-tus-green"></div>
+                                        <span class="text-sm text-tus-white/80">Attirer</span>
                                     </div>
-                                    <span class="text-sm font-semibold text-red-400">– 9 600 €</span>
+                                    <span class="text-sm font-semibold text-tus-green">8/10</span>
                                 </div>
                                 <div
                                     class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/10">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-cyan-400"></div>
+                                        <span class="text-sm text-tus-white/80">Convertir</span>
+                                    </div>
+                                    <span class="text-sm font-semibold text-cyan-400">6/10</span>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-amber-500/30">
                                     <div class="flex items-center gap-2">
                                         <div class="w-2 h-2 rounded-full bg-amber-400"></div>
-                                        <span class="text-sm text-tus-white/80">Visibilité manquée</span>
+                                        <span class="text-sm text-tus-white font-medium">Structurer</span>
                                     </div>
-                                    <span class="text-sm font-semibold text-amber-400">– 5 200 €</span>
+                                    <span class="text-sm font-bold text-amber-400">3/10 ⚠</span>
                                 </div>
                                 <div
                                     class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/10">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-2 h-2 rounded-full bg-orange-400"></div>
-                                        <span class="text-sm text-tus-white/80">Temps perdu en gestion</span>
+                                        <div class="w-2 h-2 rounded-full bg-purple-400"></div>
+                                        <span class="text-sm text-tus-white/80">Exécuter</span>
                                     </div>
-                                    <span class="text-sm font-semibold text-orange-400">– 3 600 €</span>
+                                    <span class="text-sm font-semibold text-purple-400">7/10</span>
                                 </div>
                             </div>
                             <!-- CTA in mockup -->
                             <div class="pt-2">
                                 <div
                                     class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-tus-blue text-center simulator-mockup-cta">
-                                    <span class="text-sm font-semibold text-white">Obtenir mon plan d'action
+                                    <span class="text-sm font-semibold text-white">Voir les actions recommandées
                                         →</span>
                                 </div>
                             </div>
@@ -450,14 +521,14 @@ métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>30+ diagnostics disponibles</span>
+                <span>30+ outils de pilotage</span>
             </div>
             <div class="flex items-center gap-2 text-sm text-tus-white/50">
                 <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Résultat en 2 minutes</span>
+                <span>Diagnostic en 2 minutes</span>
             </div>
             <div class="flex items-center gap-2 text-sm text-tus-white/50">
                 <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
