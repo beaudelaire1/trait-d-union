@@ -72,6 +72,10 @@ class _ToolView(TemplateView):
             {'name': 'Simulateur', 'url': '/simulateur/'},
             {'name': self.tool_name},
         ]
+        # Exposé pour le CTA capture email + rapport PDF (cf. tool_base.html).
+        ctx['tool_name'] = self.tool_name
+        match = getattr(self.request, 'resolver_match', None)
+        ctx['tool_slug'] = match.url_name if match and match.url_name else ''
         return ctx
 
 

@@ -104,23 +104,9 @@
                     </div>
                 </div>
             </div>
-
-            {# Capture email pour rapport PDF #}
-            <div class="mo-fade-up" data-delay="400" style="margin-top:24px;">
-                <button type="button"
-                        @click="window.__buildReportSnapshot = () => buildReportSnapshot(); $dispatch('open-report-modal')"
-                        class="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-tus-blue px-5 py-3.5 text-sm font-display font-bold text-white shadow-lg shadow-tus-blue/20 hover:shadow-tus-blue/40 transition">
-                    📄 Recevoir ce diagnostic en PDF par email
-                </button>
-                <p class="text-xs text-center mt-2" style="color: var(--sim-sublabel);">
-                    Synthèse + pistes d'action · PDF dans votre boîte mail en 2 min
-                </p>
-            </div>
         </div>
     </div>
 </div>
-
-{% include 'partials/simulator_report_modal.html' with tool_slug='acse' tool_name='Flux A.C.S.E' %}
 {% endblock %}
 
 {% block tool_js %}

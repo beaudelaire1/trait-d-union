@@ -268,17 +268,37 @@
         <div class="max-w-3xl mx-auto text-center py-10 px-8 rounded-2xl"
              style="background: linear-gradient(135deg, rgba(107,138,255,0.06), rgba(34,197,94,0.04)); border: 1px solid var(--sim-card-border);">
             <h2 class="text-xl md:text-2xl font-display font-bold mb-3" style="color: var(--sim-ink);">
-                {% block tool_cta_title %}Envie d'en discuter ?{% endblock %}
+                {% block tool_cta_title %}Gardez une trace de ce diagnostic{% endblock %}
             </h2>
             <p class="mb-6 text-sm" style="color: var(--sim-muted);">
-                {% block tool_cta_text %}Échangeons sur les outils digitaux que TUS peut mettre en place pour votre activité.{% endblock %}
+                {% block tool_cta_text %}Recevez votre rapport personnalisé par email. Un PDF synthétique pour y revenir à tête reposée ou le partager avec votre équipe.{% endblock %}
             </p>
-            <a href="{% url 'leads:contact' %}" class="tool-cta">
-                Parlons-en
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </a>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                {% if tool_slug %}
+                <button type="button"
+                        class="tool-cta"
+                        @click="window.__buildReportSnapshot = (typeof buildReportSnapshot === 'function') ? buildReportSnapshot : null; $dispatch('open-report-modal')">
+                    Recevoir mon rapport PDF
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </button>
+                {% endif %}
+                <a href="{% url 'leads:contact' %}"
+                   class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-display font-semibold text-sm transition-all hover:translate-y-[-1px]"
+                   style="color: var(--sim-ink); background: transparent; border: 1px solid var(--sim-card-border);">
+                    Parler avec Trait d'Union
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
+            <p class="mt-5 text-[11px]" style="color: var(--sim-muted); opacity: 0.7;">
+                Aucune carte. Aucun spam. Désinscription en un clic.
+            </p>
         </div>
     </section>
+
+    {# ── Modal de capture email (partagé par tous les simulateurs) ── #}
+    {% if tool_slug %}
+        {% include 'partials/simulator_report_modal.html' with tool_slug=tool_slug tool_name=tool_name %}
+    {% endif %}
 
 </div>
 </div>
