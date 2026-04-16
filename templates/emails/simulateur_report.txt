@@ -1,0 +1,19 @@
+TRAIT D'UNION STUDIO
+
+Votre rapport est prêt.
+
+Bonjour{% if report.name %} {{ report.name }}{% endif %},
+
+Vous trouverez en pièce jointe votre rapport personnalisé « {{ tool_name }} ».
+Il synthétise vos réponses, un verdict chiffré et des pistes d'action concrètes.
+
+Étapes suggérées :
+1. Lire le rapport (5 min).
+2. Identifier la recommandation qui vous parle le plus.
+3. Réserver un échange de 30 min : {{ site_url }}/contact/
+
+Vous pouvez aussi simplement répondre à cet email.
+
+—
+Trait d'Union Studio
+{{ site_url }}

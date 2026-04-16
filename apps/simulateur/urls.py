@@ -23,6 +23,7 @@ from .views import (
     PointMortView,
     PricingPaliersView,
     PrixPsychologiqueView,
+    ReportSubmitView,
     RetentionView,
     RoiMarketingView,
     SaisonnaliteView,
@@ -40,6 +41,8 @@ app_name = 'simulateur'
 urlpatterns = [
     path('', HubView.as_view(), name='hub'),
     path('devis/', SimulateurView.as_view(), name='devis'),
+    # ── Endpoint capture email + envoi rapport PDF ──
+    path('report/', ReportSubmitView.as_view(), name='report_submit'),
     # ── 10 outils existants ──
     path('point-mort/', PointMortView.as_view(), name='point-mort'),
     path('cac/', CacView.as_view(), name='cac'),

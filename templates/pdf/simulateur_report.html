@@ -1,0 +1,136 @@
+{% load static %}<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Rapport {{ tool_name }}</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 20mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    color: #111827;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    margin: 0;
+  }
+  h1, h2, h3 {
+    font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    color: #0f172a;
+    margin: 0 0 8px 0;
+  }
+  h1 { font-size: 22pt; font-weight: 700; }
+  h2 { font-size: 13pt; margin-top: 18px; padding-bottom: 4px; border-bottom: 1px solid #e5e7eb; }
+  h3 { font-size: 11pt; margin-top: 12px; }
+  .tag {
+    display: inline-block; padding: 3px 9px; border-radius: 999px;
+    background: #eef2ff; color: #4338ca; font-size: 8.5pt;
+    letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600;
+  }
+  .muted { color: #6b7280; font-size: 9pt; }
+  .header {
+    border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 18px;
+  }
+  .brand { font-weight: 700; font-size: 10pt; letter-spacing: 0.05em; }
+  .brand small { font-weight: 400; color: #6b7280; }
+  .verdict {
+    background: #f9fafb; border-left: 3px solid #0f172a;
+    padding: 12px 14px; border-radius: 4px; margin: 14px 0;
+  }
+  .verdict .score { font-size: 22pt; font-weight: 700; color: #0f172a; }
+  table.kv { width: 100%; border-collapse: collapse; margin-top: 6px; }
+  table.kv td { padding: 5px 8px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  table.kv td:first-child { color: #6b7280; width: 55%; }
+  table.kv td:last-child { font-weight: 600; text-align: right; }
+  ul.reco { padding-left: 18px; margin: 6px 0; }
+  ul.reco li { margin-bottom: 4px; }
+  .cta {
+    margin-top: 22px; padding: 14px 16px;
+    background: #0f172a; color: #fff; border-radius: 6px;
+  }
+  .cta h3 { color: #fff; margin: 0 0 6px 0; }
+  .cta p { margin: 0; font-size: 9.5pt; }
+  .footer {
+    margin-top: 30px; padding-top: 10px; border-top: 1px solid #e5e7eb;
+    font-size: 8.5pt; color: #9ca3af; text-align: center;
+  }
+  .pillar {
+    display: flex; justify-content: space-between; padding: 6px 0;
+    border-bottom: 1px dashed #e5e7eb;
+  }
+  .pillar .name { font-weight: 600; }
+  .pillar .val { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">{{ branding.name|default:"Trait d'Union Studio" }}
+    <small>— {{ branding.tagline|default:"Architecture Digitale & Design" }}</small>
+  </div>
+</div>
+
+<span class="tag">Rapport personnalisé</span>
+<h1>{{ tool_name }}</h1>
+<p class="muted">
+  Préparé pour {{ report.name|default:report.email }}{% if report.company %} — {{ report.company }}{% endif %}<br>
+  Généré le {{ generated_at|date:"d/m/Y à H:i" }}
+</p>
+
+{% if verdict or score %}
+<div class="verdict">
+  {% if score %}<div class="score">{{ score }}</div>{% endif %}
+  {% if verdict %}<p style="margin:4px 0 0 0;">{{ verdict }}</p>{% endif %}
+</div>
+{% endif %}
+
+{% if sections %}
+{% for section in sections %}
+<h2>{{ section.title|default:"Section" }}</h2>
+{% if section.summary %}<p>{{ section.summary }}</p>{% endif %}
+{% if section.items %}
+<table class="kv">
+{% for item in section.items %}
+<tr>
+  <td>{{ item.label }}</td>
+  <td>{{ item.value }}{% if item.unit %} <span class="muted">{{ item.unit }}</span>{% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+{% if section.pillars %}
+{% for p in section.pillars %}
+<div class="pillar"><span class="name">{{ p.name }}</span><span class="val">{{ p.value }}{% if p.suffix %}{{ p.suffix }}{% endif %}</span></div>
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if recommendations %}
+<h2>Pistes d'action prioritaires</h2>
+<ul class="reco">
+{% for reco in recommendations %}
+<li>{{ reco }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<div class="cta">
+  <h3>Et ensuite ?</h3>
+  <p>Ce rapport identifie les points de friction. Pour les transformer en
+  système : un échange de 30&nbsp;min permet de cadrer un plan concret.</p>
+  <p style="margin-top:8px;">
+    <strong>Contact :</strong> {{ branding.email|default:"contact@traitdunion.it" }}
+    · {{ branding.phone|default:"" }}
+  </p>
+</div>
+
+<div class="footer">
+  {{ branding.name|default:"Trait d'Union Studio" }}
+  · {{ branding.address|default:"" }}, {{ branding.zip_code|default:"" }} {{ branding.city|default:"" }}
+  · SIRET {{ branding.siret|default:"" }}
+  <br>
+  {{ branding.website|default:"traitdunion.it" }}
+</div>
+
+</body>
+</html>

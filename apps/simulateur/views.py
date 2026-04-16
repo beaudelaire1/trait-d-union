@@ -1,11 +1,23 @@
 """Views for the standalone Simulateur app."""
 from __future__ import annotations
 
+import json
+import logging
 from typing import Any
 
+from django.http import HttpRequest, JsonResponse
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
+from core.utils import get_client_ip
 from services.models import Service
+
+from .forms import SimulatorReportForm
+from .services import SimulatorReportService
+
+logger = logging.getLogger(__name__)
 
 
 # ── Hub ──────────────────────────────────────────────────────
@@ -208,3 +220,90 @@ class VulnerabileFournisseurView(_ToolView):
 class CoutNonQualiteView(_ToolView):
     template_name = 'simulateur/cout_non_qualite.html'
     tool_name = 'Coût de la Non-Qualité'
+
+
+# ── Endpoint: capture email + envoi rapport PDF ─────────────
+@method_decorator(require_POST, name='dispatch')
+class ReportSubmitView(View):
+    """Reçoit la demande de rapport PDF en fin de simulateur.
+
+    Entrée : JSON ``{email, name?, company?, tool_slug, tool_name,
+    snapshot, website (honeypot), consent}``.
+    Sortie : JSON ``{ok, message}`` ou ``{ok:false, errors}``.
+    """
+
+    MAX_PER_IP_PER_HOUR = 5
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
+        # Parse JSON payload.
+        try:
+            payload = json.loads(request.body.decode('utf-8') or '{}')
+        except (ValueError, UnicodeDecodeError):
+            return JsonResponse(
+                {'ok': False, 'message': 'Requête invalide.'}, status=400,
+            )
+
+        if not isinstance(payload, dict):
+            return JsonResponse(
+                {'ok': False, 'message': 'Format invalide.'}, status=400,
+            )
+
+        # Rate-limit par IP (fenêtre 1h).
+        ip = get_client_ip(request)
+        if self._is_rate_limited(ip):
+            logger.warning("Rate limit atteint pour %s (report simulateur)", ip)
+            return JsonResponse(
+                {'ok': False,
+                 'message': 'Trop de demandes. Merci de réessayer plus tard.'},
+                status=429,
+            )
+
+        # Honeypot : si rempli, succès factice, rien n'est persisté ni envoyé.
+        if payload.get('website'):
+            logger.info("Honeypot simulateur déclenché depuis %s", ip)
+            return JsonResponse({'ok': True, 'message': 'Merci.'})
+
+        form = SimulatorReportForm(payload)
+        if not form.is_valid():
+            return JsonResponse(
+                {'ok': False, 'errors': form.errors.get_json_data()},
+                status=400,
+            )
+
+        report = form.save(commit=False)
+        report.ip_address = ip or None
+        report.user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
+        report.save()
+
+        try:
+            SimulatorReportService.send(report)
+        except Exception as exc:  # noqa: BLE001
+            logger.error(
+                "Échec envoi rapport simulateur #%s : %s",
+                report.pk, exc, exc_info=True,
+            )
+            return JsonResponse(
+                {'ok': False,
+                 'message': "Nous n'avons pas pu générer le rapport. "
+                            'Réessayez ou contactez-nous.'},
+                status=500,
+            )
+
+        return JsonResponse({
+            'ok': True,
+            'message': 'Votre rapport a été envoyé. Vérifiez votre boîte mail '
+                       '(pensez à regarder dans les spams).',
+        })
+
+    def _is_rate_limited(self, ip: str) -> bool:
+        if not ip:
+            return False
+        from datetime import timedelta
+        from django.utils import timezone
+        from .models import SimulatorReport
+        since = timezone.now() - timedelta(hours=1)
+        count = SimulatorReport.objects.filter(
+            ip_address=ip, created_at__gte=since,
+        ).count()
+        return count >= self.MAX_PER_IP_PER_HOUR
+
