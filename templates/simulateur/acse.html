@@ -161,7 +161,7 @@
                 const s = this.scorePondere();
                 if (s < 4) return 'Flux critique — plusieurs ruptures de charge détectées';
                 if (s < 7) return 'Flux fragile — des optimisations prioritaires identifiées';
-                return 'Flux solide — quelques ajustements pour l\'excellence';
+                return 'Flux solide — quelques ajustements pour optimiser';
             },
             prioritePilier(p) {
                 return (10 - p.score) * p.importance;
