@@ -140,6 +140,124 @@
     }
     .tool-cta:hover { transform: translateY(-1px); background: rgba(11,45,255,0.9); box-shadow: 0 8px 24px rgba(11,45,255,0.3); }
 
+    /* ── Capture email / download PDF : CTA élégant, palette outil ── */
+    .report-cta {
+        position: relative;
+        border-radius: 20px;
+        border: 1px solid var(--sim-card-border);
+        background: var(--sim-card-bg);
+        overflow: hidden;
+        isolation: isolate;
+        transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+    .report-cta:hover { border-color: rgba(107, 138, 255, 0.35); }
+    .report-cta-accent {
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(600px circle at 15% 0%, var(--tool-glow, #6B8AFF), transparent 55%),
+            radial-gradient(500px circle at 100% 100%, var(--tool-glow, #6B8AFF), transparent 55%);
+        opacity: 0.08;
+        pointer-events: none;
+        z-index: -1;
+    }
+    .report-cta-inner {
+        position: relative;
+        padding: 2.25rem 2rem;
+        text-align: center;
+    }
+    .report-cta-eyebrow {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--tool-glow, var(--sim-accent));
+        margin-bottom: 0.85rem;
+        opacity: 0.9;
+    }
+    .report-cta-title {
+        font-family: 'Space Grotesk', 'Fraunces', serif;
+        font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.01em;
+        color: var(--sim-ink);
+        margin-bottom: 0.65rem;
+    }
+    .report-cta-text {
+        font-size: 0.92rem;
+        line-height: 1.55;
+        color: var(--sim-muted);
+        max-width: 30rem;
+        margin: 0 auto 1.5rem;
+    }
+    .report-cta-actions {
+        display: inline-flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .report-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        padding: 0.78rem 1.35rem;
+        border-radius: 12px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        border: 1px solid transparent;
+        white-space: nowrap;
+    }
+    .report-btn svg { flex-shrink: 0; }
+    .report-btn--primary {
+        color: #fff;
+        background: var(--tool-glow, var(--sim-accent));
+        box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.4);
+    }
+    .report-btn--primary:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.08);
+        box-shadow: 0 10px 26px -8px rgba(0, 0, 0, 0.5);
+    }
+    .report-btn--ghost {
+        color: var(--sim-ink);
+        background: transparent;
+        border-color: var(--sim-card-border);
+    }
+    .report-btn--ghost:hover {
+        border-color: var(--tool-glow, var(--sim-accent));
+        color: var(--tool-glow, var(--sim-accent));
+        background: rgba(255, 255, 255, 0.03);
+    }
+    [data-theme="light"] .report-btn--ghost:hover { background: rgba(0, 0, 0, 0.02); }
+    .report-cta-fineprint {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 1.25rem;
+        font-size: 0.72rem;
+        color: var(--sim-muted);
+        opacity: 0.78;
+    }
+    .report-cta-dot {
+        display: inline-block;
+        width: 3px; height: 3px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.5;
+    }
+    .report-cta-dot:first-child { display: none; }
+    @media (max-width: 540px) {
+        .report-cta-inner { padding: 1.75rem 1.25rem; }
+        .report-btn { width: 100%; justify-content: center; }
+        .report-cta-actions { width: 100%; }
+        .report-cta-fineprint { font-size: 0.68rem; gap: 0.4rem; }
+    }
+
     .back-link {
         display: inline-flex; align-items: center; gap: 0.4rem;
         font-size: 0.85rem; font-weight: 500;
@@ -263,35 +381,54 @@
         </div>
     </section>
 
-    {# ── CTA ── #}
+    {# ── CTA capture email / download PDF ── #}
     <section class="pb-20 px-6">
-        <div class="max-w-3xl mx-auto text-center py-10 px-8 rounded-2xl"
-             style="background: linear-gradient(135deg, rgba(107,138,255,0.06), rgba(34,197,94,0.04)); border: 1px solid var(--sim-card-border);">
-            <h2 class="text-xl md:text-2xl font-display font-bold mb-3" style="color: var(--sim-ink);">
-                {% block tool_cta_title %}Gardez une trace de ce diagnostic{% endblock %}
-            </h2>
-            <p class="mb-6 text-sm" style="color: var(--sim-muted);">
-                {% block tool_cta_text %}Recevez votre rapport personnalisé par email. Un PDF synthétique pour y revenir à tête reposée ou le partager avec votre équipe.{% endblock %}
-            </p>
-            <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                {% if tool_slug %}
-                <button type="button"
-                        class="tool-cta"
-                        @click="window.__buildReportSnapshot = (typeof buildReportSnapshot === 'function') ? buildReportSnapshot : null; $dispatch('open-report-modal')">
-                    Recevoir mon rapport PDF
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                </button>
-                {% endif %}
+        <div class="max-w-3xl mx-auto">
+            <div class="report-cta mo-fade-up">
+                <div class="report-cta-accent"></div>
+                <div class="report-cta-inner">
+                    <p class="report-cta-eyebrow">Votre diagnostic</p>
+                    <h2 class="report-cta-title">
+                        {% block tool_cta_title %}Gardez une trace de ce diagnostic{% endblock %}
+                    </h2>
+                    <p class="report-cta-text">
+                        {% block tool_cta_text %}Un PDF synthétique avec vos chiffres et des pistes d'action concrètes — à relire à tête reposée ou à partager avec votre équipe.{% endblock %}
+                    </p>
+
+                    {% if tool_slug %}
+                    <div class="report-cta-actions">
+                        <button type="button"
+                                class="report-btn report-btn--primary"
+                                @click="$dispatch('open-report-modal', { delivery: 'download' })">
+                            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 6h16M5 20h14a2 2 0 002-2V8H3v10a2 2 0 002 2z"/></svg>
+                            <span>Télécharger le PDF</span>
+                        </button>
+                        <button type="button"
+                                class="report-btn report-btn--ghost"
+                                @click="$dispatch('open-report-modal', { delivery: 'email' })">
+                            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <span>Recevoir par email</span>
+                        </button>
+                    </div>
+                    <p class="report-cta-fineprint">
+                        <span class="report-cta-dot"></span>
+                        Aucune carte bancaire
+                        <span class="report-cta-dot"></span>
+                        Aucun spam
+                        <span class="report-cta-dot"></span>
+                        Désinscription en un clic
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="text-center mt-6">
                 <a href="{% url 'leads:contact' %}"
-                   class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-display font-semibold text-sm transition-all hover:translate-y-[-1px]"
-                   style="color: var(--sim-ink); background: transparent; border: 1px solid var(--sim-card-border);">
-                    Parler avec Trait d'Union
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                   class="text-sm transition-colors"
+                   style="color: var(--sim-muted);">
+                    ou <span style="color: var(--tool-glow); border-bottom: 1px solid currentColor; padding-bottom: 1px;">parler directement avec Trait d'Union</span>
                 </a>
             </div>
-            <p class="mt-5 text-[11px]" style="color: var(--sim-muted); opacity: 0.7;">
-                Aucune carte. Aucun spam. Désinscription en un clic.
-            </p>
         </div>
     </section>
 

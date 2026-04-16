@@ -279,8 +279,17 @@ class ReportSubmitView(View):
         report.user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
         report.save()
 
+        # Mode de livraison : 'email' (défaut) ou 'download' (les deux).
+        delivery = payload.get('delivery', 'email')
+        if delivery not in ('email', 'download'):
+            delivery = 'email'
+
+        pdf_bytes: bytes | None = None
         try:
-            SimulatorReportService.send(report)
+            if delivery == 'download':
+                # Génère le PDF (réutilisé pour la pièce jointe email).
+                pdf_bytes = SimulatorReportService.generate_pdf(report)
+            SimulatorReportService.send(report, pdf_bytes=pdf_bytes)
         except Exception as exc:  # noqa: BLE001
             logger.error(
                 "Échec envoi rapport simulateur #%s : %s",
@@ -293,11 +302,20 @@ class ReportSubmitView(View):
                 status=500,
             )
 
-        return JsonResponse({
+        response: dict[str, Any] = {
             'ok': True,
             'message': 'Votre rapport a été envoyé. Vérifiez votre boîte mail '
                        '(pensez à regarder dans les spams).',
-        })
+            'delivery': delivery,
+        }
+        if delivery == 'download' and pdf_bytes is not None:
+            import base64
+            response['pdf_base64'] = base64.b64encode(pdf_bytes).decode('ascii')
+            response['filename'] = f"rapport_{report.tool_slug or 'simulateur'}.pdf"
+            response['message'] = (
+                "Téléchargement prêt. Une copie a aussi été envoyée par email."
+            )
+        return JsonResponse(response)
 
     def _is_rate_limited(self, ip: str) -> bool:
         if not ip:

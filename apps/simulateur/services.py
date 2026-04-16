@@ -45,11 +45,16 @@ class SimulatorReportService:
         return DocumentGenerator._render_pdf(html)
 
     @classmethod
-    def send(cls, report: SimulatorReport) -> None:
-        """Génère et envoie le rapport par email au lead."""
+    def send(cls, report: SimulatorReport, *, pdf_bytes: bytes | None = None) -> None:
+        """Génère et envoie le rapport par email au lead.
+
+        Accepte des ``pdf_bytes`` déjà générés pour éviter un double rendu
+        lorsqu'un téléchargement direct a été effectué.
+        """
         from django.core.mail import EmailMultiAlternatives
 
-        pdf_bytes = cls.generate_pdf(report)
+        if pdf_bytes is None:
+            pdf_bytes = cls.generate_pdf(report)
 
         context = {
             'report': report,

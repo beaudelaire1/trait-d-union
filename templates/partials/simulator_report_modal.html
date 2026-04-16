@@ -1,112 +1,283 @@
 {% comment %}
 Modal de capture email en fin de simulateur.
-Usage dans un simulateur :
+Usage :
   {% include 'partials/simulator_report_modal.html' with tool_slug='acse' tool_name='Flux A.C.S.E' %}
 
-Ouverture : dispatcher un événement global depuis n'importe quel bouton :
-  <button @click="$dispatch('open-report-modal')">Recevoir mon rapport PDF</button>
+Ouverture (depuis n'importe quel bouton de la page) :
+  <button @click="$dispatch('open-report-modal', { delivery: 'download' })">…</button>
+  <button @click="$dispatch('open-report-modal', { delivery: 'email' })">…</button>
 
-Le snapshot des données à envoyer est construit par la fonction JS
-`buildReportSnapshot()` que l'Alpine component du simulateur DOIT exposer
-(retourne un objet sérialisable : {verdict, score, sections:[], recommendations:[]}).
-Si absent, un snapshot basique basé sur $root est envoyé.
+Snapshot des données : l'Alpine component du simulateur doit exposer
+`window.__buildReportSnapshot` (fonction retournant l'objet structuré) via son init().
 {% endcomment %}
+
+<style nonce="{{ request.csp_nonce }}">
+    .srm-backdrop {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        padding: 1rem;
+        background: rgba(8, 10, 20, 0.62);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+    }
+    .srm-dialog {
+        position: relative;
+        width: 100%; max-width: 460px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: linear-gradient(180deg, rgba(17,19,32,0.98), rgba(11,13,24,0.98));
+        padding: 1.75rem;
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.6);
+    }
+    [data-theme="light"] .srm-dialog {
+        background: #ffffff;
+        border-color: #e5e7eb;
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.2);
+    }
+    .srm-close {
+        position: absolute; top: 0.75rem; right: 0.75rem;
+        width: 32px; height: 32px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 8px;
+        color: var(--sim-muted, rgba(255,255,255,0.55));
+        transition: all 0.2s;
+    }
+    .srm-close:hover { color: var(--sim-ink, #fff); background: rgba(255,255,255,0.06); }
+    [data-theme="light"] .srm-close:hover { background: rgba(0,0,0,0.04); }
+
+    .srm-eyebrow {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--tool-glow, #6B8AFF);
+        margin-bottom: 0.6rem;
+    }
+    .srm-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.25rem;
+        font-weight: 600;
+        line-height: 1.3;
+        color: var(--sim-ink, #fff);
+        margin-bottom: 0.4rem;
+    }
+    .srm-subtitle {
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: var(--sim-muted, rgba(255,255,255,0.6));
+        margin-bottom: 1.25rem;
+    }
+
+    .srm-field { margin-bottom: 0.85rem; }
+    .srm-label {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--sim-label, rgba(255,255,255,0.7));
+        margin-bottom: 0.35rem;
+        letter-spacing: 0.02em;
+    }
+    .srm-input {
+        width: 100%;
+        padding: 0.65rem 0.85rem;
+        background: var(--sim-field-bg, rgba(255,255,255,0.04));
+        border: 1px solid var(--sim-field-border, rgba(255,255,255,0.1));
+        border-radius: 10px;
+        color: var(--sim-ink, #fff);
+        font-size: 0.88rem;
+        transition: all 0.2s;
+    }
+    .srm-input:focus {
+        outline: none;
+        border-color: var(--tool-glow, #6B8AFF);
+        background: var(--sim-field-focus-bg, rgba(255,255,255,0.07));
+        box-shadow: 0 0 0 3px rgba(107, 138, 255, 0.12);
+    }
+    .srm-input::placeholder { color: var(--sim-placeholder, rgba(255,255,255,0.3)); }
+    .srm-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+
+    .srm-consent {
+        display: flex; align-items: flex-start; gap: 0.5rem;
+        font-size: 0.72rem; line-height: 1.5;
+        color: var(--sim-muted, rgba(255,255,255,0.6));
+        cursor: pointer;
+        margin-top: 0.5rem;
+        margin-bottom: 0.85rem;
+    }
+    .srm-consent input {
+        margin-top: 0.15rem;
+        accent-color: var(--tool-glow, #6B8AFF);
+    }
+    .srm-error {
+        font-size: 0.75rem;
+        color: #f87171;
+        margin-bottom: 0.6rem;
+    }
+
+    .srm-submit {
+        width: 100%;
+        padding: 0.85rem 1.25rem;
+        border-radius: 12px;
+        color: #fff;
+        background: var(--tool-glow, #6B8AFF);
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .srm-submit:hover:not(:disabled) {
+        transform: translateY(-1px);
+        filter: brightness(1.08);
+        box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.5);
+    }
+    .srm-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .srm-footnote {
+        font-size: 0.66rem;
+        color: var(--sim-muted, rgba(255,255,255,0.5));
+        text-align: center;
+        margin-top: 0.75rem;
+        opacity: 0.75;
+    }
+
+    .srm-success-icon {
+        width: 56px; height: 56px;
+        border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        margin: 0 auto 1rem;
+    }
+    .srm-delivery-badge {
+        display: inline-flex; align-items: center; gap: 0.35rem;
+        font-size: 0.68rem; font-weight: 600;
+        padding: 0.25rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(107, 138, 255, 0.08);
+        color: var(--tool-glow, #6B8AFF);
+        margin-bottom: 0.85rem;
+        letter-spacing: 0.02em;
+    }
+</style>
 
 <div x-data="simulatorReportModal({
        toolSlug: '{{ tool_slug|escapejs }}',
        toolName: '{{ tool_name|escapejs }}',
-       endpoint: '{% url "simulateur:report_submit" %}',
+       endpoint: '{% url 'simulateur:report_submit' %}',
      })"
-     @open-report-modal.window="open()"
+     @open-report-modal.window="open($event.detail)"
      @keydown.escape.window="close()"
      x-show="isOpen"
      x-cloak
      style="display:none;"
-     class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+     class="srm-backdrop">
 
   <div x-show="isOpen"
        x-transition:enter="transition ease-out duration-200"
        x-transition:enter-start="opacity-0 scale-95"
        x-transition:enter-end="opacity-100 scale-100"
        @click.outside="close()"
-       class="relative w-full max-w-md rounded-2xl bg-tus-black border border-white/10 p-6 shadow-2xl">
+       class="srm-dialog">
 
-    <button type="button" @click="close()"
-            class="absolute top-3 right-3 text-tus-white/50 hover:text-tus-white transition"
-            aria-label="Fermer">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    <button type="button" @click="close()" class="srm-close" aria-label="Fermer">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
       </svg>
     </button>
 
+    {# ── État : formulaire ── #}
     <template x-if="!success">
       <div>
-        <h3 class="text-xl font-display font-bold text-tus-white mb-2">
-          Recevez votre rapport personnalisé
-        </h3>
-        <p class="text-sm text-tus-white/60 mb-5">
-          Synthèse de vos réponses + pistes d'action concrètes, au format PDF.
-          Reçu en moins de 2 minutes dans votre boîte mail.
-        </p>
+        <div class="srm-delivery-badge">
+          <template x-if="form.delivery === 'download'">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 6h16M5 20h14a2 2 0 002-2V8H3v10a2 2 0 002 2z"/></svg>
+          </template>
+          <template x-if="form.delivery === 'email'">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </template>
+          <span x-text="form.delivery === 'download' ? 'Téléchargement + copie email' : 'Envoi par email'"></span>
+        </div>
 
-        <form @submit.prevent="submit()" class="space-y-3">
-          <div>
-            <label class="block text-xs font-medium text-tus-white/70 mb-1">Email professionnel *</label>
+        <p class="srm-eyebrow">Votre rapport</p>
+        <h3 class="srm-title" x-text="form.delivery === 'download' ? 'Téléchargez votre rapport PDF' : 'Recevez votre rapport par email'"></h3>
+        <p class="srm-subtitle" x-text="form.delivery === 'download'
+          ? 'Téléchargement immédiat. Une copie est également envoyée à votre adresse pour y revenir plus tard.'
+          : 'Synthèse + pistes d\'action concrètes, en PDF dans votre boîte mail d\'ici 2 minutes.'"></p>
+
+        <form @submit.prevent="submit()" novalidate>
+          <div class="srm-field">
+            <label class="srm-label">Email professionnel *</label>
             <input type="email" x-model="form.email" required autocomplete="email"
-                   class="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-tus-white placeholder:text-tus-white/30 focus:border-tus-blue-a11y focus:outline-none"
-                   placeholder="vous@entreprise.fr">
+                   class="srm-input" placeholder="vous@entreprise.fr">
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-medium text-tus-white/70 mb-1">Prénom</label>
-              <input type="text" x-model="form.name" autocomplete="given-name" maxlength="120"
-                     class="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-tus-white placeholder:text-tus-white/30 focus:border-tus-blue-a11y focus:outline-none"
-                     placeholder="Optionnel">
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-tus-white/70 mb-1">Entreprise</label>
-              <input type="text" x-model="form.company" autocomplete="organization" maxlength="180"
-                     class="w-full rounded-lg bg-white/5 border border-white/10 px-3 py-2.5 text-sm text-tus-white placeholder:text-tus-white/30 focus:border-tus-blue-a11y focus:outline-none"
-                     placeholder="Optionnel">
+
+          <div class="srm-field">
+            <div class="srm-row-2">
+              <div>
+                <label class="srm-label">Prénom</label>
+                <input type="text" x-model="form.name" autocomplete="given-name" maxlength="120"
+                       class="srm-input" placeholder="Optionnel">
+              </div>
+              <div>
+                <label class="srm-label">Entreprise</label>
+                <input type="text" x-model="form.company" autocomplete="organization" maxlength="180"
+                       class="srm-input" placeholder="Optionnel">
+              </div>
             </div>
           </div>
 
-          {# Honeypot : doit rester vide #}
+          {# Honeypot #}
           <input type="text" x-model="form.website" tabindex="-1" autocomplete="off"
                  aria-hidden="true"
                  style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">
 
-          <label class="flex items-start gap-2 text-xs text-tus-white/60 cursor-pointer">
-            <input type="checkbox" x-model="form.consent" required
-                   class="mt-0.5 rounded border-white/20 bg-white/5">
+          <label class="srm-consent">
+            <input type="checkbox" x-model="form.consent" required>
             <span>J'accepte de recevoir ce rapport et, occasionnellement, du contenu utile de Trait d'Union Studio. Désinscription en un clic.</span>
           </label>
 
-          <p x-show="error" x-text="error" class="text-xs text-red-400"></p>
+          <p x-show="error" x-text="error" class="srm-error"></p>
 
-          <button type="submit" :disabled="loading"
-                  class="w-full rounded-lg bg-gradient-to-r from-cyan-500 to-tus-blue px-4 py-3 text-sm font-display font-bold text-white shadow-lg shadow-tus-blue/20 hover:shadow-tus-blue/40 transition disabled:opacity-60 disabled:cursor-not-allowed">
-            <span x-show="!loading">Recevoir mon rapport PDF</span>
-            <span x-show="loading">Envoi en cours…</span>
+          <button type="submit" :disabled="loading" class="srm-submit">
+            <template x-if="!loading">
+              <span class="inline-flex items-center gap-2">
+                <template x-if="form.delivery === 'download'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 6h16M5 20h14a2 2 0 002-2V8H3v10a2 2 0 002 2z"/></svg>
+                </template>
+                <template x-if="form.delivery === 'email'">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                </template>
+                <span x-text="form.delivery === 'download' ? 'Télécharger le PDF' : 'Envoyer à mon email'"></span>
+              </span>
+            </template>
+            <template x-if="loading">
+              <span class="inline-flex items-center gap-2">
+                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-opacity="0.25" stroke-width="3"></circle><path d="M21 12a9 9 0 00-9-9" stroke-width="3" stroke-linecap="round"></path></svg>
+                <span>Envoi en cours…</span>
+              </span>
+            </template>
           </button>
-          <p class="text-[11px] text-tus-white/40 text-center">
-            Aucune carte. Aucun spam. Désinscription en un clic.
-          </p>
+
+          <p class="srm-footnote">Aucune carte · Aucun spam · Désinscription en un clic</p>
         </form>
       </div>
     </template>
 
+    {# ── État : succès ── #}
     <template x-if="success">
-      <div class="py-6 text-center">
-        <div class="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center mx-auto mb-4">
-          <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      <div style="padding: 0.5rem 0 0.25rem; text-align:center;">
+        <div class="srm-success-icon">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
           </svg>
         </div>
-        <h3 class="text-lg font-display font-bold text-tus-white mb-2">Rapport envoyé !</h3>
-        <p class="text-sm text-tus-white/70 mb-5" x-text="successMessage"></p>
-        <button type="button" @click="close()"
-                class="rounded-lg border border-white/15 px-5 py-2 text-sm text-tus-white hover:bg-white/5 transition">Fermer</button>
+        <h3 class="srm-title" style="text-align:center;">Rapport prêt !</h3>
+        <p class="srm-subtitle" style="text-align:center;" x-text="successMessage"></p>
+        <button type="button" @click="close()" class="srm-submit" style="background: transparent; color: var(--sim-ink, #fff); border: 1px solid var(--sim-field-border, rgba(255,255,255,0.15));">
+          Fermer
+        </button>
       </div>
     </template>
 
@@ -121,16 +292,25 @@ Si absent, un snapshot basique basé sur $root est envoyé.
       success: false,
       successMessage: '',
       error: '',
-      form: { email: '', name: '', company: '', website: '', consent: false },
-      open() { this.isOpen = true; this.error = ''; },
-      close() { this.isOpen = false; },
+      form: {
+        email: '', name: '', company: '',
+        website: '',
+        consent: false,
+        delivery: 'email',
+      },
+      open(detail) {
+        this.isOpen = true;
+        this.error = '';
+        this.success = false;
+        const deliveryWanted = (detail && detail.delivery) || 'email';
+        this.form.delivery = (deliveryWanted === 'download') ? 'download' : 'email';
+      },
+      close() { this.isOpen = false; this.loading = false; },
       getCsrf() {
         const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
         return m ? decodeURIComponent(m[1]) : '';
       },
       collectSnapshot() {
-        // L'Alpine component du simulateur peut exposer window.__buildReportSnapshot
-        // pour retourner un objet structuré. Sinon fallback vide.
         try {
           if (typeof window.__buildReportSnapshot === 'function') {
             return window.__buildReportSnapshot() || {};
@@ -138,10 +318,34 @@ Si absent, un snapshot basique basé sur $root est envoyé.
         } catch (e) { /* ignore */ }
         return {};
       },
+      triggerDownload(base64, filename) {
+        try {
+          const binary = atob(base64);
+          const len = binary.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
+          const blob = new Blob([bytes], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename || 'rapport.pdf';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 2000);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      },
       async submit() {
         this.error = '';
         if (!this.form.consent) {
           this.error = 'Merci de confirmer votre consentement.';
+          return;
+        }
+        if (!this.form.email) {
+          this.error = 'Merci de renseigner votre email.';
           return;
         }
         this.loading = true;
@@ -154,6 +358,7 @@ Si absent, un snapshot basique basé sur $root est envoyé.
             consent: this.form.consent,
             tool_slug: toolSlug,
             tool_name: toolName,
+            delivery: this.form.delivery,
             snapshot: this.collectSnapshot(),
           };
           const res = await fetch(endpoint, {
@@ -170,6 +375,9 @@ Si absent, un snapshot basique basé sur $root est envoyé.
           if (!res.ok || data.ok === false) {
             this.error = data.message || 'Une erreur est survenue. Réessayez.';
           } else {
+            if (data.pdf_base64) {
+              this.triggerDownload(data.pdf_base64, data.filename);
+            }
             this.success = true;
             this.successMessage = data.message || 'Votre rapport vous a été envoyé.';
           }

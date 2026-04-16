@@ -114,6 +114,17 @@
 </ul>
 {% endif %}
 
+{% if not sections and not recommendations and not verdict %}
+<h2>Votre simulation</h2>
+<p>Merci d'avoir utilisé notre outil <strong>{{ tool_name }}</strong>.</p>
+<p>Vos hypothèses et résultats détaillés sont accessibles à tout moment en
+relançant l'outil — les paramètres restent ajustables en temps réel pour
+tester différents scénarios.</p>
+<p class="muted">Ce rapport confirme votre intérêt pour ce diagnostic.
+Notre équipe peut vous accompagner pour transformer vos constats en
+système concret.</p>
+{% endif %}
+
 <div class="cta">
   <h3>Et ensuite ?</h3>
   <p>Ce rapport identifie les points de friction. Pour les transformer en

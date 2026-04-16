@@ -251,6 +251,8 @@
             },
 
             init() {
+                // Expose snapshot builder globalement pour le modal capture email.
+                window.__buildReportSnapshot = () => this.buildReportSnapshot();
                 this.piliers.forEach((_, i) => {
                     this.$watch('piliers[' + i + '].score', () => this.updateChart());
                 });
