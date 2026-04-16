@@ -167,12 +167,14 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
        toolName: '{{ tool_name|escapejs }}',
        endpoint: '{% url 'simulateur:report_submit' %}',
      })"
-     @open-report-modal.window="open($event.detail)"
-     @keydown.escape.window="close()"
-     x-show="isOpen"
-     x-cloak
-     style="display:none;"
-     class="srm-backdrop">
+     @open-report-modal.window="open($event.detail)">
+
+  <template x-teleport="body">
+    <div @keydown.escape.window="close()"
+         x-show="isOpen"
+         x-cloak
+         style="display:none;"
+         class="srm-backdrop">
 
   <div x-show="isOpen"
        x-transition:enter="transition ease-out duration-200"
@@ -281,7 +283,9 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
       </div>
     </template>
 
+    </div>
   </div>
+  </template>
 </div>
 
 <script nonce="{{ request.csp_nonce }}">
@@ -304,8 +308,13 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
         this.success = false;
         const deliveryWanted = (detail && detail.delivery) || 'email';
         this.form.delivery = (deliveryWanted === 'download') ? 'download' : 'email';
+        document.body.style.overflow = 'hidden';
       },
-      close() { this.isOpen = false; this.loading = false; },
+      close() {
+        this.isOpen = false;
+        this.loading = false;
+        document.body.style.overflow = '';
+      },
       getCsrf() {
         const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
         return m ? decodeURIComponent(m[1]) : '';
