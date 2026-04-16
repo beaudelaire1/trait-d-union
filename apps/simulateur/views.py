@@ -8,6 +8,7 @@ from typing import Any
 from django.http import HttpRequest, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
@@ -61,6 +62,7 @@ class SimulateurView(TemplateView):
 
 
 # ── Outils stratégiques (100 % client-side) ──────────────────
+@method_decorator(ensure_csrf_cookie, name='dispatch')
 class _ToolView(TemplateView):
     """Base pour les outils sans logique serveur."""
     tool_name: str = ''

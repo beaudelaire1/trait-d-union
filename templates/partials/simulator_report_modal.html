@@ -316,8 +316,22 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
         document.body.style.overflow = '';
       },
       getCsrf() {
-        const m = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/);
-        return m ? decodeURIComponent(m[1]) : '';
+        // 1) Token injecté dans l'attribut data-hx-headers du body (base.html)
+        try {
+          const body = document.body;
+          const raw = body && body.getAttribute('data-hx-headers');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed['X-CSRFToken']) return parsed['X-CSRFToken'];
+          }
+        } catch (e) { /* ignore */ }
+        // 2) Fallback : cookie (nom custom configurable côté serveur)
+        const names = ['tus_ct', 'csrftoken'];
+        for (const n of names) {
+          const m = document.cookie.match(new RegExp('(?:^|;\\s*)' + n + '=([^;]+)'));
+          if (m) return decodeURIComponent(m[1]);
+        }
+        return '';
       },
       collectSnapshot() {
         try {
