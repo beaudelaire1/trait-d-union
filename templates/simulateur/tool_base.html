@@ -210,7 +210,7 @@
         border: 1px solid transparent;
         white-space: nowrap;
     }
-    .report-btn svg { flex-shrink: 0; }
+    .report-btn svg { flex-shrink: 0; width: 18px; height: 18px; }
     .report-btn--primary {
         color: #fff;
         background: var(--tool-glow, var(--sim-accent));
@@ -396,17 +396,17 @@
                     </p>
 
                     {% if tool_slug %}
-                    <div class="report-cta-actions">
+                    <div class="report-cta-actions" x-data>
                         <button type="button"
                                 class="report-btn report-btn--primary"
-                                @click="$dispatch('open-report-modal', { delivery: 'download' })">
-                            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 6h16M5 20h14a2 2 0 002-2V8H3v10a2 2 0 002 2z"/></svg>
+                                @click="window.dispatchEvent(new CustomEvent('open-report-modal', { detail: { delivery: 'download' } }))">
+                            <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 6h16M5 20h14a2 2 0 002-2V8H3v10a2 2 0 002 2z"/></svg>
                             <span>Télécharger le PDF</span>
                         </button>
                         <button type="button"
                                 class="report-btn report-btn--ghost"
-                                @click="$dispatch('open-report-modal', { delivery: 'email' })">
-                            <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                @click="window.dispatchEvent(new CustomEvent('open-report-modal', { detail: { delivery: 'email' } }))">
+                            <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                             <span>Recevoir par email</span>
                         </button>
                     </div>
