@@ -266,3 +266,181 @@ def get_content_for(tool_slug: str) -> dict:
     if not tool_slug:
         return _DEFAULT
     return TOOL_CONTENT.get(tool_slug, _DEFAULT)
+
+
+# ──────────────────────────────────────────────────────────────────
+# Interprétation conditionnelle : produire un diagnostic et des recos
+# basés sur les VRAIES valeurs saisies / calculées par l'utilisateur.
+# ──────────────────────────────────────────────────────────────────
+import re as _re
+
+
+def _to_number(raw: str) -> float | None:
+    """Parse '2 000,50 €' ou '3.5%' → 2000.50 / 3.5 (None si illisible)."""
+    if not raw:
+        return None
+    s = str(raw).strip()
+    s = s.replace('\xa0', ' ').replace(' ', '')
+    s = s.replace('€', '').replace('%', '').replace('x', '').strip()
+    # Virgule décimale fr → point
+    if ',' in s and '.' not in s:
+        s = s.replace(',', '.')
+    elif ',' in s and '.' in s:
+        s = s.replace(',', '')
+    try:
+        return float(s)
+    except (ValueError, TypeError):
+        return None
+
+
+def _find(pairs: list[dict], *keywords: str) -> tuple[str, float | None]:
+    """Cherche la première paire {label, value} dont le label contient un
+    des keywords (case-insensitive). Retourne (label, parsed_number)."""
+    for p in pairs or []:
+        label = (p.get('label') or '').lower()
+        if any(k.lower() in label for k in keywords):
+            return p.get('label', ''), _to_number(p.get('value', ''))
+    return '', None
+
+
+def _fmt_money(v: float | int) -> str:
+    try:
+        return f"{int(round(v)):,} €".replace(',', ' ')
+    except (ValueError, TypeError):
+        return f"{v} €"
+
+
+def _interpret_cac(inputs: list, results: list) -> dict:
+    _, budget = _find(inputs, 'budget')
+    _, ltv = _find(inputs, 'ltv', 'valeur vie')
+    _, cac = _find(results, 'cac', "coût par client", 'cout par client')
+    _, clients = _find(results, 'clients / mois', 'clients/mois', 'clients par mois')
+    recos: list[str] = []
+    headline = ''
+    verdict = ''
+    if cac and ltv:
+        ratio = ltv / cac if cac > 0 else 0
+        if ratio < 1 and cac > 0:
+            verdict = (
+                f"Chaque client vous coûte {_fmt_money(cac)} pour vous rapporter "
+                f"{_fmt_money(ltv)} — soit un déficit de {_fmt_money(cac - ltv)}."
+            )
+            headline = (
+                "Votre acquisition est déficitaire. Tant que ce ratio n'est pas "
+                "inversé, chaque euro marketing creuse votre trésorerie."
+            )
+            recos = [
+                "Stop à l'investissement marketing sur les canaux dont le CAC est > LTV — vérifiez d'abord par canal, pas en moyenne.",
+                f"Objectif 30 jours : ramener le CAC sous {_fmt_money(ltv / 3)} (ratio LTV/CAC ≥ 3).",
+                "Activez 1 levier de rétention (upsell, récurrence, parrainage) pour faire grimper la LTV avant de toucher au budget.",
+                "Cartographiez votre entonnoir étape par étape : la fuite se trouve rarement là où on pense.",
+            ]
+        elif ratio < 3:
+            verdict = (
+                f"Votre ratio LTV/CAC est de {ratio:.1f}x — viable, mais sans marge "
+                f"pour une casse (saisonnalité, changement d'algo, perte d'un canal)."
+            )
+            headline = (
+                "Vous êtes en zone 'fragile'. L'acquisition fonctionne mais n'a pas "
+                "encore le ressort nécessaire pour absorber un imprévu."
+            )
+            recos = [
+                "Identifiez votre canal le plus stable — et concentrez 70% de vos efforts dessus.",
+                "Testez 1 canal de contenu organique (SEO, podcast, newsletter) pour faire baisser le CAC moyen.",
+                "Automatisez la relance : 60% des leads perdus ne reviennent pas faute de suivi, pas faute d'intérêt.",
+                "Mesurez votre délai d'amortissement (CAC / revenu mensuel par client) — c'est le vrai indicateur de santé.",
+            ]
+        else:
+            verdict = (
+                f"Ratio LTV/CAC de {ratio:.1f}x : votre moteur d'acquisition est sain. "
+                f"Chaque {_fmt_money(cac)} investi rapporte {_fmt_money(ltv)} sur la durée."
+            )
+            headline = (
+                "Vous pouvez pousser l'accélérateur. La question devient : jusqu'où "
+                "votre organisation peut-elle suivre ?"
+            )
+            recos = [
+                "Doublez le budget sur le canal le plus rentable — et mesurez si le CAC reste stable (effet plafond).",
+                "Documentez votre entonnoir pour le rendre transférable (SOP, vidéos, check-lists).",
+                "Préparez la capacité opérationnelle : qui livre quand vous ferez +50% de clients ?",
+                "Investissez dans la LTV (contrats annuels, services complémentaires) avant que la concurrence ne rattrape votre CAC.",
+            ]
+    if clients and clients == 0:
+        headline = headline or (
+            "Aucun client n'est acquis avec ces paramètres. Votre entonnoir n'est "
+            "pas cassé par endroits — il est bloqué dès la première étape."
+        )
+        recos = [
+            "Vérifiez votre taux de conversion visiteur → lead : s'il est < 1%, votre message ou votre page d'entrée ne parle pas à la bonne audience.",
+            "Relancez 3 prospects passés (même tièdes) pour capturer un signal qualitatif avant d'investir plus.",
+            "Simulez avec un budget de 500 € sur 1 canal ciblé avant de projeter mensuel.",
+        ]
+    return {'headline': headline, 'verdict': verdict, 'recommendations': recos}
+
+
+def _interpret_point_mort(inputs: list, results: list) -> dict:
+    _, charges = _find(inputs, 'charges fixes', 'charges mensuelles')
+    _, marge = _find(inputs, 'marge')
+    _, seuil = _find(results, 'seuil', 'point mort', 'chiffre d\'affaires')
+    recos: list[str] = []
+    headline = ''
+    verdict = ''
+    if seuil and charges:
+        verdict = (
+            f"Vous devez générer {_fmt_money(seuil)} de chiffre d'affaires mensuel "
+            f"avant de commencer à vous rémunérer."
+        )
+        daily = seuil / 22 if seuil else 0
+        headline = (
+            f"Chaque jour ouvré, c'est {_fmt_money(daily)} à produire juste pour "
+            f"tenir les charges. Au-delà, la marge est pour vous."
+        )
+        recos = [
+            f"Listez chaque charge fixe — même les petites. Objectif : identifier {_fmt_money(charges * 0.1)} d'économies réalistes (-10%).",
+            "Séparez 'fixe' et 'quasi-fixe' : certains abonnements peuvent passer en variable avec un changement de forfait.",
+            "Fixez-vous un seuil psychologique quotidien (tableau visible) — le cerveau optimise ce qu'il voit.",
+            "Planifiez un trimestre à {:.0f}% du seuil pour sécuriser, puis scalez.".format(110),
+            "Si le seuil paraît inatteignable, le problème n'est pas la vente : c'est la structure de coûts.",
+        ]
+    return {'headline': headline, 'verdict': verdict, 'recommendations': recos}
+
+
+def _interpret_generic(inputs: list, results: list) -> dict:
+    """Fallback : extrait les 3 KPI les plus parlants pour en faire un headline."""
+    if not results:
+        return {}
+    top = results[:3]
+    parts = [f"{r.get('label', '')} : {r.get('value', '')}" for r in top if r.get('value')]
+    headline = (
+        "Vos chiffres clés : " + " · ".join(parts) + "."
+        if parts else ''
+    )
+    return {'headline': headline, 'verdict': '', 'recommendations': []}
+
+
+_INTERPRETERS = {
+    'cac': _interpret_cac,
+    'point-mort': _interpret_point_mort,
+}
+
+
+def interpret(
+    tool_slug: str,
+    *,
+    user_inputs: list | None = None,
+    results: list | None = None,
+) -> dict:
+    """Produit un headline + verdict + recommendations conditionnels sur
+    les vraies valeurs saisies / calculées. Retourne ``{}`` si rien à dire.
+    """
+    user_inputs = user_inputs or []
+    results = results or []
+    fn = _INTERPRETERS.get(tool_slug or '')
+    if fn:
+        try:
+            out = fn(user_inputs, results) or {}
+            if any(out.values()):
+                return out
+        except Exception:  # noqa: BLE001
+            pass
+    return _interpret_generic(user_inputs, results)

@@ -98,6 +98,46 @@
     color: #0f172a; line-height: 1; margin-bottom: 2mm;
   }
   .verdict .verdict-text { font-size: 11pt; color: #0f172a; font-weight: 500; }
+  .headline {
+    background: #f8fafc; border-left: 4px solid #0f766e;
+    padding: 4mm 5mm; border-radius: 3px;
+    font-size: 11pt; line-height: 1.55; color: #0f172a;
+    margin: 3mm 0 5mm 0;
+  }
+  .kpi-grid {
+    display: flex; flex-wrap: wrap; gap: 3mm;
+    margin: 3mm 0 5mm 0;
+  }
+  .kpi-card {
+    flex: 1 1 48mm; min-width: 48mm;
+    padding: 4mm 5mm;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    page-break-inside: avoid;
+  }
+  .kpi-card .kpi-label {
+    font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.08em;
+    font-weight: 600; color: #64748b; margin-bottom: 1.5mm;
+  }
+  .kpi-card .kpi-value {
+    font-family: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+    font-size: 15pt; font-weight: 700; color: #0f172a; line-height: 1.1;
+  }
+  .chart-block {
+    margin: 4mm 0 6mm 0;
+    page-break-inside: avoid;
+    text-align: center;
+  }
+  .chart-block .chart-title {
+    font-size: 9.5pt; font-weight: 600; color: #475569;
+    margin-bottom: 2mm; text-align: left;
+  }
+  .chart-block img {
+    max-width: 100%; height: auto;
+    border: 1px solid #e5e7eb; border-radius: 4px;
+    background: #fff;
+  }
   table.kv { width: 100%; border-collapse: collapse; margin-top: 2mm; }
   table.kv td {
     padding: 2.2mm 3mm; border-bottom: 1px solid #f1f5f9;
@@ -204,6 +244,35 @@
     {% if score %}<div class="score">{{ score }}</div>{% endif %}
     {% if verdict %}<div class="verdict-text">{{ verdict }}</div>{% endif %}
   </div>
+</div>
+{% endif %}
+
+{% if results %}
+<div class="section">
+  <span class="eyebrow">Vos résultats calculés</span>
+  <h2>Les chiffres de votre simulation</h2>
+  {% if headline %}<div class="headline">{{ headline }}</div>{% endif %}
+  <div class="kpi-grid">
+    {% for kpi in results %}
+    <div class="kpi-card">
+      <div class="kpi-label">{{ kpi.label }}</div>
+      <div class="kpi-value">{{ kpi.value }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if charts %}
+<div class="section">
+  <span class="eyebrow">Visualisation</span>
+  <h2>Votre scénario en image</h2>
+  {% for chart in charts %}
+  <div class="chart-block">
+    {% if chart.title %}<div class="chart-title">{{ chart.title }}</div>{% endif %}
+    <img src="{{ chart.data_url }}" alt="{{ chart.title|default:'Graphique' }}">
+  </div>
+  {% endfor %}
 </div>
 {% endif %}
 

@@ -281,6 +281,10 @@ class ReportSubmitView(View):
         report.user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
         report.save()
 
+        # Les graphiques (base64 lourds) ne sont pas persistés en DB :
+        # ils sont passés de façon transiente au service PDF.
+        transient_charts = getattr(form, '_transient_charts', None)
+
         # Mode de livraison : 'email' (défaut) ou 'download' (les deux).
         delivery = payload.get('delivery', 'email')
         if delivery not in ('email', 'download'):
@@ -294,7 +298,9 @@ class ReportSubmitView(View):
         #    prioritaire, une erreur email ne doit pas bloquer le téléchargement.
         if delivery == 'download':
             try:
-                pdf_bytes = SimulatorReportService.generate_pdf(report)
+                pdf_bytes = SimulatorReportService.generate_pdf(
+                    report, charts=transient_charts,
+                )
             except Exception as exc:  # noqa: BLE001
                 logger.error(
                     "Échec génération PDF rapport simulateur #%s : %s",
@@ -309,7 +315,9 @@ class ReportSubmitView(View):
 
         # 2) Envoi email (copie). On tolère un échec en mode download.
         try:
-            SimulatorReportService.send(report, pdf_bytes=pdf_bytes)
+            SimulatorReportService.send(
+                report, pdf_bytes=pdf_bytes, charts=transient_charts,
+            )
         except Exception as exc:  # noqa: BLE001
             email_ok = False
             email_error = str(exc)

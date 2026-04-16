@@ -48,8 +48,14 @@ class SimulatorReportForm(forms.ModelForm):
         snapshot = self.cleaned_data.get('snapshot') or {}
         if not isinstance(snapshot, dict):
             raise forms.ValidationError("Format de données invalide.")
-        # Limiter la taille (anti-abus payload).
+        # Les graphiques (base64) peuvent faire 100-500KB chacun.
+        # Cap global à 2 Mo (≈ 4 graphiques) — anti-abus payload.
         import json
-        if len(json.dumps(snapshot)) > 20_000:
+        if len(json.dumps(snapshot)) > 2_000_000:
             raise forms.ValidationError("Données trop volumineuses.")
+        # Stockage DB : on retire les charts (lourds) avant persistance,
+        # mais on les garde pour la génération PDF via un attribut transient.
+        charts = snapshot.pop('_charts', None) or snapshot.pop('charts', None)
+        if charts:
+            self._transient_charts = charts
         return snapshot

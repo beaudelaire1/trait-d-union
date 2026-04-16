@@ -334,17 +334,91 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
         return '';
       },
       collectSnapshot() {
+        let s = {};
         try {
           if (typeof window.__buildReportSnapshot === 'function') {
-            const s = window.__buildReportSnapshot() || {};
-            // Toujours enrichir avec les saisies utilisateur scrappées
-            const inputs = this.scrapeUserInputs();
-            if (inputs.length) s.user_inputs = inputs;
-            return s;
+            s = window.__buildReportSnapshot() || {};
           }
         } catch (e) { /* ignore */ }
-        // Fallback : pas de snapshot builder → on scrape au moins les saisies
-        return { user_inputs: this.scrapeUserInputs() };
+        // Toujours enrichir avec saisies + KPI affichés + graphiques
+        if (!s.user_inputs || !s.user_inputs.length) s.user_inputs = this.scrapeUserInputs();
+        if (!s.results || !s.results.length) s.results = this.scrapeResults();
+        if (!s.charts || !s.charts.length) s.charts = this.captureCharts();
+        return s;
+      },
+      scrapeResults() {
+        // Capture tous les KPI calculés affichés (label + valeur) sans
+        // dépendre du simulateur : cherche les blocs .result-block et les
+        // paires label/valeur explicites.
+        const results = [];
+        const seen = new Set();
+        const push = (label, value) => {
+          if (!label || !value) return;
+          label = label.replace(/\s+/g, ' ').trim().substring(0, 80);
+          value = value.replace(/\s+/g, ' ').trim().substring(0, 60);
+          if (!label || !value || value === '—' || value === '-') return;
+          const key = label + '::' + value;
+          if (seen.has(key)) return;
+          seen.add(key);
+          results.push({ label, value });
+        };
+        // Pattern 1 : blocs .result-block avec .result-label + .result-big
+        document.querySelectorAll('.result-block').forEach(block => {
+          if (!block.offsetParent) return;
+          const labels = block.querySelectorAll('.result-label');
+          const bigs = block.querySelectorAll('.result-big');
+          const n = Math.min(labels.length, bigs.length);
+          for (let i = 0; i < n; i++) {
+            push(labels[i].textContent, bigs[i].textContent);
+          }
+          // Pattern 1b : titre h3 + gros nombre affiché à côté
+          if (!n) {
+            const h = block.querySelector('h3');
+            const big = block.querySelector('[x-text]');
+            if (h && big) push(h.textContent, big.textContent);
+          }
+        });
+        // Pattern 2 : rangées "label : valeur" (flex justify-between)
+        document.querySelectorAll('.flex.justify-between').forEach(row => {
+          if (!row.offsetParent) return;
+          if (row.closest('#srm-modal, .srm-dialog, .srm-backdrop')) return;
+          const spans = row.querySelectorAll('span');
+          if (spans.length >= 2) {
+            push(spans[0].textContent, spans[spans.length - 1].textContent);
+          }
+        });
+        return results.slice(0, 30);
+      },
+      captureCharts() {
+        // Capture chaque instance Chart.js visible en PNG base64.
+        const out = [];
+        try {
+          if (!window.Chart || !window.Chart.instances) return out;
+          Object.values(window.Chart.instances).forEach(chart => {
+            try {
+              const canvas = chart && chart.canvas;
+              if (!canvas || !canvas.isConnected) return;
+              // Titre : chercher un h3 parent proche
+              let title = '';
+              const card = canvas.closest('.result-block, .tool-card, .chart-container');
+              const h = card && card.querySelector('h2, h3');
+              if (h) title = h.textContent.replace(/\s+/g, ' ').trim().substring(0, 80);
+              // Fond blanc (Chart.js transparent par défaut → illisible sur PDF blanc)
+              const w = canvas.width, hh = canvas.height;
+              const off = document.createElement('canvas');
+              off.width = w; off.height = hh;
+              const ctx = off.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, w, hh);
+              ctx.drawImage(canvas, 0, 0);
+              const dataUrl = off.toDataURL('image/png');
+              if (dataUrl && dataUrl.length < 600000) { // garde-fou 600KB
+                out.push({ title, data_url: dataUrl });
+              }
+            } catch (e) { /* ignore single chart failure */ }
+          });
+        } catch (e) { /* ignore */ }
+        return out.slice(0, 4);
       },
       scrapeUserInputs() {
         const results = [];

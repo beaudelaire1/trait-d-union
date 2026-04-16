@@ -14,7 +14,7 @@ from django.utils import timezone
 from core.services.document_generator import DocumentGenerator
 
 from .models import SimulatorReport
-from .report_content import get_content_for
+from .report_content import get_content_for, interpret
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +23,25 @@ class SimulatorReportService:
     """Génération + envoi du rapport PDF d'un simulateur."""
 
     @classmethod
-    def generate_pdf(cls, report: SimulatorReport) -> bytes:
+    def generate_pdf(
+        cls,
+        report: SimulatorReport,
+        *,
+        charts: list | None = None,
+    ) -> bytes:
         """Rend le template PDF générique et produit les bytes."""
         branding = DocumentGenerator.get_branding()
         snapshot = report.snapshot or {}
+        results = snapshot.get('results') or []
+        user_inputs = snapshot.get('user_inputs') or []
+
+        # Interprétation conditionnelle : bullets concrets basés sur les
+        # VRAIES valeurs saisies / calculées par l'utilisateur.
+        interpretation = interpret(
+            report.tool_slug,
+            user_inputs=user_inputs,
+            results=results,
+        )
 
         context = {
             'report': report,
@@ -35,11 +50,17 @@ class SimulatorReportService:
             'tool_slug': report.tool_slug,
             'snapshot': snapshot,
             # Champs pratiques si fournis par le front.
-            'verdict': snapshot.get('verdict'),
+            'verdict': snapshot.get('verdict') or interpretation.get('verdict'),
             'score': snapshot.get('score'),
             'sections': snapshot.get('sections', []),
-            'recommendations': snapshot.get('recommendations', []),
-            'user_inputs': snapshot.get('user_inputs', []),
+            'recommendations': (
+                snapshot.get('recommendations')
+                or interpretation.get('recommendations', [])
+            ),
+            'user_inputs': user_inputs,
+            'results': results,
+            'charts': charts or [],
+            'headline': interpretation.get('headline'),
             'strategic': get_content_for(report.tool_slug),
             'generated_at': timezone.now(),
         }
@@ -48,7 +69,13 @@ class SimulatorReportService:
         return DocumentGenerator._render_pdf(html)
 
     @classmethod
-    def send(cls, report: SimulatorReport, *, pdf_bytes: bytes | None = None) -> None:
+    def send(
+        cls,
+        report: SimulatorReport,
+        *,
+        pdf_bytes: bytes | None = None,
+        charts: list | None = None,
+    ) -> None:
         """Génère et envoie le rapport par email au lead.
 
         Accepte des ``pdf_bytes`` déjà générés pour éviter un double rendu
@@ -57,7 +84,7 @@ class SimulatorReportService:
         from django.core.mail import EmailMultiAlternatives
 
         if pdf_bytes is None:
-            pdf_bytes = cls.generate_pdf(report)
+            pdf_bytes = cls.generate_pdf(report, charts=charts)
 
         context = {
             'report': report,
