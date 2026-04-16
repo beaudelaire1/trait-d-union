@@ -336,10 +336,45 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
       collectSnapshot() {
         try {
           if (typeof window.__buildReportSnapshot === 'function') {
-            return window.__buildReportSnapshot() || {};
+            const s = window.__buildReportSnapshot() || {};
+            // Toujours enrichir avec les saisies utilisateur scrappées
+            const inputs = this.scrapeUserInputs();
+            if (inputs.length) s.user_inputs = inputs;
+            return s;
           }
         } catch (e) { /* ignore */ }
-        return {};
+        // Fallback : pas de snapshot builder → on scrape au moins les saisies
+        return { user_inputs: this.scrapeUserInputs() };
+      },
+      scrapeUserInputs() {
+        const results = [];
+        const selector = 'input[type=number], input[type=text], input:not([type]), select, textarea';
+        const seen = new Set();
+        document.querySelectorAll(selector).forEach(el => {
+          // Visible + avec valeur + pas honeypot
+          if (!el.offsetParent && el.type !== 'hidden') return;
+          if (el.getAttribute('aria-hidden') === 'true') return;
+          if (el.closest('#srm-modal, .srm-dialog, .srm-backdrop')) return;
+          const raw = (el.value || '').toString().trim();
+          if (!raw) return;
+          // Label associé
+          let label = '';
+          if (el.id) {
+            const lbl = document.querySelector(`label[for="${CSS.escape(el.id)}"]`);
+            if (lbl) label = lbl.textContent.trim();
+          }
+          if (!label) {
+            const parentLabel = el.closest('label');
+            if (parentLabel) label = parentLabel.textContent.replace(raw, '').trim();
+          }
+          if (!label) label = el.getAttribute('aria-label') || el.name || '';
+          label = (label || 'Champ').replace(/\s+/g, ' ').substring(0, 80);
+          const key = label + '::' + raw;
+          if (seen.has(key)) return;
+          seen.add(key);
+          results.push({ label, value: raw });
+        });
+        return results.slice(0, 24); // garde-fou
       },
       triggerDownload(base64, filename) {
         try {

@@ -14,6 +14,7 @@ from django.utils import timezone
 from core.services.document_generator import DocumentGenerator
 
 from .models import SimulatorReport
+from .report_content import get_content_for
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,8 @@ class SimulatorReportService:
             'score': snapshot.get('score'),
             'sections': snapshot.get('sections', []),
             'recommendations': snapshot.get('recommendations', []),
+            'user_inputs': snapshot.get('user_inputs', []),
+            'strategic': get_content_for(report.tool_slug),
             'generated_at': timezone.now(),
         }
 
