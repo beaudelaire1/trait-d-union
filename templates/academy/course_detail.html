@@ -93,7 +93,7 @@
                       {% for resource in lesson.resources %}
                         <li>
                           <a href="{{ resource.url }}" target="_blank" 
-                             class="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center">
+                             class="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center" rel="noopener noreferrer">
                             📥 {{ resource.title }}
                           </a>
                         </li>
@@ -155,7 +155,7 @@
                 </p>
                 {% if enrollment.certificate_url %}
                   <a href="{{ enrollment.certificate_url }}" target="_blank" 
-                     class="text-green-600 hover:text-green-700 font-semibold text-sm mt-2 inline-block">
+                     class="text-green-600 hover:text-green-700 font-semibold text-sm mt-2 inline-block" rel="noopener noreferrer">
                     Télécharger →
                   </a>
                 {% endif %}

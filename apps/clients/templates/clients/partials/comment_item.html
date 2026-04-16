@@ -21,7 +21,7 @@
             {{ comment.message|linebreaks }}
         </div>
         {% if comment.attachment %}
-        <a href="{{ comment.attachment.url }}" target="_blank" class="comment-attachment">
+        <a href="{{ comment.attachment.url }}" target="_blank" class="comment-attachment" rel="noopener noreferrer">
             📎 Pièce jointe
         </a>
         {% endif %}

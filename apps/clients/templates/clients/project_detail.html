@@ -212,7 +212,7 @@
             {% if documents %}
             <div class="documents-grid">
                 {% for doc in documents %}
-                <a href="{{ doc.file.url }}" target="_blank" class="doc-card glass-card">
+                <a href="{{ doc.file.url }}" target="_blank" class="doc-card glass-card" rel="noopener noreferrer">
                     <div class="doc-preview">
                         {% if doc.is_image %}<img src="{{ doc.file.url }}" alt="{{ doc.title }}" loading="lazy">
                         {% else %}<span class="doc-ext">.{{ doc.file_extension }}</span>{% endif %}
@@ -267,7 +267,7 @@
                                 <span class="time">{{ comment.created_at|date:"d/m H:i" }}</span>
                             </div>
                             <div class="comment-text">{{ comment.message|linebreaks }}</div>
-                            {% if comment.attachment %}<a href="{{ comment.attachment.url }}" class="attachment" target="_blank">📎 Pièce jointe</a>{% endif %}
+                            {% if comment.attachment %}<a href="{{ comment.attachment.url }}" class="attachment" target="_blank" rel="noopener noreferrer">📎 Pièce jointe</a>{% endif %}
                         </div>
                     </div>
                     {% empty %}

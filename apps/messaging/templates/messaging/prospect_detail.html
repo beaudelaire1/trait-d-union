@@ -50,7 +50,7 @@
                         <div>
                             <p class="text-tus-white/60 text-sm">Site web</p>
                             {% if prospect.website %}
-                            <a href="{{ prospect.website }}" target="_blank" class="text-tus-blue-a11y hover:underline">{{ prospect.website }}</a>
+                            <a href="{{ prospect.website }}" target="_blank" class="text-tus-blue-a11y hover:underline" rel="noopener noreferrer">{{ prospect.website }}</a>
                             {% else %}
                             <p class="text-tus-white">-</p>
                             {% endif %}
@@ -203,7 +203,7 @@
                         </a>
                         {% endif %}
                         {% if prospect.website %}
-                        <a href="{{ prospect.website }}" target="_blank" class="block w-full px-4 py-2 text-center bg-tus-black border border-tus-white/10 rounded-lg text-tus-white hover:bg-tus-white/5 transition">
+                        <a href="{{ prospect.website }}" target="_blank" class="block w-full px-4 py-2 text-center bg-tus-black border border-tus-white/10 rounded-lg text-tus-white hover:bg-tus-white/5 transition" rel="noopener noreferrer">
                             🌐 Visiter le site
                         </a>
                         {% endif %}
