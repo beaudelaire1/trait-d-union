@@ -419,9 +419,11 @@ CONTENT_SECURITY_POLICY = {
         ],
         "style-src": [
             "'self'",
+            _CSP_NONCE,
             "https://fonts.googleapis.com",
             "https://cdn.jsdelivr.net",
         ],
+        "style-src-attr": ["'unsafe-inline'"],
         "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
         "img-src": [
             "'self'",
