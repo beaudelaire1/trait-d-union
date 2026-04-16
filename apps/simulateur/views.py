@@ -285,35 +285,66 @@ class ReportSubmitView(View):
             delivery = 'email'
 
         pdf_bytes: bytes | None = None
-        try:
-            if delivery == 'download':
-                # Génère le PDF (réutilisé pour la pièce jointe email).
+        email_ok = True
+        email_error: str | None = None
+
+        # 1) En mode download, on génère d'abord le PDF — c'est la livraison
+        #    prioritaire, une erreur email ne doit pas bloquer le téléchargement.
+        if delivery == 'download':
+            try:
                 pdf_bytes = SimulatorReportService.generate_pdf(report)
+            except Exception as exc:  # noqa: BLE001
+                logger.error(
+                    "Échec génération PDF rapport simulateur #%s : %s",
+                    report.pk, exc, exc_info=True,
+                )
+                return JsonResponse(
+                    {'ok': False,
+                     'message': "Nous n'avons pas pu générer le PDF. "
+                                'Réessayez ou contactez-nous.'},
+                    status=500,
+                )
+
+        # 2) Envoi email (copie). On tolère un échec en mode download.
+        try:
             SimulatorReportService.send(report, pdf_bytes=pdf_bytes)
         except Exception as exc:  # noqa: BLE001
+            email_ok = False
+            email_error = str(exc)
             logger.error(
-                "Échec envoi rapport simulateur #%s : %s",
+                "Échec envoi email rapport simulateur #%s : %s",
                 report.pk, exc, exc_info=True,
             )
-            return JsonResponse(
-                {'ok': False,
-                 'message': "Nous n'avons pas pu générer le rapport. "
-                            'Réessayez ou contactez-nous.'},
-                status=500,
-            )
+            if delivery == 'email':
+                # Sans PDF en main, l'utilisateur n'a rien — on remonte l'erreur.
+                return JsonResponse(
+                    {'ok': False,
+                     'message': "Nous n'avons pas pu envoyer le rapport. "
+                                'Réessayez ou contactez-nous.'},
+                    status=500,
+                )
 
         response: dict[str, Any] = {
             'ok': True,
-            'message': 'Votre rapport a été envoyé. Vérifiez votre boîte mail '
-                       '(pensez à regarder dans les spams).',
             'delivery': delivery,
         }
         if delivery == 'download' and pdf_bytes is not None:
             import base64
             response['pdf_base64'] = base64.b64encode(pdf_bytes).decode('ascii')
             response['filename'] = f"rapport_{report.tool_slug or 'simulateur'}.pdf"
+            if email_ok:
+                response['message'] = (
+                    "Téléchargement prêt. Une copie a aussi été envoyée par email."
+                )
+            else:
+                response['message'] = (
+                    "Téléchargement prêt. (La copie email n'a pas pu partir, "
+                    "mais vous avez le PDF.)"
+                )
+        else:
             response['message'] = (
-                "Téléchargement prêt. Une copie a aussi été envoyée par email."
+                'Votre rapport a été envoyé. Vérifiez votre boîte mail '
+                '(pensez à regarder dans les spams).'
             )
         return JsonResponse(response)
 

@@ -385,7 +385,11 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
             this.error = data.message || 'Une erreur est survenue. Réessayez.';
           } else {
             if (data.pdf_base64) {
-              this.triggerDownload(data.pdf_base64, data.filename);
+              const ok = this.triggerDownload(data.pdf_base64, data.filename);
+              if (!ok) {
+                this.error = "Le téléchargement a été bloqué par votre navigateur. Vérifiez les autorisations ou utilisez l'envoi par email.";
+                return;
+              }
             }
             this.success = true;
             this.successMessage = data.message || 'Votre rapport vous a été envoyé.';
