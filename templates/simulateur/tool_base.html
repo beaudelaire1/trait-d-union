@@ -444,6 +444,54 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" nonce="{{ request.csp_nonce }}" integrity="sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC" crossorigin="anonymous"></script>
 <script nonce="{{ request.csp_nonce }}">
+    /* ── Chart.js readiness watchdog + safety net ──
+       Garantit qu'un composant Alpine appelant `new Chart(...)` ne plante jamais
+       silencieusement si Chart.js tarde à se charger ou si l'ordre d'exécution
+       varie entre navigateurs. Expose window.whenChartReady(cb) et relance
+       automatiquement `updateChart()` sur tous les composants Alpine après
+       window.load si un canvas est resté vide. */
+    (function() {
+        var readyCallbacks = [];
+        var ready = !!window.Chart;
+        window.whenChartReady = function(cb) {
+            if (ready) { try { cb(); } catch (e) { console.error('[chart-ready]', e); } }
+            else readyCallbacks.push(cb);
+        };
+        function flush() {
+            if (ready) return;
+            if (!window.Chart) return;
+            ready = true;
+            readyCallbacks.splice(0).forEach(function(cb) {
+                try { cb(); } catch (e) { console.error('[chart-ready]', e); }
+            });
+        }
+        if (!ready) {
+            // Poll every 50ms for up to 5s in case of deferred/blocked load.
+            var tries = 0;
+            var iv = setInterval(function() {
+                tries++;
+                if (window.Chart) { clearInterval(iv); flush(); }
+                else if (tries > 100) { clearInterval(iv); console.warn('[chart-ready] Chart.js not available after 5s'); }
+            }, 50);
+        }
+        // Safety net: after window.load, if any canvas has no Chart instance attached,
+        // trigger updateChart() on the nearest Alpine component that defines it.
+        window.addEventListener('load', function() {
+            if (!window.Chart) return;
+            document.querySelectorAll('canvas').forEach(function(cv) {
+                try {
+                    if (window.Chart.getChart && window.Chart.getChart(cv)) return; // already has a chart
+                    var host = cv.closest('[x-data]');
+                    if (!host || !window.Alpine) return;
+                    var data = window.Alpine.$data(host);
+                    if (data && typeof data.updateChart === 'function') {
+                        data.updateChart();
+                    }
+                } catch (e) { console.warn('[chart-safety-net]', e); }
+            });
+        });
+    })();
+
     // Écouteur global pour mettre à jour les graphiques à la volée
     document.addEventListener('theme-changed', function(e) {
         if (!window.Chart || !window.Chart.instances) return;
