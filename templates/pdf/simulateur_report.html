@@ -1,9 +1,19 @@
-{% load static %}<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rapport {{ tool_name }}</title>
 <style>
+  :root {
+    --tus-ink: #07080a;
+    --tus-paper: #f6f7fb;
+    --tus-blue: #0b2dff;
+    --tus-green: #22c55e;
+    --tus-slate: #0f172a;
+    --tus-muted: #64748b;
+    --tus-line: #dbe4f0;
+  }
   @page {
     size: A4;
     margin: 16mm 14mm 20mm 14mm;
@@ -29,46 +39,185 @@
     letter-spacing: -0.01em;
   }
   .cover {
-    padding: 14mm 10mm 10mm 10mm;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    position: relative;
+    overflow: hidden;
+    min-height: 244mm;
+    padding: 16mm 12mm 12mm 12mm;
+    background: linear-gradient(140deg, var(--tus-ink) 0%, #0c1323 48%, #162a55 100%);
     color: #fff;
-    border-radius: 6px;
+    border-radius: 8px;
+    border: 1px solid rgba(246, 247, 251, 0.08);
     margin-bottom: 14mm;
     page-break-after: always;
   }
-  .cover .brand {
-    font-size: 9pt; font-weight: 600;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: #94a3b8;
-    margin-bottom: 30mm;
+  .cover-orb {
+    position: absolute;
+    border-radius: 50%;
+  }
+  .cover-orb--blue {
+    width: 98mm;
+    height: 98mm;
+    top: -28mm;
+    right: -24mm;
+    background: radial-gradient(circle, rgba(11, 45, 255, 0.5) 0%, rgba(11, 45, 255, 0) 72%);
+  }
+  .cover-orb--green {
+    width: 72mm;
+    height: 72mm;
+    right: 18mm;
+    bottom: 28mm;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.18) 0%, rgba(34, 197, 94, 0) 74%);
+  }
+  .cover-grid {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 10mm;
+    align-items: stretch;
+  }
+  .cover-main {
+    flex: 1 1 122mm;
+  }
+  .cover-aside {
+    width: 58mm;
+    display: flex;
+    flex-direction: column;
+    gap: 4mm;
+  }
+  .cover-edition {
+    font-size: 7.2pt;
+    font-weight: 700;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(246, 247, 251, 0.62);
+    margin-bottom: 8mm;
+  }
+  .cover-logo {
+    width: 88mm;
+    margin-bottom: 8mm;
+  }
+  .cover-logo svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .cover-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2mm;
+    margin-bottom: 6mm;
+  }
+  .cover-pill {
+    display: inline-block;
+    padding: 1.8mm 3.2mm;
+    border-radius: 999px;
+    background: rgba(246, 247, 251, 0.08);
+    border: 1px solid rgba(246, 247, 251, 0.14);
+    color: var(--tus-paper);
+    font-size: 7.6pt;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .cover-pill--accent {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.28);
+    color: #9ff0bc;
   }
   .cover h1 {
-    color: #fff; font-size: 30pt; line-height: 1.1;
-    font-weight: 700; margin-bottom: 6mm;
+    color: #fff;
+    font-size: 30pt;
+    line-height: 1.04;
+    font-weight: 700;
+    margin-bottom: 6mm;
+    max-width: 122mm;
   }
   .cover .subtitle {
-    font-size: 12pt; color: #cbd5e1; line-height: 1.5;
-    margin-bottom: 20mm; max-width: 140mm;
+    font-size: 12pt;
+    color: #d9e1ef;
+    line-height: 1.62;
+    margin-bottom: 8mm;
+    max-width: 122mm;
   }
-  .cover .meta {
-    border-top: 1px solid rgba(255,255,255,0.15);
-    padding-top: 6mm; margin-top: 20mm;
-    display: flex; gap: 8mm;
+  .cover-highlight {
+    max-width: 118mm;
+    padding: 5mm 5.5mm;
+    border-radius: 6px;
+    background: rgba(246, 247, 251, 0.06);
+    border: 1px solid rgba(246, 247, 251, 0.12);
   }
-  .cover .meta-block { flex: 1; }
-  .cover .meta-label {
-    font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.12em;
-    color: #94a3b8; margin-bottom: 1.5mm;
+  .cover-highlight-label {
+    font-size: 7.3pt;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #8fa2d5;
+    margin-bottom: 2mm;
   }
-  .cover .meta-value { font-size: 10pt; font-weight: 600; color: #fff; }
-  .cover .tag {
-    display: inline-block; padding: 2mm 4mm;
-    background: rgba(167, 243, 208, 0.15);
-    color: #6ee7b7;
-    border: 1px solid rgba(167, 243, 208, 0.3);
-    border-radius: 20px;
-    font-size: 8.5pt; font-weight: 600; letter-spacing: 0.05em;
-    margin-bottom: 6mm;
+  .cover-highlight-text {
+    margin: 0;
+    color: #edf2fb;
+    font-size: 10.2pt;
+    line-height: 1.65;
+  }
+  .cover-panel {
+    padding: 4.5mm;
+    border-radius: 5px;
+    background: rgba(246, 247, 251, 0.05);
+    border: 1px solid rgba(246, 247, 251, 0.12);
+  }
+  .cover-panel--accent {
+    background: linear-gradient(145deg, rgba(11, 45, 255, 0.2) 0%, rgba(246, 247, 251, 0.06) 100%);
+    border-color: rgba(11, 45, 255, 0.25);
+  }
+  .cover-panel-label {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(246, 247, 251, 0.56);
+    margin-bottom: 1.6mm;
+  }
+  .cover-panel-value {
+    font-size: 10.3pt;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.45;
+  }
+  .cover-panel-value-soft {
+    margin-top: 1mm;
+    font-size: 9pt;
+    color: rgba(246, 247, 251, 0.74);
+  }
+  .cover-panel-copy {
+    margin: 0;
+    color: #dde6f5;
+    font-size: 9.3pt;
+    line-height: 1.62;
+  }
+  .cover-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 5mm;
+    margin-top: 12mm;
+    padding-top: 5mm;
+    border-top: 1px solid rgba(246, 247, 251, 0.14);
+  }
+  .cover-footer-card {
+    flex: 1 1 0;
+  }
+  .cover-footer-label {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: rgba(246, 247, 251, 0.5);
+    margin-bottom: 1.5mm;
+  }
+  .cover-footer-value {
+    color: #fff;
+    font-size: 9.8pt;
+    font-weight: 600;
+    line-height: 1.4;
   }
   .section { margin-bottom: 10mm; page-break-inside: avoid; }
   .section h2 {
@@ -125,17 +274,71 @@
     font-size: 15pt; font-weight: 700; color: #0f172a; line-height: 1.1;
   }
   .chart-block {
-    margin: 4mm 0 6mm 0;
+    margin: 4mm 0 7mm 0;
     page-break-inside: avoid;
-    text-align: center;
+  }
+  .chart-card {
+    padding: 5mm;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+  }
+  .chart-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 4mm; margin-bottom: 3mm;
+  }
+  .chart-kicker {
+    font-size: 7pt; text-transform: uppercase; letter-spacing: 0.16em;
+    color: #0f766e; font-weight: 700; margin-bottom: 1.5mm;
   }
   .chart-block .chart-title {
-    font-size: 9.5pt; font-weight: 600; color: #475569;
-    margin-bottom: 2mm; text-align: left;
+    font-size: 11pt; font-weight: 600; color: #0f172a;
+    text-align: left;
+  }
+  .chart-index {
+    display: inline-block;
+    padding: 1.4mm 2.8mm;
+    background: #eef2ff;
+    color: #334155;
+    border-radius: 999px;
+    font-size: 7.5pt;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .chart-meta {
+    display: flex; flex-wrap: wrap; gap: 2mm;
+    margin-bottom: 3mm;
+  }
+  .chart-chip {
+    display: inline-block;
+    padding: 1.4mm 2.8mm;
+    border-radius: 999px;
+    background: #ecfeff;
+    border: 1px solid #bae6fd;
+    color: #164e63;
+    font-size: 7.5pt;
+    font-weight: 600;
+  }
+  .chart-chip--soft {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+  }
+  .chart-frame {
+    padding: 3mm;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #dbe4f0;
+    border-radius: 4px;
+  }
+  .chart-caption {
+    font-size: 8.2pt;
+    color: #64748b;
+    margin-top: 2.5mm;
+    line-height: 1.5;
   }
   .chart-block img {
-    max-width: 100%; height: auto;
-    border: 1px solid #e5e7eb; border-radius: 4px;
+    max-width: 100%; height: auto; display: block;
+    border-radius: 3px;
     background: #fff;
   }
   table.kv { width: 100%; border-collapse: collapse; margin-top: 2mm; }
@@ -190,22 +393,131 @@
     font-style: italic; font-size: 10.5pt; line-height: 1.55;
     border-left: 4px solid #6ee7b7;
   }
+  .muted-note {
+    color: var(--tus-muted);
+    margin-bottom: 3mm;
+  }
+  .inline-unit {
+    color: #94a3b8;
+    font-weight: 400;
+  }
+  .journey-intro {
+    color: var(--tus-muted);
+    margin-bottom: 4mm;
+  }
+  .journey-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--tus-line);
+  }
+  .journey-step {
+    padding: 4mm 0 4.5mm 0;
+    border-bottom: 1px solid var(--tus-line);
+    page-break-inside: avoid;
+  }
+  .journey-step-label {
+    font-size: 7.1pt;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--tus-green);
+    margin-bottom: 1.8mm;
+  }
+  .journey-step-text {
+    font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--tus-slate);
+    font-size: 11pt;
+    font-weight: 500;
+    line-height: 1.48;
+    letter-spacing: -0.01em;
+  }
   .cta {
-    margin-top: 10mm; padding: 7mm 8mm;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    color: #fff; border-radius: 6px; page-break-inside: avoid;
+    margin-top: 10mm;
+    background: linear-gradient(145deg, var(--tus-ink) 0%, #10172e 100%);
+    color: #fff;
+    border-radius: 8px;
+    border: 1px solid rgba(11, 45, 255, 0.16);
+    page-break-inside: avoid;
+    overflow: hidden;
+  }
+  .cta-grid {
+    display: flex;
+    align-items: stretch;
   }
   .cta .cta-eyebrow {
     font-size: 7.5pt; letter-spacing: 0.2em; text-transform: uppercase;
-    color: #6ee7b7; margin-bottom: 2mm;
+    color: var(--tus-green); margin-bottom: 2mm;
   }
-  .cta h3 { color: #fff; font-size: 15pt; margin-bottom: 3mm; }
-  .cta p { color: #cbd5e1; margin-bottom: 4mm; font-size: 10.5pt; line-height: 1.55; }
+  .cta-main {
+    flex: 1 1 116mm;
+    padding: 8mm 8mm 7mm 8mm;
+  }
+  .cta-panel {
+    width: 58mm;
+    padding: 8mm 7mm;
+    background: linear-gradient(145deg, rgba(11, 45, 255, 0.18) 0%, rgba(246, 247, 251, 0.05) 100%);
+    border-left: 1px solid rgba(246, 247, 251, 0.08);
+  }
+  .cta h3 { color: #fff; font-size: 16pt; margin-bottom: 3mm; }
+  .cta p { color: #cbd5e1; margin-bottom: 4mm; font-size: 10.5pt; line-height: 1.62; }
+  .cta-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2mm;
+    margin-top: 4mm;
+  }
+  .cta-chip {
+    display: inline-block;
+    padding: 1.5mm 2.8mm;
+    border-radius: 999px;
+    border: 1px solid rgba(246, 247, 251, 0.14);
+    color: #f8fafc;
+    font-size: 7.4pt;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .cta-panel-title {
+    font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    color: #fff;
+    font-size: 10.5pt;
+    font-weight: 600;
+    margin-bottom: 3mm;
+  }
+  .cta-list {
+    margin: 0 0 5mm 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cta-list li {
+    position: relative;
+    padding-left: 5mm;
+    margin-bottom: 2.5mm;
+    color: #dbeafe;
+    font-size: 9.3pt;
+    line-height: 1.52;
+  }
+  .cta-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 1.9mm;
+    width: 2mm;
+    height: 2mm;
+    border-radius: 50%;
+    background: var(--tus-green);
+  }
   .cta .cta-contact {
     padding-top: 4mm; border-top: 1px solid rgba(255,255,255,0.12);
     font-size: 10pt; color: #fff;
+    line-height: 1.72;
   }
-  .cta .cta-contact strong { color: #6ee7b7; }
+  .cta .cta-contact strong { color: var(--tus-green); }
+  .cta-contact-subline {
+    color: #94a3b8;
+    font-size: 9pt;
+  }
   .footer-legal {
     margin-top: 15mm; padding-top: 5mm;
     border-top: 1px solid #e5e7eb;
@@ -216,22 +528,69 @@
 <body>
 
 <div class="cover">
-  <div class="brand">{{ branding.name|default:"Trait d'Union Studio" }}  ·  {{ strategic.category|default:"Diagnostic stratégique" }}</div>
-  <span class="tag">Rapport personnalisé</span>
-  <h1>{{ tool_name }}</h1>
-  <p class="subtitle">{{ strategic.measures }}</p>
-  <div class="meta">
-    <div class="meta-block">
-      <div class="meta-label">Préparé pour</div>
-      <div class="meta-value">{{ report.name|default:report.email }}{% if report.company %}<br><span style="color:#94a3b8; font-weight:400;">{{ report.company }}</span>{% endif %}</div>
+  <div class="cover-orb cover-orb--blue"></div>
+  <div class="cover-orb cover-orb--green"></div>
+  <div class="cover-grid">
+    <div class="cover-main">
+      <div class="cover-edition">Rapport confidentiel · {{ strategic.category|default:"Diagnostic stratégique" }}</div>
+      <div class="cover-logo" aria-label="Trait d'Union Studio">
+        <svg viewBox="0 0 520 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Trait d’Union Studio">
+          <defs>
+            <linearGradient id="tusGradNavStrongPdf" x1="0" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#0B2DFF"/>
+              <stop offset="0.62" stop-color="#2D5BFF"/>
+              <stop offset="1" stop-color="#F6F7FB"/>
+            </linearGradient>
+          </defs>
+          <text x="0" y="54" font-family="Space Grotesk, Arial, sans-serif" font-size="44" font-weight="700" letter-spacing="1.1" fill="#F6F7FB">TRAIT D’UNION</text>
+          <rect x="0" y="69" width="240" height="6" rx="3" fill="url(#tusGradNavStrongPdf)"/>
+          <text x="0" y="106" font-family="Space Grotesk, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="4" fill="rgba(246,247,251,0.82)">STUDIO</text>
+        </svg>
+      </div>
+      <div class="cover-pills">
+        <span class="cover-pill cover-pill--accent">Rapport personnalisé</span>
+        <span class="cover-pill">Livret d'aide à la décision</span>
+      </div>
+      <h1>{{ tool_name }}</h1>
+      <p class="subtitle">{{ strategic.measures }}</p>
+      <div class="cover-highlight">
+        <div class="cover-highlight-label">Ce que vous allez lire</div>
+        <p class="cover-highlight-text">Un diagnostic lisible, des chiffres immédiatement partageables, et un plan d'action en 5 temps pour passer de l'intuition à la décision.</p>
+      </div>
     </div>
-    <div class="meta-block">
-      <div class="meta-label">Généré le</div>
-      <div class="meta-value">{{ generated_at|date:"d F Y" }}<br><span style="color:#94a3b8; font-weight:400;">{{ generated_at|date:"H\hi" }}</span></div>
+    <div class="cover-aside">
+      <div class="cover-panel cover-panel--accent">
+        <div class="cover-panel-label">Préparé pour</div>
+        <div class="cover-panel-value">{{ report.name|default:report.email }}</div>
+        {% if report.company %}<div class="cover-panel-value-soft">{{ report.company }}</div>{% endif %}
+      </div>
+      <div class="cover-panel">
+        <div class="cover-panel-label">Généré le</div>
+        <div class="cover-panel-value">{{ generated_at|date:"d F Y" }}</div>
+        <div class="cover-panel-value-soft">{{ generated_at|date:"H\hi" }}</div>
+      </div>
+      <div class="cover-panel">
+        <div class="cover-panel-label">Référence</div>
+        <div class="cover-panel-value">TUS-{{ report.pk|default:"—" }}-{{ generated_at|date:"Y" }}</div>
+      </div>
+      <div class="cover-panel">
+        <div class="cover-panel-label">Promesse du livret</div>
+        <p class="cover-panel-copy">Faire émerger le bon levier, le bon rythme d'action et les arbitrages à poser maintenant.</p>
+      </div>
     </div>
-    <div class="meta-block">
-      <div class="meta-label">Référence</div>
-      <div class="meta-value">TUS-{{ report.pk|default:"—" }}-{{ generated_at|date:"Y" }}</div>
+  </div>
+  <div class="cover-footer">
+    <div class="cover-footer-card">
+      <div class="cover-footer-label">Catégorie</div>
+      <div class="cover-footer-value">{{ strategic.category|default:"Diagnostic stratégique" }}</div>
+    </div>
+    <div class="cover-footer-card">
+      <div class="cover-footer-label">Format</div>
+      <div class="cover-footer-value">Livret premium PDF</div>
+    </div>
+    <div class="cover-footer-card">
+      <div class="cover-footer-label">Statut</div>
+      <div class="cover-footer-value">Document confidentiel</div>
     </div>
   </div>
 </div>
@@ -269,8 +628,26 @@
   <h2>Votre scénario en image</h2>
   {% for chart in charts %}
   <div class="chart-block">
-    {% if chart.title %}<div class="chart-title">{{ chart.title }}</div>{% endif %}
-    <img src="{{ chart.data_url }}" alt="{{ chart.title|default:'Graphique' }}">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <div class="chart-kicker">Graphique clé</div>
+          {% if chart.title %}<div class="chart-title">{{ chart.title }}</div>{% endif %}
+        </div>
+        <span class="chart-index">Graphique {{ forloop.counter }}</span>
+      </div>
+      {% if chart.x_label or chart.y_label or chart.series %}
+      <div class="chart-meta">
+        {% if chart.x_label %}<span class="chart-chip">Axe X · {{ chart.x_label }}</span>{% endif %}
+        {% if chart.y_label %}<span class="chart-chip">Axe Y · {{ chart.y_label }}</span>{% endif %}
+        {% for serie in chart.series %}<span class="chart-chip chart-chip--soft">{{ serie }}</span>{% endfor %}
+      </div>
+      {% endif %}
+      <div class="chart-frame">
+        <img src="{{ chart.data_url }}" alt="{{ chart.title|default:'Graphique' }}">
+      </div>
+      <div class="chart-caption">Version export haute lisibilité, avec axes, graduations et légende conservés pour l'impression client.</div>
+    </div>
   </div>
   {% endfor %}
 </div>
@@ -284,7 +661,7 @@
   {% if section.items %}
   <table class="kv">
     {% for item in section.items %}
-    <tr><td>{{ item.label }}</td><td>{{ item.value }}{% if item.unit %} <span style="color:#94a3b8; font-weight:400;">{{ item.unit }}</span>{% endif %}</td></tr>
+    <tr><td>{{ item.label }}</td><td>{{ item.value }}{% if item.unit %} <span class="inline-unit">{{ item.unit }}</span>{% endif %}</td></tr>
     {% endfor %}
   </table>
   {% endif %}
@@ -301,7 +678,7 @@
 <div class="section">
   <span class="eyebrow">Vos hypothèses</span>
   <h2>Les données que vous avez saisies</h2>
-  <p style="color:#64748b; margin-bottom:3mm;">Gardez-les pour refaire la simulation avec des chiffres ajustés dans 30 jours.</p>
+  <p class="muted-note">Gardez-les pour refaire la simulation avec des chiffres ajustés dans 30 jours.</p>
   <table class="kv">
     {% for item in user_inputs %}
     <tr><td>{{ item.label }}</td><td>{{ item.value }}</td></tr>
@@ -314,9 +691,7 @@
 <div class="section">
   <span class="eyebrow">Priorités</span>
   <h2>Pistes d'action prioritaires</h2>
-  <ul class="steps">
-    {% for reco in recommendations %}<li>{{ reco }}</li>{% endfor %}
-  </ul>
+  <ul class="steps">{% for reco in recommendations %}<li>{{ reco }}</li>{% endfor %}</ul>
 </div>
 {% endif %}
 
@@ -324,10 +699,8 @@
 <div class="section">
   <span class="eyebrow">Pour aller plus loin</span>
   <h2>3 questions à vous poser cette semaine</h2>
-  <p style="color:#64748b;">Les meilleurs diagnostics déclenchent les bonnes questions. Prenez 15&nbsp;minutes pour celles-ci — seul·e, ou avec un pair.</p>
-  <ul class="questions">
-    {% for q in strategic.questions %}<li>{{ q }}</li>{% endfor %}
-  </ul>
+  <p class="muted-note">Les meilleurs diagnostics déclenchent les bonnes questions. Prenez 15&nbsp;minutes pour celles-ci — seul·e, ou avec un pair.</p>
+  <ul class="questions">{% for q in strategic.questions %}<li>{{ q }}</li>{% endfor %}</ul>
 </div>
 {% endif %}
 
@@ -335,9 +708,8 @@
 <div class="section">
   <span class="eyebrow">Plan d'action</span>
   <h2>5 étapes concrètes pour transformer ce diagnostic</h2>
-  <ul class="steps">
-    {% for s in strategic.next_steps %}<li>{{ s }}</li>{% endfor %}
-  </ul>
+  <p class="journey-intro">Voici la séquence recommandée pour traduire ce rapport en décisions visibles, dans le bon ordre et sans dispersion.</p>
+  <ul class="journey-steps">{% for s in strategic.next_steps %}<li class="journey-step"><div class="journey-step-label">Étape {{ forloop.counter }}</div><div class="journey-step-text">{{ s }}</div></li>{% endfor %}</ul>
 </div>
 {% endif %}
 
@@ -348,13 +720,27 @@
 {% endif %}
 
 <div class="cta">
-  <div class="cta-eyebrow">Et maintenant&nbsp;?</div>
-  <h3>Passez du diagnostic au système</h3>
-  <p>Ce rapport éclaire une zone. Pour en faire un plan d'action ajusté à votre situation — votre équipe, votre marché, votre énergie — un échange de 30&nbsp;minutes suffit souvent pour poser les 3 bonnes priorités.</p>
-  <div class="cta-contact">
-    <strong>Parlons-en</strong> &nbsp;·&nbsp;
-    {{ branding.email|default:"contact@traitdunion.it" }}{% if branding.phone %} &nbsp;·&nbsp; {{ branding.phone }}{% endif %}<br>
-    <span style="color:#94a3b8; font-size:9pt;">{{ branding.website|default:"traitdunion.it" }}</span>
+  <div class="cta-grid">
+    <div class="cta-main">
+      <div class="cta-eyebrow">Et maintenant&nbsp;?</div>
+      <h3>Passez du diagnostic au système</h3>
+      <p>Ce rapport éclaire une zone. Pour en faire un plan d'action ajusté à votre réalité — votre équipe, votre marché, votre capacité d'exécution — un échange de 30&nbsp;minutes suffit souvent pour poser les 3 bonnes priorités.</p>
+      <div class="cta-chips">
+        <span class="cta-chip">30 min</span>
+        <span class="cta-chip">Vision claire</span>
+        <span class="cta-chip">Priorités activables</span>
+        <span class="cta-chip">Feuille de route</span>
+      </div>
+    </div>
+    <div class="cta-panel">
+      <div class="cta-panel-title">Ce que vous obtenez à l'issue de l'échange</div>
+      <ul class="cta-list"><li>Le levier à travailler en premier, pas le plus bruyant.</li><li>Un arbitrage concret entre croissance, marge et charge mentale.</li><li>Une prochaine action réaliste à enclencher sous 7 jours.</li></ul>
+      <div class="cta-contact">
+        <strong>Parlons-en</strong> &nbsp;·&nbsp;
+        {{ branding.email|default:"contact@traitdunion.it" }}{% if branding.phone %} &nbsp;·&nbsp; {{ branding.phone }}{% endif %}<br>
+        <span class="cta-contact-subline">{{ branding.website|default:"traitdunion.it" }}</span>
+      </div>
+    </div>
   </div>
 </div>
 

@@ -119,3 +119,38 @@ class TestSimulatorReportEndpoint:
         mock_send.assert_called_once()
         _, kwargs = mock_send.call_args
         assert 'pdf_bytes' in kwargs and kwargs['pdf_bytes'] == pdf_bytes
+
+    def test_chart_payload_is_forwarded_without_persisting_base64(self):
+        client = Client()
+        chart_payload = [
+            {
+                'title': 'Coûts vs chiffre d\'affaires',
+                'x_label': 'Nombre de ventes',
+                'y_label': 'Euros (€)',
+                'series': ['Coûts totaux', 'Chiffre d\'affaires'],
+                'data_url': 'data:image/png;base64,AAA',
+            }
+        ]
+
+        with patch('apps.simulateur.services.SimulatorReportService.send') as mock_send:
+            mock_send.return_value = None
+            res = client.post(
+                self.endpoint,
+                data=json.dumps(self._payload(snapshot={
+                    'verdict': 'Flux fragile',
+                    'score': '5.2 / 10',
+                    'sections': [],
+                    'recommendations': ['Cartographier le tunnel commercial.'],
+                    'charts': chart_payload,
+                })),
+                content_type='application/json',
+            )
+
+        assert res.status_code == 200, res.content
+        report = SimulatorReport.objects.get(email='dirigeant@acme.fr')
+        assert 'charts' not in report.snapshot
+        assert '_charts' not in report.snapshot
+
+        mock_send.assert_called_once()
+        _, kwargs = mock_send.call_args
+        assert kwargs['charts'] == chart_payload

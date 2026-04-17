@@ -389,31 +389,315 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
         });
         return results.slice(0, 30);
       },
+      normalizeChartText(value) {
+        if (value === null || value === undefined) return '';
+        if (Array.isArray(value)) {
+          return value.map((item) => this.normalizeChartText(item)).filter(Boolean).join(' · ');
+        }
+        return String(value).replace(/\s+/g, ' ').trim();
+      },
+      cloneChartConfig(value, seen = new WeakMap()) {
+        if (typeof value === 'function') return value;
+        if (value === null || typeof value !== 'object') return value;
+        if (seen.has(value)) return seen.get(value);
+        if (Array.isArray(value)) {
+          const arr = [];
+          seen.set(value, arr);
+          value.forEach((item, index) => {
+            arr[index] = this.cloneChartConfig(item, seen);
+          });
+          return arr;
+        }
+        if (value instanceof Date) return new Date(value.getTime());
+        const out = {};
+        seen.set(value, out);
+        Object.keys(value).forEach((key) => {
+          const item = value[key];
+          if (typeof item === 'undefined') return;
+          out[key] = this.cloneChartConfig(item, seen);
+        });
+        return out;
+      },
+      buildChartExportMeta(chart, fallbackTitle = '') {
+        const scales = chart && chart.options && chart.options.scales ? chart.options.scales : {};
+        let xLabel = '';
+        let yLabel = '';
+
+        Object.entries(scales).forEach(([key, scale]) => {
+          if (!scale || !scale.title || !scale.title.text) return;
+          const text = this.normalizeChartText(scale.title.text);
+          if (!text) return;
+          const axis = String(scale.axis || key.charAt(0) || '').toLowerCase();
+          if (!xLabel && axis === 'x') xLabel = text;
+          if (!yLabel && axis === 'y') yLabel = text;
+        });
+
+        const series = (chart && chart.data && chart.data.datasets ? chart.data.datasets : [])
+          .map((dataset) => this.normalizeChartText(dataset && dataset.label))
+          .filter(Boolean)
+          .slice(0, 4);
+
+        return {
+          title: fallbackTitle || 'Graphique',
+          x_label: xLabel,
+          y_label: yLabel,
+          series,
+        };
+      },
+      buildPdfChartSurfacePlugin() {
+        return {
+          id: 'pdfSurface',
+          beforeDraw(chart) {
+            const ctx = chart.ctx;
+            const canvas = chart.canvas;
+            const chartArea = chart.chartArea;
+            if (!ctx || !canvas) return;
+
+            ctx.save();
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#ffffff');
+            gradient.addColorStop(1, '#f8fafc');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = 'rgba(15, 23, 42, 0.08)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(1, 1, canvas.width - 2, canvas.height - 2);
+
+            if (chartArea) {
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
+              ctx.fillRect(
+                chartArea.left - 8,
+                chartArea.top - 8,
+                (chartArea.right - chartArea.left) + 16,
+                (chartArea.bottom - chartArea.top) + 16,
+              );
+            }
+            ctx.restore();
+          },
+        };
+      },
+      buildPrintChartConfig(chart) {
+        const baseConfig = (chart && chart.config && chart.config._config)
+          ? chart.config._config
+          : {
+              type: chart.config.type,
+              data: chart.data,
+              options: chart.options,
+              plugins: chart.config && chart.config.plugins ? chart.config.plugins : [],
+            };
+        const config = this.cloneChartConfig(baseConfig);
+        const ink = '#0f172a';
+        const muted = '#475569';
+        const grid = 'rgba(15, 23, 42, 0.12)';
+
+        config.options = config.options || {};
+        config.options.responsive = false;
+        config.options.animation = false;
+        config.options.maintainAspectRatio = false;
+        config.options.devicePixelRatio = 2;
+
+        const existingLayout = config.options.layout || {};
+        const rawPadding = existingLayout.padding;
+        const padding = (typeof rawPadding === 'number')
+          ? { top: rawPadding, right: rawPadding, bottom: rawPadding, left: rawPadding }
+          : (rawPadding || {});
+
+        config.options.layout = {
+          ...existingLayout,
+          padding: {
+            top: Math.max(32, padding.top || 0),
+            right: Math.max(28, padding.right || 0),
+            bottom: Math.max(28, padding.bottom || 0),
+            left: Math.max(28, padding.left || 0),
+          },
+        };
+
+        config.plugins = Array.isArray(config.plugins) ? config.plugins.slice() : [];
+        config.plugins.push(this.buildPdfChartSurfacePlugin());
+
+        const pluginOptions = config.options.plugins || {};
+        config.options.plugins = pluginOptions;
+
+        if (pluginOptions.legend !== false) {
+          pluginOptions.legend = pluginOptions.legend || {};
+          pluginOptions.legend.labels = {
+            ...(pluginOptions.legend.labels || {}),
+            color: ink,
+            padding: Math.max(18, (pluginOptions.legend.labels && pluginOptions.legend.labels.padding) || 0),
+            usePointStyle: true,
+            boxWidth: 12,
+            boxHeight: 12,
+            font: {
+              ...((pluginOptions.legend.labels && pluginOptions.legend.labels.font) || {}),
+              size: 12,
+              weight: '600',
+            },
+          };
+        }
+
+        if (pluginOptions.title && pluginOptions.title.display) {
+          pluginOptions.title = {
+            ...pluginOptions.title,
+            color: ink,
+            font: {
+              ...(pluginOptions.title.font || {}),
+              size: 15,
+              weight: '700',
+            },
+          };
+        }
+
+        if (pluginOptions.subtitle && pluginOptions.subtitle.display) {
+          pluginOptions.subtitle = {
+            ...pluginOptions.subtitle,
+            color: muted,
+            font: {
+              ...(pluginOptions.subtitle.font || {}),
+              size: 11,
+            },
+          };
+        }
+
+        if (pluginOptions.tooltip) pluginOptions.tooltip.enabled = false;
+
+        if (pluginOptions.annotation && pluginOptions.annotation.annotations) {
+          Object.values(pluginOptions.annotation.annotations).forEach((annotation) => {
+            if (!annotation || typeof annotation !== 'object') return;
+            annotation.borderColor = '#0f766e';
+            if (annotation.label) {
+              annotation.label = {
+                ...annotation.label,
+                backgroundColor: '#0f766e',
+                color: '#ffffff',
+                padding: 6,
+                font: {
+                  ...(annotation.label.font || {}),
+                  size: 11,
+                  weight: '700',
+                },
+              };
+            }
+          });
+        }
+
+        Object.values(config.options.scales || {}).forEach((scale) => {
+          if (!scale || typeof scale !== 'object') return;
+          scale.grid = {
+            ...(scale.grid || {}),
+            color: grid,
+          };
+          scale.border = {
+            ...(scale.border || {}),
+            color: 'rgba(15, 23, 42, 0.18)',
+          };
+          scale.ticks = {
+            ...(scale.ticks || {}),
+            color: muted,
+            padding: Math.max(10, (scale.ticks && scale.ticks.padding) || 0),
+            backdropColor: 'transparent',
+            font: {
+              ...((scale.ticks && scale.ticks.font) || {}),
+              size: 11,
+              weight: (((scale.ticks || {}).font || {}).weight) || '600',
+            },
+          };
+          if (scale.title) {
+            scale.title = {
+              ...scale.title,
+              color: ink,
+              font: {
+                ...(scale.title.font || {}),
+                size: 12,
+                weight: '700',
+              },
+            };
+          }
+          if (scale.pointLabels) {
+            scale.pointLabels = {
+              ...scale.pointLabels,
+              color: ink,
+              font: {
+                ...(scale.pointLabels.font || {}),
+                size: 11,
+                weight: '600',
+              },
+            };
+          }
+          if (scale.angleLines) {
+            scale.angleLines = {
+              ...scale.angleLines,
+              color: grid,
+            };
+          }
+        });
+
+        return config;
+      },
+      renderChartForPdf(chart) {
+        const sourceCanvas = chart && chart.canvas;
+        const sourceWidth = (sourceCanvas && sourceCanvas.clientWidth) || 640;
+        const sourceHeight = (sourceCanvas && sourceCanvas.clientHeight) || 380;
+        const aspectRatio = (sourceWidth > 0 && sourceHeight > 0) ? (sourceHeight / sourceWidth) : 0.62;
+        const width = Math.max(1100, Math.round(sourceWidth * 2));
+        const height = Math.max(720, Math.round(width * Math.min(0.78, Math.max(0.56, aspectRatio))));
+
+        const exportCanvas = document.createElement('canvas');
+        exportCanvas.width = width;
+        exportCanvas.height = height;
+
+        const exportConfig = this.buildPrintChartConfig(chart);
+        let exportChart = null;
+        try {
+          exportChart = new window.Chart(exportCanvas.getContext('2d'), exportConfig);
+          exportChart.resize(width, height);
+          exportChart.update('none');
+          return exportCanvas.toDataURL('image/png');
+        } finally {
+          if (exportChart) exportChart.destroy();
+        }
+      },
+      fallbackChartCapture(chart) {
+        const canvas = chart && chart.canvas;
+        if (!canvas) return '';
+        const width = canvas.width;
+        const height = canvas.height;
+        const offscreen = document.createElement('canvas');
+        offscreen.width = width;
+        offscreen.height = height;
+        const ctx = offscreen.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(canvas, 0, 0);
+        return offscreen.toDataURL('image/png');
+      },
       captureCharts() {
         // Capture chaque instance Chart.js visible en PNG base64.
+        // Exporte une variante "print-safe" pour conserver axes, graduations
+        // et légendes en PDF, même quand la page est en thème sombre.
         const out = [];
         try {
           if (!window.Chart || !window.Chart.instances) return out;
           Object.values(window.Chart.instances).forEach(chart => {
             try {
               const canvas = chart && chart.canvas;
-              if (!canvas || !canvas.isConnected) return;
+              if (!canvas || !canvas.isConnected || canvas.offsetParent === null) return;
               // Titre : chercher un h3 parent proche
               let title = '';
               const card = canvas.closest('.result-block, .tool-card, .chart-container');
               const h = card && card.querySelector('h2, h3');
               if (h) title = h.textContent.replace(/\s+/g, ' ').trim().substring(0, 80);
-              // Fond blanc (Chart.js transparent par défaut → illisible sur PDF blanc)
-              const w = canvas.width, hh = canvas.height;
-              const off = document.createElement('canvas');
-              off.width = w; off.height = hh;
-              const ctx = off.getContext('2d');
-              ctx.fillStyle = '#ffffff';
-              ctx.fillRect(0, 0, w, hh);
-              ctx.drawImage(canvas, 0, 0);
-              const dataUrl = off.toDataURL('image/png');
-              if (dataUrl && dataUrl.length < 600000) { // garde-fou 600KB
-                out.push({ title, data_url: dataUrl });
+              const meta = this.buildChartExportMeta(chart, title);
+
+              let dataUrl = '';
+              try {
+                dataUrl = this.renderChartForPdf(chart);
+              } catch (e) {
+                dataUrl = this.fallbackChartCapture(chart);
+              }
+
+              if (dataUrl && dataUrl.length < 800000) { // garde-fou ~600KB binaire
+                out.push({ ...meta, data_url: dataUrl });
               }
             } catch (e) { /* ignore single chart failure */ }
           });
