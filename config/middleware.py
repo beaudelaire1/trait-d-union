@@ -143,7 +143,12 @@ class CacheControlMiddleware(MiddlewareMixin):
             return response
 
         if 'text/html' in content_type:
-            response['Cache-Control'] = 'public, max-age=300, must-revalidate'
+            # ⚠️ CSP nonces change per request: HTML responses MUST NOT be cached
+            # by shared caches (CDN/proxy) nor reused after CSP header refresh,
+            # otherwise the browser will reject every inline/external script
+            # because the nonce in the cached HTML no longer matches the CSP
+            # header (silent script-src blocking = empty charts, dead buttons).
+            response['Cache-Control'] = 'private, no-cache, no-store, max-age=0, must-revalidate'
             if 'Last-Modified' not in response:
                 response['Last-Modified'] = http_date(time.time())
             return response
