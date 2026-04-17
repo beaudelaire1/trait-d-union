@@ -408,6 +408,7 @@ CONTENT_SECURITY_POLICY = {
         "script-src": [
             "'self'",
             _CSP_NONCE,
+            "'unsafe-eval'",
             "'strict-dynamic'",
             "https://cdn.jsdelivr.net",
             "https://unpkg.com",
