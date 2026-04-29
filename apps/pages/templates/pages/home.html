@@ -16,6 +16,91 @@ mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
 {% block twitter_description %}Studio d'architecture digitale en Guyane. Sites internet, e-commerce et plateformes
 métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
 
+{% block extra_head %}
+<style nonce="{{ request.csp_nonce }}">
+    /* ── Trust Marquee — Premium infinite scroll ── */
+    .trust-lane {
+        position: relative;
+        overflow: hidden;
+        padding: 1rem 0;
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+        mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    }
+
+    .trust-track {
+        display: flex;
+        align-items: center;
+        gap: 4rem;
+        width: max-content;
+        will-change: transform;
+        animation: trust-glide 30s linear infinite;
+    }
+
+    .trust-lane:hover .trust-track {
+        animation-play-state: paused;
+    }
+
+    .trust-group {
+        display: flex;
+        align-items: center;
+        gap: 4rem;
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 0.75rem 1.5rem;
+        transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .trust-item img {
+        height: 2.75rem;
+        width: auto;
+        max-width: 170px;
+        object-fit: contain;
+        opacity: 0.45;
+        filter: grayscale(100%) brightness(2);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .trust-item:hover img {
+        opacity: 0.9;
+        filter: grayscale(0%) brightness(1);
+    }
+
+    @media (min-width: 768px) {
+        .trust-item img {
+            height: 3.25rem;
+            max-width: 210px;
+        }
+        .trust-group { gap: 5rem; }
+        .trust-track { gap: 5rem; }
+    }
+
+    @keyframes trust-glide {
+        from { transform: translate3d(0, 0, 0); }
+        to   { transform: translate3d(calc(-50% - 2.5rem), 0, 0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .trust-lane {
+            overflow: visible;
+            -webkit-mask-image: none;
+            mask-image: none;
+        }
+        .trust-track {
+            width: 100%;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: none;
+            gap: 3rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
 <!-- Hero Section -->
@@ -119,6 +204,34 @@ métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
         </div>
     </div>
 </div>
+
+{% if trusted_logos %}
+<section class="py-14 md:py-16 relative overflow-hidden" id="trust-section">
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+        <div class="mb-8 text-center reveal">
+            <span class="text-tus-white/30 font-display font-medium text-[0.7rem] tracking-[0.35em] uppercase">Ils nous font confiance</span>
+        </div>
+
+        <div class="trust-lane reveal" aria-label="Logos des clients accompagnés par Trait d'Union Studio">
+            <div class="sr-only">
+                Clients : {% for logo in trusted_logos %}{{ logo.name }}{% if not forloop.last %}, {% endif %}{% endfor %}.
+            </div>
+            <div class="trust-track" aria-hidden="true">
+                {# Repeat 4x for seamless infinite scroll even with few logos #}
+                {% for i in "1234" %}
+                <div class="trust-group">
+                    {% for logo in trusted_logos %}
+                    <div class="trust-item">
+                        <img src="{{ logo.image_url }}" alt="{% if forloop.parentloop.first %}{{ logo.name }}{% endif %}" decoding="async" loading="lazy">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
 
 <!-- PME/TPE — Structuration & Digitalisation -->
 <section class="py-20 relative overflow-hidden">

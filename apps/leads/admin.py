@@ -3,7 +3,7 @@ from django.contrib import admin, messages
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
-from .models import Lead, LeadStatus
+from .models import Lead, LeadStatus, EmailSubscriber
 from .email_models import EmailTemplate, EmailComposition
 
 
@@ -251,3 +251,24 @@ class EmailCompositionAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(EmailSubscriber)
+class EmailSubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'source', 'source_detail', 'is_active', 'created_at')
+    list_filter = ('source', 'is_active', 'created_at')
+    search_fields = ('email', 'source_detail')
+    readonly_fields = ('created_at',)
+    ordering = ('-created_at',)
+    date_hierarchy = 'created_at'
+    actions = ['action_deactivate', 'action_export_emails']
+
+    @admin.action(description="🚫 Désactiver les abonnés sélectionnés")
+    def action_deactivate(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f"{updated} abonné(s) désactivé(s).", level=messages.SUCCESS)
+
+    @admin.action(description="📋 Copier les emails (pour Brevo)")
+    def action_export_emails(self, request, queryset):
+        emails = ', '.join(queryset.values_list('email', flat=True))
+        self.message_user(request, f"Emails : {emails}", level=messages.INFO)

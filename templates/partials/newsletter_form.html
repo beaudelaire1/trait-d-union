@@ -1,0 +1,68 @@
+{% comment %}
+Newsletter email capture form (HTMX).
+
+Usage:
+  {% include 'partials/newsletter_form.html' %}
+  {% include 'partials/newsletter_form.html' with source="article" source_detail=article.slug variant="article" %}
+
+Variants: "footer" (default, compact), "article" (larger, post-article CTA)
+{% endcomment %}
+
+{% load static %}
+
+{% with variant=variant|default:"footer" %}
+
+{% if variant == "article" %}
+{# ── Post-article CTA — plus visible, avec contexte ── #}
+<div class="mt-16 mb-8 p-8 rounded-2xl border border-tus-blue/20 bg-gradient-to-br from-tus-blue/5 to-transparent">
+    <div class="max-w-lg mx-auto text-center">
+        <p class="text-tus-blue-a11y font-display font-semibold text-sm tracking-wider uppercase mb-2">Chroniques TUS</p>
+        <h3 class="text-xl md:text-2xl font-display font-bold text-tus-white mb-3">
+            Recevez nos prochains articles
+        </h3>
+        <p class="text-tus-white/60 text-sm mb-6">
+            Un email par publication. Pas de spam, désinscription en un clic.
+        </p>
+        <form hx-post="{% url 'leads:newsletter_subscribe' %}"
+              hx-target="#nl-result-article"
+              hx-swap="innerHTML"
+              class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            {% csrf_token %}
+            <input type="hidden" name="source" value="{{ source|default:'article' }}">
+            <input type="hidden" name="source_detail" value="{{ source_detail|default:'' }}">
+            <input type="email" name="email" required
+                   placeholder="votre@email.com"
+                   class="flex-1 bg-tus-white/5 border border-tus-white/10 rounded-xl px-4 py-3 text-tus-white placeholder-tus-white/40 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:outline-none transition-all text-sm">
+            <button type="submit"
+                    class="px-6 py-3 bg-tus-blue hover:bg-tus-blue/80 text-white font-semibold rounded-xl transition-colors text-sm whitespace-nowrap">
+                S'abonner
+            </button>
+        </form>
+        <div id="nl-result-article" class="mt-3 min-h-[1.5rem]"></div>
+    </div>
+</div>
+
+{% else %}
+{# ── Footer variant — compact, une ligne ── #}
+<div class="mt-6 pt-6 border-t border-tus-white/5">
+    <p class="text-sm font-display font-semibold text-tus-white/80 mb-3">Restez informé</p>
+    <form hx-post="{% url 'leads:newsletter_subscribe' %}"
+          hx-target="#nl-result-footer"
+          hx-swap="innerHTML"
+          class="flex gap-2">
+        {% csrf_token %}
+        <input type="hidden" name="source" value="footer">
+        <input type="email" name="email" required
+               placeholder="votre@email.com"
+               class="flex-1 min-w-0 bg-tus-white/5 border border-tus-white/10 rounded-lg px-3 py-2 text-sm text-tus-white placeholder-tus-white/40 focus:border-tus-blue/50 focus:ring-1 focus:ring-tus-blue/30 focus:outline-none transition-all">
+        <button type="submit"
+                class="px-4 py-2 bg-tus-blue hover:bg-tus-blue/80 text-white text-sm font-semibold rounded-lg transition-colors whitespace-nowrap">
+            OK
+        </button>
+    </form>
+    <div id="nl-result-footer" class="mt-2 min-h-[1.25rem]"></div>
+    <p class="text-[0.7rem] text-tus-white/30 mt-2">Pas de spam. Désinscription en un clic.</p>
+</div>
+{% endif %}
+
+{% endwith %}

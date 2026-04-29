@@ -9,6 +9,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
+from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
 
 from core.services.captcha import verify_recaptcha as core_verify_recaptcha
@@ -114,3 +115,74 @@ class ContactSuccessView(TemplateView):
     """Simple success page after the contact form is submitted."""
 
     template_name: str = 'leads/success.html'
+
+
+# ==============================================================================
+# NEWSLETTER / EMAIL CAPTURE
+# ==============================================================================
+
+@require_http_methods(["POST"])
+def newsletter_subscribe(request: HttpRequest) -> HttpResponse:
+    """HTMX endpoint pour l'inscription newsletter.
+
+    Accepte un email + source, retourne un fragment HTML de confirmation.
+    Rate-limité à 5 inscriptions/heure par IP.
+    """
+    from django.core.validators import validate_email
+    from django.core.exceptions import ValidationError as DjangoValidationError
+    from django.core.cache import cache as _cache
+    from .models import EmailSubscriber
+
+    # Rate limit
+    ip = get_client_ip(request)
+    cache_key = f"ratelimit:newsletter:{ip}"
+    try:
+        count = _cache.get(cache_key, 0)
+        if count >= 5:
+            return HttpResponse(
+                '<p class="text-amber-400 text-sm">Trop de tentatives. Réessayez plus tard.</p>',
+                status=429,
+            )
+        try:
+            _cache.incr(cache_key)
+        except ValueError:
+            _cache.set(cache_key, 1, 3600)
+    except Exception:
+        pass
+
+    email = request.POST.get('email', '').strip().lower()
+    source = request.POST.get('source', 'footer')
+    source_detail = request.POST.get('source_detail', '')[:200]
+
+    # Validate
+    if not email:
+        return HttpResponse(
+            '<p class="text-red-400 text-sm">Veuillez saisir votre email.</p>',
+            status=400,
+        )
+    try:
+        validate_email(email)
+    except DjangoValidationError:
+        return HttpResponse(
+            '<p class="text-red-400 text-sm">Email invalide.</p>',
+            status=400,
+        )
+
+    # Create or update
+    subscriber, created = EmailSubscriber.objects.get_or_create(
+        email=email,
+        defaults={
+            'source': source,
+            'source_detail': source_detail,
+        },
+    )
+
+    if not created and not subscriber.is_active:
+        subscriber.is_active = True
+        subscriber.save(update_fields=['is_active'])
+
+    return HttpResponse(
+        '<p class="text-tus-green text-sm font-medium">'
+        '✓ Bienvenue ! Vous recevrez nos prochains contenus.'
+        '</p>'
+    )

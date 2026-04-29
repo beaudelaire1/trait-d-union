@@ -88,6 +88,9 @@
         <div class="article-content max-w-none">
             {{ article.body|safe_html }}
         </div>
+
+        <!-- Newsletter CTA post-article -->
+        {% include 'partials/newsletter_form.html' with variant="article" source="article" source_detail=article.slug %}
     </div>
 </div>
 {% endblock %}

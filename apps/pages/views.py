@@ -5,6 +5,7 @@ from typing import Any
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.templatetags.static import static
 from django.views.generic import TemplateView
 
 from services.models import Service
@@ -60,6 +61,17 @@ class HomeView(TemplateView):
         # Breadcrumbs SEO (page d'accueil = racine)
         context['breadcrumbs_list'] = [
             {'name': 'Accueil', 'url': '/'},
+        ]
+
+        context['trusted_logos'] = [
+            {
+                'name': 'Nettoyage Express',
+                'image_url': static('img/trusted/nettoyage-express-logo.png'),
+            },
+            {
+                'name': 'EEBC',
+                'image_url': static('img/trusted/eebc-logo.png'),
+            },
         ]
         
         return context

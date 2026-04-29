@@ -87,3 +87,43 @@ class Lead(models.Model):
     @property
     def is_converted(self) -> bool:
         return self.converted_to_client_id is not None
+
+
+class EmailSubscriber(models.Model):
+    """Abonné à la newsletter / lead magnet.
+
+    Capture d'emails depuis :
+    - Footer (toutes les pages)
+    - Fin d'article (chroniques)
+    - Simulateurs (rapport PDF)
+    """
+
+    class Source(models.TextChoices):
+        FOOTER = 'footer', 'Footer'
+        ARTICLE = 'article', 'Fin d\'article'
+        SIMULATEUR = 'simulateur', 'Simulateur'
+        POPUP = 'popup', 'Popup'
+
+    email = models.EmailField("Email", unique=True)
+    source = models.CharField(
+        "Source", max_length=20,
+        choices=Source.choices, default=Source.FOOTER,
+    )
+    source_detail = models.CharField(
+        "Détail source", max_length=200, blank=True,
+        help_text="Slug article, nom simulateur, etc.",
+    )
+    is_confirmed = models.BooleanField("Confirmé", default=False)
+    is_active = models.BooleanField("Actif", default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Abonné newsletter"
+        verbose_name_plural = "Abonnés newsletter"
+        indexes = [
+            models.Index(fields=['is_active', '-created_at'], name='idx_subscriber_active'),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.email} ({self.get_source_display()})"
