@@ -11,7 +11,7 @@ from .email_models import EmailTemplate, EmailComposition
 class LeadAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'email', 'project_type', 'budget',
-        'status', 'client_link', 'attachment_link', 'created_at',
+        'status', 'score_badge', 'client_link', 'attachment_link', 'created_at',
     )
     list_filter = ('status', 'project_type', 'budget', 'created_at', ('attachment', admin.EmptyFieldListFilter))
     search_fields = ('name', 'email', 'message', 'notes')
@@ -26,6 +26,22 @@ class LeadAdmin(admin.ModelAdmin):
             return format_html('<a href="{}" target="_blank" class="button">Télécharger</a>', obj.attachment.url)
         return "-"
     attachment_link.short_description = "Pièce jointe"
+
+    def score_badge(self, obj):
+        score = obj.score or 0
+        if score >= 70:
+            color = '#22C55E'
+        elif score >= 40:
+            color = '#F59E0B'
+        else:
+            color = '#6B7280'
+        return format_html(
+            '<span style="background:{};color:white;padding:2px 8px;'
+            'border-radius:10px;font-size:11px;font-weight:600;">{}</span>',
+            color, score,
+        )
+    score_badge.short_description = "Score"
+    score_badge.admin_order_field = 'score'
 
     def status_badge(self, obj):
         colors = {

@@ -281,6 +281,19 @@ class ReportSubmitView(View):
         report.user_agent = request.META.get('HTTP_USER_AGENT', '')[:500]
         report.save()
 
+        # Auto-subscribe to newsletter (silent, no error if fails)
+        try:
+            from apps.leads.models import EmailSubscriber
+            EmailSubscriber.objects.get_or_create(
+                email=report.email,
+                defaults={
+                    'source': EmailSubscriber.Source.SIMULATEUR,
+                    'source_detail': report.tool_slug or '',
+                },
+            )
+        except Exception:
+            pass  # Never block the report flow for newsletter
+
         # Les graphiques (base64 lourds) ne sont pas persistés en DB :
         # ils sont passés de façon transiente au service PDF.
         transient_charts = getattr(form, '_transient_charts', None)
