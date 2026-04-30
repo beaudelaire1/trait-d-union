@@ -3,7 +3,7 @@ from django.contrib import admin, messages
 from django.urls import reverse
 from django.utils.html import format_html
 from django.utils import timezone
-from .models import Lead, LeadStatus, EmailSubscriber
+from .models import Lead, LeadStatus, EmailSubscriber, NewsletterCampaign
 from .email_models import EmailTemplate, EmailComposition
 
 
@@ -288,3 +288,75 @@ class EmailSubscriberAdmin(admin.ModelAdmin):
     def action_export_emails(self, request, queryset):
         emails = ', '.join(queryset.values_list('email', flat=True))
         self.message_user(request, f"Emails : {emails}", level=messages.INFO)
+
+
+@admin.register(NewsletterCampaign)
+class NewsletterCampaignAdmin(admin.ModelAdmin):
+    list_display = ('subject', 'status_badge', 'recipients_count', 'sent_count', 'failed_count', 'sent_at', 'created_at')
+    list_filter = ('status', 'created_at')
+    search_fields = ('subject',)
+    readonly_fields = ('status', 'recipients_count', 'sent_count', 'failed_count', 'sent_at', 'created_at')
+    ordering = ('-created_at',)
+    actions = ['action_send_campaign']
+
+    fieldsets = (
+        ('Contenu', {
+            'fields': ('subject', 'body_html'),
+        }),
+        ('Envoi', {
+            'fields': ('status', 'recipients_count', 'sent_count', 'failed_count', 'sent_at', 'created_at'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def status_badge(self, obj):
+        colors = {
+            'draft': '#6B7280',
+            'sending': '#F59E0B',
+            'sent': '#22C55E',
+            'failed': '#EF4444',
+        }
+        color = colors.get(obj.status, '#6B7280')
+        return format_html(
+            '<span style="background:{};color:white;padding:2px 10px;'
+            'border-radius:10px;font-size:11px;font-weight:600;">{}</span>',
+            color, obj.get_status_display(),
+        )
+    status_badge.short_description = "Statut"
+
+    @admin.action(description="📤 Envoyer la newsletter aux abonnés actifs")
+    def action_send_campaign(self, request, queryset):
+        from django_q.tasks import async_task
+        from .models import EmailSubscriber
+
+        subscriber_count = EmailSubscriber.objects.filter(is_active=True).count()
+
+        sent = 0
+        skipped = 0
+        for campaign in queryset:
+            if campaign.status != 'draft':
+                skipped += 1
+                continue
+
+            async_task(
+                'apps.leads.tasks.send_newsletter_campaign_task',
+                campaign_id=campaign.pk,
+                task_name=f'newsletter_{campaign.pk}',
+            )
+            campaign.status = 'sending'
+            campaign.save(update_fields=['status'])
+            sent += 1
+
+        if sent:
+            self.message_user(
+                request,
+                f"📤 {sent} campagne(s) lancée(s) vers {subscriber_count} abonné(s) actifs. "
+                f"Suivi dans Django-Q.",
+                level=messages.SUCCESS,
+            )
+        if skipped:
+            self.message_user(
+                request,
+                f"⏭️ {skipped} campagne(s) ignorée(s) (déjà envoyée ou en cours).",
+                level=messages.WARNING,
+            )

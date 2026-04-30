@@ -34,6 +34,7 @@ class ArticleAdmin(admin.ModelAdmin):
     search_fields = ("title", "subtitle", "excerpt", "body")
     prepopulated_fields = {"slug": ("title",)}
     date_hierarchy = "publish_date"
+    actions = ['send_as_newsletter']
     fieldsets = (
         (None, {
             'fields': ('title', 'subtitle', 'slug', 'category', 'author', 'cover_image', 'credits_image', 'excerpt', 'body'),
@@ -46,6 +47,40 @@ class ArticleAdmin(admin.ModelAdmin):
             'fields': ('is_published', 'publish_date'),
         }),
     )
+
+    @admin.action(description="📤 Envoyer comme newsletter aux abonnés")
+    def send_as_newsletter(self, request, queryset):
+        from django_q.tasks import async_task
+        from apps.leads.models import EmailSubscriber
+
+        subscriber_count = EmailSubscriber.objects.filter(is_active=True).count()
+        if subscriber_count == 0:
+            self.message_user(request, "❌ Aucun abonné actif.", level=admin.options.messages.WARNING)
+            return
+
+        sent = 0
+        for article in queryset:
+            if not article.is_published:
+                self.message_user(
+                    request,
+                    f"⏭️ « {article.title} » ignoré (non publié).",
+                    level=admin.options.messages.WARNING,
+                )
+                continue
+            async_task(
+                'apps.leads.tasks.send_article_as_newsletter_task',
+                article_id=article.pk,
+                task_name=f'newsletter_article_{article.pk}',
+            )
+            sent += 1
+
+        if sent:
+            self.message_user(
+                request,
+                f"📤 {sent} article(s) envoyé(s) comme newsletter à {subscriber_count} abonné(s). "
+                f"Suivi dans l'admin Leads > Campagnes newsletter.",
+                level=admin.options.messages.SUCCESS,
+            )
 
     class Media:
         css = {

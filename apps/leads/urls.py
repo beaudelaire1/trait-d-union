@@ -1,7 +1,7 @@
 """URL configuration for the leads app."""
 from django.urls import path
 
-from .views import ContactView, DynamicFieldsView, ContactSuccessView, newsletter_subscribe
+from .views import ContactView, DynamicFieldsView, ContactSuccessView, newsletter_subscribe, newsletter_unsubscribe
 from .email_views import (
     EmailComposeView, 
     EmailListView, 
@@ -17,6 +17,7 @@ urlpatterns = [
     path('fields/', DynamicFieldsView.as_view(), name='dynamic_fields'),
     path('success/', ContactSuccessView.as_view(), name='success'),
     path('newsletter/', newsletter_subscribe, name='newsletter_subscribe'),
+    path('newsletter/unsubscribe/', newsletter_unsubscribe, name='newsletter_unsubscribe'),
     
     # Email composition
     path('emails/', EmailListView.as_view(), name='email_list'),

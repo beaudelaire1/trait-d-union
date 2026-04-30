@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Désinscription — Trait d'Union Studio{% endblock %}
+{% block meta_description %}Désinscription de la newsletter Trait d'Union Studio.{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-6 py-20">
+    <div class="max-w-md text-center">
+        {% if email %}
+        <div class="w-16 h-16 rounded-full bg-tus-green/10 flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <h1 class="text-2xl font-display font-bold text-tus-white mb-4">Désinscription confirmée</h1>
+        <p class="text-tus-white/60 mb-8">
+            L'adresse <strong class="text-tus-white">{{ email }}</strong> a été retirée de notre liste.
+            Vous ne recevrez plus nos emails.
+        </p>
+        {% elif invalid_token %}
+        <h1 class="text-2xl font-display font-bold text-tus-white mb-4">Lien invalide</h1>
+        <p class="text-tus-white/60 mb-8">
+            Ce lien de désinscription est invalide ou a expiré.
+            Contactez-nous à <a href="mailto:contact@traitdunion.it" class="text-tus-blue-a11y hover:underline">contact@traitdunion.it</a> pour être retiré manuellement.
+        </p>
+        {% else %}
+        <h1 class="text-2xl font-display font-bold text-tus-white mb-4">Désinscription</h1>
+        <p class="text-tus-white/60 mb-8">Aucune adresse email fournie.</p>
+        {% endif %}
+        <a href="{% url 'pages:home' %}" class="text-tus-blue-a11y hover:underline text-sm">← Retour à l'accueil</a>
+    </div>
+</div>
+{% endblock %}

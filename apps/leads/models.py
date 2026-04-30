@@ -177,3 +177,60 @@ from django.dispatch import receiver
 def auto_score_lead(sender, instance, **kwargs):
     """Compute lead score before saving."""
     instance.score = instance.compute_score()
+
+
+class NewsletterCampaign(models.Model):
+    """Campagne newsletter envoyée aux abonnés EmailSubscriber.
+
+    Workflow :
+    1. Créer la campagne dans l'admin (sujet + contenu HTML)
+    2. Prévisualiser
+    3. Envoyer → dispatche en async via django-q2
+    4. Suivi : total envoyés, échecs
+    """
+
+    class Status(models.TextChoices):
+        DRAFT = 'draft', '📝 Brouillon'
+        SENDING = 'sending', '📤 En cours d\'envoi'
+        SENT = 'sent', '✅ Envoyée'
+        FAILED = 'failed', '❌ Échouée'
+
+    subject = models.CharField("Sujet", max_length=200)
+    body_html = models.TextField(
+        "Contenu HTML",
+        help_text="Contenu de la newsletter. Sera injecté dans le template premium TUS.",
+    )
+    status = models.CharField(
+        "Statut", max_length=20,
+        choices=Status.choices, default=Status.DRAFT,
+    )
+    recipients_count = models.PositiveIntegerField("Destinataires", default=0)
+    sent_count = models.PositiveIntegerField("Envoyés", default=0)
+    failed_count = models.PositiveIntegerField("Échecs", default=0)
+    sent_at = models.DateTimeField("Envoyée le", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Campagne newsletter"
+        verbose_name_plural = "Campagnes newsletter"
+
+    def __str__(self) -> str:
+        return f"[{self.get_status_display()}] {self.subject}"
+
+
+def make_unsubscribe_url(email: str) -> str:
+    """Génère l'URL de désinscription signée pour un email donné."""
+    import hashlib
+    import hmac
+    from django.conf import settings as _settings
+
+    token = hmac.new(
+        _settings.SECRET_KEY.encode(), email.lower().encode(), hashlib.sha256,
+    ).hexdigest()[:32]
+
+    site_url = str(getattr(_settings, 'SITE_URL', 'https://www.traitdunion.it')).rstrip('/')
+    if 'localhost' in site_url or '127.0.0.1' in site_url:
+        site_url = 'https://www.traitdunion.it'
+
+    return f"{site_url}/contact/newsletter/unsubscribe/?email={email}&token={token}"

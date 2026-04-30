@@ -186,3 +186,34 @@ def newsletter_subscribe(request: HttpRequest) -> HttpResponse:
         '✓ Bienvenue ! Vous recevrez nos prochains contenus.'
         '</p>'
     )
+
+
+@require_http_methods(["GET"])
+def newsletter_unsubscribe(request: HttpRequest) -> HttpResponse:
+    """Page de désinscription newsletter (lien signé dans chaque email).
+
+    Usage : /contact/newsletter/unsubscribe/?email=xxx@yyy.com&token=xxx
+    Le token est un HMAC-SHA256 de l'email signé avec SECRET_KEY.
+    """
+    from django.conf import settings as _settings
+    from .models import EmailSubscriber
+    import hashlib
+    import hmac
+
+    email = request.GET.get('email', '').strip().lower()
+    token = request.GET.get('token', '')
+    valid = False
+
+    if email and token:
+        expected = hmac.new(
+            _settings.SECRET_KEY.encode(), email.encode(), hashlib.sha256,
+        ).hexdigest()[:32]
+        valid = hmac.compare_digest(token, expected)
+
+    if valid:
+        EmailSubscriber.objects.filter(email=email).update(is_active=False)
+
+    return render(request, 'leads/newsletter_unsubscribe.html', {
+        'email': email if valid else '',
+        'invalid_token': bool(email and not valid),
+    })
