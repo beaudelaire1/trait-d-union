@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="180" viewBox="0 0 280 180" fill="none">
+  <!-- Nettoyage Express — Logo fidèle : lettres N·E + flèche industrielle + accent vert -->
+  <g transform="translate(20 16)">
+    <!-- Cadre rectangulaire haut -->
+    <rect x="4" y="4" width="232" height="120" rx="4" stroke="#1A1D22" stroke-width="5" fill="none"/>
+
+    <!-- Lettre N -->
+    <path d="M32 28v68h14V50l28 46h14V28H74v46L46 28H32z" fill="#1A1D22"/>
+
+    <!-- Barre horizontale flèche (milieu) avec encoche descendante -->
+    <path d="M96 62h84l-14-14h20l22 22-22 22h-20l14-14H96z" fill="#1A1D22"/>
+
+    <!-- Lettre E (intégrée à droite de la flèche) -->
+    <path d="M148 28v68h52V84h-36V68h30V56h-30V40h36V28h-52z" fill="#1A1D22"/>
+
+    <!-- Barre verte accent (signature Nettoyage Express) -->
+    <rect x="4" y="130" width="232" height="8" rx="4" fill="#3D9E4A"/>
+
+    <!-- Petit rectangle vert sous la flèche -->
+    <rect x="100" y="100" width="40" height="16" rx="4" fill="#3D9E4A"/>
+  </g>
+</svg>

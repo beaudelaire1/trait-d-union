@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="340" viewBox="0 0 860 340" fill="none">
+  <g transform="translate(52 18)">
+    <circle cx="372" cy="84" r="82" fill="#FFF0AF" opacity="0.72"/>
+    <path d="M347 12h50v88h88v42h-88v118h-50V142h-88v-42h88V12z" fill="#F4A044"/>
+    <path d="M118 112c67-33 154-33 221 0l33 16v119c-64-24-151-33-254-19V128l0-16z" fill="#FFF9F0" stroke="#B67439" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M626 112c-67-33-154-33-221 0l-33 16v119c64-24 151-33 254-19V128l0-16z" fill="#FFF9F0" stroke="#B67439" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M372 126v126" stroke="#B67439" stroke-width="10" stroke-linecap="round"/>
+    <path d="M153 146c43-10 113-18 190-10" stroke="#B8A18A" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+    <path d="M153 182c46-10 115-14 190-8" stroke="#B8A18A" stroke-width="5" stroke-linecap="round" opacity="0.72"/>
+    <path d="M153 218c54-7 121-10 190-5" stroke="#B8A18A" stroke-width="5" stroke-linecap="round" opacity="0.62"/>
+    <path d="M591 146c-43-10-113-18-190-10" stroke="#B8A18A" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+    <path d="M591 182c-46-10-115-14-190-8" stroke="#B8A18A" stroke-width="5" stroke-linecap="round" opacity="0.72"/>
+    <path d="M591 218c-54-7-121-10-190-5" stroke="#B8A18A" stroke-width="5" stroke-linecap="round" opacity="0.62"/>
+    <text x="370" y="214" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-size="132" font-weight="900" letter-spacing="-5" fill="#1E36F2">EEBC</text>
+    <text x="372" y="302" text-anchor="middle" font-family="Georgia, Times New Roman, serif" font-size="34" font-style="italic" font-weight="700" fill="#1E36F2">Notre seule source d'autorite</text>
+  </g>
+</svg>

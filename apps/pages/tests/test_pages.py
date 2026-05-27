@@ -38,6 +38,13 @@ class TestPublicPages:
         response = client.get(reverse('pages:home'))
         assert 'pages/home.html' in [t.name for t in response.templates]
 
+    def test_home_contains_trust_logos_section(self, client):
+        response = client.get(reverse('pages:home'))
+        content = response.content
+        assert b'Ils nous font confiance' in content
+        assert b'Nettoyage Express' in content
+        assert b'EEBC' in content
+
     def test_services_template(self, client):
         response = client.get(reverse('pages:services'))
         assert 'pages/services.html' in [t.name for t in response.templates]
