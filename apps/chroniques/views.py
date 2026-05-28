@@ -101,6 +101,7 @@ def article_list(request):
 
 def article_detail(request, slug: str):
     article = get_object_or_404(Article.objects.select_related('category'), slug=slug, is_published=True)
+    article.increment_views()
     return render(request, "chroniques/detail.html", {
         "article": article,
         "breadcrumbs_list": [

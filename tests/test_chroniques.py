@@ -1,8 +1,10 @@
 """Tests for chroniques app: Category model, Article subtitle/category, filtering, sorting, search."""
 import pytest
+from django.contrib import admin
 from django.test import Client
 from django.utils import timezone
 from datetime import timedelta
+from apps.chroniques.admin import ArticleAdmin
 from apps.chroniques.models import Article, Category
 
 
@@ -124,6 +126,25 @@ class TestArticleDetail:
         content = resp.content.decode()
         assert "italic" in content
         assert "Subtitle italic" in content
+
+    def test_detail_increments_views_count(self):
+        article = Article.objects.create(
+            title="Titre", slug="titre-vues", body="Content", is_published=True,
+        )
+
+        resp = Client().get(f"/chroniques/{article.slug}/")
+
+        assert resp.status_code == 200
+        article.refresh_from_db()
+        assert article.views_count == 1
+
+
+class TestArticleAdmin:
+    def test_admin_shows_views_count(self):
+        article_admin = ArticleAdmin(Article, admin.site)
+
+        assert "views_count" in article_admin.list_display
+        assert "views_count" in article_admin.readonly_fields
 
 
 @pytest.mark.django_db

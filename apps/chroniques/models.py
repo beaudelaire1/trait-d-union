@@ -46,6 +46,7 @@ class Article(models.Model):
         "Crédits image", max_length=255, blank=True, help_text="Crédits pour l'image de couverture")
 
     is_published = models.BooleanField("Publié", default=True)
+    views_count = models.PositiveIntegerField("Nombre de vues", default=0)
     publish_date = models.DateTimeField("Date de publication", default=timezone.now)
     updated_at = models.DateTimeField("Mise à jour", auto_now=True)
 
@@ -70,3 +71,8 @@ class Article(models.Model):
 
     def get_absolute_url(self) -> str:
         return reverse("chroniques:detail", kwargs={"slug": self.slug})
+
+    def increment_views(self) -> None:
+        from django.db.models import F
+
+        type(self).objects.filter(pk=self.pk).update(views_count=F("views_count") + 1)

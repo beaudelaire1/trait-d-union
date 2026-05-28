@@ -29,12 +29,13 @@ class ArticleAdminForm(forms.ModelForm):
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
     form = ArticleAdminForm
-    list_display = ("title", "category", "is_published", "publish_date", "author")
+    list_display = ("title", "category", "views_count", "is_published", "publish_date", "author")
     list_filter = ("is_published", "publish_date", "category")
     search_fields = ("title", "subtitle", "excerpt", "body")
     prepopulated_fields = {"slug": ("title",)}
     date_hierarchy = "publish_date"
     actions = ['send_as_newsletter']
+    readonly_fields = ("views_count",)
     fieldsets = (
         (None, {
             'fields': ('title', 'subtitle', 'slug', 'category', 'author', 'cover_image', 'credits_image', 'excerpt', 'body'),
@@ -45,6 +46,10 @@ class ArticleAdmin(admin.ModelAdmin):
         }),
         ('Publication', {
             'fields': ('is_published', 'publish_date'),
+        }),
+        ('Statistiques', {
+            'fields': ('views_count',),
+            'classes': ('collapse',),
         }),
     )
 
