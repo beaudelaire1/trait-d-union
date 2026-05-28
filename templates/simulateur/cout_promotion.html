@@ -89,7 +89,7 @@
                 <div class="flex items-start gap-3">
                     <span class="text-2xl" x-text="estRealiste() ? '✅' : '⚠️'"></span>
                     <div>
-                        <p class="font-semibold" :style="'color:' + (estRealiste() ? '#22c55e' : '#ef4444')" x-text="estRealiste() ? 'Promo potentiellement rentable' : 'Promo risquée'"></p>
+                        <p class="font-semibold" :style="'color:' + (estRealiste() ? '#22c55e' : '#ef4444')" x-text="estRealiste() ? 'Volume à valider' : 'Promo risquée'"></p>
                         <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
                     </div>
                 </div>
@@ -134,9 +134,9 @@
                 const pct = this.pctAugmentation();
                 const va = this.volumeAdditionnel();
                 if (va === '∞') return `La remise de ${this.tauxRemise}% absorbe toute la marge — il est mathématiquement impossible d'être rentable. Réduisez le taux de remise ou trouvez un autre levier commercial.`;
-                if (pct <= 30) return `Il faut +${va} unités (+${pct}%) pour être neutre. C'est réaliste si votre marché est réceptif. La promo peut fonctionner.`;
-                if (pct <= 100) return `+${pct}% de volume requis — c'est ambitieux. Assurez-vous d'avoir la capacité de livrer ${this.pointMort()} unités et que la demande existe.`;
-                return `+${pct}% de ventes en plus est très difficile à atteindre. Cette promo vous coûtera probablement de l'argent. Réduisez la remise à 10-15% ou ciblez un segment précis.`;
+                if (pct <= 30) return `Il faut +${va} unités (+${pct}%) pour être neutre. Ce volume peut être atteignable si la demande, le stock et la capacité de livraison sont vérifiés.`;
+                if (pct <= 100) return `+${pct}% de volume requis — hypothèse ambitieuse. Validez la capacité de livrer ${this.pointMort()} unités et l'existence de la demande avant de lancer.`;
+                return `+${pct}% de ventes en plus est un seuil très élevé. Sans preuve de demande, cette promo risque de détruire de la marge. Réduisez la remise ou ciblez un segment précis.`;
             },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             init() {

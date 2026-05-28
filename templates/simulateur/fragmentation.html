@@ -1,19 +1,19 @@
 {% extends 'simulateur/tool_base.html' %}
 
-{% block title %}Indice de Fragmentation — Le Piège du Multi-SaaS | Trait d'Union Studio{% endblock %}
-{% block meta_description %}Mesurez le coût caché de l'empilement d'outils génériques. Comparez location éternelle vs actif propriétaire.{% endblock %}
+{% block title %}Indice de Fragmentation — Comparatif SaaS / Propriétaire | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Mesurez le coût direct de vos abonnements et comparez-le à un outil propriétaire, avec les limites du modèle.{% endblock %}
 
 {% block tool_color %}#a855f7{% endblock %}
 {% block tool_tag %}Multi-SaaS{% endblock %}
 {% block tool_title %}Indice de Fragmentation{% endblock %}
-{% block tool_description %}Combien d'outils empilés font tourner votre entreprise ? Calculez votre dette technique et le coût de la location éternelle.{% endblock %}
+{% block tool_description %}Combien d'outils empilés font tourner votre entreprise ? Comparez les coûts directs SaaS et propriétaire sur votre horizon.{% endblock %}
 
 {% block tool_icon %}
 <svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
 {% endblock %}
 
-{% block tool_cta_title %}Un écosystème unifié, ça ressemble à quoi ?{% endblock %}
-{% block tool_cta_text %}Échangeons sur ce que TUS peut construire pour remplacer vos abonnements fragmentés par un outil central adapté à votre activité.{% endblock %}
+{% block tool_cta_title %}Comparer avant de remplacer ?{% endblock %}
+{% block tool_cta_text %}Échangeons sur les scénarios réalistes : SaaS conservés, intégration hybride ou outil propriétaire.{% endblock %}
 
 {% block tool_content %}
 <div x-data="fragmentationSim()" x-cloak>
@@ -79,7 +79,7 @@
                     <div class="text-4xl" style="color: var(--sim-divider);">→</div>
                     <div>
                         <p class="result-big text-4xl" :style="'color:' + niveauColor()" x-text="niveauLabel()"></p>
-                        <p class="text-xs mt-1" style="color: var(--sim-muted);">dette technique</p>
+                        <p class="text-xs mt-1" style="color: var(--sim-muted);">complexité opérationnelle</p>
                     </div>
                 </div>
             </div>
@@ -89,7 +89,7 @@
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Total SaaS sur <span x-text="horizon"></span> ans</p>
                     <p class="result-big text-2xl" style="color: #ef4444;" x-text="fmt(totalSaas()) + ' €'"></p>
-                    <p class="text-xs mt-1" style="color: var(--sim-muted);">sans capitalisation d'actif</p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);">coûts directs d'abonnement</p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">TCO propriétaire sur <span x-text="horizon"></span> ans</p>
@@ -164,12 +164,16 @@
                                     <strong x-text="'+' + fmt(Math.round(economie())) + ' €'"></strong> d'économie totale.
                                 </p>
                                 <p class="text-sm mt-2 font-semibold" style="color: #22c55e;">
-                                    → L'investissement est rentable sur votre horizon. Plus vous conservez l'outil longtemps, plus l'avantage se creuse.
+                                    → Sur les coûts directs saisis, l'investissement est rentable sur votre horizon. À confirmer avec les risques de livraison, migration, formation et dépendance prestataire.
                                 </p>
                             </div>
                         </template>
                     </div>
                 </div>
+            </div>
+
+            <div class="result-block mo-fade-up" data-delay="225">
+                <p class="text-xs" style="color: var(--sim-sublabel);" x-text="modeleLimite()"></p>
             </div>
 
             {# Graphique projection #}
@@ -218,6 +222,10 @@
                 return 'Élevée';
             },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
+
+            modeleLimite() {
+                return 'Le modèle compare les coûts directs. Il ne valorise pas la qualité d’intégration, le risque projet, la dette technique future, la réversibilité ni le coût de formation.';
+            },
 
             init() {
                 ['nbOutils','coutMensuel','coutEcosysteme','hebergement','maintenance','horizon'].forEach(k => {

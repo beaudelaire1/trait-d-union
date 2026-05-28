@@ -1,12 +1,12 @@
 {% extends 'simulateur/tool_base.html' %}
 
 {% block title %}Prix Psychologique | Trait d'Union Studio{% endblock %}
-{% block meta_description %}Trouvez le prix juste basé sur la valeur perçue. Détectez la sous-tarification structurelle de vos offres.{% endblock %}
+{% block meta_description %}Estimez une zone de prix à tester à partir de vos hypothèses de valeur perçue et du contexte marché.{% endblock %}
 
 {% block tool_color %}#14b8a6{% endblock %}
 {% block tool_tag %}Tarification{% endblock %}
 {% block tool_title %}Simulateur de Prix Psychologique{% endblock %}
-{% block tool_description %}Pas le prix bas, le prix juste. Positionnez votre offre par la valeur perçue et détectez la sous-tarification structurelle.{% endblock %}
+{% block tool_description %}Estimez une zone de prix à tester à partir de la valeur perçue, du contexte marché et de vos hypothèses commerciales.{% endblock %}
 
 {% block tool_icon %}
 <svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
@@ -73,7 +73,7 @@
         <div class="lg:col-span-3 space-y-6">
 
             <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + couleur()">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + couleur()">Prix psychologique recommandé</p>
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + couleur()">Prix psychologique indicatif</p>
                 <p class="result-big text-5xl" :style="'color:' + couleur()" x-text="fmt(prixRecommande()) + ' €'"></p>
                 <p class="text-base mt-3" style="color: var(--sim-muted);">
                     Fourchette : <strong x-text="fmt(fourchetteBas()) + ' € — ' + fmt(fourchetteHaut()) + ' €'"></strong>
@@ -136,10 +136,10 @@
             ecart() { return this.prixActuel > 0 ? Math.round((this.prixRecommande() - this.prixActuel) / this.prixActuel * 100) : 0; },
             diagnostic() {
                 const e = this.ecart();
-                if (e >= 20) return 'Sous-tarification structurelle';
-                if (e >= 5) return 'Marge d\'optimisation';
-                if (e <= -20) return 'Sur-tarification';
-                return 'Prix cohérent';
+                if (e >= 20) return 'Écart bas à analyser';
+                if (e >= 5) return 'Marge de test possible';
+                if (e <= -20) return 'Écart haut à analyser';
+                return 'Prix aligné dans ces hypothèses';
             },
             couleur() {
                 const e = this.ecart();
@@ -151,10 +151,10 @@
             insight() {
                 const e = this.ecart();
                 const reco = this.prixRecommande();
-                if (e >= 20) return `Votre prix actuel (${this.fmt(this.prixActuel)} €) est nettement en dessous de la valeur perçue (${this.fmt(reco)} €). Avec un score de ${this.scoreValeur()}/30 en complexité + unicité + durée, vous sous-vendez votre expertise. Augmentez progressivement de 10-15% par trimestre.`;
-                if (e >= 5) return `Une légère marge d'optimisation existe. Le marché peut accepter ${this.fmt(reco)} € pour un score de valeur de ${this.scoreValeur()}/30. Testez une augmentation de prix sur vos prochains devis.`;
-                if (e <= -20) return `Votre prix (${this.fmt(this.prixActuel)} €) dépasse sensiblement la valeur perçue (${this.fmt(reco)} €). Soit renforcez la perception de valeur (positionnement, packaging), soit ajustez le tarif.`;
-                return `Votre prix est bien aligné avec la valeur perçue. Score de ${this.scoreValeur()}/30 pour un prix recommandé de ${this.fmt(reco)} €. Continuez à renforcer l'unicité pour justifier de futures augmentations.`;
+                if (e >= 20) return `Dans ces hypothèses, votre prix actuel (${this.fmt(this.prixActuel)} €) est nettement sous la zone indicative (${this.fmt(reco)} €). Le score de ${this.scoreValeur()}/30 en complexité + unicité + durée suggère un test tarifaire progressif, à valider sur les prochains devis.`;
+                if (e >= 5) return `Dans ces hypothèses, une marge de test existe autour de ${this.fmt(reco)} € pour un score de valeur de ${this.scoreValeur()}/30. Testez l'acceptation avant de généraliser.`;
+                if (e <= -20) return `Dans ces hypothèses, votre prix (${this.fmt(this.prixActuel)} €) dépasse sensiblement la zone indicative (${this.fmt(reco)} €). Vérifiez la perception de valeur, le packaging et les comparables avant de conclure.`;
+                return `Dans ces hypothèses, votre prix reste proche de la zone indicative. Score de ${this.scoreValeur()}/30 pour un prix indicatif de ${this.fmt(reco)} €. Les prochains retours commerciaux doivent confirmer cette zone.`;
             },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             init() {
@@ -172,7 +172,7 @@
                 if (chart) chart.destroy();
                 chart = new Chart(ctx, {
                     type: 'bar', data: {
-                        labels: ['Prix marché', 'Votre prix', 'Prix recommandé', 'Fourchette haute'],
+                        labels: ['Prix marché', 'Votre prix', 'Prix indicatif', 'Fourchette haute'],
                         datasets: [{ data: [this.prixMarche, this.prixActuel, this.prixRecommande(), this.fourchetteHaut()],
                             backgroundColor: ['rgba(107,114,128,0.3)', 'rgba(239,68,68,0.3)', 'rgba(20,184,166,0.3)', 'rgba(34,197,94,0.3)'],
                             borderColor: ['#6b7280', '#ef4444', '#14b8a6', '#22c55e'],

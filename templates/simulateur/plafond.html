@@ -171,7 +171,7 @@
             coutMensuelAuto: 100,
 
             tempsOptimise() { return this.tempsAdmin * (1 - this.gainAutomation / 100); },
-            capaciteActuelle() { return this.tempsAdmin > 0 ? Math.floor(this.heuresDisponibles / this.tempsAdmin) : 0; },
+            capaciteActuelle() { return this.projetsActuels; },
             capaciteOptimisee() { const t = this.tempsOptimise(); return t > 0 ? Math.floor(this.heuresDisponibles / t) : 0; },
             projetsGagnes() { return Math.max(0, this.capaciteOptimisee() - this.capaciteActuelle()); },
             caSupp() { return this.projetsGagnes() * this.panierMoyen; },

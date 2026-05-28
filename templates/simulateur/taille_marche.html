@@ -53,7 +53,7 @@
                         <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="pctSOM + '%'"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="pctSOM" min="0.5" max="30" step="0.5">
-                    <p class="tool-sublabel">Typiquement 1-5% pour un nouvel entrant</p>
+                    <p class="tool-sublabel">SOM = part visée du SAM. La plage réaliste dépend de la concurrence et du canal d'acquisition.</p>
                 </div>
             </div>
         </div>
@@ -79,7 +79,7 @@
             </div>
 
             <div class="result-block text-center py-6 mo-fade-up" data-delay="100" style="border-color: #22c55e;">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #22c55e;">Objectif CA réaliste (SOM)</p>
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #22c55e;">Objectif CA indicatif (SOM)</p>
                 <p class="result-big text-4xl" style="color: #22c55e;" x-text="fmtM(som()) + ' € / an'"></p>
                 <p class="text-base mt-2" style="color: var(--sim-muted);">soit ~<strong x-text="fmt(Math.round(som() / 12))"></strong> € / mois</p>
             </div>
@@ -128,7 +128,7 @@
                 const clients = this.clientsSOM();
                 if (clients < 10) return `Seulement ${clients} clients potentiels dans votre SOM — le marché est très niche. Augmentez la dépense moyenne (upsell/cross-sell) ou élargissez votre zone SAM.`;
                 if (this.pctSOM > 10) return `${this.pctSOM}% de part de marché est ambitieux pour un acteur non dominant. Commencez par 2-5% puis augmentez progressivement avec la notoriété.`;
-                return `SOM de ${this.fmtM(somCA)} €/an avec ${clients} clients — c'est réaliste avec ${this.pctSOM}% du SAM. Pour atteindre cet objectif : ${Math.ceil(clients / 12)} nouveaux clients/mois à ${this.fmt(this.depenseMoyenne)} € de panier moyen.`;
+                return `SOM de ${this.fmtM(somCA)} €/an avec ${clients} clients — soit ${this.pctSOM}% du SAM. Pour atteindre cet objectif indicatif : ${Math.ceil(clients / 12)} nouveaux clients/mois à ${this.fmt(this.depenseMoyenne)} € de panier moyen.`;
             },
             init() {
                 ['populationTotale','depenseMoyenne','pctSAM','pctSOM'].forEach(k => {

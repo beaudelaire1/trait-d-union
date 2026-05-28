@@ -68,10 +68,11 @@
 
         <div class="lg:col-span-3 space-y-6">
 
-            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + (roas() >= 1 ? '#22c55e' : '#ef4444')">
+            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + (marketingRentable() ? '#22c55e' : '#ef4444')">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ec4899;">ROAS (Return On Ad Spend)</p>
-                <p class="result-big text-5xl" :style="'color:' + (roas() >= 1 ? '#22c55e' : '#ef4444')" x-text="roas() + 'x'"></p>
-                <p class="text-base mt-3" style="color: var(--sim-muted);" x-text="roas() >= 1 ? 'Chaque euro investi rapporte ' + roas() + ' €' : 'Votre marketing perd de l\'argent'"></p>
+                <p class="result-big text-5xl" :style="'color:' + (marketingRentable() ? '#22c55e' : '#ef4444')" x-text="roas() + 'x'"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);" x-text="marketingRentable() ? 'Marge nette positive apres budget' : 'ROAS sous le seuil de rentabilite marge'"></p>
+                <p class="text-xs mt-1" style="color: var(--sim-sublabel);" x-text="'Seuil rentabilite: ' + roasSeuil() + 'x avec ' + marge + '% de marge'"></p>
             </div>
 
             <div class="grid sm:grid-cols-4 gap-4">
@@ -137,16 +138,19 @@
             caGenere() { return this.clients() * this.panierMoyen; },
             margeNette() { return this.clients() > 0 ? this.caGenere() * this.marge / 100 - this.budget : -this.budget; },
             roas() { return (this.budget > 0 && this.clients() > 0) ? Math.round(this.caGenere() / this.budget * 10) / 10 : 0; },
+            roasSeuil() { return this.marge > 0 ? Math.round(100 / this.marge * 10) / 10 : '∞'; },
+            marketingRentable() { return this.margeNette() >= 0; },
             coutParLead() { return this.leads() > 0 ? Math.round(this.budget / this.leads()) : '∞'; },
             coutParClient() { return this.clients() > 0 ? Math.round(this.budget / this.clients()) : '∞'; },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             insight() {
                 const r = this.roas();
                 const cpl = this.coutParLead();
+                const seuil = this.roasSeuil();
                 if (this.clients() === 0) return `Aucun client généré avec ces paramètres. Votre entonnoir ne produit pas de conversion — vérifiez vos taux ou augmentez votre trafic.`;
-                if (r < 1) return `ROAS de ${r}x — votre marketing perd de l'argent. Deux leviers : augmenter le taux de conversion (SEO, landing pages) ou augmenter le panier moyen (upsell, bundles).`;
-                if (r < 3) return `ROAS de ${r}x — correct mais optimisable. Coût par lead de ${cpl} €. Améliorez le taux lead→client (nurturing, automation) pour passer au-dessus de 3x.`;
-                return `ROAS de ${r}x — excellent ! Votre marketing est rentable avec un coût d'acquisition client de ${this.coutParClient()} €. Envisagez de scaler le budget pour accélérer la croissance.`;
+                if (!this.marketingRentable()) return `ROAS de ${r}x — insuffisant avec ${this.marge}% de marge. Le seuil de rentabilité est ${seuil}x : améliorez la conversion, le panier moyen ou la marge avant d'augmenter le budget.`;
+                if (r < 3) return `ROAS de ${r}x — rentable mais encore sensible aux variations de marge. Coût par lead de ${cpl} €. Surveillez surtout la marge nette marketing.`;
+                return `ROAS de ${r}x — marge nette marketing positive avec un coût d'acquisition client de ${this.coutParClient()} €. Testez une hausse de budget par paliers en contrôlant la marge nette.`;
             },
             init() {
                 ['budget','visiteurs','tauxLead','tauxClient','panierMoyen','marge'].forEach(k => {

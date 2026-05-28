@@ -49,7 +49,7 @@
                         <span class="text-lg font-bold font-mono" style="color: #f59e0b;" x-text="ratioBasic + 'x'"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="ratioBasic" min="0.3" max="0.8" step="0.05">
-                    <p class="tool-sublabel">Recommandé : 0.5 – 0.65x</p>
+                    <p class="tool-sublabel">Hypothèse de départ : 0.5 – 0.65x, à tester selon la valeur perçue.</p>
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-2">
@@ -57,7 +57,7 @@
                         <span class="text-lg font-bold font-mono" style="color: #a855f7;" x-text="ratioPremium + 'x'"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="ratioPremium" min="1.5" max="4" step="0.1">
-                    <p class="tool-sublabel">Recommandé : 2.0 – 2.5x</p>
+                    <p class="tool-sublabel">Hypothèse de départ : 2.0 – 2.5x, à tester selon votre marché.</p>
                 </div>
             </div>
 
@@ -156,8 +156,8 @@
             prixPro: 500, coutPro: 200, coutBasicVal: 120, coutPremiumVal: 260, ratioBasic: 0.6, ratioPremium: 2.2,
             pctBasic: 25, pctPremium: 15, volumeTotal: 100,
             pctPro() { return Math.max(0, 100 - this.pctBasic - this.pctPremium); },
-            prixBasic() { return Math.round(this.prixPro * this.ratioBasic); },
-            prixPremium() { return Math.round(this.prixPro * this.ratioPremium); },
+            prixBasic() { return Math.max(1, Math.round(this.prixPro * this.ratioBasic)); },
+            prixPremium() { return Math.max(1, Math.round(this.prixPro * this.ratioPremium)); },
             coutBasic() { return this.coutBasicVal; },
             coutPremium() { return this.coutPremiumVal; },
             margeBasic() { return this.prixBasic() - this.coutBasic(); },
@@ -173,14 +173,14 @@
             },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             insight() {
-                const ecartBP = this.prixPro / (this.prixBasic() || 1);
+                const ecartBP = this.prixPro / this.prixBasic();
                 const ecartPPr = this.prixPremium() / this.prixPro;
                 let tips = [];
                 if (ecartBP < 1.4) tips.push('L\'écart Basic/Pro est faible — le Pro ne semble pas assez différencié. Augmentez-le à 1.6x minimum.');
                 if (ecartBP > 2.5) tips.push('L\'écart Basic/Pro est très grand — risque de « trou » perçu. Ajoutez une raison claire pour le saut de prix.');
                 if (ecartPPr > 3) tips.push('Le Premium à ' + this.fmt(this.prixPremium()) + ' € peut sembler excessif. L\'ancrage fonctionne mieux avec un ratio de 2-2.5x.');
-                if (this.pctPro() < 40) tips.push('Idéalement, 50-60% des ventes devraient être sur le Pro (votre meilleure marge). Ajustez la valeur perçue.');
-                if (tips.length === 0) return `Grille bien calibrée ! Le Pro à ${this.fmt(this.prixPro)} € concentre ${this.pctPro()}% des ventes. Le Premium agit comme ancre psychologique et booste la perception de valeur du Pro.`;
+                if (this.pctPro() < 40) tips.push('Le Pro capte moins de 40% des ventes dans votre hypothèse. Vérifiez si la valeur perçue justifie assez le passage Basic → Pro.');
+                if (tips.length === 0) return `Grille cohérente avec ces hypothèses. Le Pro à ${this.fmt(this.prixPro)} € concentre ${this.pctPro()}% des ventes, et le Premium sert d'ancrage de comparaison.`;
                 return tips.join(' ');
             },
             init() {

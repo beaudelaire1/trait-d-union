@@ -12,8 +12,8 @@
 <svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
 {% endblock %}
 
-{% block tool_cta_title %}Prêt à agir maintenant ?{% endblock %}
-{% block tool_cta_text %}TUS transforme votre inaction digitale en avantage compétitif — chaque mois compte.{% endblock %}
+{% block tool_cta_title %}Besoin de comparer les options ?{% endblock %}
+{% block tool_cta_text %}TUS peut vous aider à chiffrer plusieurs scénarios avant d'investir.{% endblock %}
 
 {% block tool_content %}
 <div x-data="coutInactionSim()" x-cloak>
@@ -33,7 +33,7 @@
                         <span class="text-lg font-bold font-mono" style="color: #ef4444;" x-text="aggravation + '%'"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="aggravation" min="0" max="20" step="1">
-                    <p class="tool-sublabel">% d'augmentation de la perte chaque mois</p>
+                    <p class="tool-sublabel">0 % = coût stable ; au-dessus, la perte est composée mois après mois.</p>
                 </div>
             </div>
 
@@ -62,7 +62,7 @@
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #ef4444;">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ef4444;">Coût cumulé de l'inaction à 24 mois</p>
                 <p class="result-big text-5xl" style="color: #ef4444;" x-text="fmt(coutInaction24()) + ' €'"></p>
-                <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="fmt(Math.round(coutInaction24() / (coutSolution || 1) * 10) / 10) + 'x'"></strong> le coût de la solution</p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="ratioSolution24()"></strong> le coût de la solution</p>
             </div>
 
             <div class="grid sm:grid-cols-3 gap-4">
@@ -91,7 +91,7 @@
                 <div class="flex items-start gap-3">
                     <span class="text-2xl">⏳</span>
                     <div>
-                        <p class="font-semibold" style="color: #ef4444;">Chaque mois compte</p>
+                        <p class="font-semibold" style="color: #ef4444;">Lecture comparative</p>
                         <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
                     </div>
                 </div>
@@ -107,13 +107,17 @@
     let chart = null;
     function coutInactionSim() {
         return {
-            perteMensuelle: 3000, aggravation: 5, coutSolution: 15000, delaiMiseEnPlace: 3, reductionProbleme: 80,
+            perteMensuelle: 3000, aggravation: 0, coutSolution: 15000, delaiMiseEnPlace: 3, reductionProbleme: 80,
             coutInactionN(n) {
                 let total = 0; let perte = this.perteMensuelle;
                 for (let m = 1; m <= n; m++) { total += perte; perte *= (1 + this.aggravation / 100); }
                 return total;
             },
             coutInaction24() { return this.coutInactionN(24); },
+            ratioSolution24() {
+                if (this.coutSolution <= 0) return 'non calculable sans coût solution';
+                return this.fmt(Math.round(this.coutInaction24() / this.coutSolution * 10) / 10) + 'x';
+            },
             coutSolutionN(n) {
                 let total = this.coutSolution;
                 let perte = this.perteMensuelle;
@@ -135,8 +139,9 @@
                 const pb = this.pointBascule();
                 const c24 = this.coutInaction24();
                 if (pb === '>36') return `Le point de bascule est au-delà de 36 mois. La solution semble trop coûteuse par rapport au problème. Réduisez le périmètre de la solution ou reconsidérez l'ampleur réelle du problème.`;
-                if (pb <= this.delaiMiseEnPlace + 1) return `Dès le mois ${pb}, la solution est plus rentable que l'inaction. Avec ${this.fmt(c24)} € de pertes cumulées sur 2 ans, chaque mois de retard est un mois de trop.`;
-                return `Le point de bascule est au mois ${pb}. D'ici là, vous aurez perdu ${this.fmt(this.coutInactionN(pb))} € supplémentaires. Le coût de l'inaction accélère : au mois 24, il atteint ${this.fmt(c24)} €.`;
+                const hypothese = this.aggravation > 0 ? ` avec une aggravation composee de ${this.aggravation}% par mois` : ' avec une perte mensuelle stable';
+                if (pb <= this.delaiMiseEnPlace + 1) return `Dans ce scénario${hypothese}, la solution devient moins coûteuse que l'inaction au mois ${pb}. Les pertes cumulées projetées sur 2 ans atteignent ${this.fmt(c24)} €.`;
+                return `Dans ce scénario${hypothese}, le point de bascule est au mois ${pb}. D'ici là, l'inaction cumulerait ${this.fmt(this.coutInactionN(pb))} € de pertes, puis ${this.fmt(c24)} € à 24 mois.`;
             },
             init() {
                 ['perteMensuelle','aggravation','coutSolution','delaiMiseEnPlace','reductionProbleme'].forEach(k => {

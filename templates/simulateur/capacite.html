@@ -30,6 +30,11 @@
                     <label class="tool-label">Tarif horaire moyen facturé (€/h)</label>
                     <input type="number" class="tool-input" x-model.number="tarifHoraire" min="10" step="10" placeholder="80">
                 </div>
+                <div>
+                    <label class="tool-label">Semaines facturables / an</label>
+                    <input type="number" class="tool-input" x-model.number="semainesFacturables" min="1" max="52" step="1" placeholder="47">
+                    <p class="tool-sublabel mt-1">Déduisez congés, jours fériés, formation et indisponibilités.</p>
+                </div>
             </div>
 
             <div class="tool-card space-y-6 mo-fade-up" data-delay="100">
@@ -130,16 +135,16 @@
     let chart = null;
     function capaciteSim() {
         return {
-            heuresTotales: 50, tarifHoraire: 80,
+            heuresTotales: 50, tarifHoraire: 80, semainesFacturables: 47,
             pctFacturable: 40, pctAdmin: 25, pctProspection: 20, pctManagement: 15,
             tauxCible: 65,
             totalPct() { return this.pctFacturable + this.pctAdmin + this.pctProspection + this.pctManagement; },
             heuresFacturables() { return this.heuresTotales * this.pctFacturable / 100; },
             heuresCible() { return this.heuresTotales * this.tauxCible / 100; },
-            caReel() { return this.heuresFacturables() * this.tarifHoraire * 47; },
-            caPotentiel() { return this.heuresCible() * this.tarifHoraire * 47; },
+            caReel() { return this.heuresFacturables() * this.tarifHoraire * this.semainesFacturables; },
+            caPotentiel() { return this.heuresCible() * this.tarifHoraire * this.semainesFacturables; },
             caPerdu() { return Math.max(0, this.caPotentiel() - this.caReel()); },
-            caParPoint() { return this.heuresTotales * this.tarifHoraire * 47 / 100; },
+            caParPoint() { return this.heuresTotales * this.tarifHoraire * this.semainesFacturables / 100; },
             insight() {
                 const max = Math.max(this.pctAdmin, this.pctProspection, this.pctManagement);
                 let levier = '';
@@ -150,7 +155,7 @@
             },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             init() {
-                ['heuresTotales','tarifHoraire','pctFacturable','pctAdmin','pctProspection','pctManagement','tauxCible'].forEach(k => {
+                ['heuresTotales','tarifHoraire','semainesFacturables','pctFacturable','pctAdmin','pctProspection','pctManagement','tauxCible'].forEach(k => {
                     this.$watch(k, () => this.updateChart());
                 });
                 this.$nextTick(() => this.updateChart());

@@ -71,9 +71,9 @@
         <div class="lg:col-span-3 space-y-6">
 
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #a855f7;">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #a855f7;">Meilleur profil à cibler</p>
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #a855f7;">Meilleur profil dans vos hypothèses</p>
                 <p class="result-big text-4xl" style="color: #a855f7;" x-text="bestNom()"></p>
-                <p class="text-base mt-3" style="color: var(--sim-muted);">Score : <strong style="color: #22c55e;" x-text="bestScore() + ' pts'"></strong></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">Score relatif : <strong style="color: #22c55e;" x-text="bestScore() + ' pts'"></strong></p>
             </div>
 
             <div class="result-block mo-fade-up" data-delay="150">
@@ -156,7 +156,7 @@
                 const r = this.ranking();
                 if (r.length < 2) return 'Ajoutez au moins 2 profils pour comparer.';
                 const best = r[0]; const worst = r[r.length - 1];
-                return `Concentrez vos efforts sur "${best.nom || 'Profil ' + (best.idx+1)}" (LTV : ${this.fmt(best.ltv)} €, ROI acquisition : ${best.roi}x). "${worst.nom || 'Profil ' + (worst.idx+1)}" arrive en dernier — sa LTV est de ${this.fmt(worst.ltv)} € pour un CAC de ${this.fmt(this.clients[worst.idx].cac)} €. Réduisez l'effort commercial sur ce segment et réallouez vers le premier.`;
+                return `Selon ces hypothèses, "${best.nom || 'Profil ' + (best.idx+1)}" ressort en tête (LTV : ${this.fmt(best.ltv)} €, ROI acquisition : ${best.roi}x). "${worst.nom || 'Profil ' + (worst.idx+1)}" arrive en dernier — sa LTV est de ${this.fmt(worst.ltv)} € pour un CAC de ${this.fmt(this.clients[worst.idx].cac)} €. Testez ces segments avant de réallouer l'effort commercial.`;
             },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             init() {

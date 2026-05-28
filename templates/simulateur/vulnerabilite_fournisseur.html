@@ -55,6 +55,8 @@
                         </div>
                     </div>
                 </template>
+                <p class="text-xs font-semibold" :style="'color:' + (totalPart() === 100 ? '#22c55e' : '#f59e0b')" x-text="'Total achats saisis : ' + totalPart() + '%'"></p>
+                <p x-show="totalPart() !== 100" class="text-xs" style="color: #f59e0b;" x-text="partWarning()"></p>
             </div>
         </div>
 
@@ -115,10 +117,16 @@
             ],
             addFournisseur() { if (this.fournisseurs.length < 6) this.fournisseurs.push({ nom: '', part: 10, remplacabilite: 3, fiabilite: 3 }); },
             removeFournisseur(i) { if (this.fournisseurs.length > 1) this.fournisseurs.splice(i, 1); },
+            totalPart() { return this.fournisseurs.reduce((s, f) => s + (f.part || 0), 0); },
+            partWarning() {
+                const total = this.totalPart();
+                if (total === 0) return 'Aucune part fournisseur renseignée : l’indice est nul par absence de données.';
+                return `Les parts ne totalisent pas 100% : l’indice est normalisé sur les ${total}% saisis.`;
+            },
             scoreF(f) {
                 const concentration = f.part;
-                const difficulte = (6 - f.remplacabilite) * 10;
-                const risque = (6 - f.fiabilite) * 8;
+                const difficulte = (6 - f.remplacabilite) * 25;  /* 0\u2013100 */
+                const risque = (6 - f.fiabilite) * 25;           /* 0\u2013100 */
                 return Math.min(100, Math.round((concentration * 0.5) + (difficulte * 0.3) + (risque * 0.2)));
             },
             fournisseursScores() {
@@ -130,7 +138,7 @@
             },
             indiceVulnerabilite() {
                 if (this.fournisseurs.length === 0) return 0;
-                const totalPart = this.fournisseurs.reduce((s, f) => s + f.part, 0) || 1;
+                const totalPart = this.totalPart() || 1;
                 return Math.round(this.fournisseurs.reduce((s, f) => s + this.scoreF(f) * (f.part / totalPart), 0));
             },
             scoreColor() {

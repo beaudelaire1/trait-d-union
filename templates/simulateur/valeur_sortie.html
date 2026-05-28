@@ -6,7 +6,7 @@
 {% block tool_color %}#8b5cf6{% endblock %}
 {% block tool_tag %}Stratégie{% endblock %}
 {% block tool_title %}Valeur de Sortie{% endblock %}
-{% block tool_description %}Si je vendais demain, combien vaudrait mon entreprise ? Estimation par les multiples sectoriels.{% endblock %}
+{% block tool_description %}Si je vendais demain, combien vaudrait mon entreprise ? Estimation indicative par multiples sectoriels à confronter à des comparables récents.{% endblock %}
 
 {% block tool_icon %}
 <svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -47,8 +47,9 @@
                     </select>
                 </div>
                 <div class="text-xs space-y-1" style="color: var(--sim-muted);">
-                    <p>Multiple CA : <strong x-text="multCA()"></strong>x</p>
-                    <p>Multiple EBITDA : <strong x-text="multEBITDA()"></strong>x</p>
+                    <p>Multiple CA indicatif : <strong x-text="multCA()"></strong>x</p>
+                    <p>Multiple EBITDA indicatif : <strong x-text="multEBITDA()"></strong>x</p>
+                    <p>Ces multiples sont des hypothèses de simulation, pas une expertise de valorisation.</p>
                 </div>
             </div>
         </div>
@@ -56,22 +57,22 @@
         <div class="lg:col-span-3 space-y-6">
 
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #8b5cf6;">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #8b5cf6;">Fourchette de valorisation</p>
-                <p class="result-big text-4xl" style="color: #8b5cf6;" x-text="fmt(valorBasse()) + ' € — ' + fmt(valorHaute()) + ' €'"></p>
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #8b5cf6;">Fourchette indicative de valorisation</p>
+                <p class="result-big text-4xl" style="color: #8b5cf6;" x-text="fmt(valorMin()) + ' € — ' + fmt(valorMax()) + ' €'"></p>
                 <p class="text-lg mt-2 font-semibold" style="color: var(--sim-ink);">Médiane : <span style="color: #8b5cf6;" x-text="fmt(valorMediane()) + ' €'"></span></p>
             </div>
 
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
-                    <p class="result-label mb-1">Basse (CA)</p>
+                    <p class="result-label mb-1">Multiple CA</p>
                     <p class="result-big text-2xl" style="color: #f59e0b;" x-text="fmt(valorBasse()) + ' €'"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
-                    <p class="result-label mb-1">Médiane (EBITDA)</p>
+                    <p class="result-label mb-1">Multiple EBITDA</p>
                     <p class="result-big text-2xl" style="color: #8b5cf6;" x-text="fmt(valorMediane()) + ' €'"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
-                    <p class="result-label mb-1">Haute (croissance)</p>
+                    <p class="result-label mb-1">EBITDA + prime croissance</p>
                     <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(valorHaute()) + ' €'"></p>
                 </div>
             </div>
@@ -127,13 +128,20 @@
             valorBasse() { return this.ca * this.multCA(); },
             valorMediane() { return this.ebitda * this.multEBITDA(); },
             valorHaute() { return this.ebitda * this.multEBITDA() * this.primeCroissance(); },
+            /* Bornes de fourchette calculées dynamiquement — selon les inputs,
+               la valorisation "multiple CA" peut tomber au-dessus ou en dessous
+               de la "multiple EBITDA" (cas marge faible / forte). */
+            valorMin() { return Math.min(this.valorBasse(), this.valorMediane(), this.valorHaute()); },
+            valorMax() { return Math.max(this.valorBasse(), this.valorMediane(), this.valorHaute()); },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             insight() {
                 const med = this.valorMediane();
-                const ratio = this.ebitda / (this.ca || 1) * 100;
+                if (this.ca <= 0) return `Saisissez un chiffre d'affaires strictement positif pour éviter un ratio de valorisation non interprétable.`;
+                if (this.ebitda <= 0) return `EBITDA nul ou négatif : les multiples d'EBITDA ne sont pas exploitables. Privilégiez une analyse par actifs, traction commerciale ou comparables sectoriels récents.`;
+                const ratio = this.ebitda / this.ca * 100;
                 if (ratio < 10) return `Votre marge EBITDA de ${Math.round(ratio)}% est en dessous des standards. Améliorer la rentabilité de 5 points augmenterait la valorisation de ~${this.fmt(this.ca * 0.05 * this.multEBITDA())} €. Concentrez-vous sur la marge avant de vendre.`;
-                if (this.croissance > 20) return `Avec ${this.croissance}% de croissance, les acquéreurs appliqueront une prime significative. La fourchette haute (${this.fmt(this.valorHaute())} €) est réaliste si vous documentez cette trajectoire sur 3 ans.`;
-                return `Valorisation médiane de ${this.fmt(med)} € (${Math.round(med/this.ca*10)/10}x le CA). Pour maximiser la valeur : récurrence du CA, diversification clients, processus documentés, et un digital maîtrisé.`;
+                if (this.croissance > 20) return `Avec ${this.croissance}% de croissance, une prime peut être défendable si elle est documentée par des données récentes. La fourchette haute (${this.fmt(this.valorHaute())} €) reste une hypothèse à valider par comparables.`;
+                return `Valorisation médiane indicative de ${this.fmt(med)} € (${Math.round(med/this.ca*10)/10}x le CA). À valider avec des transactions comparables, la récurrence du CA, la concentration clients et la qualité des processus.`;
             },
             init() {
                 ['ca','ebitda','croissance','secteur'].forEach(k => {

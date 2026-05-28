@@ -1,12 +1,12 @@
 {% extends 'simulateur/tool_base.html' %}
 
 {% block title %}Radar de Dépendance Commerciale | Trait d'Union Studio{% endblock %}
-{% block meta_description %}Si votre client principal part demain, vous coulez ? Mesurez votre indice de concentration et simulez les risques.{% endblock %}
+{% block meta_description %}Mesurez votre indice de concentration client et estimez l'exposition liée à vos principaux comptes.{% endblock %}
 
 {% block tool_color %}#ef4444{% endblock %}
 {% block tool_tag %}Risque{% endblock %}
 {% block tool_title %}Radar de Dépendance Commerciale{% endblock %}
-{% block tool_description %}Si votre client principal part demain, vous coulez ? Mesurez votre concentration et le temps de compensation.{% endblock %}
+{% block tool_description %}Mesurez votre concentration client et estimez le temps nécessaire pour compenser la perte d'un compte majeur.{% endblock %}
 
 {% block tool_icon %}
 <svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
@@ -51,6 +51,7 @@
                     </div>
                 </template>
                 <p class="text-xs font-semibold" :style="'color:' + (totalPct() === 100 ? '#22c55e' : totalPct() > 100 ? '#ef4444' : '#f59e0b')" x-text="'Total : ' + totalPct() + '%'"></p>
+                <p x-show="totalPct() !== 100" class="text-xs" style="color: #f59e0b;" x-text="repartitionWarning()"></p>
                 <button x-show="clients.length < 10" @click="clients.push({nom:'',pct:0})"
                         class="w-full py-1.5 rounded-xl text-xs font-semibold transition"
                         style="border: 1px dashed var(--sim-card-border); color: var(--sim-muted);">+ Ajouter</button>
@@ -110,6 +111,12 @@
                 { nom: 'Client C', pct: 15 }, { nom: 'Autres', pct: 30 }
             ],
             totalPct() { return this.clients.reduce((s, c) => s + (c.pct || 0), 0); },
+            repartitionWarning() {
+                const total = this.totalPct();
+                if (total < 100) return `Il manque ${100 - total}% de CA : le HHI peut sous-estimer ou mal qualifier la concentration.`;
+                if (total > 100) return `Le total dépasse 100% : corrigez la répartition avant d'interpréter le HHI.`;
+                return '';
+            },
             hhi() { return this.clients.reduce((s, c) => s + Math.pow(c.pct || 0, 2), 0); },
             couleurHHI() {
                 const h = this.hhi();
@@ -140,6 +147,7 @@
                 const h = this.hhi();
                 const perte = this.pertePremier();
                 const mois = this.moisCompensation();
+                if (this.totalPct() !== 100) return `${this.repartitionWarning()} Les montants de perte restent calculés sur les parts saisies, mais le niveau de risque HHI ne doit pas être utilisé tant que la répartition ne totalise pas 100%.`;
                 if (h >= 2500) return `Votre premier client représente ${this.fmt(perte)} € soit un HHI de ${h}. En cas de perte, il faudrait ${this.clientsCompensation()} nouveaux clients sur ${mois} mois. Diversifiez immédiatement votre portefeuille.`;
                 if (h >= 1500) return `Concentration modérée (HHI ${h}). La perte du 1er client coûterait ${this.fmt(perte)} €, compensable en ${mois} mois. Réduisez progressivement la part du top client.`;
                 return `Bonne diversification (HHI ${h}). Maintenez cette répartition et continuez la prospection pour réduire encore la concentration.`;

@@ -104,7 +104,7 @@
                 <div class="grid sm:grid-cols-3 gap-4 mt-4">
                     <div>
                         <p class="result-label mb-1">Économie nette / mois</p>
-                        <p class="result-big text-xl" style="color: #22c55e;" x-text="fmt(economieNette()) + ' €'"></p>
+                        <p class="result-big text-xl" :style="'color:' + (economieNette() >= 0 ? '#22c55e' : '#ef4444')" x-text="(economieNette() >= 0 ? '' : '-') + fmt(Math.abs(economieNette())) + ' €'"></p>
                         <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="'brute ' + fmt(economieMensuelle()) + ' € − maintien ' + fmt(coutRecurrent) + ' €'"></p>
                     </div>
                     <div>
@@ -153,17 +153,19 @@
             coutTotalMensuel() { return this.coutsVisibles() + this.coutsCaches(); },
             pctVisible() { const t = this.coutTotalMensuel(); return t > 0 ? Math.round(this.coutsVisibles() / t * 100) : 0; },
             economieMensuelle() { return this.coutTotalMensuel() * this.reductionQualite / 100; },
-            /* Économie nette = économie brute − coût récurrent de maintien */
-            economieNette() { return Math.max(0, this.economieMensuelle() - this.coutRecurrent); },
+            /* Économie nette = économie brute − coût récurrent de maintien. */
+            economieNette() { return this.economieMensuelle() - this.coutRecurrent; },
             moisAmortissement() {
                 const ecoNette = this.economieNette();
                 return ecoNette > 0 ? Math.ceil(this.investQualite / ecoNette) : '∞';
             },
-            /* ROI = (économie nette × 12 − invest initial) / (invest initial + récurrent × 12) */
+            /* ROI 12 mois = bénéfice net annuel rapporté à l'investissement initial.
+               L'économie nette inclut déjà la déduction du coût récurrent ;
+               le dénominateur ne doit donc pas le re-comptabiliser. */
             roi12() {
-                const coutTotal12 = this.investQualite + this.coutRecurrent * 12;
-                const gain12 = this.economieNette() * 12;
-                return coutTotal12 > 0 ? Math.round((gain12 - this.investQualite) / coutTotal12 * 100) : 0;
+                if (this.investQualite <= 0) return 0;
+                const beneficeNet12 = this.economieNette() * 12 - this.investQualite;
+                return Math.round(beneficeNet12 / this.investQualite * 100);
             },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             insight() {
@@ -172,10 +174,11 @@
                 const roi = this.roi12();
                 const coutTotal12 = this.investQualite + this.coutRecurrent * 12;
                 const ecoNette = this.economieNette();
+                if (ecoNette <= 0) return `ROI négatif sur 12 mois. Le coût récurrent de ${this.fmt(this.coutRecurrent)} €/mois donne une économie nette mensuelle de ${this.fmt(ecoNette)} €. Ciblez les postes les plus coûteux ou réduisez le périmètre d'investissement.`;
                 if (pctC > 70) return `${pctC}% de vos coûts de non-qualité sont cachés — c'est la partie immergée de l'iceberg. Les clients perdus et l'impact réputation coûtent ${this.fmt(this.coutsCaches())} €/mois. Un plan qualité (${this.fmt(coutTotal12)} € coût total sur 12 mois) serait amorti en ${this.moisAmortissement()} mois.`;
                 if (roi > 100) return `ROI de ${roi}% — l'investissement qualité (${this.fmt(this.investQualite)} € initial + ${this.fmt(this.coutRecurrent)} €/mois) se rembourse dès le mois ${this.moisAmortissement()}. Économie nette : ${this.fmt(ecoNette)} €/mois. La non-qualité vous coûte ${this.fmt(total * 12)} €/an.`;
                 if (roi > 0) return `ROI de ${roi}% sur 12 mois. Rentable mais modéré. Ciblez d'abord les retouches (${this.fmt(this.retouches)} €/mois) — c'est souvent le levier le plus rapide. Économie nette après maintien : ${this.fmt(ecoNette)} €/mois.`;
-                return `ROI négatif sur 12 mois. Le coût récurrent de ${this.fmt(this.coutRecurrent)} €/mois réduit l'économie. Ciblez les postes les plus coûteux ou réduisez le périmètre d'investissement.`;
+                return `ROI de ${roi}% sur 12 mois. Le plan reste positif mais faible à ce niveau d'hypothèses. Vérifiez la réduction attendue avant d'investir.`;
             },
             init() {
                 ['retouches','reclamations','penalites','clientsPerdus','heuresPerdu','coutHoraire','reputation','investQualite','coutRecurrent','reductionQualite'].forEach(k => {

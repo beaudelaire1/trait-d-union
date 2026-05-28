@@ -6,7 +6,7 @@
 {% block tool_color %}#8b5cf6{% endblock %}
 {% block tool_tag %}Croissance{% endblock %}
 {% block tool_title %}Effet Composé de la Rétention{% endblock %}
-{% block tool_description %}+5% de rétention = +25 à +95% de profit. Visualisez l'effet boule de neige sur 5 ans.{% endblock %}
+{% block tool_description %}Visualisez l'effet composé d'une meilleure rétention sur le CA, la marge additionnelle et le coût du programme sur 5 ans.{% endblock %}
 
 {% block tool_icon %}
 <svg class="w-8 h-8" style="color: var(--tool-glow);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
@@ -32,6 +32,15 @@
                 <div>
                     <label class="tool-label">Revenu moyen par client / an (€)</label>
                     <input type="number" class="tool-input" x-model.number="revenuMoyen" min="10" step="100" placeholder="1200">
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Marge sur CA additionnel</label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="margeAdditionnelle + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="margeAdditionnelle" min="5" max="90" step="5" title="Marge sur CA additionnel">
+                    <p class="tool-sublabel">Le gain net utilise la marge, pas le CA brut.</p>
                 </div>
 
                 <div>
@@ -75,14 +84,14 @@
         {# ── Résultats ── #}
         <div class="lg:col-span-3 space-y-6">
 
-            {# KPI principal — ROI net à 5 ans #}
+            {# KPI principal — gain net sur marge à 5 ans #}
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #8b5cf6;">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #8b5cf6;">
-                    ROI net à 5 ans
+                    Gain net estimé à 5 ans
                 </p>
                 <p class="result-big text-5xl" :style="'color:' + (roiNet5Ans() >= 0 ? '#22c55e' : '#ef4444')" x-text="(roiNet5Ans() >= 0 ? '+' : '') + fmt(roiNet5Ans()) + ' €'"></p>
                 <p class="text-base mt-3" style="color: var(--sim-muted);">
-                    Gain brut <strong x-text="'+' + fmt(ecart5Ans()) + ' €'" style="color: #8b5cf6;"></strong>
+                    Marge additionnelle <strong x-text="'+' + fmt(ecartMarge5Ans()) + ' €'" style="color: #8b5cf6;"></strong>
                     − Coût programme <strong x-text="fmt(coutProgramme5Ans()) + ' €'" style="color: #ef4444;"></strong>
                 </p>
             </div>
@@ -98,8 +107,8 @@
                     <p class="result-big text-2xl" style="color: #22c55e;" x-text="clientsAn5Ameliore()"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
-                    <p class="result-label mb-1">Gain annuel en année 5</p>
-                    <p class="result-big text-2xl" style="color: #8b5cf6;" x-text="'+' + fmt(gainAn5()) + ' €'"></p>
+                    <p class="result-label mb-1">Marge add. an 5</p>
+                    <p class="result-big text-2xl" style="color: #8b5cf6;" x-text="'+' + fmt(gainMargeAn5()) + ' €'"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
                     <p class="result-label mb-1">Mois d'amortissement</p>
@@ -129,6 +138,7 @@
                                 <th class="text-right py-2 px-2">CA amélioré</th>
                                 <th class="text-right py-2 px-2" style="color: #8b5cf6;">Δ CA</th>
                                 <th class="text-right py-2 px-2" style="color: #ef4444;">Coût prog.</th>
+                                <th class="text-right py-2 px-2" style="color: #8b5cf6;">Marge add.</th>
                                 <th class="text-right py-2 pl-2" style="color: #22c55e;">Net</th>
                             </tr>
                         </thead>
@@ -142,7 +152,8 @@
                                     <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="fmt(row.caAmel) + ' €'"></td>
                                     <td class="text-right py-2 px-2 font-semibold" style="color: #8b5cf6;" x-text="'+' + fmt(row.delta) + ' €'"></td>
                                     <td class="text-right py-2 px-2" style="color: #ef4444;" x-text="fmt(budgetAnnuel) + ' €'"></td>
-                                    <td class="text-right py-2 pl-2 font-semibold" :style="'color:' + (row.delta - budgetAnnuel >= 0 ? '#22c55e' : '#ef4444')" x-text="(row.delta - budgetAnnuel >= 0 ? '+' : '') + fmt(row.delta - budgetAnnuel) + ' €'"></td>
+                                    <td class="text-right py-2 px-2 font-semibold" style="color: #8b5cf6;" x-text="'+' + fmt(row.margeDelta) + ' €'"></td>
+                                    <td class="text-right py-2 pl-2 font-semibold" :style="'color:' + (row.margeDelta - budgetAnnuel >= 0 ? '#22c55e' : '#ef4444')" x-text="(row.margeDelta - budgetAnnuel >= 0 ? '+' : '') + fmt(row.margeDelta - budgetAnnuel) + ' €'"></td>
                                 </tr>
                             </template>
                         </tbody>
@@ -174,6 +185,7 @@
         return {
             clientsActifs: 200,
             revenuMoyen: 1200,
+            margeAdditionnelle: 40,
             retentionActuelle: 75,
             amelioration: 5,
             nouveauxParAn: 50,
@@ -202,7 +214,8 @@
                     caAct: r.ca,
                     clientsAmel: amel[i].clients,
                     caAmel: amel[i].ca,
-                    delta: amel[i].ca - r.ca
+                    delta: amel[i].ca - r.ca,
+                    margeDelta: (amel[i].ca - r.ca) * this.margeAdditionnelle / 100
                 }));
             },
             ecart5Ans() {
@@ -213,8 +226,11 @@
             coutProgramme5Ans() {
                 return this.budgetAnnuel * 5;
             },
+            ecartMarge5Ans() {
+                return this.ecart5Ans() * this.margeAdditionnelle / 100;
+            },
             roiNet5Ans() {
-                return this.ecart5Ans() - this.coutProgramme5Ans();
+                return this.ecartMarge5Ans() - this.coutProgramme5Ans();
             },
             moisAmortissement() {
                 const act = this.projeter(this.retentionActuelle);
@@ -223,7 +239,7 @@
                 let cumulGain = 0;
                 let cumulCout = 0;
                 for (let a = 0; a < 5; a++) {
-                    const gainMoisCetteAnnee = (amel[a].ca - act[a].ca) / 12;
+                    const gainMoisCetteAnnee = (amel[a].ca - act[a].ca) * this.margeAdditionnelle / 100 / 12;
                     for (let m = 0; m < 12; m++) {
                         cumulGain += gainMoisCetteAnnee;
                         cumulCout += coutMensuel;
@@ -246,20 +262,22 @@
                 const amel = this.projeter(this.retentionActuelle + this.amelioration);
                 return amel[4].ca - act[4].ca;
             },
+            gainMargeAn5() { return this.gainAn5() * this.margeAdditionnelle / 100; },
             insight() {
                 const ecart = this.ecart5Ans();
+                const marge = this.ecartMarge5Ans();
                 const net = this.roiNet5Ans();
                 const cout = this.coutProgramme5Ans();
                 const pts = this.amelioration;
-                if (net <= 0) return `Attention : avec un budget de ${this.fmt(this.budgetAnnuel)} €/an, le coût du programme (${this.fmt(cout)} € sur 5 ans) dépasse le gain brut de ${this.fmt(ecart)} €. Réduisez le budget ou visez une amélioration plus forte pour rentabiliser l'investissement.`;
-                if (net > 500000) return `+${pts} points de rétention génèrent ${this.fmt(ecart)} € de CA brut sur 5 ans. Après déduction du programme (${this.fmt(cout)} €), le ROI net est de +${this.fmt(net)} € — un levier extrêmement rentable.`;
-                if (net > 100000) return `L'écart de ${pts} points crée ${this.fmt(ecart)} € de CA supplémentaire en 5 ans. Net du coût programme (${this.fmt(cout)} €), il reste +${this.fmt(net)} € de bénéfice réel.`;
-                return `+${pts} points de rétention ajoutent ${this.fmt(ecart)} € de CA cumulé. Après ${this.fmt(cout)} € d'investissement programme, le gain net est de ${this.fmt(net)} €. L'effet composé récompense la patience.`;
+                if (net <= 0) return `Attention : avec un budget de ${this.fmt(this.budgetAnnuel)} €/an, le coût du programme (${this.fmt(cout)} € sur 5 ans) dépasse la marge additionnelle estimée de ${this.fmt(marge)} €. Réduisez le budget ou visez une amélioration plus forte pour rentabiliser l'investissement.`;
+                if (net > 500000) return `+${pts} points de rétention génèrent ${this.fmt(ecart)} € de CA brut sur 5 ans, soit ${this.fmt(marge)} € de marge additionnelle estimée. Après programme (${this.fmt(cout)} €), le gain net est de +${this.fmt(net)} €.`;
+                if (net > 100000) return `L'écart de ${pts} points crée ${this.fmt(ecart)} € de CA supplémentaire en 5 ans. Net du coût programme (${this.fmt(cout)} €), il reste +${this.fmt(net)} € de gain estimé sur marge.`;
+                return `+${pts} points de rétention ajoutent ${this.fmt(ecart)} € de CA cumulé. Avec ${this.margeAdditionnelle}% de marge et ${this.fmt(cout)} € d'investissement programme, le gain net est de ${this.fmt(net)} €.`;
             },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
 
             init() {
-                ['clientsActifs','revenuMoyen','retentionActuelle','amelioration','nouveauxParAn','budgetAnnuel'].forEach(k => {
+                ['clientsActifs','revenuMoyen','margeAdditionnelle','retentionActuelle','amelioration','nouveauxParAn','budgetAnnuel'].forEach(k => {
                     this.$watch(k, () => this.updateChart());
                 });
                 this.$nextTick(() => this.updateChart());
@@ -276,9 +294,9 @@
                 const amel = this.projeter(this.retentionActuelle + this.amelioration);
                 const labels = act.map(r => 'Année ' + r.a);
 
-                /* Courbe du gain net = écart CA cumulé − coût programme cumulé */
+                /* Courbe du gain net = marge additionnelle cumulée − coût programme cumulé */
                 const gainNetData = amel.map((r, i) => {
-                    const ecartCumul = r.cumul - act[i].cumul;
+                    const ecartCumul = (r.cumul - act[i].cumul) * this.margeAdditionnelle / 100;
                     const coutCumul = this.budgetAnnuel * (i + 1);
                     return ecartCumul - coutCumul;
                 });

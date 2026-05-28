@@ -35,6 +35,14 @@
                 <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Stratégie de lissage</h2>
                 <div>
                     <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Seuil de mois creux</label>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="seuilCreux + '% de la moyenne'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="seuilCreux" min="60" max="100" step="5" title="Seuil de mois creux">
+                    <p class="tool-sublabel">Un mois est traité comme creux s'il passe sous ce seuil.</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Budget marketing en creux (€/mois)</label>
                         <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="fmt(budgetLissage)"></span>
                     </div>
@@ -48,6 +56,14 @@
                     </div>
                     <input type="range" class="tool-range" x-model.number="effetLissage" min="5" max="50" step="5">
                     <p class="tool-sublabel">% d'augmentation du CA dans les mois creux</p>
+                </div>
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="tool-label mb-0">Marge brute sur CA additionnel</label>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="margeAdd + '%'"></span>
+                    </div>
+                    <input type="range" class="tool-range" x-model.number="margeAdd" min="5" max="80" step="5">
+                    <p class="tool-sublabel">Marge brute moyenne réalisée sur le CA gagné — sert au calcul du gain réel</p>
                 </div>
             </div>
         </div>
@@ -104,7 +120,7 @@
         return {
             labels: ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'],
             mois: [8000,7000,12000,15000,18000,10000,5000,4000,14000,16000,13000,9000],
-            budgetLissage: 1000, effetLissage: 20,
+            seuilCreux: 85, budgetLissage: 1000, effetLissage: 20, margeAdd: 30,
             caAnnuel() { return this.mois.reduce((s, m) => s + m, 0); },
             moyenne() { return this.caAnnuel() / 12; },
             indiceSaison() {
@@ -115,21 +131,27 @@
             },
             moisCreux() {
                 const moy = this.moyenne();
-                return this.mois.map((m, i) => ({ idx: i, val: m, isBas: m < moy * 0.85 }));
+                return this.mois.map((m, i) => ({ idx: i, val: m, isBas: m < moy * this.seuilCreux / 100 }));
             },
             caLisse() {
                 const moy = this.moyenne();
                 return this.mois.reduce((s, m) => {
-                    if (m < moy * 0.85) return s + m + m * this.effetLissage / 100;
+                    if (m < moy * this.seuilCreux / 100) return s + m + m * this.effetLissage / 100;
                     return s + m;
                 }, 0);
             },
             coutLissage() {
                 const moy = this.moyenne();
-                const nbCreux = this.mois.filter(m => m < moy * 0.85).length;
+                const nbCreux = this.mois.filter(m => m < moy * this.seuilCreux / 100).length;
                 return this.budgetLissage * nbCreux;
             },
-            gainNetLissage() { return Math.round(this.caLisse() - this.caAnnuel() - this.coutLissage()); },
+            /* CA additionnel généré par le lissage (uniquement les mois creux). */
+            caAdditionnel() { return this.caLisse() - this.caAnnuel(); },
+            /* Gain net = marge brute sur CA additionnel − coût des actions marketing.
+               (Comparer du CA brut à un coût marketing donnerait une fausse rentabilité.) */
+            gainNetLissage() {
+                return Math.round(this.caAdditionnel() * this.margeAdd / 100 - this.coutLissage());
+            },
             insight() {
                 const idx = this.indiceSaison();
                 const moy = this.moyenne();
@@ -137,12 +159,12 @@
                 const creuxLabels = creux.map(c => this.labels[c.idx]).join(', ');
                 if (idx < 1.2) return `Votre activité est assez régulière (indice ${idx.toFixed(2)}). Pas de saisonnalité marquée à traiter.`;
                 if (idx < 1.5) return `Saisonnalité modérée (indice ${idx.toFixed(2)}). Mois creux : ${creuxLabels}. Le lissage avec ${this.fmt(this.budgetLissage)} €/mois d'investissement marketing rapporterait un gain net de ${this.fmt(this.gainNetLissage())} €.`;
-                return `Forte saisonnalité (indice ${idx.toFixed(2)}). Les mois creux (${creuxLabels}) sont en dessous de ${this.fmt(Math.round(moy * 0.85))} €. Deux approches : lissage (investir ${this.fmt(this.budgetLissage)} €/mois en creux) ou capitalisation (maximiser les marges en haute saison). Le lissage génère un gain net de ${this.fmt(this.gainNetLissage())} €.`;
+                return `Forte saisonnalité (indice ${idx.toFixed(2)}). Les mois creux (${creuxLabels}) sont en dessous de ${this.fmt(Math.round(moy * this.seuilCreux / 100))} € selon votre seuil. Deux approches : lissage (investir ${this.fmt(this.budgetLissage)} €/mois en creux) ou capitalisation (maximiser les marges en haute saison). Le lissage génère un gain net de ${this.fmt(this.gainNetLissage())} €.`;
             },
             fmt(v) { return Math.round(v).toLocaleString('fr-FR'); },
             init() {
                 this.$watch('mois', () => this.updateChart(), { deep: true });
-                ['budgetLissage','effetLissage'].forEach(k => this.$watch(k, () => this.updateChart()));
+                ['seuilCreux','budgetLissage','effetLissage','margeAdd'].forEach(k => this.$watch(k, () => this.updateChart()));
                 this.$nextTick(() => this.updateChart());
             },
             updateChart() {
@@ -152,7 +174,7 @@
                 const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.75)';
                 const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.12)';
                 const moy = this.moyenne();
-                const lisse = this.mois.map(m => m < moy * 0.85 ? m + m * this.effetLissage / 100 : m);
+                const lisse = this.mois.map(m => m < moy * this.seuilCreux / 100 ? m + m * this.effetLissage / 100 : m);
                 if (chart) chart.destroy();
                 chart = new Chart(ctx, {
                     type: 'bar', data: {
