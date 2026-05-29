@@ -163,7 +163,7 @@ def send_newsletter_campaign_task(campaign_id: int) -> dict:
 
         # Throttle
         if i < len(emails) - 1:
-            time.sleep(1)
+            time.sleep(0.2)
 
     # Update campaign
     campaign.sent_count = success_count
@@ -265,7 +265,7 @@ def send_article_as_newsletter_task(article_id: int) -> dict:
             logger.error("Newsletter article: erreur envoi à %s: %s", email, e)
 
         if i < len(subscribers) - 1:
-            time.sleep(1)
+            time.sleep(0.2)
 
     campaign.sent_count = success_count
     campaign.failed_count = len(failed_emails)

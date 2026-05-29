@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db import models
 
 from .models import Article, Category
@@ -55,36 +55,57 @@ class ArticleAdmin(admin.ModelAdmin):
 
     @admin.action(description="📤 Envoyer comme newsletter aux abonnés")
     def send_as_newsletter(self, request, queryset):
-        from django_q.tasks import async_task
+        """Envoi synchrone de l'article comme newsletter à tous les abonnés actifs.
+
+        Pas de worker django-q2 disponible en prod : on exécute directement
+        la tâche dans la requête. Pour ~50 abonnés c'est < 12s, acceptable.
+        """
         from apps.leads.models import EmailSubscriber
+        from apps.leads.tasks import send_article_as_newsletter_task
 
         subscriber_count = EmailSubscriber.objects.filter(is_active=True).count()
         if subscriber_count == 0:
-            self.message_user(request, "❌ Aucun abonné actif.", level=admin.options.messages.WARNING)
+            self.message_user(request, "❌ Aucun abonné actif.", level=messages.WARNING)
             return
 
-        sent = 0
         for article in queryset:
             if not article.is_published:
                 self.message_user(
                     request,
                     f"⏭️ « {article.title} » ignoré (non publié).",
-                    level=admin.options.messages.WARNING,
+                    level=messages.WARNING,
                 )
                 continue
-            async_task(
-                'apps.leads.tasks.send_article_as_newsletter_task',
-                article_id=article.pk,
-                task_name=f'newsletter_article_{article.pk}',
-            )
-            sent += 1
 
-        if sent:
+            try:
+                result = send_article_as_newsletter_task(article_id=article.pk)
+            except Exception as exc:
+                self.message_user(
+                    request,
+                    f"❌ Erreur lors de l'envoi de « {article.title} » : {exc}",
+                    level=messages.ERROR,
+                )
+                continue
+
+            if result.get('error'):
+                self.message_user(
+                    request,
+                    f"❌ « {article.title} » : {result['error']}",
+                    level=messages.ERROR,
+                )
+                continue
+
+            total = result.get('total', 0)
+            success = result.get('success', 0)
+            failed = len(result.get('failed', []))
+            campaign_id = result.get('campaign_id')
+
             self.message_user(
                 request,
-                f"📤 {sent} article(s) envoyé(s) comme newsletter à {subscriber_count} abonné(s). "
-                f"Suivi dans l'admin Leads > Campagnes newsletter.",
-                level=admin.options.messages.SUCCESS,
+                f"📤 « {article.title} » envoyé : {success}/{total} OK"
+                f"{f', {failed} échec(s)' if failed else ''}"
+                f"{f' — campagne #{campaign_id}' if campaign_id else ''}.",
+                level=messages.SUCCESS if success and not failed else messages.WARNING,
             )
 
     class Media:

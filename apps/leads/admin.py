@@ -326,34 +326,50 @@ class NewsletterCampaignAdmin(admin.ModelAdmin):
 
     @admin.action(description="📤 Envoyer la newsletter aux abonnés actifs")
     def action_send_campaign(self, request, queryset):
-        from django_q.tasks import async_task
+        """Envoi synchrone immédiat (pas de worker django-q2 en prod)."""
         from .models import EmailSubscriber
+        from .tasks import send_newsletter_campaign_task
 
         subscriber_count = EmailSubscriber.objects.filter(is_active=True).count()
+        if subscriber_count == 0:
+            self.message_user(request, "❌ Aucun abonné actif.", level=messages.WARNING)
+            return
 
-        sent = 0
         skipped = 0
         for campaign in queryset:
             if campaign.status != 'draft':
                 skipped += 1
                 continue
 
-            async_task(
-                'apps.leads.tasks.send_newsletter_campaign_task',
-                campaign_id=campaign.pk,
-                task_name=f'newsletter_{campaign.pk}',
-            )
-            campaign.status = 'sending'
-            campaign.save(update_fields=['status'])
-            sent += 1
+            try:
+                result = send_newsletter_campaign_task(campaign_id=campaign.pk)
+            except Exception as exc:
+                self.message_user(
+                    request,
+                    f"❌ Erreur sur « {campaign.subject} » : {exc}",
+                    level=messages.ERROR,
+                )
+                continue
 
-        if sent:
+            if result.get('error'):
+                self.message_user(
+                    request,
+                    f"❌ « {campaign.subject} » : {result['error']}",
+                    level=messages.ERROR,
+                )
+                continue
+
+            total = result.get('total', 0)
+            success = result.get('success', 0)
+            failed = len(result.get('failed', []))
+
             self.message_user(
                 request,
-                f"📤 {sent} campagne(s) lancée(s) vers {subscriber_count} abonné(s) actifs. "
-                f"Suivi dans Django-Q.",
-                level=messages.SUCCESS,
+                f"📤 « {campaign.subject} » envoyée : {success}/{total} OK"
+                f"{f', {failed} échec(s)' if failed else ''}.",
+                level=messages.SUCCESS if success and not failed else messages.WARNING,
             )
+
         if skipped:
             self.message_user(
                 request,
