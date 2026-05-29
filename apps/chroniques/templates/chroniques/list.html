@@ -29,6 +29,149 @@
   ]{% endif %}
 }
 </script>
+
+<style nonce="{{ request.csp_nonce }}">
+  /* Rail de catégories — une seule ligne, scroll horizontal élégant (ADN TUS) */
+  .category-rail {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent);
+  }
+  .category-rail__track {
+    /* Centré quand le contenu tient, scrollable depuis le début s'il déborde */
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    scrollbar-width: none;            /* Firefox */
+    -ms-overflow-style: none;         /* IE/Edge */
+    scroll-behavior: smooth;
+    scroll-snap-type: x proximity;
+  }
+  .category-rail__track::-webkit-scrollbar { display: none; }  /* WebKit */
+  .category-rail__track > a { scroll-snap-align: start; }
+
+  /* 🔍 Champ de recherche TUS — règles dures (indépendantes de Tailwind) */
+  .tus-search-field {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .tus-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: rgba(246, 247, 251, 0.65);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .tus-search-input {
+    width: 100%;
+    padding: 10px 16px 10px 44px !important;  /* 44px = 14 + 18 + 12 (icon-text gap) */
+    text-indent: 0 !important;
+    border-radius: 12px;
+    background: rgba(246, 247, 251, 0.05);
+    border: 1px solid rgba(246, 247, 251, 0.10);
+    color: #f6f7fb;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .tus-search-input::placeholder {
+    color: rgba(246, 247, 251, 0.45);
+    opacity: 1;
+  }
+  .tus-search-input:focus {
+    border-color: rgba(11, 45, 255, 0.6);
+    box-shadow: 0 0 0 1px rgba(11, 45, 255, 0.2);
+  }
+  .tus-search-field:focus-within .tus-search-icon {
+    color: rgba(246, 247, 251, 0.85);
+  }
+
+  /* ⌄ Bloc de tri (select + chevron) — règles dures */
+  .tus-sort-field {
+    position: relative;
+    flex-shrink: 0;
+  }
+  .tus-sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding: 10px 36px 10px 14px;
+    border-radius: 12px;
+    background: rgba(246, 247, 251, 0.05);
+    border: 1px solid rgba(246, 247, 251, 0.10);
+    color: rgba(246, 247, 251, 0.85);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .tus-sort-select:focus {
+    border-color: rgba(11, 45, 255, 0.6);
+    box-shadow: 0 0 0 1px rgba(11, 45, 255, 0.2);
+  }
+  .tus-sort-chevron {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: rgba(246, 247, 251, 0.55);
+    pointer-events: none;
+    transition: color .2s ease;
+  }
+  .tus-sort-field:focus-within .tus-sort-chevron {
+    color: rgba(246, 247, 251, 0.85);
+  }
+
+  /* Bouton soumettre — cohérence visuelle */
+  .tus-search-submit {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 12px;
+    background: #0b2dff;
+    color: #ffffff;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25rem;
+    border: 1px solid #0b2dff;
+    cursor: pointer;
+    transition: background-color .2s ease, transform .15s ease;
+  }
+  .tus-search-submit:hover { background: #1c3eff; }
+  .tus-search-submit:active { transform: scale(0.98); }
+  .tus-search-submit-icon {
+    width: 16px;
+    height: 16px;
+  }
+  @media (min-width: 640px) {
+    .tus-search-submit-icon { display: none; }
+    .tus-search-submit-label { display: inline; }
+  }
+  @media (max-width: 639px) {
+    .tus-search-submit-label { display: none; }
+  }
+
+  /* ⌄ Menu déroulant de tri — options lisibles (fond sombre, texte clair) */
+  #sort-select option {
+    background-color: #0d1016;
+    color: #f6f7fb;
+  }
+  #sort-select option:checked,
+  #sort-select option:hover {
+    background-color: #0b2dff;
+    color: #ffffff;
+  }
+</style>
 {% endblock %}
 
 {% block seo_pagination %}
@@ -51,54 +194,61 @@
             <p class="text-tus-white/70">Articles courts et points de vue sur nos pratiques.</p>
         </div>
 
-        {# ── Search + Sort bar ─────────────────────────────────── #}
-        <form method="get" action="{% url 'chroniques:list' %}" class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 reveal">
+        {# ── Toolbar : recherche + tri (épuré, une ligne) ────────── #}
+        <form method="get" action="{% url 'chroniques:list' %}" class="max-w-2xl mx-auto flex items-center gap-2 mb-8 reveal">
             {% if active_category %}
             <input type="hidden" name="category" value="{{ active_category.slug }}">
             {% endif %}
-            <div class="relative w-full sm:w-72">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-tus-white/40 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
-                <input type="text" name="q" value="{{ search_query }}" placeholder="Rechercher un article…"
-                       class="w-full pl-9 pr-3 py-2 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm text-tus-white placeholder-tus-white/40 focus:border-tus-blue/60 focus:outline-none transition-colors">
+            <div class="tus-search-field">
+                <svg class="tus-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Rechercher un article…" class="tus-search-input">
             </div>
-            <select name="sort" id="sort-select"
-                    class="py-2 px-3 rounded-lg bg-tus-white/5 border border-tus-white/10 text-sm text-tus-white/70 focus:border-tus-blue/60 focus:outline-none transition-colors appearance-none cursor-pointer">
-                {% for key, label in sort_options.items %}
-                <option value="{{ key }}" {% if key == current_sort %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="px-4 py-2 rounded-lg bg-tus-blue-a11y text-white text-sm hover:bg-tus-blue transition-colors">Rechercher</button>
+            <div class="tus-sort-field">
+                <select name="sort" id="sort-select" class="tus-sort-select">
+                    {% for key, label in sort_options.items %}
+                    <option value="{{ key }}" {% if key == current_sort %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <svg class="tus-sort-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+            <button type="submit" aria-label="Rechercher" class="tus-search-submit">
+                <span class="tus-search-submit-label">Rechercher</span>
+                <svg class="tus-search-submit-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+            </button>
         </form>
 
-        {# ── Category pills ───────────────────────────────────── #}
+        {# ── Rail de catégories : une seule ligne, scroll horizontal, fondu ── #}
         {% if categories %}
-        <div class="flex flex-wrap items-center justify-center gap-2 mb-8 reveal">
-            <a href="{% url 'chroniques:list' %}{% if search_query %}?q={{ search_query }}{% endif %}{% if current_sort != 'recent' %}{% if search_query %}&{% else %}?{% endif %}sort={{ current_sort }}{% endif %}"
-               class="px-4 py-1.5 rounded-full text-sm border transition-colors {% if not active_category %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40{% endif %}">
-                Tous
-            </a>
-            {% for cat in categories %}
-            <a href="{% url 'chroniques:list' %}?category={{ cat.slug }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort != 'recent' %}&sort={{ current_sort }}{% endif %}"
-               class="px-4 py-1.5 rounded-full text-sm border transition-colors {% if active_category and active_category.slug == cat.slug %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40{% endif %}">
-                {{ cat.name }}
-            </a>
-            {% endfor %}
+        <div class="category-rail relative mb-10 reveal">
+            <div class="category-rail__track flex items-center gap-2 overflow-x-auto pb-1">
+                <a href="{% url 'chroniques:list' %}{% if search_query %}?q={{ search_query }}{% endif %}{% if current_sort != 'recent' %}{% if search_query %}&{% else %}?{% endif %}sort={{ current_sort }}{% endif %}"
+                   class="shrink-0 px-4 py-1.5 rounded-full text-sm whitespace-nowrap border transition-colors {% if not active_category %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40 hover:text-tus-white{% endif %}">
+                    Tous
+                </a>
+                {% for cat in categories %}
+                <a href="{% url 'chroniques:list' %}?category={{ cat.slug }}{% if search_query %}&q={{ search_query }}{% endif %}{% if current_sort != 'recent' %}&sort={{ current_sort }}{% endif %}"
+                   class="shrink-0 px-4 py-1.5 rounded-full text-sm whitespace-nowrap border transition-colors {% if active_category and active_category.slug == cat.slug %}bg-tus-blue-a11y text-white border-tus-blue-a11y{% else %}bg-tus-white/5 text-tus-white/70 border-tus-white/10 hover:border-tus-blue/40 hover:text-tus-white{% endif %}">
+                    {{ cat.name }}
+                </a>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
 
         {# ── Active filters summary ──────────────────────────── #}
         {% if search_query or active_category %}
-        <div class="flex flex-wrap items-center justify-center gap-2 mb-6 text-sm">
+        <div class="flex flex-wrap items-center justify-center gap-2 mb-8 text-sm reveal">
+            <span class="text-tus-white/40 text-xs uppercase tracking-wider">Filtres</span>
             {% if search_query %}
-            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-tus-blue/10 text-tus-blue-a11y border border-tus-blue/20">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tus-blue/10 text-tus-blue-a11y border border-tus-blue/20">
                 « {{ search_query }} »
-                <a href="{% url 'chroniques:list' %}{% if active_category %}?category={{ active_category.slug }}{% endif %}{% if current_sort != 'recent' %}{% if active_category %}&{% else %}?{% endif %}sort={{ current_sort }}{% endif %}" class="ml-1 hover:text-white">✕</a>
+                <a href="{% url 'chroniques:list' %}{% if active_category %}?category={{ active_category.slug }}{% endif %}{% if current_sort != 'recent' %}{% if active_category %}&{% else %}?{% endif %}sort={{ current_sort }}{% endif %}" class="hover:text-white" aria-label="Retirer la recherche">✕</a>
             </span>
             {% endif %}
             {% if active_category %}
-            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-tus-blue/10 text-tus-blue-a11y border border-tus-blue/20">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tus-blue/10 text-tus-blue-a11y border border-tus-blue/20">
                 {{ active_category.name }}
-                <a href="{% url 'chroniques:list' %}{% if search_query %}?q={{ search_query }}{% endif %}{% if current_sort != 'recent' %}{% if search_query %}&{% else %}?{% endif %}sort={{ current_sort }}{% endif %}" class="ml-1 hover:text-white">✕</a>
+                <a href="{% url 'chroniques:list' %}{% if search_query %}?q={{ search_query }}{% endif %}{% if current_sort != 'recent' %}{% if search_query %}&{% else %}?{% endif %}sort={{ current_sort }}{% endif %}" class="hover:text-white" aria-label="Retirer la catégorie">✕</a>
             </span>
             {% endif %}
             <a href="{% url 'chroniques:list' %}" class="text-tus-white/50 hover:text-tus-white transition-colors text-xs underline">Réinitialiser</a>

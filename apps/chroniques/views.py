@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.shortcuts import get_object_or_404, render
 from django.core.paginator import Paginator
 from django.db import ProgrammingError, OperationalError
@@ -58,7 +58,12 @@ def article_list(request):
             current_sort = DEFAULT_SORT
         qs = qs.order_by(*SORT_OPTIONS[current_sort])
 
-        categories = Category.objects.all()
+        categories = (
+            Category.objects
+            .annotate(n=Count('articles', filter=Q(articles__is_published=True)))
+            .filter(n__gt=0)
+            .order_by('-n', 'name')
+        )
 
         # ── Pagination (preserve filters) ───────────────────────────
         paginator = Paginator(qs, 9)
