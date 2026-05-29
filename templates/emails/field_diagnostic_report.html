@@ -1,0 +1,44 @@
+{% autoescape off %}<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Votre diagnostic d'entreprise</title></head>
+<body style="font-family: -apple-system, Segoe UI, Helvetica, Arial, sans-serif; color:#111827; line-height:1.55; margin:0; padding:0; background:#f3f4f6;">
+
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f4f6; padding:24px 0;">
+<tr><td align="center">
+<table role="presentation" width="560" cellspacing="0" cellpadding="0" style="background:#ffffff; border-radius:10px; overflow:hidden; max-width:560px; width:100%;">
+
+<tr><td style="background:#0f172a; color:#fff; padding:22px 28px;">
+<div style="font-family: 'Space Grotesk', Arial, sans-serif; font-weight:700; font-size:14px; letter-spacing:.05em;">TRAIT D'UNION STUDIO</div>
+<div style="font-size:12px; opacity:.75;">Architecture Digitale &amp; Design</div>
+</td></tr>
+
+<tr><td style="padding:28px;">
+<h1 style="font-family:'Space Grotesk', Arial, sans-serif; font-size:22px; margin:0 0 12px 0; color:#0f172a;">Votre diagnostic est prêt.</h1>
+
+<p style="margin:0 0 14px 0;">Bonjour{% if diag.contact_name %} {{ diag.contact_name }}{% endif %},</p>
+
+<p style="margin:0 0 14px 0;">Vous trouverez en pièce jointe le diagnostic d'entreprise réalisé pour
+<strong>{{ diag.company_name }}</strong>. Il synthétise nos échanges, un score
+global chiffré et des recommandations concrètes par domaine.</p>
+
+<p style="margin:18px 0;">
+<a href="{{ site_url }}/contact/" style="display:inline-block; padding:12px 22px; background:#0f172a; color:#fff; text-decoration:none; border-radius:6px; font-weight:600;">Réserver un échange</a>
+</p>
+
+<p style="margin:0 0 10px 0; font-size:13px; color:#6b7280;">
+Vous pouvez aussi simplement répondre à cet email, nous le lisons en personne.
+</p>
+
+<hr style="border:none; border-top:1px solid #e5e7eb; margin:20px 0;">
+<p style="margin:0; font-size:12px; color:#9ca3af;">
+Diagnostic réalisé par <a href="{{ site_url }}" style="color:#9ca3af;">traitdunion.it</a>.
+</p>
+</td></tr>
+
+</table>
+</td></tr>
+</table>
+
+</body>
+</html>
+{% endautoescape %}

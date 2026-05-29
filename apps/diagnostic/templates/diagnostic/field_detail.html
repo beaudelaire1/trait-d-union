@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Diagnostic {{ diag.company_name }} — TUS{% endblock %}
+
+{% block extra_head %}
+<style nonce="{{ request.csp_nonce }}">
+  .bar-track { background: #2a2a30; border-radius: 999px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; transition: width 1s ease; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen" style="background: #0f0f12;">
+  <div class="max-w-5xl mx-auto px-4 py-10">
+
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+      {% for message in messages %}
+      <div class="rounded-lg px-4 py-3 text-sm font-medium"
+           style="{% if message.tags == 'success' %}background:#30d15822; color:#30d158; border:1px solid #30d15844;{% elif message.tags == 'error' %}background:#ff453a22; color:#ff453a; border:1px solid #ff453a44;{% else %}background:#1f1f24; color:#a1a1a6; border:1px solid #2a2a30;{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ── En-tête + actions ──────────────────────── #}
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+      <a href="{% url 'diagnostic:field_list' %}" class="inline-flex items-center gap-1 text-sm font-medium transition-colors hover:text-white" style="color: #8e8e93;">
+        ← Historique terrain
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="{% url 'diagnostic:field_form' diag.pk %}"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90 border"
+           style="border-color: #2a2a30; background: #1f1f24;">✏️ Modifier</a>
+        <a href="{% url 'diagnostic:field_pdf' diag.pk %}"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90"
+           style="background: #0B2DFF;">📄 Rapport PDF</a>
+        {% if diag.contact_email %}
+        <form method="post" action="{% url 'diagnostic:field_send_email' diag.pk %}" class="inline">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{% url 'diagnostic:field_detail' diag.pk %}">
+          <button type="submit"
+                  onclick="return confirm('Envoyer le rapport PDF à {{ diag.contact_email }} ?');"
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90"
+                  style="background: #30d158;">✉️ Envoyer au client</button>
+        </form>
+        {% else %}
+        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold"
+              style="background: #1f1f24; color: #8e8e93;"
+              title="Renseignez un email de contact pour activer l'envoi.">✉️ Aucun email</span>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ── Hero score ─────────────────────────────── #}
+    <div class="rounded-2xl border p-8 mb-6" style="background: #18181c; border-color: #2a2a30;">
+      <div class="flex flex-col md:flex-row items-center gap-8">
+        {# Cercle de score #}
+        <div class="relative flex-shrink-0">
+          <svg width="150" height="150" viewBox="0 0 150 150">
+            <circle cx="75" cy="75" r="{{ gauge.r }}" fill="none" stroke="#2a2a30" stroke-width="11"/>
+            <circle cx="75" cy="75" r="{{ gauge.r }}" fill="none"
+                    stroke="{{ r.verdict.color }}" stroke-width="11" stroke-linecap="round"
+                    stroke-dasharray="{{ gauge.circ }}"
+                    stroke-dashoffset="{{ gauge.offset }}"
+                    transform="rotate(-90 75 75)"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span class="text-4xl font-bold" style="color: {{ r.verdict.color }};">{{ diag.overall_score }}</span>
+            <span class="text-xs" style="color: #8e8e93;">/100</span>
+          </div>
+        </div>
+
+        {# Identité + verdict #}
+        <div class="flex-1 text-center md:text-left">
+          <div class="flex items-center justify-center md:justify-start gap-2 mb-1">
+            <span>{{ profile_meta.icon }}</span>
+            <span class="text-xs font-semibold uppercase tracking-wider" style="color: #30d158;">{{ profile_meta.label }}</span>
+          </div>
+          <h1 class="text-2xl font-bold text-white">{{ diag.company_name }}</h1>
+          <div class="inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-full text-sm font-semibold"
+               style="background: {{ r.verdict.color }}22; color: {{ r.verdict.color }};">
+            {{ r.verdict.label }}
+          </div>
+          <p class="text-sm mt-3 max-w-lg" style="color: #a1a1a6;">{{ r.verdict.text }}</p>
+          <div class="flex flex-wrap gap-4 mt-4 text-xs" style="color: #8e8e93;">
+            <span>📅 {{ diag.created_at|date:"d/m/Y H:i" }}</span>
+            {% if diag.sector %}<span>🏷️ {{ diag.get_sector_display|default:diag.sector }}</span>{% endif %}
+            {% if diag.created_by %}<span>👤 {{ diag.created_by.get_short_name|default:diag.created_by.username }}</span>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Bandeau d'urgence ──────────────────────── #}
+    {% if r.urgency.level != 'sain' %}
+    <div class="rounded-xl border p-4 mb-6 flex items-start gap-3"
+         style="background: {% if r.urgency.level == 'urgence' %}#ff453a18{% elif r.urgency.level == 'alerte' %}#ff9f0a18{% else %}#ffd60a14{% endif %};
+                border-color: {% if r.urgency.level == 'urgence' %}#ff453a44{% elif r.urgency.level == 'alerte' %}#ff9f0a44{% else %}#ffd60a33{% endif %};">
+      <span class="text-xl">{{ r.urgency.label|slice:":2" }}</span>
+      <div>
+        <p class="font-bold text-white text-sm">{{ r.urgency.label }}</p>
+        <p class="text-xs mt-0.5" style="color: #d1d1d6;">{{ r.urgency.text }}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    {# ── Forces & faiblesses ────────────────────── #}
+    <div class="grid sm:grid-cols-2 gap-4 mb-6">
+      <div class="rounded-xl border p-5" style="background: #18181c; border-color: #30d15833;">
+        <p class="text-xs uppercase tracking-wider font-semibold mb-3" style="color: #30d158;">✅ Forces principales</p>
+        {% if r.highlights.strengths %}
+        <ul class="space-y-2">
+          {% for s in r.highlights.strengths %}
+          <li class="text-sm flex items-center gap-2" style="color: #f5f5f7;"><span style="color:#30d158;">▸</span> {{ s }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}<p class="text-sm" style="color: #8e8e93;">Aucune force majeure identifiée.</p>{% endif %}
+      </div>
+      <div class="rounded-xl border p-5" style="background: #18181c; border-color: #ff453a33;">
+        <p class="text-xs uppercase tracking-wider font-semibold mb-3" style="color: #ff453a;">⚠️ Faiblesses critiques</p>
+        {% if r.highlights.weaknesses %}
+        <ul class="space-y-2">
+          {% for w in r.highlights.weaknesses %}
+          <li class="text-sm flex items-center gap-2" style="color: #f5f5f7;"><span style="color:#ff453a;">▸</span> {{ w }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}<p class="text-sm" style="color: #8e8e93;">Aucune faiblesse critique identifiée.</p>{% endif %}
+      </div>
+    </div>
+
+    {# ── Scores par domaine ─────────────────────── #}
+    <div class="rounded-2xl border p-6 mb-6" style="background: #18181c; border-color: #2a2a30;">
+      <h2 class="text-lg font-bold text-white mb-5">Scores par domaine</h2>
+      <div class="space-y-4">
+        {% for d in r.domain_scores %}
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-sm font-medium text-white">{{ d.icon }} {{ d.label }}
+              <span class="text-xs font-normal" style="color:#8e8e93;">· pondération {% widthratio d.weight 1 100 %}%</span>
+            </span>
+            {% if d.score is not None %}
+            <span class="text-sm font-bold" style="color: {% if d.score >= 7 %}#30d158{% elif d.score >= 4 %}#ff9f0a{% else %}#ff453a{% endif %};">{{ d.score }}/10</span>
+            {% else %}
+            <span class="text-xs" style="color: #8e8e93;">non évalué</span>
+            {% endif %}
+          </div>
+          <div class="bar-track">
+            {% if d.score is not None %}
+            {% widthratio d.score 10 100 as pct %}
+            <div class="bar-fill" style="width: {{ pct }}%; background: {% if d.score >= 7 %}#30d158{% elif d.score >= 4 %}#ff9f0a{% else %}#ff453a{% endif %};"></div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── KPIs vitaux ────────────────────────────── #}
+    <div class="rounded-2xl border p-6 mb-6" style="background: #18181c; border-color: #2a2a30;">
+      <h2 class="text-lg font-bold text-white mb-5">Indicateurs vitaux</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {% for k in r.kpis %}
+        <div class="rounded-xl p-4" style="background: #0f0f12; border: 1px solid {{ k.color }}33;">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs" style="color: #8e8e93;">{{ k.label }}</span>
+            <span class="w-2 h-2 rounded-full" style="background: {{ k.color }};"></span>
+          </div>
+          <p class="text-xl font-bold" style="color: {{ k.color }};">
+            {% if k.value is not None %}{{ k.value|floatformat:"-1" }}<span class="text-xs font-normal" style="color:#8e8e93;"> {{ k.unit }}</span>{% else %}—{% endif %}
+          </p>
+          <p class="text-[11px] mt-1" style="color: {{ k.color }};">{{ k.label_status }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── Plan d'action ──────────────────────────── #}
+    <div class="rounded-2xl border p-6 mb-6" style="background: #18181c; border-color: #2a2a30;">
+      <h2 class="text-lg font-bold text-white mb-1">Plan d'action priorisé</h2>
+      <p class="text-xs mb-5" style="color: #8e8e93;">Classé du plus urgent au plus optionnel.</p>
+      <div class="space-y-3">
+        {% for rec in r.recommendations %}
+        <div class="rounded-xl p-4 border-l-4" style="background: #0f0f12; border-color: {{ rec.priority_color }};">
+          <div class="flex flex-wrap items-center gap-2 mb-1.5">
+            <span class="text-xs font-bold px-2 py-0.5 rounded-full" style="background: {{ rec.priority_color }}22; color: {{ rec.priority_color }};">{{ rec.priority_label }}</span>
+            <span class="text-[11px]" style="color: #8e8e93;">{{ rec.horizon }}</span>
+            {% if rec.simulateur %}
+            <a href="/simulateur/#{{ rec.simulateur }}" target="_blank" rel="noopener noreferrer"
+               class="text-[11px] underline" style="color: #0B2DFF;">→ Simulateur {{ rec.simulateur }}</a>
+            {% endif %}
+          </div>
+          <p class="font-semibold text-white text-sm">{{ rec.title }}</p>
+          <p class="text-xs mt-1" style="color: #a1a1a6;">{{ rec.detail }}</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# ── Notes d'entretien ──────────────────────── #}
+    {% if diag.notes %}
+    <div class="rounded-2xl border p-6" style="background: #18181c; border-color: #2a2a30;">
+      <h2 class="text-lg font-bold text-white mb-3">📝 Notes d'entretien</h2>
+      <p class="text-sm whitespace-pre-line" style="color: #a1a1a6;">{{ diag.notes }}</p>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

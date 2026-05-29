@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Diagnostics terrain — TUS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen" style="background: #0f0f12;">
+  <div class="max-w-5xl mx-auto px-4 py-10">
+
+    {# ── En-tête + actions ──────────────────────── #}
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+      <div>
+        <a href="{% url 'diagnostic:diagnostic_home' %}" class="inline-flex items-center gap-1 text-sm font-medium mb-2 transition-colors hover:text-white" style="color: #8e8e93;">
+          ← Centre de diagnostic
+        </a>
+        <h1 class="text-2xl font-bold text-white">Diagnostics terrain</h1>
+      </div>
+      <a href="{% url 'diagnostic:field_new' %}"
+         class="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-white text-sm transition-all hover:opacity-90"
+         style="background: #30d158;">
+        + Nouveau diagnostic
+      </a>
+    </div>
+
+    {# ── Liste ──────────────────────────────────── #}
+    {% if diagnostics %}
+    <div class="space-y-3">
+      {% for d in diagnostics %}
+      <a href="{% url 'diagnostic:field_detail' d.pk %}"
+         class="flex items-center gap-4 rounded-xl border p-4 transition-all hover:border-white/20"
+         style="background: #18181c; border-color: #2a2a30;">
+        {# Pastille score #}
+        <div class="flex-shrink-0 w-14 h-14 rounded-full flex flex-col items-center justify-center font-bold"
+             style="background: {{ d.score_color }}22; color: {{ d.score_color }}; border: 2px solid {{ d.score_color }}55;">
+          <span class="text-lg leading-none">{{ d.overall_score }}</span>
+          <span class="text-[9px] opacity-70">/100</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-white truncate">{{ d.company_name }}</p>
+          <div class="flex flex-wrap gap-x-4 gap-y-1 mt-1 text-xs" style="color: #8e8e93;">
+            <span>{{ d.get_profile_display }}</span>
+            {% if d.sector %}<span>· {{ d.get_sector_display }}</span>{% endif %}
+            <span>📅 {{ d.created_at|date:"d/m/Y H:i" }}</span>
+            {% if d.created_by %}<span>👤 {{ d.created_by.get_short_name|default:d.created_by.username }}</span>{% endif %}
+          </div>
+        </div>
+        <span style="color: #8e8e93;">→</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="rounded-xl border p-12 text-center" style="background: #18181c; border-color: #2a2a30;">
+      <div class="text-5xl mb-4">🧭</div>
+      <h2 class="text-lg font-bold text-white mb-2">Aucun diagnostic terrain</h2>
+      <p class="text-sm mb-6" style="color: #8e8e93;">Lancez votre premier diagnostic d'entreprise.</p>
+      <a href="{% url 'diagnostic:field_new' %}"
+         class="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-white text-sm"
+         style="background: #30d158;">+ Nouveau diagnostic</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

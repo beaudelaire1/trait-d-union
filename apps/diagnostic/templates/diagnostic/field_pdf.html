@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Diagnostic terrain — {{ diag.company_name }}</title>
+<style>
+  @page {
+    size: A4;
+    margin: 15mm 14mm 18mm 14mm;
+    @bottom-center {
+      content: "{{ branding.name|default:'Trait d\'Union Studio' }}  ·  Diagnostic confidentiel  ·  page " counter(page) " / " counter(pages);
+      font-family: 'Inter', Arial, sans-serif; font-size: 7.5pt; color: #9ca3af;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    color: #1f2937; font-size: 10pt; line-height: 1.55; margin: 0;
+  }
+  h1, h2, h3 { font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    color: #0f172a; margin: 0; letter-spacing: -0.01em; }
+
+  /* ── Cover ── */
+  .cover {
+    position: relative; overflow: hidden; min-height: 250mm;
+    padding: 20mm 14mm; color: #fff; border-radius: 8px;
+    background: linear-gradient(140deg, #07080a 0%, #0c1323 48%, #162a55 100%);
+    page-break-after: always;
+  }
+  .cover-tag { font-size: 8pt; font-weight: 700; letter-spacing: 0.28em;
+    text-transform: uppercase; color: #7da2ff; }
+  .cover h1 { color: #fff; font-size: 30pt; line-height: 1.05; margin: 8mm 0 4mm; }
+  .cover-sub { color: #c7d2fe; font-size: 12pt; }
+  .cover-profile { display: inline-block; margin-top: 6mm; padding: 2mm 4mm;
+    border-radius: 999px; background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.16); font-size: 9pt; }
+  .cover-score-wrap { margin-top: 20mm; display: flex; align-items: center; gap: 8mm; }
+  .cover-score { width: 46mm; height: 46mm; border-radius: 50%;
+    border: 3mm solid {{ r.verdict.color|default:'#30d158' }};
+    display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .cover-score .num { font-size: 26pt; font-weight: 800; color: #fff; line-height: 1; }
+  .cover-score .den { font-size: 9pt; color: #94a3b8; }
+  .cover-verdict-label { font-size: 16pt; font-weight: 700; color: {{ r.verdict.color|default:'#30d158' }}; }
+  .cover-verdict-text { color: #cbd5e1; font-size: 10pt; max-width: 95mm; margin-top: 2mm; }
+  .cover-meta { position: absolute; bottom: 16mm; left: 14mm; right: 14mm;
+    font-size: 8.5pt; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 4mm; }
+
+  /* ── Sections ── */
+  .section { margin-bottom: 8mm; }
+  .section-title { font-size: 14pt; margin-bottom: 4mm; padding-bottom: 2mm;
+    border-bottom: 2px solid #0b2dff; color: #0f172a; }
+  .lead { color: #475569; font-size: 9.5pt; margin-bottom: 4mm; }
+
+  /* Urgence */
+  .urgency { padding: 4mm; border-radius: 6px; margin-bottom: 6mm; font-size: 9.5pt; }
+
+  /* Forces/faiblesses */
+  .two-col { display: flex; gap: 5mm; margin-bottom: 6mm; }
+  .col { flex: 1; padding: 4mm; border-radius: 6px; background: #f8fafc; border: 1px solid #e2e8f0; }
+  .col h3 { font-size: 9pt; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2.5mm; }
+  .col ul { margin: 0; padding-left: 4mm; }
+  .col li { font-size: 9.5pt; margin-bottom: 1.5mm; }
+
+  /* Domaines */
+  .domain { margin-bottom: 3mm; }
+  .domain-head { display: flex; justify-content: space-between; font-size: 9.5pt; margin-bottom: 1mm; }
+  .domain-head .name { font-weight: 600; color: #0f172a; }
+  .domain-bar { height: 5pt; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+  .domain-fill { height: 100%; border-radius: 999px; }
+
+  /* KPIs */
+  table.kpis { width: 100%; border-collapse: collapse; font-size: 9pt; }
+  table.kpis th { text-align: left; color: #64748b; font-size: 8pt;
+    text-transform: uppercase; letter-spacing: 0.04em; padding: 2mm; border-bottom: 1px solid #e2e8f0; }
+  table.kpis td { padding: 2.5mm 2mm; border-bottom: 1px solid #f1f5f9; }
+  .pill { display: inline-block; padding: 0.5mm 2.5mm; border-radius: 999px;
+    font-size: 8pt; font-weight: 700; }
+
+  /* Recos */
+  .rec { padding: 3.5mm 4mm; border-radius: 6px; background: #f8fafc;
+    border-left: 3pt solid #94a3b8; margin-bottom: 3mm; page-break-inside: avoid; }
+  .rec-meta { font-size: 8pt; margin-bottom: 1.5mm; }
+  .rec-title { font-weight: 700; font-size: 10pt; color: #0f172a; }
+  .rec-detail { font-size: 9pt; color: #475569; margin-top: 1mm; }
+
+  .notes { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 4mm; font-size: 9.5pt; color: #475569; white-space: pre-line; }
+</style>
+</head>
+<body>
+
+  {# ─────────────────── PAGE DE GARDE ─────────────────── #}
+  <div class="cover">
+    <div class="cover-tag">{{ branding.name|default:"Trait d'Union Studio" }} · Diagnostic terrain</div>
+    <h1>{{ diag.company_name }}</h1>
+    <div class="cover-sub">Diagnostic stratégique d'entreprise</div>
+    <div class="cover-profile">{{ profile_meta.icon }} {{ profile_meta.label }}</div>
+
+    <div class="cover-score-wrap">
+      <div class="cover-score">
+        <span class="num">{{ diag.overall_score }}</span>
+        <span class="den">/ 100</span>
+      </div>
+      <div>
+        <div class="cover-verdict-label">{{ r.verdict.label }}</div>
+        <div class="cover-verdict-text">{{ r.verdict.text }}</div>
+      </div>
+    </div>
+
+    <div class="cover-meta">
+      {% if diag.sector %}Secteur : {{ diag.get_sector_display|default:diag.sector }} &nbsp;·&nbsp;{% endif %}
+      {% if diag.contact_name %}Interlocuteur : {{ diag.contact_name }} &nbsp;·&nbsp;{% endif %}
+      Réalisé le {{ generated_at|date:"d/m/Y" }}
+    </div>
+  </div>
+
+  {# ─────────────────── RÉSUMÉ EXÉCUTIF ─────────────────── #}
+  <div class="section">
+    <h2 class="section-title">Résumé exécutif</h2>
+
+    {% if r.urgency.level != 'sain' %}
+    <div class="urgency" style="background: {% if r.urgency.level == 'urgence' %}#fef2f2{% elif r.urgency.level == 'alerte' %}#fff7ed{% else %}#fefce8{% endif %};
+         border: 1px solid {% if r.urgency.level == 'urgence' %}#fecaca{% elif r.urgency.level == 'alerte' %}#fed7aa{% else %}#fef08a{% endif %};">
+      <strong>{{ r.urgency.label }}</strong> — {{ r.urgency.text }}
+    </div>
+    {% endif %}
+
+    <div class="two-col">
+      <div class="col" style="border-color:#bbf7d0;">
+        <h3 style="color:#16a34a;">Forces principales</h3>
+        {% if r.highlights.strengths %}
+        <ul>{% for s in r.highlights.strengths %}<li>{{ s }}</li>{% endfor %}</ul>
+        {% else %}<p style="font-size:9pt;color:#64748b;">Aucune force majeure identifiée.</p>{% endif %}
+      </div>
+      <div class="col" style="border-color:#fecaca;">
+        <h3 style="color:#dc2626;">Faiblesses critiques</h3>
+        {% if r.highlights.weaknesses %}
+        <ul>{% for w in r.highlights.weaknesses %}<li>{{ w }}</li>{% endfor %}</ul>
+        {% else %}<p style="font-size:9pt;color:#64748b;">Aucune faiblesse critique identifiée.</p>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# ─────────────────── SCORES PAR DOMAINE ─────────────────── #}
+  <div class="section">
+    <h2 class="section-title">Scores par domaine</h2>
+    {% for d in r.domain_scores %}
+    <div class="domain">
+      <div class="domain-head">
+        <span class="name">{{ d.label }} <span style="color:#94a3b8;font-weight:400;">· pondération {% widthratio d.weight 1 100 %}%</span></span>
+        <span style="font-weight:700;color:{% if d.score >= 7 %}#16a34a{% elif d.score >= 4 %}#d97706{% elif d.score is not None %}#dc2626{% else %}#94a3b8{% endif %};">
+          {% if d.score is not None %}{{ d.score }}/10{% else %}n/a{% endif %}
+        </span>
+      </div>
+      <div class="domain-bar">
+        {% if d.score is not None %}{% widthratio d.score 10 100 as pct %}
+        <div class="domain-fill" style="width:{{ pct }}%;background:{% if d.score >= 7 %}#16a34a{% elif d.score >= 4 %}#d97706{% else %}#dc2626{% endif %};"></div>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# ─────────────────── INDICATEURS VITAUX ─────────────────── #}
+  <div class="section">
+    <h2 class="section-title">Indicateurs vitaux</h2>
+    <table class="kpis">
+      <thead><tr><th>Indicateur</th><th>Valeur</th><th>État</th><th>Lecture</th></tr></thead>
+      <tbody>
+        {% for k in r.kpis %}
+        <tr>
+          <td style="font-weight:600;color:#0f172a;">{{ k.label }}</td>
+          <td>{% if k.value is not None %}{{ k.value|floatformat:"-1" }} {{ k.unit }}{% else %}—{% endif %}</td>
+          <td><span class="pill" style="background:{{ k.color }}22;color:{{ k.color }};">{{ k.label_status }}</span></td>
+          <td style="color:#64748b;font-size:8.5pt;">{{ k.detail }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# ─────────────────── PLAN D'ACTION ─────────────────── #}
+  <div class="section">
+    <h2 class="section-title">Plan d'action priorisé</h2>
+    <p class="lead">Classé du plus urgent au plus optionnel.</p>
+    {% for rec in r.recommendations %}
+    <div class="rec" style="border-left-color:{{ rec.priority_color }};">
+      <div class="rec-meta">
+        <span class="pill" style="background:{{ rec.priority_color }}22;color:{{ rec.priority_color }};">{{ rec.priority_label }}</span>
+        <span style="color:#94a3b8;">&nbsp; {{ rec.horizon }}</span>
+      </div>
+      <div class="rec-title">{{ rec.title }}</div>
+      <div class="rec-detail">{{ rec.detail }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# ─────────────────── NOTES ─────────────────── #}
+  {% if diag.notes %}
+  <div class="section">
+    <h2 class="section-title">Notes d'entretien</h2>
+    <div class="notes">{{ diag.notes }}</div>
+  </div>
+  {% endif %}
+
+</body>
+</html>

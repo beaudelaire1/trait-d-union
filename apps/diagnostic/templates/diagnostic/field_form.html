@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Questionnaire — {{ diag.company_name }}{% endblock %}
+
+{% block extra_head %}
+<style nonce="{{ request.csp_nonce }}">
+  [x-cloak] { display: none !important; }
+  .q-section { scroll-margin-top: 90px; }
+  /* Style des champs */
+  .fld {
+    width: 100%; padding: 0.65rem 0.9rem; border-radius: 0.6rem;
+    background: #0f0f12; border: 1px solid #2a2a30; color: #fff;
+    font-size: 0.875rem; transition: border-color .15s, box-shadow .15s;
+  }
+  .fld:focus { outline: none; border-color: #30d158; box-shadow: 0 0 0 3px #30d15833; }
+  /* Échelle 1-5 */
+  .scale-opt {
+    flex: 1; text-align: center; padding: 0.5rem 0; border-radius: 0.5rem;
+    background: #0f0f12; border: 1px solid #2a2a30; color: #8e8e93;
+    cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: all .12s;
+  }
+  .scale-opt:hover { border-color: #4a4a52; }
+  input:checked + .scale-opt { background: #30d15822; border-color: #30d158; color: #30d158; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen" style="background: #0f0f12;"
+     x-data="fieldForm()">
+  <div class="max-w-3xl mx-auto px-4 py-10 pb-32">
+
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+      {% for message in messages %}
+      <div class="rounded-lg px-4 py-3 text-sm font-medium"
+           style="{% if message.tags == 'success' %}background:#30d15822; color:#30d158; border:1px solid #30d15844;{% elif message.tags == 'error' %}background:#ff453a22; color:#ff453a; border:1px solid #ff453a44;{% else %}background:#1f1f24; color:#a1a1a6; border:1px solid #2a2a30;{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# ── En-tête ──────────────────────────────────── #}
+    <a href="{% url 'diagnostic:field_new' %}" class="inline-flex items-center gap-1 text-sm font-medium mb-5 transition-colors hover:text-white" style="color: #8e8e93;">
+      ← Modifier le profil
+    </a>
+
+    {% if diag.results and diag.contact_email %}
+    <div class="mb-5">
+      <form method="post" action="{% url 'diagnostic:field_send_email' diag.pk %}" class="inline">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'diagnostic:field_form' diag.pk %}">
+        <button type="submit"
+                onclick="return confirm('Envoyer le rapport PDF à {{ diag.contact_email }} ?');"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold text-white transition-all hover:opacity-90"
+                style="background: #30d158;">✉️ Envoyer le rapport au client</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <div class="mb-8">
+      <div class="flex items-center gap-2 mb-2 flex-wrap">
+        <span class="text-xl">{{ profile_meta.icon }}</span>
+        <span class="text-xs font-semibold uppercase tracking-wider" style="color: #30d158;">{{ profile_meta.label }}</span>
+        {% if sector_label %}
+        <span class="text-xs px-2 py-0.5 rounded-full" style="background:#0B2DFF22; color:#7d93ff;">{{ sector_label }}</span>
+        {% endif %}
+      </div>
+      <h1 class="text-2xl font-bold text-white">{{ diag.company_name }}</h1>
+      <p class="text-sm mt-1" style="color: #8e8e93;">
+        Étape 2 / 2 — Renseignez les réponses au fil de l'entretien. Chaque
+        question peut être lue telle quelle au client. Les questions laissées
+        vides n'impactent pas le score.
+      </p>
+    </div>
+
+    <form method="post" action="{% url 'diagnostic:field_form' diag.pk %}" x-ref="form">
+      {% csrf_token %}
+
+      {% for section in sections %}
+      <section class="q-section mb-8 rounded-2xl border p-6" style="background: #18181c; border-color: #2a2a30;">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b" style="border-color: #2a2a30;">
+          <span class="text-2xl">{{ section.domain.icon }}</span>
+          <div>
+            <h2 class="text-lg font-bold text-white">{{ section.domain.label }}</h2>
+            <p class="text-xs" style="color: #8e8e93;">{{ section.domain.description }}</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          {% for q in section.questions %}
+          <div>
+            <label {% if q.type != 'scale' and q.type != 'boolean' %}for="{{ q.id }}"{% endif %}
+                   class="block text-sm font-semibold text-white mb-1">
+              {{ q.label }}{% if q.required %} <span style="color:#ff453a;">*</span>{% endif %}
+              {% if q.unit %}<span class="font-normal" style="color:#8e8e93;"> ({{ q.unit }})</span>{% endif %}
+              {% if q.sectors %}<span class="align-middle ml-1 text-[10px] px-1.5 py-0.5 rounded-full" style="background:#0B2DFF22; color:#7d93ff;">secteur</span>{% endif %}
+            </label>
+            {% if q.help %}<p class="text-xs mb-2" style="color: #8e8e93;">{{ q.help }}</p>{% endif %}
+
+            {% if q.type == 'currency' or q.type == 'percent' or q.type == 'number' %}
+              <input type="number" step="any" name="{{ q.id }}" id="{{ q.id }}"
+                     {% if q.min is not None %}min="{{ q.min }}"{% endif %}
+                     {% if q.max is not None %}max="{{ q.max }}"{% endif %}
+                     {% if q.required %}required{% endif %}
+                     placeholder="{{ q.placeholder }}"
+                     class="fld" @input="track">
+
+            {% elif q.type == 'choice' %}
+              <select name="{{ q.id }}" id="{{ q.id }}" class="fld" @change="track"
+                      {% if q.required %}required{% endif %}>
+                <option value="">— Sélectionner —</option>
+                {% for value, label in q.choices %}
+                <option value="{{ value }}">{{ label }}</option>
+                {% endfor %}
+              </select>
+
+            {% elif q.type == 'scale' %}
+              <div class="flex items-center gap-2">
+                {% for n in "12345" %}
+                <label class="flex-1">
+                  <input type="radio" name="{{ q.id }}" value="{{ n }}" class="sr-only" @change="track">
+                  <span class="scale-opt block">{{ n }}</span>
+                </label>
+                {% endfor %}
+              </div>
+              <div class="flex justify-between mt-1.5 text-[11px]" style="color: #8e8e93;">
+                <span>{{ q.scale_labels.0 }}</span>
+                <span>{{ q.scale_labels.1 }}</span>
+              </div>
+
+            {% elif q.type == 'boolean' %}
+              <div class="flex gap-2">
+                <label class="flex-1"><input type="radio" name="{{ q.id }}" value="oui" class="sr-only" @change="track"><span class="scale-opt block">Oui</span></label>
+                <label class="flex-1"><input type="radio" name="{{ q.id }}" value="non" class="sr-only" @change="track"><span class="scale-opt block">Non</span></label>
+              </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endfor %}
+
+      {# ── Notes libres ─────────────────────────────── #}
+      <section class="mb-8 rounded-2xl border p-6" style="background: #18181c; border-color: #2a2a30;">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-2xl">📝</span>
+          <h2 class="text-lg font-bold text-white">Notes d'entretien</h2>
+        </div>
+        <textarea name="notes" rows="4" placeholder="Observations qualitatives, contexte, verbatims clients…"
+                  class="fld" style="resize: vertical;">{{ diag.notes }}</textarea>
+      </section>
+    </form>
+  </div>
+
+  {# ── Barre flottante : progression + validation ─── #}
+  <div class="fixed bottom-0 left-0 right-0 z-40 border-t" style="background: #18181cee; border-color: #2a2a30; backdrop-filter: blur(8px);">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-4">
+      <div class="flex-1">
+        <div class="flex justify-between text-xs mb-1" style="color: #8e8e93;">
+          <span x-text="answered + ' / ' + total + ' questions renseignées'"></span>
+          <span x-text="Math.round(answered / total * 100) + ' %'"></span>
+        </div>
+        <div class="h-2 rounded-full overflow-hidden" style="background: #2a2a30;">
+          <div class="h-full rounded-full transition-all" style="background: #30d158;" :style="'width:' + (answered / total * 100) + '%'"></div>
+        </div>
+      </div>
+      <button type="button" @click="$refs.form.requestSubmit()"
+              class="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white text-sm transition-all hover:opacity-90"
+              style="background: #30d158;">
+        🎯 Calculer le diagnostic
+      </button>
+    </div>
+  </div>
+</div>
+
+<script nonce="{{ request.csp_nonce }}">
+  function fieldForm() {
+    return {
+      total: {{ sections|length|default:0 }},
+      answered: 0,
+      init() {
+        // total réel = nombre de champs de question (hors notes)
+        this.total = this.$refs.form.querySelectorAll('[name]:not([name=notes]):not([name=csrfmiddlewaretoken])').length;
+        // dédoublonner les groupes radio
+        const names = new Set();
+        this.$refs.form.querySelectorAll('[name]:not([name=notes]):not([name=csrfmiddlewaretoken])').forEach(el => names.add(el.name));
+        this.total = names.size;
+        this.track();
+      },
+      track() {
+        const form = this.$refs.form;
+        const names = new Set();
+        form.querySelectorAll('[name]:not([name=notes]):not([name=csrfmiddlewaretoken])').forEach(el => {
+          if (el.type === 'radio') {
+            if (el.checked) names.add(el.name);
+          } else if (el.value && el.value.trim() !== '') {
+            names.add(el.name);
+          }
+        });
+        this.answered = names.size;
+      },
+    };
+  }
+</script>
+{% endblock %}

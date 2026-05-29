@@ -1,0 +1,10 @@
+Bonjour{% if diag.contact_name %} {{ diag.contact_name }}{% endif %},
+
+Vous trouverez en pièce jointe le diagnostic d'entreprise réalisé pour {{ diag.company_name }}.
+Il synthétise nos échanges, un score global chiffré et des recommandations concrètes par domaine.
+
+Pour transformer ces pistes en plan d'action, réservez un échange : {{ site_url }}/contact/
+Vous pouvez aussi simplement répondre à cet email.
+
+— Trait d'Union Studio
+{{ site_url }}

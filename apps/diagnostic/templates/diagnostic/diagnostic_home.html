@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Diagnostic — TUS{% endblock %}
+
+{% block content %}
+<div class="min-h-screen" style="background: #0f0f12;">
+  <div class="max-w-4xl mx-auto px-4 py-14">
+
+    {# ── En-tête ──────────────────────────────────── #}
+    <div class="text-center mb-12">
+      <p class="text-xs uppercase tracking-[0.3em] font-semibold mb-3" style="color: #0B2DFF;">Trait d'Union Studio</p>
+      <h1 class="text-3xl sm:text-4xl font-bold text-white">Centre de diagnostic</h1>
+      <p class="text-sm mt-3 max-w-xl mx-auto" style="color: #8e8e93;">
+        Choisissez le type de diagnostic à mener pour ce client.
+      </p>
+    </div>
+
+    {# ── Deux cartes de choix ─────────────────────── #}
+    <div class="grid sm:grid-cols-2 gap-6">
+
+      {# Numérique #}
+      <a href="{% url 'diagnostic:diagnostic_list' %}"
+         class="group relative rounded-2xl border p-8 transition-all hover:-translate-y-1"
+         style="background: #18181c; border-color: #2a2a30;">
+        <div class="absolute top-0 left-0 right-0 h-1 rounded-t-2xl" style="background: linear-gradient(90deg,#0B2DFF,#5b7bff);"></div>
+        <div class="text-5xl mb-5">🔬</div>
+        <h2 class="text-xl font-bold text-white mb-2">Diagnostic Numérique</h2>
+        <p class="text-sm mb-5" style="color: #8e8e93;">
+          Analyse automatique d'un site web : performance, SEO, sécurité,
+          accessibilité, mobile, SSL et standards.
+        </p>
+        <ul class="space-y-1.5 text-xs mb-6" style="color: #a1a1a6;">
+          <li>⚡ Score automatique /100 en 15 s</li>
+          <li>🌐 À partir d'une simple URL</li>
+          <li>📊 7 catégories analysées</li>
+        </ul>
+        <span class="inline-flex items-center gap-2 text-sm font-semibold transition-colors group-hover:gap-3"
+              style="color: #0B2DFF;">
+          Lancer une analyse de site →
+        </span>
+      </a>
+
+      {# Terrain #}
+      <a href="{% url 'diagnostic:field_list' %}"
+         class="group relative rounded-2xl border p-8 transition-all hover:-translate-y-1"
+         style="background: #18181c; border-color: #2a2a30;">
+        <div class="absolute top-0 left-0 right-0 h-1 rounded-t-2xl" style="background: linear-gradient(90deg,#30d158,#9acd32);"></div>
+        <div class="text-5xl mb-5">🧭</div>
+        <h2 class="text-xl font-bold text-white mb-2">Diagnostic Terrain</h2>
+        <p class="text-sm mb-5" style="color: #8e8e93;">
+          Entretien client structuré : santé financière, commercial,
+          organisation, stratégie et risques de l'entreprise.
+        </p>
+        <ul class="space-y-1.5 text-xs mb-6" style="color: #a1a1a6;">
+          <li>📋 Questionnaire orienté par profil</li>
+          <li>🎯 Score objectif /100 + signaux d'alerte</li>
+          <li>📄 Rapport PDF avec plan d'action</li>
+        </ul>
+        <span class="inline-flex items-center gap-2 text-sm font-semibold transition-colors group-hover:gap-3"
+              style="color: #30d158;">
+          Démarrer un diagnostic terrain →
+        </span>
+      </a>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
