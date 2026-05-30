@@ -106,6 +106,7 @@ INSTALLED_APPS = [
     'apps.simulateur',
     'apps.audit',
     'apps.diagnostic',
+    'apps.einvoicing',
     'services',
     'core',
     'django_q',
@@ -358,6 +359,63 @@ INVOICE_BRANDING = {
 }
 
 QUOTE_BRANDING = INVOICE_BRANDING  # Alias pour les devis
+
+# ==============================================================================
+# 🇫🇷 FACTURATION ÉLECTRONIQUE — Réforme 2026/2027
+# ==============================================================================
+# Bloc de configuration unique pour la conformité e-invoicing (EN 16931 / Factur-X).
+# Voir .kiro/steering/einvoicing-fr.md pour le cadre réglementaire complet.
+#
+# Phases : Phase 1 = données + audit, Phase 2 = Factur-X, Phase 3 = PDP IOPOLE,
+#          Phase 4 = API REST, Phase 5 = templates PDF mis à jour.
+INVOICING = {
+    # Régime fiscal de l'émetteur (TUS) — Guyane art. 294 CGI : TVA non applicable.
+    # Override possible via env var EINVOICING_VAT_REGIME.
+    # Valeurs : STANDARD | FRANCHISE | DOM_GUYANE_MAYOTTE | EXEMPT_OTHER.
+    "VAT_REGIME": os.environ.get("EINVOICING_VAT_REGIME", "DOM_GUYANE_MAYOTTE"),
+    # Format de sortie par défaut : FACTURX | UBL | CII
+    "EINVOICE_FORMAT": os.environ.get("EINVOICING_FORMAT", "FACTURX"),
+    # Profil Factur-X : MINIMUM | BASIC_WL | BASIC | EN16931 | EXTENDED
+    "FACTURX_PROFILE": os.environ.get("EINVOICING_FACTURX_PROFILE", "EN16931"),
+    # Émetteur (extrait de INVOICE_BRANDING + données réglementaires complémentaires)
+    "EMITTER": {
+        "name": INVOICE_BRANDING["name"],
+        "legal_form": os.environ.get("EINVOICING_LEGAL_FORM", "AE"),  # auto-entrepreneur
+        "siren": os.environ.get("EINVOICING_SIREN", "908264112"),
+        "siret": INVOICE_BRANDING["siret"].replace(" ", ""),
+        "vat_intra": INVOICE_BRANDING.get("tva_intra", "") or "",
+        "ape_code": os.environ.get("EINVOICING_APE", ""),
+        "address_line": INVOICE_BRANDING["address"],
+        "city": INVOICE_BRANDING["city"],
+        "zip_code": INVOICE_BRANDING["zip_code"],
+        "country_code": os.environ.get("EINVOICING_COUNTRY", "FR"),
+        "email": INVOICE_BRANDING["email"],
+        "phone": INVOICE_BRANDING["phone"],
+        "iban": INVOICE_BRANDING.get("iban", ""),
+        "bic": INVOICE_BRANDING.get("bic", ""),
+        "peppol_id": os.environ.get("EINVOICING_PEPPOL_ID", ""),  # ex. 0009:90826411200016
+    },
+    # PDP (Phase 3) — IOPOLE par défaut (Plateforme Agréée DGFiP), abstraction
+    # permettant le swap (b2brouter, iopole, …).
+    "PDP": {
+        "PROVIDER": os.environ.get("EINVOICING_PDP_PROVIDER", "iopole"),
+        "BASE_URL": os.environ.get("EINVOICING_PDP_BASE_URL", ""),
+        "API_KEY": os.environ.get("EINVOICING_PDP_API_KEY", ""),
+        "ACCOUNT_ID": os.environ.get("EINVOICING_PDP_ACCOUNT_ID", ""),
+        "API_VERSION": os.environ.get("EINVOICING_PDP_API_VERSION", "2026-03-02"),
+        "OAUTH_CLIENT_ID": os.environ.get("EINVOICING_PDP_OAUTH_CLIENT_ID", ""),
+        "OAUTH_CLIENT_SECRET": os.environ.get("EINVOICING_PDP_OAUTH_CLIENT_SECRET", ""),
+        "TOKEN_PATH": os.environ.get("EINVOICING_PDP_TOKEN_PATH", "/oauth/token"),
+        "API_PREFIX": os.environ.get("EINVOICING_PDP_API_PREFIX", "/v1"),
+        "WEBHOOK_SECRET": os.environ.get("EINVOICING_PDP_WEBHOOK_SECRET", ""),
+        "TIMEOUT_SECONDS": int(os.environ.get("EINVOICING_PDP_TIMEOUT", "20")),
+        "RETRY_MAX_ATTEMPTS": int(os.environ.get("EINVOICING_PDP_RETRIES", "5")),
+        "SANDBOX": os.environ.get("EINVOICING_PDP_SANDBOX", "1") == "1",
+    },
+    # E-reporting B2C / cross-border (Phase 3) — TUS facture des particuliers via Stripe.
+    "E_REPORTING_ENABLED": os.environ.get("EINVOICING_E_REPORTING", "1") == "1",
+}
+
 
 # Site URL (pour les emails) — garde-fou : jamais localhost en production
 _raw_site_url = os.environ.get('SITE_URL', 'https://www.traitdunion.it')

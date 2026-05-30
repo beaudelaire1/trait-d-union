@@ -4,7 +4,7 @@ Génère les PDFs pour les devis et factures avec la charte graphique TUS.
 """
 import logging
 from io import BytesIO
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -41,12 +41,30 @@ class DocumentGenerator:
     
     @classmethod
     def get_branding(cls) -> dict:
-        """Récupère les informations de branding depuis settings ou défaut."""
-        return getattr(settings, 'INVOICE_BRANDING', DEFAULT_BRANDING)
+        """Récupère les informations de branding depuis settings ou défaut.
+
+        La mention légale TVA est calculée dynamiquement à partir du régime
+        actif (`apps.einvoicing.legal`) — jamais hardcodée.
+        """
+        from apps.einvoicing.legal import (
+            get_legal_tva_mention,
+            get_active_regime,
+            is_vat_applicable,
+        )
+
+        branding = dict(getattr(settings, 'INVOICE_BRANDING', DEFAULT_BRANDING))
+        branding['legal_tva_mention'] = get_legal_tva_mention()
+        branding['vat_regime'] = get_active_regime()
+        branding['vat_applicable'] = is_vat_applicable()
+        return branding
     
     @classmethod
-    def _render_pdf(cls, html_content: str) -> bytes:
-        """Convertit du HTML en PDF avec fallback pour les fonts offline."""
+    def _render_pdf(cls, html_content: str, *, pdf_variant: Optional[str] = None) -> bytes:
+        """Convertit du HTML en PDF avec fallback pour les fonts offline.
+
+        ``pdf_variant`` : transmis tel quel à WeasyPrint pour produire un PDF
+        conforme à un sous-ensemble (ex. ``pdf/a-3b`` pour Factur-X).
+        """
         try:
             from weasyprint import HTML, CSS
         except Exception as exc:
@@ -57,10 +75,13 @@ class DocumentGenerator:
 
         # Remplacer Google Fonts par fallback CSS local pour éviter timeouts sur Render
         html_content = cls._patch_fonts(html_content)
-        
+
         try:
             html = HTML(string=html_content, base_url=settings.BASE_DIR)
-            pdf_bytes = html.write_pdf(timeout=30)  # 30s timeout pour Render
+            kwargs = {}
+            if pdf_variant:
+                kwargs["pdf_variant"] = pdf_variant
+            pdf_bytes = html.write_pdf(**kwargs)
             return pdf_bytes
         except Exception as e:
             logger.error(f"Erreur WeasyPrint: {e}", exc_info=True)
@@ -175,12 +196,26 @@ class DocumentGenerator:
         return pdf_bytes
     
     @classmethod
-    def generate_invoice_pdf(cls, invoice: "Invoice", attach: bool = True) -> bytes:
+    def generate_invoice_pdf(
+        cls,
+        invoice: "Invoice",
+        attach: bool = True,
+        format: str = "pdf",
+        *,
+        pdf_variant: Optional[str] = None,
+    ) -> bytes:
         """Génère le PDF d'une facture.
         
         Args:
             invoice: Instance de la facture
             attach: Si True, attache le PDF à la facture
+            format: 'pdf' (défaut, rendu classique) ou 'facturx' (PDF/A-3 + XML CII).
+                    Le format 'facturx' produit un fichier hybride conforme
+                    EN 16931 / réforme française 2026, embarquant le XML
+                    `factur-x.xml` (Cross Industry Invoice).
+            pdf_variant: variante WeasyPrint (ex. ``pdf/a-3b``). Si omis avec
+                ``format='facturx'``, on bascule automatiquement sur
+                ``pdf/a-3b`` (Factur-X exige PDF/A-3).
             
         Returns:
             Contenu PDF en bytes
@@ -206,13 +241,27 @@ class DocumentGenerator:
         
         # Render le template
         html_content = render_to_string('factures/invoice_pdf.html', context)
-        
+
+        # Si on cible le format Factur-X, on doit forcer la variante PDF/A-3b
+        # (sauf override explicite par l'appelant).
+        effective_variant = pdf_variant
+        if format == "facturx" and not effective_variant:
+            effective_variant = "pdf/a-3b"
+
         # Générer le PDF
-        pdf_bytes = cls._render_pdf(html_content)
+        pdf_bytes = cls._render_pdf(html_content, pdf_variant=effective_variant)
+
+        # Variante Factur-X : on embarque le XML CII et on transforme en PDF/A-3
+        if format == "facturx":
+            from apps.einvoicing.builders import build_facturx_pdf
+            pdf_bytes = build_facturx_pdf(invoice, pdf_bytes=pdf_bytes)
+        elif format != "pdf":
+            raise ValueError(f"Format inconnu: {format!r} (attendu 'pdf' ou 'facturx').")
         
         # Attacher à la facture si demandé
         if attach:
-            filename = f"facture_{invoice.number}.pdf"
+            suffix = "_facturx" if format == "facturx" else ""
+            filename = f"facture_{invoice.number}{suffix}.pdf"
             invoice.pdf.save(filename, ContentFile(pdf_bytes), save=True)
         
         return pdf_bytes
