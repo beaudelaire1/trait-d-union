@@ -179,6 +179,32 @@
     </table>
   </div>
 
+  {# ─────────────────── RÉSILIENCE TERRITORIALE (Outre-Mer) ─────────────────── #}
+  {% if r.territorial_resilience %}
+  <div class="section">
+    <h2 class="section-title">Résilience territoriale</h2>
+    <p class="lead">
+      Capacité de l'entreprise à absorber les chocs territoriaux : fret,
+      octroi de mer, dépendance désserte, dispositifs locaux.
+    </p>
+    <div style="display:flex;gap:6mm;align-items:center;margin-bottom:4mm;">
+      <div style="flex:0 0 auto;padding:3mm 5mm;border-radius:3mm;border:1pt solid {{ r.territorial_resilience.color }};background:{{ r.territorial_resilience.color }}18;">
+        <div style="font-size:22pt;font-weight:bold;color:{{ r.territorial_resilience.color }};">
+          {{ r.territorial_resilience.score }}<span style="font-size:9pt;color:#94a3b8;">/100</span>
+        </div>
+        <div style="font-size:9pt;text-transform:uppercase;letter-spacing:0.5px;color:{{ r.territorial_resilience.color }};">
+          {{ r.territorial_resilience.label }}
+        </div>
+      </div>
+      <div style="flex:1;font-size:9pt;color:#475569;">
+        {% for note in r.territorial_resilience.notes %}
+        <p style="margin:0 0 1mm 0;">• {{ note }}</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   {# ─────────────────── REPÈRES MÉTIER (sectoriel) ─────────────────── #}
   {% if r.sector_metrics %}
   <div class="section">

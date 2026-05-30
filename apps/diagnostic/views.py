@@ -18,6 +18,7 @@ from .field_questions import (
     PROFILES, SECTORS, sections_for_profile, questions_for_profile,
 )
 from .field_scoring import analyze
+from .territory_calibration import territory_choices
 from apps.audit.models import AuditLog
 
 
@@ -159,12 +160,14 @@ def field_new(request):
         if profile not in PROFILES or not company:
             return render(request, "diagnostic/field_new.html", {
                 "profiles": PROFILES, "sectors": SECTORS,
+                "territories": territory_choices(),
                 "error": "Le nom de l'entreprise et le profil sont requis.",
                 "posted": request.POST,
             })
         diag = FieldDiagnostic.objects.create(
             company_name=company,
             sector=request.POST.get("sector", ""),
+            territory=request.POST.get("territory", ""),
             profile=profile,
             contact_name=request.POST.get("contact_name", "").strip(),
             contact_email=request.POST.get("contact_email", "").strip(),
@@ -174,6 +177,7 @@ def field_new(request):
 
     return render(request, "diagnostic/field_new.html", {
         "profiles": PROFILES, "sectors": SECTORS,
+        "territories": territory_choices(),
     })
 
 
@@ -191,7 +195,11 @@ def field_form(request, pk):
                 answers[q.id] = raw
         diag.answers = answers
         diag.notes = request.POST.get("notes", "").strip()
-        results = analyze(answers, diag.profile, sector=diag.sector or None)
+        results = analyze(
+            answers, diag.profile,
+            sector=diag.sector or None,
+            territory=diag.territory or None,
+        )
         diag.results = results
         diag.overall_score = results["global_score"]
         diag.save()

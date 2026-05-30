@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from .field_questions import SECTORS
+from .territory_calibration import territory_choices
 
 
 class SiteDiagnostic(models.Model):
@@ -67,6 +68,17 @@ class FieldDiagnostic(models.Model):
     company_name = models.CharField(_("Entreprise"), max_length=200)
     sector = models.CharField(
         _("Secteur"), max_length=50, blank=True, choices=SECTORS,
+    )
+    territory = models.CharField(
+        _("Territoire"),
+        max_length=30,
+        blank=True,
+        choices=territory_choices(),
+        help_text=_(
+            "Territoire d'implantation : utilisé pour ajuster les seuils KPI "
+            "(DSO, matelas, couverture) et déclencher les recommandations "
+            "Outre-Mer."
+        ),
     )
     profile = models.CharField(
         _("Profil"), max_length=20,

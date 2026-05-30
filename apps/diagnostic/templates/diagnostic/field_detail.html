@@ -177,6 +177,36 @@
       </div>
     </div>
 
+    {# ── Résilience territoriale (Palier 4 — Outre-Mer) ────────── #}
+    {% if r.territorial_resilience %}
+    <div class="rounded-2xl border p-6 mb-6" style="background: #18181c; border-color: #2a2a30;">
+      <div class="flex items-center gap-2 mb-1">
+        <h2 class="text-lg font-bold text-white">Résilience territoriale</h2>
+        <span class="text-[10px] px-2 py-0.5 rounded-full" style="background:#0B2DFF22; color:#7d93ff;">Outre-Mer</span>
+      </div>
+      <p class="text-xs mb-4" style="color: #8e8e93;">
+        Capacité de l'entreprise à absorber les chocs territoriaux : fret,
+        octroi de mer, dépendance désserte, dispositifs locaux.
+      </p>
+
+      <div class="flex items-center gap-4 mb-4">
+        <div class="flex-shrink-0 rounded-2xl px-5 py-3 text-center" style="background: {{ r.territorial_resilience.color }}22; border: 1px solid {{ r.territorial_resilience.color }};">
+          <div class="text-3xl font-bold" style="color: {{ r.territorial_resilience.color }};">
+            {{ r.territorial_resilience.score }}<span class="text-sm font-normal" style="color:#8e8e93;">/100</span>
+          </div>
+          <div class="text-[11px] uppercase tracking-wider mt-1" style="color: {{ r.territorial_resilience.color }};">
+            {{ r.territorial_resilience.label }}
+          </div>
+        </div>
+        <div class="flex-1 text-xs space-y-1.5" style="color:#a1a1a6;">
+          {% for note in r.territorial_resilience.notes %}
+          <p>• {{ note }}</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
     {# ── Repères de votre métier (Palier 3 — sectoriel) ───────── #}
     {% if r.sector_metrics %}
     <div class="rounded-2xl border p-6 mb-6" style="background: #18181c; border-color: #2a2a30;">

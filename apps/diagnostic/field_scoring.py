@@ -21,6 +21,14 @@ déjà audités. Le moteur est pur (sans effet de bord) et déterministe.
   transactionnelle, etc.).
 - Tous les paramètres sectoriels sont OPTIONNELS : sans secteur, le moteur
   conserve son comportement universel d'origine (rétro-compatibilité v1).
+
+🌍 Calibration territoriale (Palier 4 — Outre-Mer) :
+- Les seuils KPIs peuvent être ajustés par territoire (DOM/COM) via
+  :mod:`apps.diagnostic.territory_calibration` (module dédié).
+- Un score de résilience territoriale /100 est calculé à partir des
+  questions DOM-spécifiques (indépendant du score global).
+- Tous les paramètres territoriaux sont OPTIONNELS : sans territoire,
+  le moteur reste en mode v2 sectoriel.
 """
 from __future__ import annotations
 
@@ -33,6 +41,11 @@ from .sector_calibration import (
     SectorContext,
     get_kpi_thresholds,
     is_kpi_hidden,
+)
+from .territory_calibration import (
+    apply_territory_threshold_adjustment,
+    compute_territorial_resilience,
+    is_outre_mer as _is_outre_mer,
 )
 
 
@@ -163,8 +176,14 @@ def _resolve_thresholds(
     *,
     universal_good: float,
     universal_danger: float,
+    territory: Optional[str] = None,
 ) -> tuple[float, float] | None:
     """Détermine les seuils (good, danger) à utiliser pour un KPI.
+
+    Pipeline d'ajustement :
+        1. Seuil universel (par défaut)
+        2. Seuil sectoriel (s'il existe)
+        3. Ajustement territorial (delta appliqué au résultat précédent)
 
     Retourne ``None`` si le KPI est explicitement marqué non pertinent
     pour le secteur (l'appelant peut alors masquer le KPI).
@@ -172,16 +191,22 @@ def _resolve_thresholds(
     sector_thresholds = get_kpi_thresholds(kpi_key, sector)
     if sector_thresholds is None and is_kpi_hidden(kpi_key, sector):
         return None
-    if sector_thresholds is None:
-        return universal_good, universal_danger
-    return sector_thresholds
+    base = sector_thresholds if sector_thresholds is not None else (
+        universal_good, universal_danger,
+    )
+    return apply_territory_threshold_adjustment(kpi_key, territory, base)
 
 
-def compute_kpis(answers: dict[str, Any], sector: Optional[str] = None) -> dict[str, Kpi]:
+def compute_kpis(answers: dict[str, Any],
+                 sector: Optional[str] = None,
+                 territory: Optional[str] = None) -> dict[str, Kpi]:
     """Calcule les KPIs vitaux dérivés des réponses brutes.
 
     Si ``sector`` est fourni, les seuils sectoriels surchargent les valeurs
     universelles (cf. :mod:`apps.diagnostic.sector_calibration`).
+    Si ``territory`` est fourni, un ajustement supplémentaire est appliqué
+    pour refléter les réalités locales (cf.
+    :mod:`apps.diagnostic.territory_calibration`).
     """
     ca = _num(answers, "ca_mensuel")
     charges_fixes = _num(answers, "charges_fixes")
@@ -211,9 +236,10 @@ def compute_kpis(answers: dict[str, Any], sector: Optional[str] = None) -> dict[
         "Solde + encaissements attendus − décaissements certains.",
     )
 
-    # 2. DSO — délai moyen de paiement (seuils sectoriels)
+    # 2. DSO — délai moyen de paiement (seuils sectoriels + territoriaux)
     dso_thresholds = _resolve_thresholds(
-        "dso", sector, universal_good=30, universal_danger=45,
+        "dso", sector, territory=territory,
+        universal_good=30, universal_danger=45,
     )
     if dso_thresholds is None:
         # KPI non pertinent (B2C transactionnel, restauration, beauté…)
@@ -224,9 +250,10 @@ def compute_kpis(answers: dict[str, Any], sector: Optional[str] = None) -> dict[
     else:
         dso_good, dso_danger = dso_thresholds
         sector_note = (
-            f" Seuils ajustés pour ce secteur (sain ≤ {int(dso_good)} j, "
+            f" Seuils ajustés (sain ≤ {int(dso_good)} j, "
             f"danger ≥ {int(dso_danger)} j)."
-            if get_kpi_thresholds("dso", sector) is not None else ""
+            if (get_kpi_thresholds("dso", sector) is not None
+                or _is_outre_mer(territory)) else ""
         )
         kpis["dso"] = Kpi(
             "dso", "DSO — délai de paiement client", delai, "jours",
@@ -238,7 +265,8 @@ def compute_kpis(answers: dict[str, Any], sector: Optional[str] = None) -> dict[
     # 3. Marge brute (seuils sectoriels)
     marge_pct = (100 - cv_pct) if cv_pct is not None else None
     marge_thresholds = _resolve_thresholds(
-        "marge_brute", sector, universal_good=50, universal_danger=30,
+        "marge_brute", sector, territory=territory,
+        universal_good=50, universal_danger=30,
     )
     marge_good, marge_danger = marge_thresholds or (50.0, 30.0)
     sector_marge_note = (
@@ -252,14 +280,15 @@ def compute_kpis(answers: dict[str, Any], sector: Optional[str] = None) -> dict[
         f"CA restant après les coûts directs.{sector_marge_note}",
     )
 
-    # 4. Couverture des charges fixes (seuils sectoriels)
+    # 4. Couverture des charges fixes (seuils sectoriels + territoriaux)
     couverture = None
     if ca is not None and marge_pct is not None and charges_fixes is not None:
         marge_eur = ca * marge_pct / 100
         couverture = _safe_div(charges_fixes, marge_eur)
         couverture = round(couverture * 100, 1) if couverture is not None else None
     cov_thresholds = _resolve_thresholds(
-        "couverture", sector, universal_good=70, universal_danger=85,
+        "couverture", sector, territory=territory,
+        universal_good=70, universal_danger=85,
     )
     cov_good, cov_danger = cov_thresholds or (70.0, 85.0)
     kpis["couverture"] = Kpi(
@@ -280,7 +309,8 @@ def compute_kpis(answers: dict[str, Any], sector: Optional[str] = None) -> dict[
 
     # 6. Dépendance commerciale (seuils sectoriels)
     dep_thresholds = _resolve_thresholds(
-        "dependance_client", sector, universal_good=20, universal_danger=30,
+        "dependance_client", sector, territory=territory,
+        universal_good=20, universal_danger=30,
     )
     if dep_thresholds is None:
         kpis["dependance_client"] = Kpi(
@@ -313,11 +343,21 @@ def compute_kpis(answers: dict[str, Any], sector: Optional[str] = None) -> dict[
         "Heures facturées / heures travaillées.",
     )
 
-    # 9. Matelas de trésorerie (universel)
+    # 9. Matelas de trésorerie (seuils + ajustement territorial)
+    matelas_thresholds = _resolve_thresholds(
+        "matelas", sector=None, territory=territory,
+        universal_good=3, universal_danger=1,
+    )
+    matelas_good, matelas_danger = matelas_thresholds or (3.0, 1.0)
+    matelas_note = (
+        f" Outre-Mer : cible ≥ {int(matelas_good)} mois recommandée."
+        if _is_outre_mer(territory) else ""
+    )
     kpis["matelas"] = Kpi(
         "matelas", "Matelas de sécurité", secours, "mois",
-        _status(secours, good=3, danger=1, higher_is_better=True),
-        "Mois de charges couverts par l'épargne sans aucune rentrée.",
+        _status(secours, good=matelas_good, danger=matelas_danger,
+                higher_is_better=True),
+        f"Mois de charges couverts par l'épargne sans aucune rentrée.{matelas_note}",
     )
 
     return kpis
@@ -697,18 +737,22 @@ def verdict_for_score(score: int) -> dict[str, str]:
 
 # ── Orchestration : produit le rapport complet ───────────────────────
 def analyze(answers: dict[str, Any], profile: str,
-            sector: Optional[str] = None) -> dict[str, Any]:
+            sector: Optional[str] = None,
+            territory: Optional[str] = None) -> dict[str, Any]:
     """Point d'entrée : produit le rapport de diagnostic terrain complet.
 
     Returns un dict sérialisable (stocké dans ``FieldDiagnostic.results``).
 
     Si ``sector`` est fourni, les seuils KPIs et la pondération des domaines
     peuvent être surchargés (cf. ``sector_calibration``).
+    Si ``territory`` est fourni, des ajustements territoriaux complètent les
+    seuils KPIs (DSO, matelas, couverture) et un score de résilience
+    territoriale est exposé (cf. ``territory_calibration``).
     """
     if profile not in PROFILES:
         profile = "pme"
 
-    kpis = compute_kpis(answers, sector=sector)
+    kpis = compute_kpis(answers, sector=sector, territory=territory)
     domain_scores = compute_domain_scores(answers, kpis)
     global_score = compute_global_score(domain_scores, profile, sector=sector)
     signals = detect_signals(kpis)
@@ -720,7 +764,9 @@ def analyze(answers: dict[str, Any], profile: str,
         evaluate_sector_metrics,
         evaluate_sector_rules,
     )
-    sector_recos = evaluate_sector_rules(answers, sector, profile=profile)
+    sector_recos = evaluate_sector_rules(
+        answers, sector, profile=profile, territory=territory,
+    )
     if sector_recos:
         for sreco in sector_recos:
             recommendations.append(Recommendation(
@@ -733,6 +779,18 @@ def analyze(answers: dict[str, Any], profile: str,
         recommendations.sort(key=lambda r: PRIORITY_RANK[r.priority])
 
     sector_metrics = evaluate_sector_metrics(answers, sector)
+
+    # Palier 4 — Résilience territoriale (Outre-Mer uniquement)
+    resilience = compute_territorial_resilience(answers, territory)
+    territorial_resilience = None
+    if resilience is not None:
+        territorial_resilience = {
+            "score": resilience.score,
+            "label": resilience.label,
+            "color": resilience.color,
+            "facets": list(resilience.facets),
+            "notes": list(resilience.notes),
+        }
 
     highlights = top_strengths_weaknesses(kpis, domain_scores)
     verdict = verdict_for_score(global_score)
@@ -747,6 +805,8 @@ def analyze(answers: dict[str, Any], profile: str,
         "scoring_version": SCORING_VERSION,
         "profile": profile,
         "sector": sector or "",
+        "territory": territory or "",
+        "is_outre_mer": _is_outre_mer(territory),
         "sector_weights_applied": ctx.weights is not None,
         "global_score": global_score,
         "verdict": verdict,
@@ -792,5 +852,6 @@ def analyze(answers: dict[str, Any], profile: str,
             }
             for m in sector_metrics
         ],
+        "territorial_resilience": territorial_resilience,
         "highlights": highlights,
     }

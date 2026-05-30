@@ -58,6 +58,9 @@ class SectorRule:
             qui sera remplacé par la valeur saisie.
         simulateur: Slug du simulateur TUS associé (facultatif).
         profiles: Si renseigné, restreint la règle aux profils listés.
+        territories: Si renseigné, restreint la règle aux territoires listés
+            (codes du référentiel ``territory_calibration``). Une règle sans
+            ``territories`` s'applique à tous les territoires.
     """
 
     sector: str
@@ -68,6 +71,7 @@ class SectorRule:
     detail: str
     simulateur: str = ""
     profiles: tuple[str, ...] | None = None
+    territories: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -190,15 +194,6 @@ SECTOR_RULES: tuple[SectorRule, ...] = (
         "Une dépendance forte au neuf vous expose aux cycles immobiliers. "
         "La rénovation, plus régulière et moins concurrentielle, sécurise "
         "le carnet de commandes.",
-    ),
-    SectorRule(
-        "btp", "btp_dom_materiaux", ">= 60",
-        "important",
-        "Forte dépendance aux matériaux importés (DOM)",
-        "Au-delà de 60 % de matériaux importés, les délais de fret et "
-        "l'octroi de mer pèsent sur les marges et la planification. "
-        "Sécuriser des fournisseurs alternatifs et intégrer une clause de "
-        "révision de prix dans les marchés.",
     ),
 
     # ─────────── RESTAURATION ───────────────────────────────────────
@@ -794,6 +789,150 @@ SECTOR_RULES: tuple[SectorRule, ...] = (
         "commercial et donnent de la visibilité. Plan de fidélisation "
         "B2B (relances annuelles, offres pluriannuelles).",
     ),
+
+    # ════════════════════════════════════════════════════════════════
+    # RÈGLES TERRITORIALES — OUTRE-MER (Palier 4)
+    # ════════════════════════════════════════════════════════════════
+    # Ces règles ne s'activent que sur des territoires Outre-Mer ciblés,
+    # et corrigent / complètent les recommandations sectorielles standard.
+
+    # ─── BTP Outre-Mer ─────────────────────────────────────────────
+    SectorRule(
+        "btp", "btp_dom_materiaux", ">= 70",
+        "important",
+        "Dépendance critique aux matériaux importés",
+        "Au-delà de 70 % de matériaux importés, la moindre rupture de "
+        "fret immobilise les chantiers. Sécuriser : fournisseurs "
+        "alternatifs, stock tampon, clause de révision dans tous les "
+        "marchés. Anticiper la saison cyclonique (juin-novembre / "
+        "novembre-avril selon zone).",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte", "saint_martin", "polynesie",
+                     "nouvelle_caledonie"),
+    ),
+    SectorRule(
+        "btp", "btp_delai_reglement_situations", ">= 60",
+        "important",
+        "DSO élevé sur la commande publique locale",
+        "La commande publique en territoire ultramarin paie souvent à "
+        "60-90 jours. Plan : facturation à l'avancement plus serré, "
+        "négocier acomptes, surveiller les retenues de garantie qui "
+        "s'accumulent.",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte"),
+    ),
+
+    # ─── Restauration / Hôtellerie / Tourisme Outre-Mer ────────────
+    SectorRule(
+        "restauration", "rest_dom_appro", ">= 60",
+        "important",
+        "Carte trop dépendante des produits importés",
+        "Au-delà de 60 % de denrées importées, vous êtes exposé aux "
+        "ruptures de fret et à la volatilité des prix. Réorienter une "
+        "part de la carte vers le local sécurise l'appro ET fait un "
+        "argument commercial fort en territoire ultramarin.",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte"),
+    ),
+    SectorRule(
+        "hotellerie", "hot_dom_clientele", ">= 70",
+        "important",
+        "Très forte dépendance à la clientèle hors territoire",
+        "Une clientèle à 70 %+ extérieure lie votre remplissage à la "
+        "desserte aérienne et à la haute saison. Développer une offre "
+        "locale (séjours week-end, B2B local, événementiel) amortit ce "
+        "risque structurel.",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte", "polynesie", "nouvelle_caledonie"),
+    ),
+    SectorRule(
+        "tourisme", "tou_dom_desserte", "scale_at_least:4",
+        "important",
+        "Dépendance critique à la desserte aérienne",
+        "Une grève ou réduction de lignes peut effondrer votre "
+        "fréquentation en quelques jours. Diversifier vers la clientèle "
+        "locale et inter-îles donne une base de revenu indépendante "
+        "des aléas aériens.",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte", "saint_martin", "saint_barth",
+                     "polynesie", "nouvelle_caledonie"),
+    ),
+
+    # ─── Transport inter-îles ──────────────────────────────────────
+    SectorRule(
+        "transport", "tra_dom_inter_iles", "scale_at_least:4",
+        "important",
+        "Forte dépendance au transport inter-îles / portuaire",
+        "Les ruptures de charge (port, aéroport, liaisons maritimes) "
+        "ajoutent des délais et coûts incompressibles. Mutualiser avec "
+        "d'autres opérateurs et anticiper les rotations en saison "
+        "cyclonique sécurise les engagements clients.",
+        territories=("martinique", "guadeloupe", "saint_martin",
+                     "polynesie"),
+    ),
+
+    # ─── Industrie / artisanat Outre-Mer ───────────────────────────
+    SectorRule(
+        "industrie", "ind_dom_intrants", ">= 70",
+        "important",
+        "Production très dépendante d'intrants importés",
+        "Au-delà de 70 % d'intrants importés, la marge est exposée aux "
+        "hausses du fret et à l'octroi de mer. Sourcer une partie en "
+        "local, ou produire pour le marché inter-îles, ouvre un relais "
+        "de marge et de débouchés.",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte"),
+    ),
+    SectorRule(
+        "artisanat", "art_dom_matiere", "scale_at_least:4",
+        "recommande",
+        "Matières premières fortement dépendantes du fret",
+        "Le coût et le délai d'acheminement pèsent sur le prix et la "
+        "planification. Quand c'est possible, valoriser des matières "
+        "locales devient un avantage commercial (label terroir) et "
+        "sécurise l'approvisionnement.",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte"),
+    ),
+
+    # ─── Numérique : opportunité export hors territoire ────────────
+    SectorRule(
+        "numerique", "num_dom_export", "<= 20",
+        "recommande",
+        "Activité concentrée sur le marché local",
+        "Le numérique permet de dépasser l'étroitesse du marché local. "
+        "Moins de 20 % de CA hors territoire signifie un fort "
+        "potentiel de croissance externe inexploité (hexagone, "
+        "international, autres DOM/COM).",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte", "polynesie", "nouvelle_caledonie"),
+    ),
+
+    # ─── Formation : dispositifs régionaux ─────────────────────────
+    SectorRule(
+        "formation", "for_dom_financement", "scale_at_least:4",
+        "important",
+        "Modèle dépendant des dispositifs régionaux",
+        "Les fonds régionaux et FSE/FEDER conditionnent une grande "
+        "part de l'activité formation outre-mer. Calendrier et "
+        "critères évoluent : diversifier vers la formation B2B "
+        "directement financée par les entreprises sécurise.",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte"),
+    ),
+
+    # ─── Association / ESS : dispositifs locaux ────────────────────
+    SectorRule(
+        "association", "asso_dom_dispositifs", "scale_at_least:4",
+        "important",
+        "Structure portée par les dispositifs locaux",
+        "Politique de la ville, contrats aidés, FSE : ces dispositifs "
+        "irriguent beaucoup de structures ultramarines. Une révision "
+        "(cycle politique, budgétaire) peut déséquilibrer brutalement. "
+        "Diversifier vers des ressources propres et plurifinanceurs.",
+        territories=("guyane", "martinique", "guadeloupe", "reunion",
+                     "mayotte"),
+    ),
 )
 
 
@@ -928,6 +1067,7 @@ def evaluate_sector_rules(
     sector: Optional[str],
     profile: Optional[str] = None,
     *,
+    territory: Optional[str] = None,
     max_rules: int = 4,
 ) -> list[SectorRecommendation]:
     """Évalue toutes les règles sectorielles applicables et retourne les
@@ -935,6 +1075,7 @@ def evaluate_sector_rules(
     noyer le rapport).
 
     Si ``sector`` est ``None`` ou inconnu, retourne une liste vide.
+    Les règles avec ``territories`` filtrent sur le territoire fourni.
     """
     if not sector:
         return []
@@ -946,6 +1087,11 @@ def evaluate_sector_rules(
             continue
         if rule.profiles and profile and profile not in rule.profiles:
             continue
+        if rule.territories:
+            # Si la règle est restreinte à des territoires, on doit avoir un
+            # territoire ET il doit faire partie de la liste autorisée.
+            if not territory or territory not in rule.territories:
+                continue
         raw = answers.get(rule.question_id)
         if raw in (None, ""):
             continue

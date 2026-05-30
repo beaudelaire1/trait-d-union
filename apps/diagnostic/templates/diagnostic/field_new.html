@@ -77,6 +77,25 @@
           </select>
         </div>
 
+        <div>
+          <label for="territory" class="block text-sm font-semibold text-white mb-2">
+            Territoire d'implantation
+            <span class="text-[10px] px-2 py-0.5 rounded-full ml-1" style="background:#0B2DFF22; color:#7d93ff;">Outre-Mer</span>
+          </label>
+          <p class="text-xs mb-2" style="color: #8e8e93;">
+            Active les ajustements territoriaux (DSO commande publique DOM, matelas
+            renforcé, recommandations Outre-Mer) et le score de résilience territoriale.
+          </p>
+          <select name="territory" id="territory"
+                  class="w-full px-4 py-3 rounded-lg text-white text-sm border focus:outline-none focus:ring-2"
+                  style="background: #0f0f12; border-color: #2a2a30;">
+            <option value="">— Non précisé —</option>
+            {% for value, label in territories %}
+            <option value="{{ value }}" {% if posted.territory == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
         <div class="grid sm:grid-cols-2 gap-4">
           <div>
             <label for="contact_name" class="block text-sm font-semibold text-white mb-2">Interlocuteur</label>
