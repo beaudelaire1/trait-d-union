@@ -5,6 +5,14 @@ factures/models.py — Version rationalisée
 ✔ Calcul automatique des totaux (HT, TVA, TTC) avec support des remises
 ✔ Génération de PDF via InvoicePdfService (WeasyPrint)
 ✔ Relation vers les devis pour conversion facile
+
+E-INVOICING UPGRADE (FR 2026/2027) :
+✔ Mentions obligatoires nouvelles : type transaction, base TVA, dates livraison,
+  réf. acheteur, réf. commande, code devise.
+✔ État de cycle de vie PDP (`lifecycle_state`) — chaîne d'audit immuable
+  via `apps.einvoicing.InvoiceLifecycleEvent`.
+✔ Catégorie TVA / motif d'exemption / code unité par ligne (EN 16931).
+✔ Numérotation séparée pour les avoirs (`AVO-AAAA-XXXXX`).
 """
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import date
@@ -13,6 +21,18 @@ from typing import List
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from core.utils import raw_media_storage
+
+from apps.einvoicing.codelists import (
+    InvoiceTypeCode,
+    LifecycleState,
+    TransactionType,
+    UN_UNIT_CODES,
+    VATCategory,
+    VATEX_REASON_CODES,
+    VATPaymentBasis,
+    unit_code_choices,
+    vatex_choices,
+)
 
 
 # =========================
@@ -58,12 +78,87 @@ class Invoice(models.Model):
         max_length=20,
         unique=True,
         blank=True,
-        help_text="Numéro FAC-AAAA-XXX, généré automatiquement si vide."
+        help_text="Numéro FAC-AAAA-XXX, généré automatiquement si vide. Pour les avoirs : AVO-AAAA-XXXXX."
     )
     issue_date = models.DateField(default=date.today)
     due_date = models.DateField(null=True, blank=True)
     status = models.CharField( max_length=20, choices=InvoiceStatus.choices, default=InvoiceStatus.DRAFT)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # ===========================================
+    # E-INVOICING (FR 2026/2027) — Mentions obligatoires
+    # ===========================================
+    invoice_type_code = models.CharField(
+        _("Code type de facture (UNTDID 1001)"),
+        max_length=4,
+        choices=InvoiceTypeCode.choices,
+        default=InvoiceTypeCode.COMMERCIAL_INVOICE,
+        help_text=_("380 facture, 381 avoir, 386 acompte, 384 rectificative."),
+    )
+    transaction_type = models.CharField(
+        _("Type de transaction"),
+        max_length=10,
+        choices=TransactionType.choices,
+        default=TransactionType.SERVICES,
+        help_text=_("Mention obligatoire dès 2026 (biens, services, mixte)."),
+    )
+    vat_payment_basis = models.CharField(
+        _("Base de paiement TVA"),
+        max_length=10,
+        choices=VATPaymentBasis.choices,
+        default=VATPaymentBasis.NOT_APPLICABLE,
+        help_text=_("Pour services : encaissements (par défaut). Option débits sur facture."),
+    )
+    delivery_date = models.DateField(
+        _("Date de livraison / exécution"),
+        null=True, blank=True,
+        help_text=_("À renseigner si différente de la date d'émission."),
+    )
+    delivery_period_start = models.DateField(_("Début période"), null=True, blank=True)
+    delivery_period_end = models.DateField(_("Fin période"), null=True, blank=True)
+    buyer_reference = models.CharField(
+        _("Référence acheteur"),
+        max_length=100, blank=True,
+        help_text=_("BT-10 EN 16931 — référence fournie par l'acheteur."),
+    )
+    purchase_order_ref = models.CharField(
+        _("Référence bon de commande"),
+        max_length=100, blank=True,
+        help_text=_("Référence du BdC client (BT-13)."),
+    )
+    contract_ref = models.CharField(_("Référence contrat"), max_length=100, blank=True)
+    currency_code = models.CharField(
+        _("Devise (ISO 4217)"),
+        max_length=3,
+        default="EUR",
+    )
+    lifecycle_state = models.CharField(
+        _("État cycle de vie PDP"),
+        max_length=20,
+        choices=LifecycleState.choices,
+        default=LifecycleState.DRAFT,
+        help_text=_("État synchronisé avec la PDP — détaillé dans InvoiceLifecycleEvent."),
+        db_index=True,
+    )
+    external_pdp_id = models.CharField(
+        _("Identifiant PDP externe"),
+        max_length=64,
+        blank=True,
+        db_index=True,
+        help_text=_("ID renvoyé par la PDP (B2Brouter ou autre) à la soumission."),
+    )
+    is_credit_note = models.BooleanField(
+        _("Avoir"),
+        default=False,
+        help_text=_("Coché pour les avoirs (génère une numérotation AVO-AAAA-XXXXX)."),
+    )
+    credit_note_for = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True, blank=True,
+        related_name="credit_notes",
+        verbose_name=_("Avoir relatif à la facture"),
+    )
 
     # Totaux
     total_ht = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
@@ -207,7 +302,9 @@ class Invoice(models.Model):
 
         if not self.pk and not self.number:
             year = self.issue_date.year if self.issue_date else date.today().year
-            prefix = f"FAC-{year}-"
+            # Numérotation séparée pour les avoirs (intangibilité fiscale art. 289 CGI)
+            prefix = f"AVO-{year}-" if self.is_credit_note else f"FAC-{year}-"
+            counter_width = 5 if self.is_credit_note else 3
             from django.db import transaction
             with transaction.atomic():
                 last = (
@@ -223,7 +320,10 @@ class Invoice(models.Model):
                         counter = int(last.number.rsplit("-", 1)[-1])
                     except (ValueError, IndexError):
                         counter = Invoice.objects.filter(number__startswith=prefix).count()
-                self.number = f"{prefix}{counter + 1:03d}"
+                self.number = f"{prefix}{counter + 1:0{counter_width}d}"
+        # Forcer le code type de facture cohérent avec is_credit_note
+        if self.is_credit_note and self.invoice_type_code != InvoiceTypeCode.CREDIT_NOTE:
+            self.invoice_type_code = InvoiceTypeCode.CREDIT_NOTE
         super().save(*args, **kwargs)
 
     def compute_totals(self):
@@ -268,12 +368,15 @@ class Invoice(models.Model):
         self.amount = self.total_ttc
         self.save(update_fields=["total_ht", "tva", "total_ttc", "amount"])
 
-    def generate_pdf(self, attach: bool = True) -> bytes:
+    def generate_pdf(self, attach: bool = True, format: str = "pdf") -> bytes:
         """
         Génère le PDF de la facture via DocumentGenerator.
+
+        Le paramètre `format='facturx'` active la sortie PDF/A-3 hybride
+        avec XML CII embarqué (réforme FR 2026/2027).
         """
         from core.services.document_generator import DocumentGenerator
-        return DocumentGenerator.generate_invoice_pdf(self, attach=attach)
+        return DocumentGenerator.generate_invoice_pdf(self, attach=attach, format=format)
 
 
 class InvoiceItem(models.Model):
@@ -289,6 +392,40 @@ class InvoiceItem(models.Model):
         decimal_places=2,
         default=Decimal("0.00"),
         help_text=_("Remise en pourcentage appliquée à cette ligne."),
+    )
+
+    # ===========================================
+    # E-INVOICING (FR 2026/2027) — EN 16931
+    # ===========================================
+    unit_code = models.CharField(
+        _("Code unité (UN/ECE Rec 20)"),
+        max_length=4,
+        choices=unit_code_choices(),
+        default="C62",
+        help_text=_("C62=unité, HUR=heure, DAY=jour, MTR=mètre, LS=forfait..."),
+    )
+    vat_category_code = models.CharField(
+        _("Catégorie TVA (UNTDID 5305)"),
+        max_length=2,
+        choices=VATCategory.choices,
+        default=VATCategory.EXEMPT,
+        help_text=_("S=normal, Z=zéro, E=exonéré (franchise), AE=autoliquidation, K=intra-UE."),
+    )
+    vat_exemption_reason_code = models.CharField(
+        _("Motif d'exemption (VATEX)"),
+        max_length=20,
+        choices=vatex_choices(),
+        blank=True,
+        default="VATEX-EU-79-C",
+        help_text=_(
+            "Obligatoire si vat_category_code ∈ {E, K, AE, G, O}. "
+            "TUS franchise en base = VATEX-EU-79-C."
+        ),
+    )
+    item_identifier = models.CharField(
+        _("Identifiant article"),
+        max_length=64, blank=True,
+        help_text=_("BT-155 — référence interne ou code produit (optionnel)."),
     )
 
     class Meta:

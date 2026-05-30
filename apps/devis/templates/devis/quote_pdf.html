@@ -742,7 +742,7 @@
                     {{ branding.address }}<br>
                     {{ branding.zip_code }} {{ branding.city }}, {{ branding.region }}<br>
                     {{ branding.phone }}<br>
-                    {{ branding.email }}
+                    {{ branding.email }}{% if branding.siret %}<br>SIRET&nbsp;: {{ branding.siret }}{% endif %}{% if branding.tva_intra %}<br>TVA&nbsp;: {{ branding.tva_intra }}{% endif %}
                 </div>
             </div>
 
@@ -752,8 +752,10 @@
                 <div class="party-details">
                     {% if quote.client.company and quote.client.full_name %}{{ quote.client.full_name }}<br>{% endif %}
                     {% if quote.client.address_line %}{{ quote.client.address_line }}<br>{% endif %}
-                    {% if quote.client.zip_code or quote.client.city %}{{ quote.client.zip_code }} {{ quote.client.city }}<br>{% endif %}
+                    {% if quote.client.zip_code or quote.client.city %}{{ quote.client.zip_code }} {{ quote.client.city }}{% if quote.client.country_code and quote.client.country_code != "FR" %}, {{ quote.client.country_code }}{% endif %}<br>{% endif %}
                     {{ quote.client.email }}{% if quote.client.phone %}<br>{{ quote.client.phone }}{% endif %}
+                    {% if quote.client.siret %}<br>SIRET&nbsp;: {{ quote.client.siret }}{% elif quote.client.siren %}<br>SIREN&nbsp;: {{ quote.client.siren }}{% endif %}
+                    {% if quote.client.tva_number %}<br>TVA&nbsp;: {{ quote.client.tva_number }}{% endif %}
                 </div>
             </div>
         </div>
@@ -780,7 +782,7 @@
                         <td class="center">{{ item.quantity }}</td>
                         <td class="right amount-cell">{{ item.unit_price|floatformat:2 }} €</td>
                         <td class="center">{% if item.line_discount %}{{ item.line_discount|floatformat:2 }}%{% else %}—{% endif %}</td>
-                        <td class="center">{{ item.tax_rate|default:"20"|floatformat:2 }}%</td>
+                        <td class="center">{% if item.tax_rate %}{{ item.tax_rate|floatformat:2 }}%{% else %}—{% endif %}</td>
                         <td class="right amount-cell">{{ item.total_ttc|floatformat:2 }} €</td>
                     </tr>
                     {% empty %}
@@ -802,7 +804,7 @@
                     <span class="value">{{ quote.total_ht|floatformat:2 }} €</span>
                 </div>
                 <div class="totals-row">
-                    <span class="label">TVA (20%)</span>
+                    <span class="label">{% if quote.tva or branding.vat_applicable %}TVA{% else %}TVA non applicable{% endif %}</span>
                     <span class="value">{{ quote.tva|floatformat:2 }} €</span>
                 </div>
                 <div class="totals-row grand-total">
@@ -909,8 +911,7 @@
             <div class="conditions-box">
                 <h4>Conditions générales</h4>
                 <p>
-                    • Acompte de 30% à la commande, solde à la livraison • Pénalités de retard: 3× le taux d'intérêt
-                    légal • TVA non applicable, art. 293 B du CGI
+                    • Acompte de 30% à la commande, solde à la livraison • Pénalités de retard&nbsp;: 3× le taux d'intérêt légal{% if branding.legal_tva_mention %} • {{ branding.legal_tva_mention }}{% endif %}
                 </p>
             </div>
         </div>

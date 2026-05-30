@@ -36,10 +36,49 @@ class InvoiceAdminForm(forms.ModelForm):
 @admin.register(Invoice)
 class InvoiceAdmin(admin.ModelAdmin):
     form = InvoiceAdminForm
-    list_display = ("number", "client_name", "status", "issue_date", "total_ttc", "pdf_link")
-    list_filter = ("status", "issue_date")
-    search_fields = ("number", "client__full_name", "quote__client__full_name")
+    list_display = ("number", "client_name", "status", "lifecycle_state", "issue_date", "total_ttc", "pdf_link")
+    list_filter = ("status", "lifecycle_state", "transaction_type", "is_credit_note", "issue_date")
+    search_fields = ("number", "client__full_name", "quote__client__full_name", "buyer_reference", "purchase_order_ref")
     autocomplete_fields = ("client",)
+    raw_id_fields = ("quote", "credit_note_for")
+    fieldsets = (
+        (None, {
+            "fields": ("quote", "client", "command_ref", "number", "issue_date", "due_date", "status"),
+        }),
+        ("E-invoicing FR (2026/2027)", {
+            "fields": (
+                "invoice_type_code",
+                "transaction_type",
+                "vat_payment_basis",
+                ("delivery_date", "delivery_period_start", "delivery_period_end"),
+                ("buyer_reference", "purchase_order_ref", "contract_ref"),
+                "currency_code",
+                "lifecycle_state",
+                ("is_credit_note", "credit_note_for"),
+            ),
+            "description": (
+                "Mentions obligatoires dès le 1er sept 2026 (réception) "
+                "et 1er sept 2027 (émission TPE). Le SIREN du client est "
+                "tiré automatiquement de sa fiche."
+            ),
+        }),
+        ("Totaux", {
+            "fields": ("total_ht", "tva", "total_ttc", "discount", "amount"),
+        }),
+        ("Notes & PDF", {
+            "fields": ("notes", "payment_terms", "pdf"),
+        }),
+        ("Paiement & dunning", {
+            "fields": (
+                "stripe_checkout_session_id",
+                ("amount_paid", "paid_at"),
+                ("paid_by", "payment_proof"),
+                "payment_audit_trail",
+                ("last_reminder_level", "last_reminder_date", "reminder_count", "dunning_completed"),
+            ),
+            "classes": ("collapse",),
+        }),
+    )
 
     @admin.display(description="Client", ordering="client__full_name")
     def client_name(self, obj):
@@ -51,6 +90,7 @@ class InvoiceAdmin(admin.ModelAdmin):
     readonly_fields = ("total_ht", "tva", "total_ttc", "issue_date", "created_at")
     actions = [
         "generate_pdfs",
+        "generate_facturx_pdfs",
         "send_invoices",
         "generate_pdfs_and_publish",
         "send_invoices_and_publish",
@@ -62,7 +102,10 @@ class InvoiceAdmin(admin.ModelAdmin):
         fields = (
             "description",
             "quantity",
+            "unit_code",
             "unit_price",
+            "vat_category_code",
+            "vat_exemption_reason_code",
             "tax_rate",
             "line_discount",
             "total_ht",
@@ -90,6 +133,41 @@ class InvoiceAdmin(admin.ModelAdmin):
             count += 1
         self.message_user(request, f"{count} facture(s) convertie(s) en PDF.")
     generate_pdfs.short_description = "Générer les PDF pour les factures sélectionnées"
+
+    @admin.action(description="🇫🇷 Générer en Factur-X (PDF/A-3 + XML CII, conforme EN 16931)")
+    def generate_facturx_pdfs(self, request, queryset):
+        """Action admin Phase 2 — produit un Factur-X (PDF/A-3 + XML CII embarqué).
+
+        Le rendu visuel reste identique au PDF classique. Seule la "couche
+        machine" est ajoutée (XML embarqué + métadonnées XMP PDF/A-3).
+        """
+        ok = 0
+        ko = 0
+        for invoice in queryset:
+            try:
+                invoice.compute_totals()
+                invoice.generate_pdf(attach=True, format="facturx")
+                invoice.save()
+                ok += 1
+            except Exception as exc:  # noqa: BLE001
+                ko += 1
+                self.message_user(
+                    request,
+                    f"Facture {invoice.number}: échec Factur-X — {exc}",
+                    level=messages.ERROR,
+                )
+        if ok:
+            self.message_user(
+                request,
+                f"✅ {ok} facture(s) convertie(s) en Factur-X (PDF/A-3 + XML CII).",
+                level=messages.SUCCESS,
+            )
+        if ko:
+            self.message_user(
+                request,
+                f"⚠️ {ko} facture(s) en échec — voir messages d'erreur.",
+                level=messages.WARNING,
+            )
 
     @admin.action(description="📄 Générer les PDF et publier sur portail")
     def generate_pdfs_and_publish(self, request, queryset):

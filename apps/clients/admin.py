@@ -69,9 +69,9 @@ class ClientProfileCreationForm(forms.ModelForm):
 @admin.register(ClientProfile)
 class ClientProfileAdmin(admin.ModelAdmin):
     """Admin for client profiles — création rapide et gestion complète."""
-    list_display = ['full_name', 'email', 'company_name', 'phone', 'portal_status_badge', 'created_at']
-    search_fields = ['full_name', 'email', 'company_name', 'phone', 'user__username']
-    list_filter = ['email_notifications', 'must_change_password', 'created_at']
+    list_display = ['full_name', 'email', 'company_name', 'is_business', 'siren', 'phone', 'portal_status_badge', 'created_at']
+    search_fields = ['full_name', 'email', 'company_name', 'phone', 'user__username', 'siren', 'siret']
+    list_filter = ['is_business', 'country_code', 'email_notifications', 'must_change_password', 'created_at']
     readonly_fields = ['created_at', 'updated_at']
     actions = ['action_reset_password', 'action_resend_welcome_email']
 
@@ -103,8 +103,31 @@ class ClientProfileAdmin(admin.ModelAdmin):
             ('Adresse', {
                 'fields': ('address_line', 'city', 'zip_code', 'address')
             }),
+            ('Adresse de livraison (si différente)', {
+                'fields': (
+                    'delivery_address_line', 'delivery_city',
+                    'delivery_zip_code', 'delivery_country_code',
+                ),
+                'classes': ('collapse',),
+                'description': (
+                    'Mention obligatoire dès 2026 si l\'adresse de livraison '
+                    'diffère de l\'adresse de facturation.'
+                ),
+            }),
+            ('Identification fiscale (e-invoicing FR 2026)', {
+                'fields': (
+                    'is_business', 'country_code',
+                    'siren', 'siret', 'tva_number',
+                    'legal_form', 'peppol_id',
+                ),
+                'description': (
+                    '<strong>SIREN obligatoire</strong> sur les factures B2B émises '
+                    'à partir du 1er sept. 2026. Format Peppol : <code>scheme:value</code> '
+                    '(ex. <code>0009:90826411200016</code>).'
+                ),
+            }),
             ('Portail', {
-                'fields': ('user', 'siret', 'tva_number', 'avatar')
+                'fields': ('user', 'avatar')
             }),
             ('Préférences', {
                 'fields': ('email_notifications', 'must_change_password')

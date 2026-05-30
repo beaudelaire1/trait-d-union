@@ -5,6 +5,10 @@ to store client-specific information and preferences.
 
 TUS FLOW UPGRADE: Includes WorkflowTemplate and MilestoneTemplate for scalable
 milestone management.
+
+E-INVOICING UPGRADE (FR 2026/2027): ajoute les champs réglementaires
+nécessaires à la facturation électronique (SIREN, forme juridique, adresse
+de livraison séparée, identifiant Peppol, drapeau B2B/B2C).
 """
 from django.db import models
 from django.contrib.auth.models import User
@@ -13,6 +17,15 @@ from core.utils import raw_media_storage
 
 # Import workflow models
 from .models_workflow import WorkflowTemplate, MilestoneTemplate
+
+# E-invoicing : codes & validators
+from apps.einvoicing.codelists import LegalForm
+from apps.einvoicing.validators import (
+    validate_siren,
+    validate_siret,
+    validate_vat_intracom,
+    validate_peppol_id,
+)
 
 
 class ClientProfile(models.Model):
@@ -45,9 +58,89 @@ class ClientProfile(models.Model):
         null=True,
         blank=True,
     )
-    siret = models.CharField("SIRET", max_length=14, blank=True)
-    tva_number = models.CharField("N° TVA intracommunautaire", max_length=20, blank=True)
+    siret = models.CharField(
+        "SIRET",
+        max_length=14,
+        blank=True,
+        validators=[validate_siret],
+    )
+    siren = models.CharField(
+        "SIREN",
+        max_length=9,
+        blank=True,
+        validators=[validate_siren],
+        help_text=(
+            "9 chiffres. Obligatoire sur les factures B2B émises à partir du "
+            "1er sept. 2026."
+        ),
+    )
+    legal_form = models.CharField(
+        "Forme juridique",
+        max_length=10,
+        choices=LegalForm.choices,
+        blank=True,
+    )
+    tva_number = models.CharField(
+        "N° TVA intracommunautaire",
+        max_length=20,
+        blank=True,
+        validators=[validate_vat_intracom],
+    )
+    is_business = models.BooleanField(
+        "Compte professionnel",
+        default=False,
+        help_text="Coché pour B2B (déclenche les contrôles de SIREN/TVA).",
+    )
+    country_code = models.CharField(
+        "Code pays (ISO 3166-1 alpha-2)",
+        max_length=2,
+        default="FR",
+        help_text="FR par défaut, BE/DE/LU... pour clients UE, autre pour hors UE.",
+    )
+    peppol_id = models.CharField(
+        "Identifiant Peppol",
+        max_length=70,
+        blank=True,
+        validators=[validate_peppol_id],
+        help_text="Format `<scheme>:<value>`, ex. `0009:90826411200016` (SIRET).",
+    )
+
+    # Adresse de livraison (mention obligatoire si différente de l'adresse de facturation)
+    delivery_address_line = models.CharField(
+        "Adresse de livraison", max_length=255, blank=True,
+    )
+    delivery_city = models.CharField("Ville (livraison)", max_length=100, blank=True)
+    delivery_zip_code = models.CharField("Code postal (livraison)", max_length=20, blank=True)
+    delivery_country_code = models.CharField(
+        "Pays (livraison)", max_length=2, blank=True,
+    )
+
+    # ── Stripe (e-invoicing : enrichissement tax_ids) ────────────────
+    stripe_customer_id = models.CharField(
+        "Stripe Customer ID",
+        max_length=64,
+        blank=True,
+        db_index=True,
+        help_text=(
+            "ID Stripe (cus_xxx). Source de vérité fiscale partagée : "
+            "Stripe pousse les tax_ids (SIREN/TVA) vers ClientProfile et inversement."
+        ),
+    )
+
     avatar = models.ImageField("Photo de profil", upload_to='clients/avatars/', blank=True, null=True)
+
+    # ── Synchronisation Stripe (enrichissement, pas PDP) ─────
+    stripe_customer_id = models.CharField(
+        "Stripe Customer ID",
+        max_length=64,
+        blank=True,
+        db_index=True,
+        help_text=(
+            "Identifiant du Customer Stripe associé. Stripe collecte les "
+            "tax_ids (SIREN/SIRET/TVA) au Checkout : ils sont remontés ici "
+            "via le webhook customer.updated."
+        ),
+    )
 
     # ── Préférences ───────────────────────────────────────────
     email_notifications = models.BooleanField("Notifications par email", default=True)
@@ -87,6 +180,40 @@ class ClientProfile(models.Model):
     def has_portal_access(self):
         """True si un compte portail (User) est associé."""
         return self.user_id is not None
+
+    # ── Helpers e-invoicing FR ──────────────────────────────────────
+    @property
+    def has_distinct_delivery_address(self) -> bool:
+        """True si une adresse de livraison spécifique est renseignée."""
+        return any(
+            [
+                self.delivery_address_line,
+                self.delivery_city,
+                self.delivery_zip_code,
+            ]
+        )
+
+    @property
+    def effective_delivery_address(self) -> dict:
+        """Adresse de livraison effective (livraison spécifique ou facturation)."""
+        if self.has_distinct_delivery_address:
+            return {
+                "line": self.delivery_address_line,
+                "city": self.delivery_city,
+                "zip": self.delivery_zip_code,
+                "country": self.delivery_country_code or self.country_code or "FR",
+            }
+        return {
+            "line": self.address_line,
+            "city": self.city,
+            "zip": self.zip_code,
+            "country": self.country_code or "FR",
+        }
+
+    @property
+    def needs_siren_for_einvoicing(self) -> bool:
+        """True si la facture est B2B FR : SIREN obligatoire dès 2026."""
+        return self.is_business and (self.country_code or "FR") == "FR"
 
 
 class ClientNotification(models.Model):
