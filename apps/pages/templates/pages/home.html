@@ -725,6 +725,88 @@ métier sur mesure à Cayenne, Kourou, Martinique et Guadeloupe.{% endblock %}
     </div>
 </section>
 
+<!-- ──────────────────────────────────────────────────────────
+     Facturation électronique simplifiée — schéma marketing
+     (light/dark adaptatif via partials/einvoicing_flow.html)
+     ────────────────────────────────────────────────────────── -->
+<section class="py-24 relative overflow-hidden" id="einvoicing-section">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-tus-blue/3 to-transparent"></div>
+
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+
+        <div class="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+
+            <!-- ─── Texte ─── -->
+            <div class="lg:col-span-5 reveal-left">
+                <span class="inline-flex items-center gap-2 text-tus-blue-a11y font-display font-semibold text-sm tracking-wider uppercase mb-4">
+                    <span class="inline-block w-2 h-2 rounded-full bg-tus-green animate-pulse"></span>
+                    Réforme 2026 · 2027
+                </span>
+
+                <h2 class="text-3xl md:text-4xl lg:text-5xl font-display font-bold leading-tight mb-6">
+                    Facturation électronique,
+                    <span class="bg-gradient-to-r from-tus-blue via-cyan-400 to-tus-green bg-clip-text text-transparent">
+                        sans friction.
+                    </span>
+                </h2>
+
+                <p class="text-lg text-tus-white/70 mb-6">
+                    Vos factures circulent automatiquement entre votre activité, une plateforme agréée
+                    par l'administration et vos clients. Vous gardez la main sur la mise en page, le suivi des paiements
+                    et l'historique. Le reste — validation, routage, déclaration fiscale — se fait en arrière-plan.
+                </p>
+
+                <ul class="space-y-3 mb-8">
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-tus-green/15 border border-tus-green/30 shrink-0">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--tw-prose-bullets, #22C55E);">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </span>
+                        <span class="text-tus-white/80">
+                            <strong class="text-tus-white">Conforme</strong> dès aujourd'hui — Factur-X, EN&nbsp;16931, e-reporting fiscal.
+                        </span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-tus-green/15 border border-tus-green/30 shrink-0">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--tw-prose-bullets, #22C55E);">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </span>
+                        <span class="text-tus-white/80">
+                            <strong class="text-tus-white">Cycle de vie en temps réel</strong> — déposée, reçue, approuvée, encaissée.
+                        </span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-tus-green/15 border border-tus-green/30 shrink-0">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--tw-prose-bullets, #22C55E);">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </span>
+                        <span class="text-tus-white/80">
+                            <strong class="text-tus-white">Aucune saisie en double</strong> — devis accepté = facture prête à émettre.
+                        </span>
+                    </li>
+                </ul>
+
+                <a href="{% url 'leads:contact' %}"
+                   class="inline-flex items-center gap-2 font-semibold text-tus-blue-a11y hover:text-cyan-400 transition-colors duration-micro ease-standard">
+                    Discuter de votre cas d'usage
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- ─── Schéma ─── -->
+            <div class="lg:col-span-7 reveal-right">
+                {% include 'partials/einvoicing_flow.html' %}
+            </div>
+
+        </div>
+    </div>
+</section>
+
 <!-- Écosystème TUS Teasing Section -->
 <section class="py-24 relative overflow-hidden">
     <!-- Background effects -->

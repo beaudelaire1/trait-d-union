@@ -1,0 +1,386 @@
+{% comment %}
+   ------------------------------------------------------------------
+   Schéma de flux : Facturation électronique simplifiée
+   - Pure HTML/SVG inline (pas de JS, pas de lib externe)
+   - S'adapte automatiquement au mode light/dark via les tokens
+     `--tus-blue`, `--tus-green`, `--tus-white`
+   - Réutilisable hors home (include partials/einvoicing_flow.html)
+   ------------------------------------------------------------------
+{% endcomment %}
+
+<style nonce="{{ request.csp_nonce }}">
+    /* Conteneur ──────────────────────────────────────────────── */
+    .einvoice-flow {
+        --node-bg: rgba(255, 255, 255, 0.04);
+        --node-border: rgba(255, 255, 255, 0.10);
+        --node-shadow: 0 1px 3px rgba(0, 0, 0, 0.20);
+        --node-ink: rgba(246, 247, 251, 0.95);
+        --node-meta: rgba(246, 247, 251, 0.55);
+        --grid-dot: rgba(255, 255, 255, 0.05);
+        --line-flow: #4D6FFF;          /* var(--tus-blue) lumineux */
+        --line-receipt: #22C55E;
+        --line-public: #EAB308;
+        --pill-accept-bg: #16A34A;
+        --pill-refuse-bg: #DC2626;
+        --pill-invoice-bg: rgba(255, 255, 255, 0.06);
+        --pill-invoice-border: rgba(255, 255, 255, 0.18);
+        --pill-invoice-ink: rgba(246, 247, 251, 0.95);
+    }
+
+    [data-theme="light"] .einvoice-flow {
+        --node-bg: #FFFFFF;
+        --node-border: rgba(17, 24, 39, 0.08);
+        --node-shadow: 0 4px 14px rgba(15, 32, 68, 0.06);
+        --node-ink: #111827;
+        --node-meta: rgba(17, 24, 39, 0.55);
+        --grid-dot: rgba(17, 24, 39, 0.06);
+        --line-flow: #0B2DFF;
+        --line-receipt: #16A34A;
+        --line-public: #CA8A04;
+        --pill-accept-bg: #16A34A;
+        --pill-refuse-bg: #DC2626;
+        --pill-invoice-bg: rgba(11, 45, 255, 0.06);
+        --pill-invoice-border: rgba(11, 45, 255, 0.20);
+        --pill-invoice-ink: #0B2DFF;
+    }
+
+    .einvoice-flow__board {
+        position: relative;
+        border-radius: 1.5rem;
+        padding: 1.5rem 1rem;
+        background:
+            radial-gradient(circle at 20% 0%, rgba(11, 45, 255, 0.10), transparent 55%),
+            radial-gradient(circle at 80% 100%, rgba(34, 197, 94, 0.08), transparent 60%),
+            var(--node-bg);
+        border: 1px solid var(--node-border);
+        box-shadow: var(--node-shadow);
+        overflow: hidden;
+    }
+
+    [data-theme="light"] .einvoice-flow__board {
+        background:
+            radial-gradient(circle at 20% 0%, rgba(11, 45, 255, 0.05), transparent 55%),
+            radial-gradient(circle at 80% 100%, rgba(34, 197, 94, 0.04), transparent 60%),
+            #FBFBFD;
+    }
+
+    .einvoice-flow__board::before {
+        content: "";
+        position: absolute; inset: 0;
+        background-image: radial-gradient(var(--grid-dot) 1px, transparent 1.5px);
+        background-size: 18px 18px;
+        opacity: 0.6;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .einvoice-flow__svg {
+        position: relative;
+        width: 100%;
+        height: auto;
+        z-index: 1;
+        display: block;
+    }
+
+    /* Nodes ──────────────────────────────────────────────────── */
+    .einvoice-flow__node {
+        fill: var(--node-bg);
+        stroke: var(--node-border);
+        stroke-width: 1;
+    }
+
+    .einvoice-flow__node--solid {
+        fill: var(--node-bg);
+    }
+
+    .einvoice-flow__title {
+        fill: var(--node-ink);
+        font: 600 14px/1 'Space Grotesk', system-ui, sans-serif;
+    }
+
+    .einvoice-flow__sub {
+        fill: var(--node-meta);
+        font: 500 11px/1 'Inter', system-ui, sans-serif;
+    }
+
+    /* Lignes & flèches ──────────────────────────────────────── */
+    .einvoice-flow__line {
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
+
+    .einvoice-flow__line--solid { stroke: var(--line-flow); }
+    .einvoice-flow__line--public { stroke: var(--line-public); }
+    .einvoice-flow__line--receipt {
+        stroke: var(--line-receipt);
+        stroke-dasharray: 5 5;
+    }
+
+    .einvoice-flow__dot {
+        fill: var(--node-meta);
+    }
+
+    /* Pills d'action (Accept / Refuse / Invoice) ─────────────── */
+    .einvoice-flow__pill rect {
+        rx: 8;
+        stroke: none;
+    }
+    .einvoice-flow__pill text {
+        font: 600 11px/1 'Inter', system-ui, sans-serif;
+        fill: #FFFFFF;
+    }
+    .einvoice-flow__pill--invoice rect {
+        fill: var(--pill-invoice-bg);
+        stroke: var(--pill-invoice-border);
+        stroke-width: 1;
+    }
+    .einvoice-flow__pill--invoice text {
+        fill: var(--pill-invoice-ink);
+    }
+
+    /* Légende ────────────────────────────────────────────────── */
+    .einvoice-flow__legend {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem 1.25rem;
+        margin-top: 1rem;
+        padding: 0.625rem 1rem;
+        border-radius: 999px;
+        border: 1px solid var(--node-border);
+        background: var(--node-bg);
+        font: 500 0.78rem/1 'Inter', system-ui, sans-serif;
+        color: var(--node-meta);
+    }
+    .einvoice-flow__legend-item { display: inline-flex; align-items: center; gap: 0.5rem; }
+    .einvoice-flow__legend-swatch {
+        width: 22px; height: 2px; border-radius: 999px;
+        display: inline-block;
+    }
+    .einvoice-flow__legend-swatch--solid { background: var(--line-flow); }
+    .einvoice-flow__legend-swatch--public { background: var(--line-public); }
+    .einvoice-flow__legend-swatch--receipt {
+        background: linear-gradient(to right, var(--line-receipt) 50%, transparent 50%);
+        background-size: 6px 2px;
+    }
+
+    /* Mobile ─────────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+        .einvoice-flow__board { padding: 1rem 0.5rem; }
+    }
+</style>
+
+<div class="einvoice-flow" role="img"
+     aria-label="Schéma : flux d'une facture électronique entre l'émetteur, sa plateforme agréée, l'administration et le destinataire.">
+    <div class="einvoice-flow__board">
+
+        <svg class="einvoice-flow__svg" viewBox="0 0 940 380"
+             xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"
+             aria-hidden="true" focusable="false">
+
+            <!-- Definitions ─────────────────────────────────── -->
+            <defs>
+                <marker id="einvoice-arrow-flow" viewBox="0 0 10 10" refX="9" refY="5"
+                        markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="var(--line-flow)" />
+                </marker>
+                <marker id="einvoice-arrow-receipt" viewBox="0 0 10 10" refX="9" refY="5"
+                        markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="var(--line-receipt)" />
+                </marker>
+                <marker id="einvoice-arrow-public" viewBox="0 0 10 10" refX="9" refY="5"
+                        markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 Z" fill="var(--line-public)" />
+                </marker>
+            </defs>
+
+            <!-- Action Pills (top right) ────────────────────── -->
+            <g class="einvoice-flow__pill" transform="translate(560, 10)">
+                <rect width="86" height="26" fill="var(--pill-accept-bg)"></rect>
+                <text x="43" y="17" text-anchor="middle">Acceptée</text>
+            </g>
+            <g class="einvoice-flow__pill" transform="translate(656, 10)">
+                <rect width="86" height="26" fill="var(--pill-refuse-bg)"></rect>
+                <text x="43" y="17" text-anchor="middle">Refusée</text>
+            </g>
+            <g class="einvoice-flow__pill einvoice-flow__pill--invoice" transform="translate(830, 10)">
+                <rect width="88" height="26"></rect>
+                <text x="44" y="17" text-anchor="middle">Facture</text>
+            </g>
+
+            <!-- ─── ALLER · Transmission de la facture (bleu plein) ─── -->
+            <!-- Vendeur ↘ PA Émettrice -->
+            <path class="einvoice-flow__line einvoice-flow__line--solid"
+                  d="M220 124 C 250 142, 290 158, 320 168"
+                  marker-end="url(#einvoice-arrow-flow)" />
+
+            <!-- PA Émettrice → PA Réceptrice (rail haut) -->
+            <line class="einvoice-flow__line einvoice-flow__line--solid"
+                  x1="480" y1="188" x2="520" y2="188"
+                  marker-end="url(#einvoice-arrow-flow)" />
+
+            <!-- PA Réceptrice ↗ Destinataire -->
+            <path class="einvoice-flow__line einvoice-flow__line--solid"
+                  d="M680 168 C 720 148, 760 132, 780 124"
+                  marker-end="url(#einvoice-arrow-flow)" />
+
+            <!-- ─── RETOUR · Validation & cycle de vie (vert pointillé) ─── -->
+            <!-- Destinataire ↘ PA Réceptrice -->
+            <path class="einvoice-flow__line einvoice-flow__line--receipt"
+                  d="M860 124 C 820 144, 740 162, 700 168"
+                  marker-end="url(#einvoice-arrow-receipt)" />
+
+            <!-- PA Réceptrice → PA Émettrice (rail bas, sens inverse) -->
+            <line class="einvoice-flow__line einvoice-flow__line--receipt"
+                  x1="520" y1="212" x2="480" y2="212"
+                  marker-end="url(#einvoice-arrow-receipt)" />
+
+            <!-- PA Émettrice ↖ Vendeur -->
+            <path class="einvoice-flow__line einvoice-flow__line--receipt"
+                  d="M280 168 C 230 152, 200 140, 160 124"
+                  marker-end="url(#einvoice-arrow-receipt)" />
+
+            <!-- ─── PA Émettrice ↘ Administration fiscale (ambre plein) ─── -->
+            <path class="einvoice-flow__line einvoice-flow__line--public"
+                  d="M370 232 C 400 256, 440 272, 470 280"
+                  marker-end="url(#einvoice-arrow-public)" />
+
+            <!-- Petits dots décoratifs aux extrémités (style React Flow) -->
+            <circle class="einvoice-flow__dot" cx="160" cy="124" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="220" cy="124" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="280" cy="168" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="320" cy="168" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="480" cy="188" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="520" cy="188" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="520" cy="212" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="480" cy="212" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="680" cy="168" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="700" cy="168" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="780" cy="124" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="860" cy="124" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="370" cy="232" r="2.5" />
+            <circle class="einvoice-flow__dot" cx="470" cy="280" r="2.5" />
+
+            <!-- ─── Nœuds (cartes) ─────────────────────────── -->
+            <!-- Vendeur / Émetteur -->
+            <g transform="translate(20, 50)">
+                <rect class="einvoice-flow__node" x="0" y="0" width="240" height="74" rx="14" />
+                <g transform="translate(14, 14)">
+                    <rect width="44" height="44" rx="10"
+                          fill="var(--pill-invoice-bg)"
+                          stroke="var(--pill-invoice-border)" stroke-width="1" />
+                    <!-- icône factory (chart-bar simplifié) -->
+                    <g transform="translate(11, 11)" stroke="var(--pill-invoice-ink)" stroke-width="1.8"
+                       stroke-linecap="round" fill="none">
+                        <line x1="1"  y1="20" x2="1"  y2="13" />
+                        <line x1="7"  y1="20" x2="7"  y2="9" />
+                        <line x1="13" y1="20" x2="13" y2="5" />
+                        <line x1="19" y1="20" x2="19" y2="11" />
+                        <line x1="0"  y1="22" x2="22" y2="22" />
+                    </g>
+                </g>
+                <text class="einvoice-flow__title" x="76" y="34">Vous (Émetteur)</text>
+                <text class="einvoice-flow__sub"   x="76" y="54">Émission de la facture</text>
+            </g>
+
+            <!-- API badge entre seller et PA Émetteur -->
+            <g transform="translate(212, 138)">
+                <rect class="einvoice-flow__node einvoice-flow__node--solid"
+                      x="0" y="0" width="38" height="22" rx="7" />
+                <text class="einvoice-flow__sub" x="19" y="15" text-anchor="middle"
+                      style="fill: var(--node-ink); font-weight: 600;">API</text>
+            </g>
+
+            <!-- PA Émettrice -->
+            <g transform="translate(260, 168)">
+                <rect class="einvoice-flow__node" x="0" y="0" width="220" height="64" rx="14" />
+                <g transform="translate(12, 12)">
+                    <rect width="40" height="40" rx="10"
+                          fill="var(--pill-invoice-bg)"
+                          stroke="var(--pill-invoice-border)" stroke-width="1" />
+                    <!-- icône bouclier check -->
+                    <g transform="translate(8, 8)" stroke="var(--pill-invoice-ink)" stroke-width="1.7"
+                       stroke-linecap="round" stroke-linejoin="round" fill="none">
+                        <path d="M12 1 L22 5 V11 C22 17 18 21 12 23 C6 21 2 17 2 11 V5 Z" />
+                        <path d="M8 12 L11 15 L17 9" />
+                    </g>
+                </g>
+                <text class="einvoice-flow__title" x="64" y="30">Plateforme Agréée</text>
+                <text class="einvoice-flow__sub"   x="64" y="48">Validation • Routage</text>
+            </g>
+
+            <!-- PA Réceptrice -->
+            <g transform="translate(520, 168)">
+                <rect class="einvoice-flow__node" x="0" y="0" width="220" height="64" rx="14" />
+                <g transform="translate(12, 12)">
+                    <rect width="40" height="40" rx="10"
+                          fill="var(--pill-invoice-bg)"
+                          stroke="var(--pill-invoice-border)" stroke-width="1" />
+                    <!-- icône inbox -->
+                    <g transform="translate(8, 8)" stroke="var(--pill-invoice-ink)" stroke-width="1.7"
+                       stroke-linecap="round" stroke-linejoin="round" fill="none">
+                        <path d="M2 14 L6 4 H18 L22 14" />
+                        <path d="M2 14 V20 H22 V14 H17 L15 17 H9 L7 14 Z" />
+                    </g>
+                </g>
+                <text class="einvoice-flow__title" x="64" y="30">PA Destinataire</text>
+                <text class="einvoice-flow__sub"   x="64" y="48">Réception • Notification</text>
+            </g>
+
+            <!-- Destinataire (Buyer) -->
+            <g transform="translate(700, 50)">
+                <rect class="einvoice-flow__node" x="0" y="0" width="230" height="74" rx="14" />
+                <g transform="translate(14, 14)">
+                    <rect width="44" height="44" rx="10"
+                          fill="var(--pill-invoice-bg)"
+                          stroke="var(--pill-invoice-border)" stroke-width="1" />
+                    <!-- icône user -->
+                    <g transform="translate(11, 11)" stroke="var(--pill-invoice-ink)" stroke-width="1.8"
+                       stroke-linecap="round" stroke-linejoin="round" fill="none">
+                        <circle cx="11" cy="7" r="4" />
+                        <path d="M2 21 C 2 15 6 13 11 13 C 16 13 20 15 20 21" />
+                    </g>
+                </g>
+                <text class="einvoice-flow__title" x="76" y="34">Votre client</text>
+                <text class="einvoice-flow__sub"   x="76" y="54">En attente de validation</text>
+            </g>
+
+            <!-- Administration -->
+            <g transform="translate(340, 280)">
+                <rect class="einvoice-flow__node" x="0" y="0" width="270" height="64" rx="14" />
+                <g transform="translate(12, 12)">
+                    <rect width="40" height="40" rx="10"
+                          fill="rgba(234, 179, 8, 0.10)"
+                          stroke="rgba(234, 179, 8, 0.30)" stroke-width="1" />
+                    <!-- icône bâtiment -->
+                    <g transform="translate(8, 8)" stroke="var(--line-public)" stroke-width="1.7"
+                       stroke-linecap="round" stroke-linejoin="round" fill="none">
+                        <path d="M2 22 H22" />
+                        <path d="M3 22 V10 L12 4 L21 10 V22" />
+                        <path d="M9 22 V14 H15 V22" />
+                    </g>
+                </g>
+                <text class="einvoice-flow__title" x="64" y="30">Administration fiscale</text>
+                <text class="einvoice-flow__sub"   x="64" y="48">e-Reporting automatique</text>
+            </g>
+        </svg>
+    </div>
+
+    <!-- Légende ─────────────────────────────────────────────── -->
+    <div class="einvoice-flow__legend" aria-hidden="true">
+        <span class="einvoice-flow__legend-item">
+            <span class="einvoice-flow__legend-swatch einvoice-flow__legend-swatch--solid"></span>
+            Aller : transmission de la facture
+        </span>
+        <span class="einvoice-flow__legend-item">
+            <span class="einvoice-flow__legend-swatch einvoice-flow__legend-swatch--receipt"></span>
+            Retour : décision &amp; cycle de vie
+        </span>
+        <span class="einvoice-flow__legend-item">
+            <span class="einvoice-flow__legend-swatch einvoice-flow__legend-swatch--public"></span>
+            Déclaration fiscale
+        </span>
+    </div>
+</div>
