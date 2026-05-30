@@ -135,6 +135,8 @@ urlpatterns = [
     # Business apps
     path('devis/', include('apps.devis.urls')),
     path('factures/', include('apps.factures.urls')),
+    # E-invoicing (FR 2026/2027) — webhooks PDP entrants signés HMAC.
+    path('einvoicing/', include('apps.einvoicing.urls', namespace='einvoicing')),
     # Client portal (Phase 4)
     path('ecosysteme-tus/', include('apps.clients.urls')),
     path('accounts/', include('allauth.urls')),

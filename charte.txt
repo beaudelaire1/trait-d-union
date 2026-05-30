@@ -30,7 +30,7 @@ COULEURS SECONDAIRES
 │ Nom             │ Code HEX   │ Usage                                        │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ Surface Dark    │ #0D1016    │ Cartes, surfaces élevées                     │
-│ Stroke Dark     │ rgba(246,247,251,0.10)  │ Bordures subtiles             │
+│ Stroke Dark     │ rgba(255, 255, 255, 0.1) (#) │ Bordures subtiles             │
 └─────────────────────────────────────────────────────────────────────────────┘
 
 OPACITÉS STANDARD
