@@ -191,7 +191,7 @@ def field_form(request, pk):
                 answers[q.id] = raw
         diag.answers = answers
         diag.notes = request.POST.get("notes", "").strip()
-        results = analyze(answers, diag.profile)
+        results = analyze(answers, diag.profile, sector=diag.sector or None)
         diag.results = results
         diag.overall_score = results["global_score"]
         diag.save()

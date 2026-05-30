@@ -12,13 +12,28 @@ Transforme les réponses brutes d'un diagnostic terrain en :
 ⚠️ Principe directeur : aucune note subjective. Chaque score découle d'une
 formule à seuils documentée, alignée sur les invariants des simulateurs TUS
 déjà audités. Le moteur est pur (sans effet de bord) et déterministe.
+
+🇫🇷 Calibration sectorielle (v2) :
+- Les pondérations des domaines peuvent être surchargées par secteur via
+  :mod:`apps.diagnostic.sector_calibration` (module dédié).
+- Les seuils des KPIs vitaux (DSO, marge, couverture, dépendance) peuvent
+  être ajustés au secteur (BTP a un DSO normal de 60 j, restauration est
+  transactionnelle, etc.).
+- Tous les paramètres sectoriels sont OPTIONNELS : sans secteur, le moteur
+  conserve son comportement universel d'origine (rétro-compatibilité v1).
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Optional
 
 from .field_questions import DOMAINS, PROFILES
+from .sector_calibration import (
+    SCORING_VERSION,
+    SectorContext,
+    get_kpi_thresholds,
+    is_kpi_hidden,
+)
 
 
 # ── Pondération des domaines par profil (somme = 1.0) ────────────────
@@ -142,8 +157,32 @@ def _status(value: float | None, *, good: float, danger: float,
         return "warn"
 
 
-def compute_kpis(answers: dict[str, Any]) -> dict[str, Kpi]:
-    """Calcule les KPIs vitaux dérivés des réponses brutes."""
+def _resolve_thresholds(
+    kpi_key: str,
+    sector: Optional[str],
+    *,
+    universal_good: float,
+    universal_danger: float,
+) -> tuple[float, float] | None:
+    """Détermine les seuils (good, danger) à utiliser pour un KPI.
+
+    Retourne ``None`` si le KPI est explicitement marqué non pertinent
+    pour le secteur (l'appelant peut alors masquer le KPI).
+    """
+    sector_thresholds = get_kpi_thresholds(kpi_key, sector)
+    if sector_thresholds is None and is_kpi_hidden(kpi_key, sector):
+        return None
+    if sector_thresholds is None:
+        return universal_good, universal_danger
+    return sector_thresholds
+
+
+def compute_kpis(answers: dict[str, Any], sector: Optional[str] = None) -> dict[str, Kpi]:
+    """Calcule les KPIs vitaux dérivés des réponses brutes.
+
+    Si ``sector`` est fourni, les seuils sectoriels surchargent les valeurs
+    universelles (cf. :mod:`apps.diagnostic.sector_calibration`).
+    """
     ca = _num(answers, "ca_mensuel")
     charges_fixes = _num(answers, "charges_fixes")
     cv_pct = _num(answers, "charges_variables_pct")
@@ -161,7 +200,7 @@ def compute_kpis(answers: dict[str, Any]) -> dict[str, Kpi]:
 
     kpis: dict[str, Kpi] = {}
 
-    # 1. Trésorerie prévisionnelle à 30 jours
+    # 1. Trésorerie prévisionnelle à 30 jours (universel)
     treso_30j = None
     if treso is not None or enc is not None or dec is not None:
         treso_30j = (treso or 0) + (enc or 0) - (dec or 0)
@@ -172,34 +211,65 @@ def compute_kpis(answers: dict[str, Any]) -> dict[str, Kpi]:
         "Solde + encaissements attendus − décaissements certains.",
     )
 
-    # 2. DSO — délai moyen de paiement
-    kpis["dso"] = Kpi(
-        "dso", "DSO — délai de paiement client", delai, "jours",
-        _status(delai, good=30, danger=45, higher_is_better=False),
-        "Au-delà de 45 jours, la trésorerie est sous tension.",
+    # 2. DSO — délai moyen de paiement (seuils sectoriels)
+    dso_thresholds = _resolve_thresholds(
+        "dso", sector, universal_good=30, universal_danger=45,
     )
+    if dso_thresholds is None:
+        # KPI non pertinent (B2C transactionnel, restauration, beauté…)
+        kpis["dso"] = Kpi(
+            "dso", "DSO — délai de paiement client", None, "jours", "na",
+            "Non pertinent pour ce secteur (encaissement immédiat).",
+        )
+    else:
+        dso_good, dso_danger = dso_thresholds
+        sector_note = (
+            f" Seuils ajustés pour ce secteur (sain ≤ {int(dso_good)} j, "
+            f"danger ≥ {int(dso_danger)} j)."
+            if get_kpi_thresholds("dso", sector) is not None else ""
+        )
+        kpis["dso"] = Kpi(
+            "dso", "DSO — délai de paiement client", delai, "jours",
+            _status(delai, good=dso_good, danger=dso_danger,
+                    higher_is_better=False),
+            f"Délai moyen client → trésorerie.{sector_note}",
+        )
 
-    # 3. Marge brute
+    # 3. Marge brute (seuils sectoriels)
     marge_pct = (100 - cv_pct) if cv_pct is not None else None
+    marge_thresholds = _resolve_thresholds(
+        "marge_brute", sector, universal_good=50, universal_danger=30,
+    )
+    marge_good, marge_danger = marge_thresholds or (50.0, 30.0)
+    sector_marge_note = (
+        f" Norme du secteur : sain ≥ {int(marge_good)} %, danger ≤ {int(marge_danger)} %."
+        if get_kpi_thresholds("marge_brute", sector) is not None else ""
+    )
     kpis["marge_brute"] = Kpi(
         "marge_brute", "Taux de marge brute", marge_pct, "%",
-        _status(marge_pct, good=50, danger=30, higher_is_better=True),
-        "CA restant après les coûts directs.",
+        _status(marge_pct, good=marge_good, danger=marge_danger,
+                higher_is_better=True),
+        f"CA restant après les coûts directs.{sector_marge_note}",
     )
 
-    # 4. Couverture des charges fixes (charges fixes / marge brute €)
+    # 4. Couverture des charges fixes (seuils sectoriels)
     couverture = None
     if ca is not None and marge_pct is not None and charges_fixes is not None:
         marge_eur = ca * marge_pct / 100
         couverture = _safe_div(charges_fixes, marge_eur)
         couverture = round(couverture * 100, 1) if couverture is not None else None
+    cov_thresholds = _resolve_thresholds(
+        "couverture", sector, universal_good=70, universal_danger=85,
+    )
+    cov_good, cov_danger = cov_thresholds or (70.0, 85.0)
     kpis["couverture"] = Kpi(
         "couverture", "Couverture des charges fixes", couverture, "%",
-        _status(couverture, good=70, danger=85, higher_is_better=False),
-        "Part de la marge brute absorbée par les charges fixes. >85 % = fragile.",
+        _status(couverture, good=cov_good, danger=cov_danger,
+                higher_is_better=False),
+        "Part de la marge brute absorbée par les charges fixes.",
     )
 
-    # 5. Taux de conversion commercial
+    # 5. Taux de conversion commercial (universel)
     conversion = _safe_div(devis_sig, devis_env)
     conversion = round(conversion * 100, 1) if conversion is not None else None
     kpis["conversion"] = Kpi(
@@ -208,21 +278,33 @@ def compute_kpis(answers: dict[str, Any]) -> dict[str, Kpi]:
         "Devis signés / devis envoyés.",
     )
 
-    # 6. Dépendance commerciale (plus gros client)
-    kpis["dependance_client"] = Kpi(
-        "dependance_client", "Dépendance au plus gros client", dep_client, "%",
-        _status(dep_client, good=20, danger=30, higher_is_better=False),
-        "Au-delà de 30 %, le risque de perte client devient structurel.",
+    # 6. Dépendance commerciale (seuils sectoriels)
+    dep_thresholds = _resolve_thresholds(
+        "dependance_client", sector, universal_good=20, universal_danger=30,
     )
+    if dep_thresholds is None:
+        kpis["dependance_client"] = Kpi(
+            "dependance_client", "Dépendance au plus gros client", None, "%",
+            "na",
+            "Non pertinent (clientèle diffuse / vente transactionnelle).",
+        )
+    else:
+        dep_good, dep_danger = dep_thresholds
+        kpis["dependance_client"] = Kpi(
+            "dependance_client", "Dépendance au plus gros client", dep_client, "%",
+            _status(dep_client, good=dep_good, danger=dep_danger,
+                    higher_is_better=False),
+            f"Au-delà de {int(dep_danger)} %, le risque de perte client devient structurel.",
+        )
 
-    # 7. Récurrence du CA
+    # 7. Récurrence du CA (universel)
     kpis["recurrence"] = Kpi(
         "recurrence", "Part de CA récurrent", recurrent, "%",
         _status(recurrent, good=30, danger=20, higher_is_better=True),
         "CA prévisible (contrats, abonnements) vs ponctuel.",
     )
 
-    # 8. Capacité facturable
+    # 8. Capacité facturable (universel)
     taux_fact = _safe_div(h_fact, h_trav)
     taux_fact = round(taux_fact * 100, 1) if taux_fact is not None else None
     kpis["capacite_facturable"] = Kpi(
@@ -231,7 +313,7 @@ def compute_kpis(answers: dict[str, Any]) -> dict[str, Kpi]:
         "Heures facturées / heures travaillées.",
     )
 
-    # 9. Matelas de trésorerie
+    # 9. Matelas de trésorerie (universel)
     kpis["matelas"] = Kpi(
         "matelas", "Matelas de sécurité", secours, "mois",
         _status(secours, good=3, danger=1, higher_is_better=True),
@@ -346,13 +428,19 @@ def compute_domain_scores(answers: dict[str, Any],
 
 # ── Score global pondéré ─────────────────────────────────────────────
 def compute_global_score(domain_scores: dict[str, float | None],
-                         profile: str) -> int:
+                         profile: str,
+                         sector: Optional[str] = None) -> int:
     """Moyenne pondérée des domaines /10 → score global /100.
 
     Renormalise les poids sur les seuls domaines évalués, pour ne pas
     pénaliser un domaine non renseigné.
+
+    Si une surcharge sectorielle existe pour ce couple
+    ``(profile, sector)``, elle prime sur la matrice universelle
+    (cf. :mod:`apps.diagnostic.sector_calibration`).
     """
-    weights = DOMAIN_WEIGHTS.get(profile, DOMAIN_WEIGHTS["pme"])
+    ctx = SectorContext.for_(profile, sector)
+    weights = ctx.weights or DOMAIN_WEIGHTS.get(profile, DOMAIN_WEIGHTS["pme"])
     total_w = 0.0
     acc = 0.0
     for key, score in domain_scores.items():
@@ -608,25 +696,58 @@ def verdict_for_score(score: int) -> dict[str, str]:
 
 
 # ── Orchestration : produit le rapport complet ───────────────────────
-def analyze(answers: dict[str, Any], profile: str) -> dict[str, Any]:
+def analyze(answers: dict[str, Any], profile: str,
+            sector: Optional[str] = None) -> dict[str, Any]:
     """Point d'entrée : produit le rapport de diagnostic terrain complet.
 
     Returns un dict sérialisable (stocké dans ``FieldDiagnostic.results``).
+
+    Si ``sector`` est fourni, les seuils KPIs et la pondération des domaines
+    peuvent être surchargés (cf. ``sector_calibration``).
     """
     if profile not in PROFILES:
         profile = "pme"
 
-    kpis = compute_kpis(answers)
+    kpis = compute_kpis(answers, sector=sector)
     domain_scores = compute_domain_scores(answers, kpis)
-    global_score = compute_global_score(domain_scores, profile)
+    global_score = compute_global_score(domain_scores, profile, sector=sector)
     signals = detect_signals(kpis)
     urgency = urgency_level(signals)
     recommendations = build_recommendations(answers, kpis, domain_scores, signals)
+
+    # Palier 3 — Recommandations sectorielles (ajoutées au plan d'action)
+    from .sector_recommendations import (
+        evaluate_sector_metrics,
+        evaluate_sector_rules,
+    )
+    sector_recos = evaluate_sector_rules(answers, sector, profile=profile)
+    if sector_recos:
+        for sreco in sector_recos:
+            recommendations.append(Recommendation(
+                priority=sreco.priority,
+                title=sreco.title,
+                detail=sreco.detail,
+                simulateur=sreco.simulateur,
+            ))
+        # Re-trier le plan d'action complet par priorité (sectoriel + universel)
+        recommendations.sort(key=lambda r: PRIORITY_RANK[r.priority])
+
+    sector_metrics = evaluate_sector_metrics(answers, sector)
+
     highlights = top_strengths_weaknesses(kpis, domain_scores)
     verdict = verdict_for_score(global_score)
 
+    # Pondérations effectives (utiles pour l'affichage du rapport et l'audit)
+    ctx = SectorContext.for_(profile, sector)
+    effective_weights = ctx.weights or DOMAIN_WEIGHTS.get(
+        profile, DOMAIN_WEIGHTS["pme"]
+    )
+
     return {
+        "scoring_version": SCORING_VERSION,
         "profile": profile,
+        "sector": sector or "",
+        "sector_weights_applied": ctx.weights is not None,
         "global_score": global_score,
         "verdict": verdict,
         "urgency": urgency,
@@ -643,7 +764,7 @@ def analyze(answers: dict[str, Any], profile: str) -> dict[str, Any]:
             {
                 "key": key, "label": DOMAINS[key].label,
                 "icon": DOMAINS[key].icon, "score": score,
-                "weight": DOMAIN_WEIGHTS.get(profile, {}).get(key, 0),
+                "weight": effective_weights.get(key, 0),
             }
             for key, score in domain_scores.items()
         ],
@@ -661,6 +782,15 @@ def analyze(answers: dict[str, Any], profile: str) -> dict[str, Any]:
                 "simulateur": r.simulateur,
             }
             for r in recommendations
+        ],
+        "sector_metrics": [
+            {
+                "key": m.key, "label": m.label, "value": m.value,
+                "unit": m.unit, "status": m.status, "color": m.color,
+                "good": m.good, "danger": m.danger,
+                "direction": m.direction,
+            }
+            for m in sector_metrics
         ],
         "highlights": highlights,
     }

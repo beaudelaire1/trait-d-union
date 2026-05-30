@@ -177,6 +177,39 @@
       </div>
     </div>
 
+    {# ── Repères de votre métier (Palier 3 — sectoriel) ───────── #}
+    {% if r.sector_metrics %}
+    <div class="rounded-2xl border p-6 mb-6" style="background: #18181c; border-color: #2a2a30;">
+      <div class="flex items-center gap-2 mb-1">
+        <h2 class="text-lg font-bold text-white">Repères de votre métier</h2>
+        <span class="text-[10px] px-2 py-0.5 rounded-full" style="background:#0B2DFF22; color:#7d93ff;">Sectoriel</span>
+      </div>
+      <p class="text-xs mb-5" style="color: #8e8e93;">
+        Indicateurs propres à votre secteur, comparés aux normes observées.
+      </p>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {% for m in r.sector_metrics %}
+        <div class="rounded-xl border p-3" style="background: #0f0f12; border-color: #2a2a30;">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="inline-block w-2 h-2 rounded-full" style="background: {{ m.color }};"></span>
+            <span class="text-[11px] uppercase tracking-wider" style="color:#8e8e93;">{{ m.label }}</span>
+          </div>
+          <p class="text-xl font-bold" style="color: {{ m.color }};">
+            {% if m.value is not None %}{{ m.value|floatformat:"-1" }}<span class="text-xs font-normal" style="color:#8e8e93;"> {{ m.unit }}</span>{% else %}—{% endif %}
+          </p>
+          <p class="text-[10px] mt-1" style="color:#8e8e93;">
+            {% if m.direction == 'higher_is_better' %}
+              cible &ge; {{ m.good }}{{ m.unit }} · alerte &le; {{ m.danger }}{{ m.unit }}
+            {% else %}
+              cible &le; {{ m.good }}{{ m.unit }} · alerte &ge; {{ m.danger }}{{ m.unit }}
+            {% endif %}
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
     {# ── Plan d'action ──────────────────────────── #}
     <div class="rounded-2xl border p-6 mb-6" style="background: #18181c; border-color: #2a2a30;">
       <h2 class="text-lg font-bold text-white mb-1">Plan d'action priorisé</h2>

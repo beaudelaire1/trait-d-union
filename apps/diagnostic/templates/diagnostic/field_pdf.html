@@ -179,6 +179,45 @@
     </table>
   </div>
 
+  {# ─────────────────── REPÈRES MÉTIER (sectoriel) ─────────────────── #}
+  {% if r.sector_metrics %}
+  <div class="section">
+    <h2 class="section-title">Repères de votre métier</h2>
+    <p class="lead">Indicateurs propres à votre secteur, comparés aux normes observées.</p>
+    <table class="kpis">
+      <thead>
+        <tr>
+          <th>Indicateur</th>
+          <th>Valeur</th>
+          <th>État</th>
+          <th>Repère</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in r.sector_metrics %}
+        <tr>
+          <td style="font-weight:600;color:#0f172a;">{{ m.label }}</td>
+          <td>{% if m.value is not None %}{{ m.value|floatformat:"-1" }} {{ m.unit }}{% else %}—{% endif %}</td>
+          <td><span class="pill" style="background:{{ m.color }}22;color:{{ m.color }};">
+            {% if m.status == 'good' %}Sain
+            {% elif m.status == 'warn' %}À surveiller
+            {% elif m.status == 'danger' %}Zone de danger
+            {% else %}Non renseigné{% endif %}
+          </span></td>
+          <td style="color:#64748b;font-size:8.5pt;">
+            {% if m.direction == 'higher_is_better' %}
+              cible &ge; {{ m.good }}{{ m.unit }} · alerte &le; {{ m.danger }}{{ m.unit }}
+            {% else %}
+              cible &le; {{ m.good }}{{ m.unit }} · alerte &ge; {{ m.danger }}{{ m.unit }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
   {# ─────────────────── PLAN D'ACTION ─────────────────── #}
   <div class="section">
     <h2 class="section-title">Plan d'action priorisé</h2>
