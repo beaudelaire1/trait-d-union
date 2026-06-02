@@ -46,19 +46,35 @@ class Command(BaseCommand):
             qs = qs.filter(slug=options["slug"])
 
         if options["only_missing"]:
-            # On ne garde que les projets dont aucune catégorie automatique
-            # (perf/seo/accessibilité/sécurité/ssl) n'a encore de mesure.
-            # La note UI/UX manuelle seule ne compte pas comme « audité ».
-            auto_keys = ("performance", "seo", "accessibility", "security", "ssl")
+            # Un projet est considéré « complet » seulement si CHAQUE catégorie
+            # automatique porte sa valeur de référence :
+            #   performance/seo/accessibility/security → score
+            #   ssl                                    → grade (A+/A/B…)
+            #   security accepte aussi un grade (Observatory) à défaut de score.
+            # Dès qu'une valeur manque (ex. grade SSL non encore calculé), on
+            # re-audite. Idempotent : une fois toutes les valeurs présentes, le
+            # projet n'est plus repris.
+            required = {
+                "performance": "score",
+                "seo": "score",
+                "accessibility": "score",
+                "security": "score",
+                "ssl": "grade",
+            }
             pending_ids = []
             for proj in qs:
                 results = proj.audit_results or {}
-                has_auto = any(
-                    (results.get(k) or {}).get("score") is not None
-                    or (results.get(k) or {}).get("grade")
-                    for k in auto_keys
-                )
-                if not has_auto:
+                complete = True
+                for cat, primary in required.items():
+                    node = results.get(cat) or {}
+                    has_value = node.get(primary) is not None and node.get(primary) != ""
+                    # security : un grade Observatory suffit si pas de score
+                    if not has_value and cat == "security":
+                        has_value = bool(node.get("grade"))
+                    if not has_value:
+                        complete = False
+                        break
+                if not complete:
                     pending_ids.append(proj.pk)
             qs = qs.filter(pk__in=pending_ids)
 
