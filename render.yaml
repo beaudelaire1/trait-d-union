@@ -139,6 +139,30 @@ services:
         value: fr
 
   # ==============================================================================
+  # CRON — Audit portfolio (Ch.05 : performance / sécurité / SSL) — 1× / semaine
+  # ==============================================================================
+  - type: cron
+    name: traitdunion-audit-portfolio
+    runtime: docker
+    region: frankfurt
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    schedule: "0 4 * * 1"  # tous les lundis à 04h00 (SSL Labs étant lent)
+    dockerCommand: python manage.py audit_portfolio_projects
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: traitdunion-db
+          property: connectionString
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: PAGESPEED_API_KEY
+        sync: false
+
+  # ==============================================================================
   # BASE DE DONNÉES POSTGRESQL
   # ==============================================================================
 databases:

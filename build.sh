@@ -62,6 +62,14 @@ if reset:
     print(f"🔓 {reset} device(s) TOTP débloqué(s) (throttling reset)")
 EOFTOTP
 
+# 5. Remplissage initial des audits portfolio (Ch.05) — projets sans mesure.
+#    Rapide (moteur interne + Observatory, pas de SSL Labs), non bloquant :
+#    un échec réseau ne doit jamais casser le déploiement.
+echo ""
+echo "📊 Audit portfolio (remplissage initial des projets sans mesure)..."
+python manage.py audit_portfolio_projects --only-missing --no-ssl || \
+    echo "⚠️  Audit portfolio ignoré (non bloquant) — sera relancé par le cron."
+
 echo ""
 echo "=========================================="
 echo "✅ Pre-deploy terminé avec succès!"

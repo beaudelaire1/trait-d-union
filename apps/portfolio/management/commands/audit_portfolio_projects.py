@@ -29,6 +29,13 @@ class Command(BaseCommand):
             "--no-ssl", action="store_true",
             help="Skip le scan SSL Labs (sinon lancé par défaut, ~60 s par projet).",
         )
+        parser.add_argument(
+            "--only-missing", action="store_true",
+            help=(
+                "N'audite que les projets sans résultats automatiques "
+                "(remplissage initial rapide, idempotent — idéal en pre-deploy)."
+            ),
+        )
 
     def handle(self, *args, **options):
         from apps.portfolio.models import Project
@@ -37,6 +44,23 @@ class Command(BaseCommand):
         qs = Project.objects.filter(is_published=True).exclude(url="")
         if options["slug"]:
             qs = qs.filter(slug=options["slug"])
+
+        if options["only_missing"]:
+            # On ne garde que les projets dont aucune catégorie automatique
+            # (perf/seo/accessibilité/sécurité/ssl) n'a encore de mesure.
+            # La note UI/UX manuelle seule ne compte pas comme « audité ».
+            auto_keys = ("performance", "seo", "accessibility", "security", "ssl")
+            pending_ids = []
+            for proj in qs:
+                results = proj.audit_results or {}
+                has_auto = any(
+                    (results.get(k) or {}).get("score") is not None
+                    or (results.get(k) or {}).get("grade")
+                    for k in auto_keys
+                )
+                if not has_auto:
+                    pending_ids.append(proj.pk)
+            qs = qs.filter(pk__in=pending_ids)
 
         total = qs.count()
         if total == 0:
