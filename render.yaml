@@ -102,6 +102,42 @@ services:
       - key: DJANGO_SUPERUSER_PASSWORD
         sync: false
 
+      # Avis Google Business (synchro automatique) — SECRETS
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: GOOGLE_PLACE_ID
+        sync: false
+      - key: GOOGLE_REVIEWS_LANGUAGE
+        value: fr
+
+  # ==============================================================================
+  # CRON — Synchronisation des avis Google Business (toutes les 6 h)
+  # ==============================================================================
+  - type: cron
+    name: traitdunion-sync-google-reviews
+    runtime: docker
+    region: frankfurt
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    schedule: "0 */6 * * *"  # toutes les 6 heures
+    dockerCommand: python manage.py sync_google_reviews
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: traitdunion-db
+          property: connectionString
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: GOOGLE_PLACES_API_KEY
+        sync: false
+      - key: GOOGLE_PLACE_ID
+        sync: false
+      - key: GOOGLE_REVIEWS_LANGUAGE
+        value: fr
+
   # ==============================================================================
   # BASE DE DONNÉES POSTGRESQL
   # ==============================================================================
