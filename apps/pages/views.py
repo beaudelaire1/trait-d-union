@@ -43,12 +43,19 @@ class HomeView(TemplateView):
         context['services'] = services_data
         
         # Charger les témoignages depuis la base de données (cached 5 min)
-        testimonials = cache.get('homepage_testimonials')
-        if testimonials is None:
+        # On affiche jusqu'à 6 témoignages mis en avant + le total publié
+        # pour piloter le lien "Voir tous les avis".
+        cached = cache.get('homepage_testimonials')
+        if cached is None:
             from apps.pages.models import Testimonial
-            testimonials = list(Testimonial.objects.filter(is_published=True)[:3])
-            cache.set('homepage_testimonials', testimonials, 300)
-        context['testimonials'] = testimonials
+            qs = Testimonial.objects.filter(is_published=True)
+            cached = {
+                'items': list(qs[:6]),
+                'total': qs.count(),
+            }
+            cache.set('homepage_testimonials', cached, 300)
+        context['testimonials'] = cached['items']
+        context['testimonials_total'] = cached['total']
         
         # Compteur dynamique de projets portfolio (cached 10 min)
         portfolio_count = cache.get('homepage_portfolio_count')
@@ -119,6 +126,34 @@ class FAQView(TemplateView):
         return context
 
 
+class TestimonialsListView(TemplateView):
+    """Liste paginée de tous les témoignages clients publiés."""
+
+    template_name: str = 'pages/testimonials_list.html'
+    paginate_by: int = 12
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        from django.core.paginator import Paginator
+        from apps.pages.models import Testimonial
+
+        context = super().get_context_data(**kwargs)
+        qs = Testimonial.objects.filter(is_published=True)
+        paginator = Paginator(qs, self.paginate_by)
+        page_number = self.request.GET.get('page') or 1
+        page_obj = paginator.get_page(page_number)
+
+        context.update({
+            'page_obj': page_obj,
+            'testimonials': page_obj.object_list,
+            'total_count': paginator.count,
+            'breadcrumbs_list': [
+                {'name': 'Accueil', 'url': '/'},
+                {'name': 'Avis clients', 'url': '/temoignages/'},
+            ],
+        })
+        return context
+
+
 class MentionsLegalesView(TemplateView):
     """Mentions légales page with breadcrumbs."""
 
@@ -172,6 +207,19 @@ class LegalView(TemplateView):
             {'name': 'Accueil', 'url': '/'},
             {'name': 'Informations légales', 'url': '/legal/'},
         ]
+
+        # Mention TVA depuis la source unique de vérité (apps.einvoicing.legal),
+        # alignée sur settings.INVOICING['VAT_REGIME']. Évite toute incohérence
+        # entre la page légale, les devis et les factures.
+        try:
+            from apps.einvoicing.legal import get_legal_tva_mention
+            context['vat_mention'] = get_legal_tva_mention()
+        except Exception:  # pragma: no cover - fallback défensif
+            context['vat_mention'] = "TVA non applicable, art. 293 B du CGI"
+
+        # Numéro de TVA intracommunautaire : existe pour les échanges UE,
+        # mais la TVA n'est pas facturée (cf. mention ci-dessus).
+        context['vat_intracom'] = "FR 17 908264112"
         return context
 
 

@@ -34,7 +34,8 @@
                         <p><strong class="text-tus-white">Siège social :</strong> 258 Avenue Justin Catayée, Route de la Madeleine, 97300 Cayenne, Guyane française</p>
                         <p><strong class="text-tus-white">SIRET :</strong> 908 264 112 00016</p>
                         <p><strong class="text-tus-white">SIREN :</strong> 908 264 112</p>
-                        <p><strong class="text-tus-white">N° TVA :</strong> FR 17 908264112</p>
+                        <p><strong class="text-tus-white">N° TVA intracommunautaire :</strong> {{ vat_intracom }}</p>
+                        <p class="text-tus-white/60 text-sm">{{ vat_mention }} — la TVA n'est donc pas facturée. Le numéro intracommunautaire n'est utilisé que pour les échanges au sein de l'Union européenne.</p>
                         <p><strong class="text-tus-white">Téléphone :</strong> +594 695 35 80 41</p>
                         <p><strong class="text-tus-white">Email :</strong> {% include 'partials/contact_email.html' with link_style="text-tus-blue-a11y hover:underline" %}</p>
                 </div>
@@ -56,10 +57,11 @@
                     Hébergement
                 </h2>
                 <div class="text-tus-white/70 space-y-2">
-                    <p><strong class="text-tus-white">Hostinger International Ltd.</strong></p>
-                    <p>61 Lordou Vironos Street, 6023 Larnaca, Chypre</p>
-                    <p>Site web : <a href="https://www.hostinger.fr" class="text-tus-blue-a11y hover:underline">www.hostinger.fr</a></p>
-                    <p>Infrastructure cloud mutualisée (datacenters Hostinger, UE).</p>
+                    <p><strong class="text-tus-white">Render Services, Inc.</strong></p>
+                    <p>525 Brannan Street, Suite 300, San Francisco, CA 94107, États-Unis</p>
+                    <p>Site web : <a href="https://render.com" class="text-tus-blue-a11y hover:underline">render.com</a></p>
+                    <p><strong class="text-tus-white">Localisation des données :</strong> datacenter de Francfort (Allemagne, Union européenne).</p>
+                    <p class="text-tus-white/60 text-sm">La gestion du nom de domaine (DNS) est assurée par Hostinger International Ltd. (Larnaca, Chypre, UE).</p>
                 </div>
             </section>
 
@@ -70,13 +72,13 @@
                     Technologies utilisées
                 </h2>
                 <div class="text-tus-white/70 space-y-4">
-                    <p><strong class="text-tus-white">Back-end :</strong> Django, Python, PostgreSQL, Celery, Redis, WhiteNoise, Gunicorn</p>
-                    <p><strong class="text-tus-white">Front-end :</strong> HTMX, Tailwind CSS, Alpine.js</p>
-                    <p><strong class="text-tus-white">Intégrations & APIs :</strong> Stripe/Stripe Connect, Colissimo API, Brevo (emails), Cloudinary (images), Mapbox, Leaflet, Matterport API</p>
-                    <p><strong class="text-tus-white">Storage & Infrastructure :</strong> AWS S3/R2 (django-storages), Docker, Render (hébergement)</p>
-                    <p><strong class="text-tus-white">Génération & export :</strong> WeasyPrint, ReportLab (PDF)</p>
-                    <p><strong class="text-tus-white">Édition & Contenu :</strong> TinyMCE</p>
-                    <p><strong class="text-tus-white">Monitoring & Sécurité :</strong> Sentry, Django OTP + QR Code</p>
+                    <p><strong class="text-tus-white">Back-end :</strong> Django (Python), PostgreSQL, Celery, Redis, Gunicorn, WhiteNoise</p>
+                    <p><strong class="text-tus-white">Front-end :</strong> HTMX, Alpine.js, Tailwind CSS</p>
+                    <p><strong class="text-tus-white">Intégrations & APIs :</strong> Stripe / Stripe Connect (paiement), Brevo (emails transactionnels), Cloudinary (médias), Colissimo (expédition), Mapbox & Leaflet (cartographie)</p>
+                    <p><strong class="text-tus-white">Hébergement & stockage :</strong> Render (Francfort, UE), PostgreSQL managé, stockage objet compatible S3 (AWS S3 / Cloudflare R2), conteneurisation Docker</p>
+                    <p><strong class="text-tus-white">Génération de documents :</strong> WeasyPrint & ReportLab (PDF, factures Factur-X)</p>
+                    <p><strong class="text-tus-white">Édition de contenu :</strong> TinyMCE</p>
+                    <p><strong class="text-tus-white">Sécurité & supervision :</strong> Sentry (monitoring), Django-OTP (double authentification), en-têtes CSP, HTTPS, sauvegardes automatiques</p>
                 </div>
             </section>
 

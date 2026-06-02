@@ -361,6 +361,18 @@ INVOICE_BRANDING = {
 QUOTE_BRANDING = INVOICE_BRANDING  # Alias pour les devis
 
 # ==============================================================================
+# AVIS GOOGLE BUSINESS — synchronisation automatique
+# ==============================================================================
+# Backend par défaut : Google Places API (New). Limite Google : 5 avis publics.
+# La synchro alimente apps.pages.models.Testimonial (source='google').
+# Voir apps/pages/services/google_reviews.py pour le détail.
+GOOGLE_REVIEWS = {
+    "API_KEY": os.environ.get("GOOGLE_PLACES_API_KEY", ""),
+    "PLACE_ID": os.environ.get("GOOGLE_PLACE_ID", ""),
+    "LANGUAGE": os.environ.get("GOOGLE_REVIEWS_LANGUAGE", "fr"),
+}
+
+# ==============================================================================
 # 🇫🇷 FACTURATION ÉLECTRONIQUE — Réforme 2026/2027
 # ==============================================================================
 # Bloc de configuration unique pour la conformité e-invoicing (EN 16931 / Factur-X).

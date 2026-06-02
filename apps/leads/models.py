@@ -16,10 +16,10 @@ class ProjectTypeChoice(models.TextChoices):
 
 
 class BudgetRange(models.TextChoices):
-    SMALL = 'small', '< 3 000 €'
-    MEDIUM = 'medium', '3 000 € – 8 000 €'
-    LARGE = 'large', '8 000 € – 15 000 €'
-    ENTERPRISE = 'enterprise', '> 15 000 €'
+    SMALL = 'small', '< 2 000 €'
+    MEDIUM = 'medium', '2 000 € – 5 000 €'
+    LARGE = 'large', '5 000 € – 8 500 €'
+    ENTERPRISE = 'enterprise', '> 8 500 € (plateforme métier)'
     DISCUSS = 'discuss', 'À discuter'
 
 

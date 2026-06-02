@@ -19,7 +19,7 @@
       "name": "Combien coûte la création d'un site internet en Guyane ?",
       "acceptedAnswer": {
         "@type": "Answer",
-                "text": "Le coût d'un site internet en Guyane varie selon le périmètre : one page (à partir de 1200€), site vitrine multi-pages (2500-6000€), e-commerce (5000-18000€), plateforme métier sur mesure (15000€+). Nous proposons des devis personnalisés adaptés à votre projet et budget."
+                "text": "Le coût d'un site internet en Guyane varie selon le périmètre : one page (à partir de 1 000 €), site vitrine multi-pages (1 500 € à 2 000 €), e-commerce (5 000 € à 8 500 €), plateforme métier sur mesure (sur devis). Nous proposons des devis personnalisés adaptés à votre projet et budget."
       }
     },
     {
@@ -43,7 +43,31 @@
       "name": "Quelle est votre expertise technique ?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Nous maîtrisons Django, React, Tailwind CSS, PostgreSQL, Stripe, et les meilleures pratiques SEO. Notre stack garantit des sites performants, sécurisés et scalables."
+        "text": "Nous développons sur une stack moderne et éprouvée : Django (Python) et PostgreSQL côté back-end, HTMX, Alpine.js et Tailwind CSS côté front-end, Stripe pour les paiements. Hébergement européen sur Render (Francfort), supervision Sentry, double authentification, conformité RGPD et bonnes pratiques OWASP et WCAG 2.1 AA."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Le code sur mesure veut-il dire que je serai dépendant de Trait d'Union Studio ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Non, c'est l'inverse. Sur mesure ne veut pas dire propriétaire fermé : le code est écrit en Python avec Django, des technologies open source parmi les plus répandues au monde. Il vous est livré intégralement, documenté et commenté. N'importe quel développeur Python sérieux peut le reprendre, le maintenir et le faire évoluer. Vous êtes propriétaire du code source, sans abonnement caché ni dépendance technique au studio."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "À qui appartient le code une fois le projet livré ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Le code source vous appartient intégralement à la livraison. Il est transmis avec sa documentation technique et son historique de versions (Git). Vous pouvez l'héberger où vous le souhaitez, le confier à un autre prestataire ou constituer votre propre équipe : aucune clé de bridage, aucune licence restrictive."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Êtes-vous concernés par la facturation électronique obligatoire de 2026 ?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Oui. Les plateformes que nous concevons intègrent la facturation électronique conforme à la réforme française 2026-2027 : format Factur-X (norme EN 16931), transmission via plateforme agréée et e-reporting. Vos devis acceptés se transforment en factures conformes sans double saisie."
       }
     },
     {
@@ -141,10 +165,10 @@
                         Le coût d'un site internet en Guyane varie selon la complexité du projet :
                     </p>
                     <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
-                        <li><strong class="text-tus-white">Site one page :</strong> à partir de 1200€ (page unique optimisée)</li>
-                        <li><strong class="text-tus-white">Site vitrine multi-pages :</strong> 2500€ à 6000€ (5-10 pages, design sur mesure)</li>
-                        <li><strong class="text-tus-white">Site e-commerce :</strong> 5000€ à 18000€ (boutique en ligne, paiements Stripe/PayPal)</li>
-                        <li><strong class="text-tus-white">Plateforme métier sur mesure :</strong> 15000€+ (fonctionnalités avancées, API, intégrations)</li>
+                        <li><strong class="text-tus-white">Site one page :</strong> à partir de 1 000 € (page unique optimisée)</li>
+                        <li><strong class="text-tus-white">Site vitrine multi-pages :</strong> 1 500 € à 2 000 € (5-10 pages, design sur mesure)</li>
+                        <li><strong class="text-tus-white">Site e-commerce :</strong> 5 000 € à 8 500 € (boutique en ligne, paiements Stripe/PayPal)</li>
+                        <li><strong class="text-tus-white">Plateforme métier sur mesure :</strong> sur devis (CRM, ERP, portails, API)</li>
                     </ul>
                     <p class="text-tus-white/70">
                         Nous proposons des devis personnalisés adaptés à votre projet et budget. 
@@ -225,17 +249,17 @@
                 </button>
                 <div x-show="activeTab === 4" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
-                        Notre stack technique garantit des sites performants, sécurisés et scalables :
+                        Notre stack technique garantit des sites performants, sécurisés et durables :
                     </p>
                     <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
-                        <li><strong class="text-tus-white">Backend :</strong> Django 5.0, Python 3.11, PostgreSQL</li>
-                        <li><strong class="text-tus-white">Frontend :</strong> Tailwind CSS 3.4, HTMX 2.0, Alpine.js</li>
-                        <li><strong class="text-tus-white">Infrastructure :</strong> Render.com (Europe), Cloudinary (médias), Stripe (paiements)</li>
+                        <li><strong class="text-tus-white">Backend :</strong> Django (Python), PostgreSQL, Celery, Redis</li>
+                        <li><strong class="text-tus-white">Frontend :</strong> HTMX, Alpine.js, Tailwind CSS</li>
+                        <li><strong class="text-tus-white">Infrastructure :</strong> Render (Francfort, UE), Cloudinary (médias), Stripe (paiements)</li>
                         <li><strong class="text-tus-white">SEO :</strong> JSON-LD Schema.org, sitemap XML, Core Web Vitals optimisés</li>
-                        <li><strong class="text-tus-white">Sécurité :</strong> HTTPS, CSP headers, RGPD compliant, backups automatiques</li>
+                        <li><strong class="text-tus-white">Sécurité :</strong> HTTPS, en-têtes CSP, double authentification, conformité RGPD, sauvegardes automatiques</li>
                     </ul>
                     <p class="text-tus-white/70">
-                        Nous suivons les meilleures pratiques de l'industrie (OWASP, WCAG 2.1 AA, Google PageSpeed).
+                        Nous suivons les standards de l'industrie (OWASP, WCAG 2.1 AA, Google PageSpeed). Toutes ces briques sont open source et largement répandues — votre projet n'est jamais prisonnier d'une technologie de niche.
                     </p>
                 </div>
             </div>
@@ -324,7 +348,7 @@
                         Paiement sécurisé par carte bancaire (Stripe) ou virement SEPA. Factures conformes aux normes comptables françaises.
                     </p>
                     <p class="text-tus-white/70">
-                        Pour les projets >15000€, nous pouvons envisager un étalement jusqu'à 4 versements.
+                        Pour les projets supérieurs à 8 000 €, nous pouvons envisager un étalement jusqu'à 4 versements.
                     </p>
                 </div>
             </div>
@@ -354,6 +378,91 @@
                     </ul>
                     <p class="text-tus-white/70">
                         ⚡ <strong class="text-tus-white">Réponse sous 24h garantie</strong> (jours ouvrés). Pour les urgences techniques de nos clients en maintenance, support 24/7 disponible.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 9 — Code sur mesure & dépendance -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 9 ? null : 9"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Le code sur mesure veut-il dire que je serai dépendant de Trait d'Union Studio ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 9 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 9" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        C'est l'inverse. « Sur mesure » ne signifie pas « propriétaire fermé ». Votre solution est écrite en <strong class="text-tus-white">Python avec Django</strong>, des technologies open source parmi les plus utilisées au monde — pas un langage de niche.
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li><strong class="text-tus-white">Code documenté et commenté :</strong> la logique métier est expliquée, lisible et structurée.</li>
+                        <li><strong class="text-tus-white">Standards de l'industrie :</strong> n'importe quel développeur Python sérieux peut reprendre, maintenir et faire évoluer le projet.</li>
+                        <li><strong class="text-tus-white">Aucun verrou :</strong> pas d'abonnement caché, pas de clé de bridage, pas de dépendance technique au studio.</li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        Le sur-mesure vous libère des limites des outils génériques, sans vous enfermer. Vous gardez la liberté totale de votre infrastructure.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 10 — Propriété du code -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 10 ? null : 10"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        À qui appartient le code une fois le projet livré ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 10 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 10" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Le code source vous appartient <strong class="text-tus-white">intégralement</strong> à la livraison. Vous recevez :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li>L'ensemble du code source, documenté et commenté</li>
+                        <li>L'historique de versions complet (Git)</li>
+                        <li>La documentation technique d'installation et de maintenance</li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        Vous pouvez l'héberger où vous le souhaitez, le confier à un autre prestataire ou monter votre propre équipe. Aucune licence restrictive, aucune dépendance imposée.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question 11 — Facturation électronique 2026 -->
+            <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
+                <button @click="activeTab = activeTab === 11 ? null : 11"
+                        class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
+                        Vos solutions sont-elles prêtes pour la facturation électronique obligatoire de 2026 ?
+                    </h3>
+                    <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
+                         :class="{ 'rotate-180': activeTab === 11 }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <div x-show="activeTab === 11" x-collapse class="px-6 pb-5">
+                    <p class="text-tus-white/70 leading-relaxed mb-4">
+                        Oui. La réforme rend la facturation électronique progressivement obligatoire pour toutes les entreprises assujetties à la TVA à partir de septembre 2026. Nos plateformes métier l'intègrent nativement :
+                    </p>
+                    <ul class="list-disc list-inside text-tus-white/70 space-y-2 mb-4">
+                        <li><strong class="text-tus-white">Format Factur-X :</strong> conforme à la norme européenne EN 16931</li>
+                        <li><strong class="text-tus-white">Plateforme agréée :</strong> transmission via une plateforme de dématérialisation conforme</li>
+                        <li><strong class="text-tus-white">E-reporting :</strong> remontée automatique des données à l'administration</li>
+                        <li><strong class="text-tus-white">Zéro double saisie :</strong> un devis accepté devient une facture conforme prête à émettre</li>
+                    </ul>
+                    <p class="text-tus-white/70">
+                        Nous accompagnons nos clients dans cette transition. <a href="{% url 'leads:contact' %}" class="text-tus-blue-a11y hover:underline">Discutons de votre cas d'usage →</a>
                     </p>
                 </div>
             </div>

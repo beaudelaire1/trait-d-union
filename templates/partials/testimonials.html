@@ -1,0 +1,133 @@
+{% comment %}
+   ------------------------------------------------------------------
+   Section Témoignages clients — grille verticale compacte
+   - Source : context['testimonials'] (apps.pages.models.Testimonial)
+                + context['testimonials_total'] (compte total publié)
+   - Cartes verticales 3 colonnes, responsive 1/2/3
+   - "Voir plus" : déploie le contenu en place sans changer la mise en page
+   - Lien "Voir tous les avis" si total publié > nb affichés
+   - Standard TUS : rounded-3xl, border-white/10, bg-white/[0.02], reveal
+   ------------------------------------------------------------------
+{% endcomment %}
+
+{% if testimonials %}
+<section class="py-24 relative overflow-hidden" id="testimonials-section"
+         aria-labelledby="testimonials-title">
+
+    {# Halo décoratif cohérent avec les autres sections #}
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-tus-green/5 to-transparent pointer-events-none"></div>
+    <div class="absolute right-0 top-1/3 w-[500px] h-[500px] bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-tus-green/10 via-tus-blue/5 to-transparent rounded-full parallax-slow pointer-events-none"
+         data-speed="0.1"></div>
+
+    <div class="max-w-6xl mx-auto px-6 relative z-10">
+
+        {# ── En-tête section ── #}
+        <div class="text-center mb-14">
+            <span class="text-tus-blue-a11y font-display font-semibold text-sm tracking-wider uppercase mb-4 block reveal">
+                Ils en parlent mieux que nous
+            </span>
+            <h2 id="testimonials-title" class="text-3xl md:text-5xl font-display font-bold reveal">
+                La parole à <span class="text-tus-green">nos clients</span>
+            </h2>
+            <p class="text-tus-white/60 mt-6 max-w-2xl mx-auto reveal">
+                Des retours de dirigeants qui ont fait le choix d'une infrastructure propriétaire
+                plutôt qu'un empilement d'outils génériques.
+            </p>
+        </div>
+
+        {# ── Grille verticale ── #}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for t in testimonials %}
+            <article x-data="{ expanded: false }"
+                     class="group relative rounded-3xl border border-white/10 bg-white/[0.02] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard p-6 flex flex-col reveal card-tilt">
+
+                {# Guillemet décoratif en filigrane #}
+                <span class="absolute top-4 right-5 font-display text-5xl leading-none text-tus-blue-a11y/20 select-none pointer-events-none"
+                      aria-hidden="true">”</span>
+
+                {# Étoiles #}
+                <div class="flex items-center gap-0.5 mb-4" aria-label="Note : {{ t.rating }} sur 5">
+                    {% for _ in "12345" %}
+                    <svg class="w-4 h-4 {% if forloop.counter <= t.rating %}text-tus-green{% else %}text-tus-white/15{% endif %}"
+                         fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.368 2.447a1 1 0 00-.364 1.118l1.287 3.957c.3.922-.755 1.688-1.54 1.118l-3.367-2.447a1 1 0 00-1.175 0l-3.368 2.447c-.783.57-1.838-.196-1.539-1.118l1.286-3.957a1 1 0 00-.363-1.118L2.045 9.39c-.783-.57-.38-1.81.588-1.81h4.161a1 1 0 00.951-.69l1.286-3.957z"/>
+                    </svg>
+                    {% endfor %}
+                    {% if t.source == 'google' %}
+                    <span class="ml-2 inline-flex items-center gap-1 text-[0.65rem] uppercase tracking-wider text-tus-white/40 font-display"
+                          title="Avis vérifié sur Google Business">
+                        <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1Z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.26 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z" fill="#34A853"/>
+                            <path d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.1V7.07H2.18a11 11 0 0 0 0 9.86l3.66-2.83Z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38Z" fill="#EA4335"/>
+                        </svg>
+                        Google
+                    </span>
+                    {% endif %}
+                </div>
+
+                {# Citation : court par défaut, expansible #}
+                <blockquote class="flex-1 mb-5">
+                    <p class="text-[0.95rem] text-tus-white/80 leading-relaxed font-light"
+                       :class="{ 'line-clamp-4': !expanded }"
+                       x-cloak>{{ t.content }}</p>
+                    {# Fallback no-JS : tronque visuellement la première fois côté CSS #}
+                    <noscript><style>.testi-noscript-{{ forloop.counter }} { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }</style></noscript>
+                </blockquote>
+
+                {# Voir plus / Voir moins (uniquement si contenu long) #}
+                {% if t.content|length > 220 %}
+                <button type="button"
+                        @click="expanded = !expanded"
+                        class="self-start text-sm font-display font-semibold text-tus-blue-a11y hover:text-cyan-400 inline-flex items-center gap-1.5 transition-colors duration-micro ease-standard mb-5"
+                        :aria-expanded="expanded.toString()">
+                    <span x-text="expanded ? 'Voir moins' : 'Voir plus'">Voir plus</span>
+                    <svg class="w-3.5 h-3.5 transition-transform duration-micro ease-standard"
+                         :class="{ 'rotate-180': expanded }"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {% endif %}
+
+                {# Auteur — toujours en pied de carte #}
+                <figcaption class="flex items-center gap-3 mt-auto pt-5 border-t border-white/5">
+                    {% if t.display_avatar %}
+                    <img src="{{ t.display_avatar }}" alt="{{ t.client_name }}"
+                         class="w-11 h-11 rounded-full object-cover border border-white/10 shrink-0"
+                         loading="lazy" decoding="async" referrerpolicy="no-referrer">
+                    {% else %}
+                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-tus-blue to-tus-green flex items-center justify-center text-white font-display font-bold text-base shrink-0 shadow-lg"
+                         aria-hidden="true">
+                        {{ t.client_name|first|upper }}
+                    </div>
+                    {% endif %}
+                    <div class="min-w-0">
+                        <p class="font-display font-semibold text-tus-white text-sm truncate">{{ t.client_name }}</p>
+                        {% if t.position or t.company_name %}
+                        <p class="text-xs text-tus-white/55 truncate">
+                            {{ t.position }}{% if t.position and t.company_name %} · {% endif %}{{ t.company_name }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </figcaption>
+            </article>
+            {% endfor %}
+        </div>
+
+        {# ── Lien "Voir tous les avis" (apparaît si total publié > nb affichés) ── #}
+        {% if testimonials_total and testimonials_total > testimonials|length %}
+        <div class="mt-12 text-center reveal">
+            <a href="{% url 'pages:testimonials_list' %}"
+               class="inline-flex items-center gap-2 text-tus-blue-a11y hover:text-cyan-400 font-display font-semibold transition-colors duration-micro ease-standard">
+                Voir tous les avis ({{ testimonials_total }})
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}
