@@ -63,11 +63,14 @@ if reset:
 EOFTOTP
 
 # 5. Remplissage initial des audits portfolio (Ch.05) — projets sans mesure.
-#    Rapide (moteur interne + Observatory, pas de SSL Labs), non bloquant :
-#    un échec réseau ne doit jamais casser le déploiement.
+#    Inclut SSL Labs pour obtenir le grade officiel A+/A (scan mis en cache
+#    côté SSL Labs, donc rapide aux déploiements suivants). Non bloquant :
+#    un échec/timeout réseau ne doit jamais casser le déploiement — le grade
+#    provisoire interne assure un badge en attendant, et le prochain déploiement
+#    (ou le cron hebdo) récupère le grade officiel.
 echo ""
 echo "📊 Audit portfolio (remplissage initial des projets sans mesure)..."
-python manage.py audit_portfolio_projects --only-missing --no-ssl || \
+python manage.py audit_portfolio_projects --only-missing || \
     echo "⚠️  Audit portfolio ignoré (non bloquant) — sera relancé par le cron."
 
 echo ""

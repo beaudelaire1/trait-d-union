@@ -52,6 +52,7 @@ class CategoryScore:
 
     score: Optional[int] = None       # 0-100 (PSI / Observatory)
     grade: Optional[str] = None       # A+, A, B... (SSL Labs)
+    grade_source: Optional[str] = None  # "ssllabs" (officiel) | "internal" (fallback provisoire)
     measured_at: Optional[str] = None  # ISO 8601
     detail_url: Optional[str] = None   # lien vers le rapport public
     detail_url_secondary: Optional[str] = None  # 2e lien (ex. SSL Labs en complément)
@@ -318,6 +319,7 @@ def _audit_ssllabs(url: str) -> CategoryScore:
                     grade = endpoints[0].get("grade") or endpoints[0].get("gradeTrustIgnored")
                     return CategoryScore(
                         grade=str(grade) if grade else None,
+                        grade_source="ssllabs" if grade else None,
                         measured_at=_now_iso(),
                         detail_url=f"https://www.ssllabs.com/ssltest/analyze.html?d={hostname}",
                     )
@@ -461,6 +463,7 @@ def audit_project(
         fallback_grade = _ssl_grade_from_score(audit.ssl.score)
         if fallback_grade:
             audit.ssl.grade = fallback_grade
+            audit.ssl.grade_source = "internal"
             if not audit.ssl.measured_at:
                 audit.ssl.measured_at = _now_iso()
     # Toujours garantir un lien Tester SSL Labs.

@@ -49,11 +49,11 @@ class Command(BaseCommand):
             # Un projet est considéré « complet » seulement si CHAQUE catégorie
             # automatique porte sa valeur de référence :
             #   performance/seo/accessibility/security → score
-            #   ssl                                    → grade (A+/A/B…)
+            #   ssl                                    → grade OFFICIEL SSL Labs
             #   security accepte aussi un grade (Observatory) à défaut de score.
-            # Dès qu'une valeur manque (ex. grade SSL non encore calculé), on
-            # re-audite. Idempotent : une fois toutes les valeurs présentes, le
-            # projet n'est plus repris.
+            # Le grade SSL provisoire (grade_source="internal") ne suffit PAS :
+            # on continue de viser le grade officiel SSL Labs (A+, A…). Une fois
+            # tous les indicateurs de référence présents, le projet n'est plus repris.
             required = {
                 "performance": "score",
                 "seo": "score",
@@ -71,6 +71,9 @@ class Command(BaseCommand):
                     # security : un grade Observatory suffit si pas de score
                     if not has_value and cat == "security":
                         has_value = bool(node.get("grade"))
+                    # ssl : exiger le grade OFFICIEL SSL Labs, pas le fallback interne
+                    if cat == "ssl" and node.get("grade_source") != "ssllabs":
+                        has_value = False
                     if not has_value:
                         complete = False
                         break
