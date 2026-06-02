@@ -382,6 +382,30 @@ def requests_quote(value: str) -> str:
     return quote(value, safe="")
 
 
+def _ssl_grade_from_score(score: Optional[int]) -> Optional[str]:
+    """Dérive un grade SSL provisoire à partir du score du moteur interne.
+
+    Le socle interne réalise une vraie poignée de main TLS sur l'URL du projet
+    (certificat valide, expiration > 30 j, protocole TLS 1.2/1.3). On en tire
+    un grade conservateur — on ne vérifie ni les ciphers ni HSTS comme SSL Labs,
+    donc on plafonne volontairement à « A » (jamais « A+ »). SSL Labs écrase
+    ensuite ce grade par la note officielle (A+, A, B…) via le cron.
+    """
+    if score is None:
+        return None
+    if score >= 100:
+        return "A"
+    if score >= 80:
+        return "A-"
+    if score >= 60:
+        return "B"
+    if score >= 40:
+        return "C"
+    if score >= 20:
+        return "D"
+    return "F"
+
+
 # ─── Pipeline ────────────────────────────────────────────────────────
 def audit_project(
     url: str,
@@ -430,6 +454,15 @@ def audit_project(
         ssl = _audit_ssllabs(url)
         if ssl.grade:
             audit.ssl = ssl
+    # Si SSL Labs n'a pas (encore) répondu, on garantit un grade provisoire
+    # honnête dérivé de la poignée de main TLS du moteur interne. SSL Labs
+    # écrasera ce grade par la note officielle au prochain passage du cron.
+    if not audit.ssl.grade:
+        fallback_grade = _ssl_grade_from_score(audit.ssl.score)
+        if fallback_grade:
+            audit.ssl.grade = fallback_grade
+            if not audit.ssl.measured_at:
+                audit.ssl.measured_at = _now_iso()
     # Toujours garantir un lien Tester SSL Labs.
     if hostname and not audit.ssl.detail_url:
         audit.ssl.detail_url = f"https://www.ssllabs.com/ssltest/analyze.html?d={hostname}"
