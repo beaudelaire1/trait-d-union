@@ -1,0 +1,17 @@
+{% comment %}
+   Carte d'audit — wrapper qui injecte les classes de couleur (bleu/vert)
+   puis délègue le rendu à _audit_card_inner.html.
+
+   Variables transmises : key, label, icon, subtitle, tool, display,
+   score, grade, detail_url, fallback_url, is_manual.
+{% endcomment %}
+
+{% if color == 'green' %}
+    {% with accent_class='tus-green' ring_class='tus-green/30' %}
+    {% include 'portfolio/partials/_audit_card_inner.html' %}
+    {% endwith %}
+{% else %}
+    {% with accent_class='tus-blue-a11y' ring_class='tus-blue-a11y/30' %}
+    {% include 'portfolio/partials/_audit_card_inner.html' %}
+    {% endwith %}
+{% endif %}

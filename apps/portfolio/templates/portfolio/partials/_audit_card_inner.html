@@ -1,0 +1,111 @@
+{% comment %}
+   Inner card audit — affichage selon l'outil de référence de la catégorie.
+
+   Variables :
+     accent_class, ring_class : Tailwind (bleu/vert)
+     icon, label, subtitle, tool (nom de l'outil de référence)
+     display : 'grade' (badge lettre — Performance, SSL) | 'score' (/100 + barre)
+     score (0-100, optionnel)
+     grade (A+, A… — fourni directement par SSL Labs)
+     detail_url (rapport déjà mesuré) / fallback_url (outil externe)
+     is_manual (True → UI/UX, note TUS, pas de bouton Tester)
+
+   Le bouton « Tester » est TOUJOURS présent (sauf catégorie manuelle),
+   même quand une note existe : un prospect peut re-vérifier en direct.
+{% endcomment %}
+
+{% load portfolio_tags %}
+
+{% firstof detail_url fallback_url '' as test_url %}
+<div class="group relative rounded-3xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-{{ accent_class }}/30 hover:-translate-y-1 transition-all duration-micro ease-standard p-6 flex flex-col gap-5 reveal card-tilt">
+
+    {# En-tête : icône + label + outil #}
+    <div class="flex items-start justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+            <span class="text-2xl" aria-hidden="true">{{ icon }}</span>
+            <div class="min-w-0">
+                <p class="font-display font-semibold text-tus-white text-base leading-tight">{{ label }}</p>
+                <p class="text-xs text-tus-white/55 leading-snug mt-0.5">{{ subtitle }}</p>
+            </div>
+        </div>
+        {% if is_manual %}
+        <span class="text-[10px] uppercase tracking-wider text-tus-white/40 font-display whitespace-nowrap"
+              title="Note attribuée par l'équipe TUS">Note&nbsp;TUS</span>
+        {% endif %}
+    </div>
+
+    {# Bloc valeur #}
+    <div class="flex-1 flex flex-col justify-end">
+        {% if display == 'grade' %}
+            {# ── Affichage GRADE — privilégie le grade officiel s'il existe (Observatory, SSL Labs) ── #}
+            {% if grade %}
+                {# Grade fourni directement par l'outil (le plus fidèle) #}
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-{{ accent_class }}/10 border border-{{ ring_class }} text-3xl font-display font-bold text-{{ accent_class }} shadow-lg shadow-{{ accent_class }}/5">{{ grade }}</span>
+                    <div class="min-w-0">
+                        {% if score is not None and score != '' %}
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-2xl font-display font-bold text-tus-white">{{ score }}</span>
+                            <span class="text-xs text-tus-white/40 font-display">/100</span>
+                        </div>
+                        {% endif %}
+                        <p class="text-[11px] uppercase tracking-wider text-tus-white/40 mt-1">{{ grade|grade_label }}</p>
+                    </div>
+                </div>
+            {% elif score is not None and score != '' %}
+                {# Fallback : calcul du grade à partir du score (cas Performance Lighthouse) #}
+                {% with g=score|score_grade %}
+                <div class="flex items-center gap-4">
+                    <span class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-{{ accent_class }}/10 border border-{{ ring_class }} text-3xl font-display font-bold text-{{ accent_class }} shadow-lg shadow-{{ accent_class }}/5">{{ g }}</span>
+                    <div class="min-w-0">
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-2xl font-display font-bold text-tus-white">{{ score }}</span>
+                            <span class="text-xs text-tus-white/40 font-display">/100</span>
+                        </div>
+                        <p class="text-[11px] uppercase tracking-wider text-tus-white/40 mt-1">{{ g|grade_label }}</p>
+                    </div>
+                </div>
+                {% endwith %}
+            {% else %}
+                <p class="text-sm text-tus-white/55 italic py-2">Aucune mesure récente</p>
+            {% endif %}
+
+        {% else %}
+            {# ── Affichage SCORE /100 + barre (SEO, a11y, sécurité, UI/UX) ── #}
+            {% if score is not None and score != '' %}
+                <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-display font-bold text-{{ accent_class }} leading-none">{{ score }}</span>
+                    <span class="text-sm text-tus-white/40 font-display">/100</span>
+                    <span class="ml-auto text-[10px] uppercase tracking-wider text-tus-white/40">
+                        {% if score >= 90 %}Excellent{% elif score >= 70 %}Bon{% elif score >= 50 %}Moyen{% else %}À améliorer{% endif %}
+                    </span>
+                </div>
+                <div class="mt-3 h-1.5 rounded-full bg-white/[0.05] overflow-hidden">
+                    <div class="h-full rounded-full bg-gradient-to-r from-{{ accent_class }}/60 to-{{ accent_class }} transition-all duration-700"
+                         data-audit-bar-pct="{{ score }}"></div>
+                </div>
+            {% elif is_manual %}
+                <p class="text-sm text-tus-white/55 italic py-2">Note en cours d'évaluation</p>
+            {% else %}
+                <p class="text-sm text-tus-white/55 italic py-2">Aucune mesure récente</p>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {# Pied : outil de référence + lien Tester (sauf manuel) #}
+    <div class="flex items-center justify-between gap-3 pt-1">
+        <span class="text-[10px] uppercase tracking-wider text-tus-white/30 font-display truncate">{{ tool }}</span>
+        {% if not is_manual and test_url %}
+        <a href="{{ test_url }}" rel="noopener" target="_blank"
+           class="group/test inline-flex items-center gap-1.5 text-xs font-semibold text-{{ accent_class }} hover:text-cyan-400 transition-colors duration-micro ease-standard flex-shrink-0">
+            Tester
+            <svg class="w-3.5 h-3.5 group-hover/test:translate-x-0.5 transition-transform duration-micro ease-standard"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+        </a>
+        {% endif %}
+    </div>
+
+</div>
+{# end audit card #}

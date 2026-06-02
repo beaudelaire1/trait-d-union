@@ -373,6 +373,15 @@ GOOGLE_REVIEWS = {
 }
 
 # ==============================================================================
+# AUDIT PORTFOLIO — PageSpeed Insights API
+# ==============================================================================
+# Clé optionnelle : sans clé, l'API publique fonctionne mais avec un quota
+# fortement réduit (~25 req/jour). Avec clé : ~25 000 req/jour.
+# Crée la clé dans Google Cloud Console (même projet que Places API),
+# active "PageSpeed Insights API", restreins à l'IP du cron Render.
+PAGESPEED_API_KEY = os.environ.get("PAGESPEED_API_KEY", "")
+
+# ==============================================================================
 # 🇫🇷 FACTURATION ÉLECTRONIQUE — Réforme 2026/2027
 # ==============================================================================
 # Bloc de configuration unique pour la conformité e-invoicing (EN 16931 / Factur-X).

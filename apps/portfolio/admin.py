@@ -38,6 +38,7 @@ class ProjectAdmin(admin.ModelAdmin):
     list_editable = ('is_featured', 'is_published')
     ordering = ('-created_at',)
     inlines = [StrategyPhaseInline, ProjectImageInline]
+    readonly_fields = ('audit_last_run_at',)
     
     fieldsets = (
         ('Identité du projet', {
@@ -63,6 +64,15 @@ class ProjectAdmin(admin.ModelAdmin):
         ('Ch.04 — Résultat (Impact)', {
             'description': 'Impact et livrables. Markdown : **gras**, *italique*, - liste à puces, 1. liste numérotée',
             'fields': ('result', 'image_ch04')
+        }),
+        ('Ch.05 — Performance & conformité (audit projet)', {
+            'description': (
+                'Audit automatisé via <code>python manage.py audit_portfolio_projects</code> '
+                '(PageSpeed Insights, Mozilla Observatory, SSL Labs). '
+                'La note UI/UX ci-dessous est <strong>manuelle</strong> : à toi de l\'attribuer '
+                'sur des critères design.'
+            ),
+            'fields': ('ui_ux_score', 'audit_last_run_at', 'audit_results'),
         }),
         ('Stack technique', {
             'fields': ('technologies',)

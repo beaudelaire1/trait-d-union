@@ -31,6 +31,23 @@ class Project(models.Model):
     url = models.URLField(blank=True)
     is_featured = models.BooleanField(default=False)
     is_published = models.BooleanField(default=True)
+
+    # ── Ch.05 — Audit Performance & Conformité ────────────────────
+    audit_results = models.JSONField(
+        "Audit (Ch.05)",
+        default=dict, blank=True,
+        help_text=(
+            "Scores agrégés par catégorie (PageSpeed, Mozilla Observatory, "
+            "SSL Labs). Alimenté par `manage.py audit_portfolio_projects`. "
+            "Vide → le template affiche les liens vers les outils externes."
+        ),
+    )
+    audit_last_run_at = models.DateTimeField(
+        "Audit — dernière exécution",
+        null=True, blank=True,
+        help_text="Mis à jour automatiquement à chaque audit.",
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

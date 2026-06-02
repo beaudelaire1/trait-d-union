@@ -53,6 +53,10 @@
  <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300 bg-dot-indicator" ></span>
         <span class="absolute right-8 top-1/2 -translate-y-1/2 text-xs text-tus-white/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Résultat</span>
     </a>
+    <a href="#" class="chapter-dot group relative" data-target="5" aria-label="Chapitre 5 — Performance & conformité">
+        <span class="dot-indicator block w-2.5 h-2.5 rounded-full transition-all duration-300 bg-dot-indicator"></span>
+        <span class="absolute right-8 top-1/2 -translate-y-1/2 text-xs text-tus-white/50 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Audit</span>
+    </a>
 </nav>
 
 <article class="relative overflow-hidden grain-overlay">
@@ -665,6 +669,9 @@
             {% endif %}
         </div>
     </section>
+
+    {# Ch.05 — Performance & conformité (audit projet) #}
+    {% include 'portfolio/partials/chapter_05_audit.html' %}
 
     <!-- ═══════════════════════════════════════════════════════════════
          GALERIE ADDITIONNELLE

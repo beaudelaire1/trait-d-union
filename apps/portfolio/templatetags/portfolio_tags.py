@@ -60,3 +60,50 @@ def plain_text_filter(value: str) -> str:
 def markdown_filter(value: str) -> str:
     """Backward-compatible alias — just sanitizes HTML now."""
     return safe_html_filter(value)
+
+
+# ── Audit Ch.05 — score 0-100 → grade lettre (A+/A/A-/B+/B/C/D/F) ────
+@register.filter(name="score_grade")
+def score_grade(value) -> str:
+    """Convertit un score 0-100 en grade lettre type SSL Labs.
+
+    Usage : {{ score|score_grade }}  →  "A+", "A", "B+", "C", ...
+    Échelle alignée sur les conventions courantes (PageSpeed ≥90 = A+).
+    """
+    try:
+        s = int(value)
+    except (TypeError, ValueError):
+        return ""
+    if s >= 95:
+        return "A+"
+    if s >= 90:
+        return "A"
+    if s >= 85:
+        return "A-"
+    if s >= 80:
+        return "B+"
+    if s >= 70:
+        return "B"
+    if s >= 60:
+        return "C"
+    if s >= 50:
+        return "D"
+    return "F"
+
+
+@register.filter(name="grade_label")
+def grade_label(grade: str) -> str:
+    """Renvoie un libellé qualitatif à partir d'un grade lettre."""
+    if not grade:
+        return ""
+    g = grade.upper().strip()
+    return {
+        "A+": "Excellent",
+        "A": "Très bon",
+        "A-": "Très bon",
+        "B+": "Bon",
+        "B": "Bon",
+        "C": "Moyen",
+        "D": "À améliorer",
+        "F": "Critique",
+    }.get(g, "")
