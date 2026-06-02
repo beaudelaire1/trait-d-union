@@ -4,8 +4,9 @@
    - Source : context['testimonials'] (apps.pages.models.Testimonial)
                 + context['testimonials_total'] (compte total publié)
    - Cartes verticales 3 colonnes, responsive 1/2/3
-   - "Voir plus" : déploie le contenu en place sans changer la mise en page
-   - Lien "Voir tous les avis" si total publié > nb affichés
+   - Troncature DÉTERMINISTE à 220 caractères (même côté serveur et client) :
+       - bouton "Voir plus" affiché UNIQUEMENT si le contenu dépasse 220 c.
+       - aucun "bouton zombi" sur les avis courts
    - Standard TUS : rounded-3xl, border-white/10, bg-white/[0.02], reveal
    ------------------------------------------------------------------
 {% endcomment %}
@@ -38,14 +39,12 @@
         {# ── Grille verticale ── #}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for t in testimonials %}
-            <article x-data="{ expanded: false }"
+            {# Préparation : on calcule la version tronquée côté serveur (220 c.) #}
+            {% with full=t.content|striptags %}
+            <article {% if full|length > 220 %}x-data="{ expanded: false }"{% endif %}
                      class="group relative rounded-3xl border border-white/10 bg-white/[0.02] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard p-6 flex flex-col reveal card-tilt">
 
-                {# Guillemet décoratif en filigrane #}
-                <span class="absolute top-4 right-5 font-display text-5xl leading-none text-tus-blue-a11y/20 select-none pointer-events-none"
-                      aria-hidden="true">”</span>
-
-                {# Étoiles #}
+                {# Étoiles + badge Google #}
                 <div class="flex items-center gap-0.5 mb-4" aria-label="Note : {{ t.rating }} sur 5">
                     {% for _ in "12345" %}
                     <svg class="w-4 h-4 {% if forloop.counter <= t.rating %}text-tus-green{% else %}text-tus-white/15{% endif %}"
@@ -67,17 +66,33 @@
                     {% endif %}
                 </div>
 
-                {# Citation : court par défaut, expansible #}
-                <blockquote class="flex-1 mb-5">
-                    <p class="text-[0.95rem] text-tus-white/80 leading-relaxed font-light"
-                       :class="{ 'line-clamp-4': !expanded }"
-                       x-cloak>{{ t.content }}</p>
-                    {# Fallback no-JS : tronque visuellement la première fois côté CSS #}
-                    <noscript><style>.testi-noscript-{{ forloop.counter }} { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }</style></noscript>
+                {# ─── Citation — typographie soignée TUS ─────────────────────
+                   - Police display pour le rendu éditorial
+                   - leading-relaxed pour l'aération
+                   - linebreaksbr respecte les paragraphes laissés par le client
+                   - Italique léger pour la signature visuelle "citation"
+                   - Premier guillemet typographique en majeur, fermant en mineur
+                #}
+                <blockquote class="flex-1 mb-5 relative">
+                    <span class="absolute -top-1 -left-1 font-display text-3xl leading-none text-tus-blue-a11y/30 select-none pointer-events-none"
+                          aria-hidden="true">«</span>
+                    <div class="text-[0.95rem] md:text-base text-tus-white/85 leading-relaxed font-light italic pl-5 pr-2 space-y-3
+                                [&>p]:m-0 [&>p+p]:mt-3">
+                        {% if full|length > 220 %}
+                            {# Version courte, propre — affiché tant que !expanded #}
+                            <span x-show="!expanded">{{ full|truncatechars:220|linebreaksbr }}</span>
+                            {# Version complète — affiché quand expanded #}
+                            <span x-show="expanded" x-cloak>{{ full|linebreaksbr }}</span>
+                        {% else %}
+                            {{ full|linebreaksbr }}
+                        {% endif %}
+                    </div>
+                    <span class="absolute -bottom-2 right-0 font-display text-3xl leading-none text-tus-blue-a11y/30 select-none pointer-events-none"
+                          aria-hidden="true">»</span>
                 </blockquote>
 
-                {# Voir plus / Voir moins (uniquement si contenu long) #}
-                {% if t.content|length > 220 %}
+                {# Voir plus / Voir moins — UNIQUEMENT si réellement tronqué #}
+                {% if full|length > 220 %}
                 <button type="button"
                         @click="expanded = !expanded"
                         class="self-start text-sm font-display font-semibold text-tus-blue-a11y hover:text-cyan-400 inline-flex items-center gap-1.5 transition-colors duration-micro ease-standard mb-5"
@@ -113,21 +128,9 @@
                     </div>
                 </figcaption>
             </article>
+            {% endwith %}
             {% endfor %}
         </div>
-
-        {# ── Lien "Voir tous les avis" (apparaît si total publié > nb affichés) ── #}
-        {% if testimonials_total and testimonials_total > testimonials|length %}
-        <div class="mt-12 text-center reveal">
-            <a href="{% url 'pages:testimonials_list' %}"
-               class="inline-flex items-center gap-2 text-tus-blue-a11y hover:text-cyan-400 font-display font-semibold transition-colors duration-micro ease-standard">
-                Voir tous les avis ({{ testimonials_total }})
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-            </a>
-        </div>
-        {% endif %}
     </div>
 </section>
 {% endif %}
