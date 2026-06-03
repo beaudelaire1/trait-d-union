@@ -287,8 +287,20 @@ function conformiteFacture() {
         },
 
         getCookie(name) {
-            const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-            return v ? v.pop() : '';
+            const m = document.cookie.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
+            return m ? decodeURIComponent(m[1]) : '';
+        },
+        getCsrf() {
+            // 1) Token injecté par base.html dans data-hx-headers (source canonique).
+            try {
+                const raw = document.body && document.body.getAttribute('data-hx-headers');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && parsed['X-CSRFToken']) return parsed['X-CSRFToken'];
+                }
+            } catch (e) { /* ignore */ }
+            // 2) Cookie — TUS utilise un nom custom (tus_ct) en plus du défaut Django.
+            return this.getCookie('tus_ct') || this.getCookie('csrftoken') || '';
         },
 
         async submit() {
@@ -301,9 +313,22 @@ function conformiteFacture() {
             try {
                 const res = await fetch("{% url 'simulateur:conformite-facture-check' %}", {
                     method: 'POST',
-                    headers: { 'X-CSRFToken': this.getCookie('csrftoken') },
+                    headers: { 'X-CSRFToken': this.getCsrf() },
                     body: fd,
+                    credentials: 'same-origin',
                 });
+                // Réponse non-JSON (page d'erreur HTML 4xx/5xx) : message clair.
+                const ct = res.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) {
+                    if (res.status === 413) {
+                        this.errorMsg = 'Fichier trop volumineux pour le serveur (max 15 Mo).';
+                    } else if (res.status === 403) {
+                        this.errorMsg = 'Session expirée. Rechargez la page et réessayez.';
+                    } else {
+                        this.errorMsg = `Erreur serveur (${res.status}). Réessayez plus tard.`;
+                    }
+                    return;
+                }
                 const data = await res.json();
                 if (!data.ok) {
                     this.errorMsg = data.message || "L'analyse a échoué.";
@@ -315,7 +340,7 @@ function conformiteFacture() {
                     });
                 }
             } catch (err) {
-                this.errorMsg = 'Connexion impossible. Réessayez.';
+                this.errorMsg = 'Connexion impossible. Vérifiez votre réseau et réessayez.';
             } finally {
                 this.loading = false;
             }
