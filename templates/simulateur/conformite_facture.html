@@ -1,0 +1,327 @@
+{% extends 'simulateur/tool_base.html' %}
+{% load static %}
+
+{% block title %}Test de Conformité Facture Électronique | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Vérifiez gratuitement si votre facture est conforme à la facturation électronique (EN 16931 / Factur-X). Déposez un PDF Factur-X ou un XML CII/UBL : analyse instantanée des champs obligatoires, de la TVA et des totaux.{% endblock %}
+
+{% block tool_color %}#22c55e{% endblock %}
+
+{% block tool_tag %}Conformité réglementaire{% endblock %}
+
+{% block tool_icon %}
+<div class="tool-icon" style="background: rgba(34,197,94,0.12); color: #22c55e; width:2.5rem;height:2.5rem;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+</div>
+{% endblock %}
+
+{% block tool_title %}Votre facture est-elle conforme ?{% endblock %}
+{% block tool_description %}
+Déposez une facture (PDF Factur-X ou fichier XML CII/UBL). On l'analyse sur le
+champ selon la norme européenne EN 16931 — champs obligatoires, identifiants,
+TVA et cohérence des totaux. Rien n'est conservé : le fichier est analysé puis
+oublié.
+{% endblock %}
+
+{% block tool_css %}
+    .cf-drop {
+        border: 2px dashed var(--sim-field-border);
+        border-radius: 18px;
+        background: var(--sim-field-bg);
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        transition: border-color .25s, background .25s;
+        cursor: pointer;
+    }
+    .cf-drop:hover, .cf-drop.is-drag {
+        border-color: #22c55e;
+        background: rgba(34,197,94,0.06);
+    }
+    .cf-pill {
+        display:inline-flex; align-items:center; gap:.4rem;
+        font-size:.72rem; font-weight:600; padding:.2rem .6rem;
+        border-radius:999px; text-transform:uppercase; letter-spacing:.04em;
+    }
+    .cf-pill--pass { background:rgba(34,197,94,.14); color:#22c55e; }
+    .cf-pill--fail { background:rgba(239,68,68,.14); color:#ef4444; }
+    .cf-pill--warn { background:rgba(245,158,11,.16); color:#f59e0b; }
+    .cf-pill--info { background:rgba(107,138,255,.14); color:#6B8AFF; }
+
+    .cf-gauge {
+        width:120px; height:120px; border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        position:relative; flex-shrink:0;
+    }
+    .cf-gauge-val { font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.9rem; }
+
+    .cf-check {
+        display:flex; align-items:flex-start; gap:.75rem;
+        padding:.7rem .9rem; border-radius:12px;
+        background:var(--sim-card-bg); border:1px solid var(--sim-card-border);
+    }
+    .cf-check-icon { flex-shrink:0; width:22px; height:22px; margin-top:1px; }
+    .cf-section-title {
+        font-size:.72rem; font-weight:700; text-transform:uppercase;
+        letter-spacing:.14em; color:var(--sim-muted); margin:1.5rem 0 .75rem;
+    }
+    .cf-code {
+        font-family:'JetBrains Mono',monospace; font-size:.7rem;
+        padding:.1rem .4rem; border-radius:6px;
+        background:rgba(127,127,127,.12); color:var(--sim-muted);
+    }
+    .cf-verdict {
+        border-radius:18px; padding:1.5rem;
+        border:1px solid var(--sim-card-border);
+        display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;
+    }
+    .cf-verdict--ok { background:rgba(34,197,94,.07); border-color:rgba(34,197,94,.3); }
+    .cf-verdict--ko { background:rgba(239,68,68,.07); border-color:rgba(239,68,68,.3); }
+{% endblock %}
+
+{% block tool_content %}
+<div x-data="conformiteFacture()" x-cloak>
+
+    {# ── Zone d'upload ── #}
+    <div class="tool-card mo-fade-up">
+        <form @submit.prevent="submit" enctype="multipart/form-data">
+            <label class="cf-drop block"
+                   :class="{ 'is-drag': dragging }"
+                   @dragover.prevent="dragging = true"
+                   @dragleave.prevent="dragging = false"
+                   @drop.prevent="onDrop($event)">
+                <input type="file" accept=".pdf,.xml" class="hidden" x-ref="file" @change="onPick($event)">
+                <div class="flex flex-col items-center gap-3">
+                    <svg class="w-10 h-10" style="color:#22c55e" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M7 16a4 4 0 01-.88-7.9A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <div>
+                        <p class="font-semibold" style="color:var(--sim-ink);" x-text="fileName || 'Glissez votre facture ici'"></p>
+                        <p class="text-sm mt-1" style="color:var(--sim-muted);">
+                            <span x-show="!fileName">PDF Factur-X ou XML (CII / UBL) — 15 Mo max</span>
+                            <span x-show="fileName" x-text="fileSize"></span>
+                        </p>
+                    </div>
+                    <span class="text-xs font-medium" style="color:#22c55e;">Parcourir un fichier</span>
+                </div>
+            </label>
+
+            <div class="flex items-center justify-between gap-4 mt-4 flex-wrap">
+                <p class="text-xs" style="color:var(--sim-muted);">
+                    🔒 Analyse côté serveur, en mémoire. Aucun stockage, aucune transmission à un tiers.
+                </p>
+                <button type="submit" class="tool-cta" style="background:#22c55e;"
+                        :disabled="!file || loading"
+                        :style="(!file || loading) ? 'opacity:.5;cursor:not-allowed;background:#22c55e;' : 'background:#22c55e;'">
+                    <svg x-show="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <svg x-show="loading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    <span x-text="loading ? 'Analyse en cours…' : 'Tester la conformité'"></span>
+                </button>
+            </div>
+        </form>
+
+        {# Erreur générale #}
+        <div x-show="errorMsg" x-transition class="mt-4 p-3 rounded-xl text-sm"
+             style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);"
+             x-text="errorMsg"></div>
+    </div>
+
+    {# ── Résultats ── #}
+    <template x-if="report">
+    <div class="mt-8 space-y-6">
+
+        {# Verdict global #}
+        <div class="cf-verdict mo-scale-in" :class="report.is_conformant ? 'cf-verdict--ok' : 'cf-verdict--ko'">
+            <div class="cf-gauge"
+                 :style="`background: conic-gradient(${gaugeColor} ${report.score*3.6}deg, rgba(127,127,127,.12) 0deg);`">
+                <div class="cf-gauge"
+                     style="width:96px;height:96px;background:var(--sim-bg);">
+                    <span class="cf-gauge-val" :style="`color:${gaugeColor}`" x-text="report.score"></span>
+                </div>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 flex-wrap mb-1">
+                    <h3 class="text-xl font-bold" style="color:var(--sim-ink);"
+                        x-text="report.is_conformant ? 'Facture conforme' : 'Non conforme en l\'état'"></h3>
+                    <span class="cf-pill" :class="report.is_conformant ? 'cf-pill--pass' : 'cf-pill--fail'"
+                          x-text="report.is_conformant ? 'EN 16931' : (report.counts.fail + ' anomalie(s)')"></span>
+                </div>
+                <p class="text-sm" style="color:var(--sim-muted);">
+                    <span x-text="formatLabel"></span>
+                    <template x-if="report.profile"><span> · Profil <strong x-text="report.profile"></strong></span></template>
+                </p>
+                <div class="flex items-center gap-3 mt-3 text-xs flex-wrap" style="color:var(--sim-muted);">
+                    <span class="cf-pill cf-pill--pass" x-text="report.counts.pass + ' conformes'"></span>
+                    <span class="cf-pill cf-pill--fail" x-show="report.counts.fail" x-text="report.counts.fail + ' bloquants'"></span>
+                    <span class="cf-pill cf-pill--warn" x-show="report.counts.warn" x-text="report.counts.warn + ' avertissements'"></span>
+                </div>
+            </div>
+        </div>
+
+        {# Erreur fatale (format non reconnu) #}
+        <template x-if="report.fatal_error">
+            <div class="p-4 rounded-xl text-sm"
+                 style="background:rgba(239,68,68,.08);color:var(--sim-ink);border:1px solid rgba(239,68,68,.25);">
+                <p class="font-semibold mb-1" style="color:#ef4444;">Impossible d'analyser le contenu</p>
+                <p style="color:var(--sim-muted);" x-text="report.fatal_error"></p>
+            </div>
+        </template>
+
+        {# Détail des contrôles par section #}
+        <template x-for="sec in sections" :key="sec.key">
+            <div x-show="checksBySection(sec.key).length">
+                <p class="cf-section-title" x-text="sec.label"></p>
+                <div class="space-y-2">
+                    <template x-for="chk in checksBySection(sec.key)" :key="chk.code + chk.label">
+                        <div class="cf-check">
+                            {# Icône statut #}
+                            <span class="cf-check-icon" :style="`color:${statusColor(chk.status)}`">
+                                <template x-if="chk.status === 'pass'">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                </template>
+                                <template x-if="chk.status === 'fail'">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </template>
+                                <template x-if="chk.status === 'warn'">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                </template>
+                                <template x-if="chk.status === 'info'">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </template>
+                            </span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-medium text-sm" style="color:var(--sim-ink);" x-text="chk.label"></span>
+                                    <span class="cf-code" x-text="chk.code"></span>
+                                </div>
+                                <p class="text-xs mt-.5" style="color:var(--sim-muted);" x-text="chk.detail"></p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        {# Avertissement honnêteté #}
+        <p class="text-xs leading-relaxed" style="color:var(--sim-muted);opacity:.8;">
+            Cet outil contrôle la structure sémantique (EN 16931) : champs obligatoires,
+            identifiants, ventilation de TVA et cohérence arithmétique des totaux.
+            Il ne remplace pas la validation Schematron officielle ni le contrôle de la
+            plateforme agréée (PDP), mais détecte la grande majorité des motifs de rejet.
+        </p>
+    </div>
+    </template>
+
+</div>
+{% endblock %}
+
+{% block tool_cta_title %}Besoin d'émettre des factures conformes ?{% endblock %}
+{% block tool_cta_text %}Trait d'Union conçoit des outils de facturation Factur-X prêts pour la réforme 2026 : émission, cycle de vie et transmission via plateforme agréée. Parlons de votre cas.{% endblock %}
+
+{% block tool_js %}
+<script nonce="{{ request.csp_nonce }}">
+function conformiteFacture() {
+    return {
+        file: null,
+        fileName: '',
+        fileSize: '',
+        dragging: false,
+        loading: false,
+        errorMsg: '',
+        report: null,
+        sections: [
+            { key: 'format',         label: 'Format & structure du fichier' },
+            { key: 'structure',      label: 'Données obligatoires de la facture' },
+            { key: 'identification', label: 'Identification des parties' },
+            { key: 'tva',            label: 'TVA' },
+            { key: 'totaux',         label: 'Cohérence des montants' },
+        ],
+
+        get formatLabel() {
+            if (!this.report) return '';
+            const map = {
+                facturx_pdf: 'PDF Factur-X (XML embarqué)',
+                cii_xml: 'XML UN/CEFACT CII',
+                ubl_xml: 'XML OASIS UBL',
+                pdf_no_xml: 'PDF sans XML',
+                xml: 'XML',
+                unknown: 'Format inconnu',
+            };
+            return map[this.report.format_detected] || this.report.format_detected;
+        },
+        get gaugeColor() {
+            if (!this.report) return '#22c55e';
+            const s = this.report.score;
+            if (s >= 90) return '#22c55e';
+            if (s >= 70) return '#f59e0b';
+            return '#ef4444';
+        },
+
+        statusColor(s) {
+            return { pass:'#22c55e', fail:'#ef4444', warn:'#f59e0b', info:'#6B8AFF' }[s] || '#6B8AFF';
+        },
+        checksBySection(key) {
+            if (!this.report || !this.report.checks) return [];
+            return this.report.checks.filter(c => c.section === key);
+        },
+
+        onPick(e) {
+            const f = e.target.files && e.target.files[0];
+            if (f) this.setFile(f);
+        },
+        onDrop(e) {
+            this.dragging = false;
+            const f = e.dataTransfer.files && e.dataTransfer.files[0];
+            if (f) this.setFile(f);
+        },
+        setFile(f) {
+            const name = (f.name || '').toLowerCase();
+            if (!name.endsWith('.pdf') && !name.endsWith('.xml')) {
+                this.errorMsg = 'Format non supporté. Déposez un PDF Factur-X ou un XML.';
+                return;
+            }
+            if (f.size > 15 * 1024 * 1024) {
+                this.errorMsg = 'Fichier trop volumineux (15 Mo max).';
+                return;
+            }
+            this.errorMsg = '';
+            this.file = f;
+            this.fileName = f.name;
+            this.fileSize = (f.size / 1024).toFixed(0) + ' Ko';
+        },
+
+        getCookie(name) {
+            const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+            return v ? v.pop() : '';
+        },
+
+        async submit() {
+            if (!this.file || this.loading) return;
+            this.loading = true;
+            this.errorMsg = '';
+            this.report = null;
+            const fd = new FormData();
+            fd.append('invoice', this.file);
+            try {
+                const res = await fetch("{% url 'simulateur:conformite-facture-check' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': this.getCookie('csrftoken') },
+                    body: fd,
+                });
+                const data = await res.json();
+                if (!data.ok) {
+                    this.errorMsg = data.message || "L'analyse a échoué.";
+                } else {
+                    this.report = data.report;
+                    this.$nextTick(() => {
+                        const el = this.$root.querySelector('.cf-verdict');
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                }
+            } catch (err) {
+                this.errorMsg = 'Connexion impossible. Réessayez.';
+            } finally {
+                this.loading = false;
+            }
+        },
+    };
+}
+window.conformiteFacture = conformiteFacture;
+</script>
+{% endblock %}

@@ -6,6 +6,8 @@ from .views import (
     AtterrissageView,
     CacView,
     CapaciteView,
+    ConformiteCheckView,
+    ConformiteFactureView,
     CorrelationView,
     CoutInactionView,
     CoutNonQualiteView,
@@ -43,6 +45,9 @@ urlpatterns = [
     path('devis/', SimulateurView.as_view(), name='devis'),
     # ── Endpoint capture email + envoi rapport PDF ──
     path('report/', ReportSubmitView.as_view(), name='report_submit'),
+    # ── Conformité facture électronique (serveur) ──
+    path('conformite-facture/', ConformiteFactureView.as_view(), name='conformite-facture'),
+    path('conformite-facture/check/', ConformiteCheckView.as_view(), name='conformite-facture-check'),
     # ── 10 outils existants ──
     path('point-mort/', PointMortView.as_view(), name='point-mort'),
     path('cac/', CacView.as_view(), name='cac'),

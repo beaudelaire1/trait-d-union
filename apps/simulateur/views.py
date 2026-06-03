@@ -228,6 +228,97 @@ class CoutNonQualiteView(_ToolView):
     tool_name = 'Coût de la Non-Qualité'
 
 
+# ── Conformité facture électronique (serveur) ───────────────
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class ConformiteFactureView(TemplateView):
+    """Page de l'outil : upload d'une facture (PDF Factur-X ou XML) à tester."""
+
+    template_name = 'simulateur/conformite_facture.html'
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        ctx['breadcrumbs_list'] = [
+            {'name': 'Accueil', 'url': '/'},
+            {'name': 'Simulateur', 'url': '/simulateur/'},
+            {'name': 'Conformité Facture', 'url': '/simulateur/conformite-facture/'},
+        ]
+        ctx['tool_name'] = 'Test de Conformité Facture'
+        ctx['tool_slug'] = 'conformite-facture'
+        return ctx
+
+
+@method_decorator(require_POST, name='dispatch')
+class ConformiteCheckView(View):
+    """Analyse serveur d'une facture uploadée → rapport de conformité JSON.
+
+    Aucune donnée n'est persistée : le fichier est lu en mémoire, analysé,
+    puis jeté. Rate-limit léger par IP.
+    """
+
+    MAX_BYTES = 15 * 1024 * 1024  # 15 Mo
+    MAX_PER_IP_PER_HOUR = 30
+    ALLOWED_SUFFIXES = ('.pdf', '.xml')
+
+    def post(self, request: HttpRequest, *args: Any, **kwargs: Any) -> JsonResponse:
+        ip = get_client_ip(request)
+        if self._is_rate_limited(ip):
+            return JsonResponse(
+                {'ok': False,
+                 'message': 'Trop de tests en peu de temps. Réessayez dans une heure.'},
+                status=429,
+            )
+
+        upload = request.FILES.get('invoice')
+        if not upload:
+            return JsonResponse(
+                {'ok': False, 'message': 'Aucun fichier reçu. Sélectionnez une facture PDF ou XML.'},
+                status=400,
+            )
+        if upload.size > self.MAX_BYTES:
+            return JsonResponse(
+                {'ok': False, 'message': 'Fichier trop volumineux (max 15 Mo).'},
+                status=400,
+            )
+        name = (upload.name or '').lower()
+        if not name.endswith(self.ALLOWED_SUFFIXES):
+            return JsonResponse(
+                {'ok': False,
+                 'message': 'Format non supporté. Déposez un PDF Factur-X ou un XML (CII/UBL).'},
+                status=400,
+            )
+
+        try:
+            content = upload.read()
+        except Exception:  # noqa: BLE001
+            return JsonResponse(
+                {'ok': False, 'message': 'Lecture du fichier impossible.'}, status=400,
+            )
+
+        from apps.einvoicing.conformity import check_invoice
+        try:
+            report = check_invoice(content, filename=upload.name or '')
+        except Exception as exc:  # noqa: BLE001
+            logger.error("Échec analyse conformité facture : %s", exc, exc_info=True)
+            return JsonResponse(
+                {'ok': False,
+                 'message': "Une erreur est survenue pendant l'analyse du fichier."},
+                status=500,
+            )
+
+        return JsonResponse({'ok': True, 'report': report.to_json()})
+
+    def _is_rate_limited(self, ip: str) -> bool:
+        if not ip:
+            return False
+        from django.core.cache import cache
+        key = f"conformite_facture_rl:{ip}"
+        count = cache.get(key, 0)
+        if count >= self.MAX_PER_IP_PER_HOUR:
+            return True
+        cache.set(key, count + 1, 3600)
+        return False
+
+
 # ── Endpoint: capture email + envoi rapport PDF ─────────────
 @method_decorator(require_POST, name='dispatch')
 class ReportSubmitView(View):
