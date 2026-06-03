@@ -105,7 +105,10 @@ oublié.
         padding:.1rem .45rem; border-radius:999px;
         background:rgba(127,127,127,.1);
     }
-    .cf-section-list { display:flex; flex-direction:column; gap:.35rem; }
+    .cf-section-list { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:.5rem; }
+    @media (max-width: 720px) {
+        .cf-section-list { grid-template-columns:1fr; }
+    }
 
     .cf-check {
         display:flex; align-items:flex-start; gap:.7rem;
