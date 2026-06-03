@@ -9,6 +9,10 @@ gunicorn>=21.0.0
 weasyprint>=67.0
 num2words>=0.5.13
 
+# Factur-X / e-invoicing : génération PDF/A-3 + extraction du XML embarqué
+# (build_facturx_pdf et le contrôleur de conformité en dépendent).
+pikepdf>=8.0
+
 # Email transactionnel avec Brevo (ex-Sendinblue)
 sib-api-v3-sdk>=7.6.0
 

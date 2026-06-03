@@ -38,43 +38,129 @@ oublié.
     }
     .cf-pill {
         display:inline-flex; align-items:center; gap:.4rem;
-        font-size:.72rem; font-weight:600; padding:.2rem .6rem;
+        font-size:.7rem; font-weight:600; padding:.18rem .55rem;
         border-radius:999px; text-transform:uppercase; letter-spacing:.04em;
+        line-height:1.4;
     }
     .cf-pill--pass { background:rgba(34,197,94,.14); color:#22c55e; }
     .cf-pill--fail { background:rgba(239,68,68,.14); color:#ef4444; }
     .cf-pill--warn { background:rgba(245,158,11,.16); color:#f59e0b; }
     .cf-pill--info { background:rgba(107,138,255,.14); color:#6B8AFF; }
 
+    /* ── Bloc verdict (tool-card + jauge à gauche) ── */
+    .cf-verdict {
+        display:flex; align-items:center; gap:1.25rem;
+        padding:1.1rem 1.25rem;
+        position:relative; overflow:hidden;
+    }
+    .cf-verdict::before {
+        content:""; position:absolute; inset:0 auto 0 0; width:3px;
+        background: linear-gradient(180deg, var(--tool-glow, #22c55e), transparent);
+        opacity:.85;
+    }
+    .cf-verdict--ok { border-color:rgba(34,197,94,.32); }
+    .cf-verdict--ko { border-color:rgba(239,68,68,.32); }
+    .cf-verdict--ko::before { background: linear-gradient(180deg, #ef4444, transparent); }
+
     .cf-gauge {
-        width:120px; height:120px; border-radius:50%;
+        width:96px; height:96px; border-radius:50%;
         display:flex; align-items:center; justify-content:center;
         position:relative; flex-shrink:0;
     }
-    .cf-gauge-val { font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.9rem; }
+    .cf-gauge-inner {
+        width:76px; height:76px; background:var(--sim-bg);
+        flex-direction:column; gap:0;
+    }
+    .cf-gauge-val { font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.55rem; line-height:1; }
+    .cf-gauge-unit { font-size:.6rem; color:var(--sim-muted); letter-spacing:.06em; margin-top:2px; }
+
+    /* ── Erreur fatale (format non reconnu) ── */
+    .cf-fatal {
+        padding:.9rem 1.1rem; border-radius:14px;
+        background:rgba(239,68,68,.08);
+        border:1px solid rgba(239,68,68,.28);
+    }
+    .cf-fatal-title { font-weight:600; color:#ef4444; font-size:.9rem; margin-bottom:.25rem; }
+    .cf-fatal-text { font-size:.82rem; color:var(--sim-ink-secondary); line-height:1.5; }
+
+    /* ── Sections de contrôles ── */
+    .cf-sections { display:flex; flex-direction:column; gap:.85rem; }
+    .cf-section { display:flex; flex-direction:column; gap:.45rem; }
+    .cf-section-head {
+        display:flex; align-items:center; gap:.55rem;
+        padding-bottom:.1rem;
+    }
+    .cf-section-bar {
+        width:18px; height:2px; border-radius:2px;
+        background:var(--tool-glow, #22c55e); opacity:.55;
+    }
+    .cf-section-title {
+        font-size:.7rem; font-weight:700; text-transform:uppercase;
+        letter-spacing:.16em; color:var(--sim-muted); margin:0;
+    }
+    .cf-section-count {
+        margin-left:auto;
+        font-family:'JetBrains Mono',monospace;
+        font-size:.65rem; color:var(--sim-muted);
+        padding:.1rem .45rem; border-radius:999px;
+        background:rgba(127,127,127,.1);
+    }
+    .cf-section-list { display:flex; flex-direction:column; gap:.35rem; }
 
     .cf-check {
-        display:flex; align-items:flex-start; gap:.75rem;
-        padding:.7rem .9rem; border-radius:12px;
+        display:flex; align-items:flex-start; gap:.7rem;
+        padding:.55rem .85rem; border-radius:10px;
         background:var(--sim-card-bg); border:1px solid var(--sim-card-border);
+        transition: border-color .2s ease, background .2s ease;
     }
-    .cf-check-icon { flex-shrink:0; width:22px; height:22px; margin-top:1px; }
-    .cf-section-title {
-        font-size:.72rem; font-weight:700; text-transform:uppercase;
-        letter-spacing:.14em; color:var(--sim-muted); margin:1.5rem 0 .75rem;
+    .cf-check:hover { border-color: rgba(127,127,127,.22); }
+    .cf-check--fail { border-color: rgba(239,68,68,.22); background: rgba(239,68,68,.04); }
+    .cf-check--warn { border-color: rgba(245,158,11,.22); background: rgba(245,158,11,.04); }
+    .cf-check-icon { flex-shrink:0; width:18px; height:18px; margin-top:1px; }
+    .cf-check-label {
+        font-weight:500; font-size:.85rem; color:var(--sim-ink); line-height:1.35;
+    }
+    .cf-check-detail {
+        font-size:.74rem; color:var(--sim-muted); line-height:1.45;
+        margin-top:.2rem;
     }
     .cf-code {
-        font-family:'JetBrains Mono',monospace; font-size:.7rem;
-        padding:.1rem .4rem; border-radius:6px;
+        font-family:'JetBrains Mono',monospace; font-size:.66rem;
+        padding:.08rem .4rem; border-radius:5px;
         background:rgba(127,127,127,.12); color:var(--sim-muted);
+        line-height:1.4;
     }
-    .cf-verdict {
-        border-radius:18px; padding:1.5rem;
-        border:1px solid var(--sim-card-border);
-        display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;
+
+    .cf-disclaimer {
+        font-size:.72rem; line-height:1.55;
+        color:var(--sim-muted); opacity:.78;
+        padding-top:.5rem; margin-top:.25rem;
+        border-top:1px dashed var(--sim-card-border);
     }
-    .cf-verdict--ok { background:rgba(34,197,94,.07); border-color:rgba(34,197,94,.3); }
-    .cf-verdict--ko { background:rgba(239,68,68,.07); border-color:rgba(239,68,68,.3); }
+
+    @media (max-width: 540px) {
+        .cf-verdict { flex-direction:column; align-items:flex-start; gap:.85rem; padding:1rem; }
+        .cf-gauge { width:84px; height:84px; }
+        .cf-gauge-inner { width:66px; height:66px; }
+        .cf-gauge-val { font-size:1.35rem; }
+    }
+
+    /* Le bouton « Tester la conformité » est entièrement piloté par Alpine
+       (son propre spinner + libellé). On neutralise la règle globale
+       components.css qui transforme tout bouton [disabled]/[aria-busy] en
+       spinner : sinon le bouton reste à tourner avec un libellé transparent
+       même après l'affichage du rapport. */
+    button.cf-test-btn[disabled],
+    button.cf-test-btn[aria-busy="true"] {
+        color: #F6F7FB !important;
+        pointer-events: auto;
+    }
+    button.cf-test-btn[disabled]::after,
+    button.cf-test-btn[aria-busy="true"]::after {
+        content: none !important;
+        animation: none !important;
+        display: none !important;
+    }
 {% endblock %}
 
 {% block tool_content %}
@@ -106,12 +192,13 @@ oublié.
                 <p class="text-xs" style="color:var(--sim-muted);">
                     🔒 Analyse côté serveur, en mémoire. Aucun stockage, aucune transmission à un tiers.
                 </p>
-                <button type="submit" class="tool-cta" style="background:#22c55e;"
-                        :disabled="!file || loading"
-                        :style="(!file || loading) ? 'opacity:.5;cursor:not-allowed;background:#22c55e;' : 'background:#22c55e;'">
-                    <svg x-show="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <svg x-show="loading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                    <span x-text="loading ? 'Analyse en cours…' : 'Tester la conformité'"></span>
+                <button type="submit" class="tool-cta cf-test-btn" style="background:#22c55e;"
+                        data-no-loading
+                        :disabled="!file || busy"
+                        :style="(!file || busy) ? 'opacity:.5;cursor:not-allowed;background:#22c55e;' : 'background:#22c55e;'">
+                    <svg x-show="!busy" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <svg x-show="busy" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    <span x-text="busy ? 'Analyse en cours…' : 'Tester la conformité'"></span>
                 </button>
             </div>
         </form>
@@ -124,20 +211,23 @@ oublié.
 
     {# ── Résultats ── #}
     <template x-if="report">
-    <div class="mt-8 space-y-6">
+    <div class="cf-results mt-4 space-y-3"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 -translate-y-1"
+         x-transition:enter-end="opacity-100 translate-y-0">
 
         {# Verdict global #}
-        <div class="cf-verdict mo-scale-in" :class="report.is_conformant ? 'cf-verdict--ok' : 'cf-verdict--ko'">
+        <div class="cf-verdict tool-card" :class="report.is_conformant ? 'cf-verdict--ok' : 'cf-verdict--ko'">
             <div class="cf-gauge"
                  :style="`background: conic-gradient(${gaugeColor} ${report.score*3.6}deg, rgba(127,127,127,.12) 0deg);`">
-                <div class="cf-gauge"
-                     style="width:96px;height:96px;background:var(--sim-bg);">
+                <div class="cf-gauge cf-gauge-inner">
                     <span class="cf-gauge-val" :style="`color:${gaugeColor}`" x-text="report.score"></span>
+                    <span class="cf-gauge-unit">/ 100</span>
                 </div>
             </div>
             <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-3 flex-wrap mb-1">
-                    <h3 class="text-xl font-bold" style="color:var(--sim-ink);"
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <h3 class="text-lg md:text-xl font-bold leading-tight" style="color:var(--sim-ink);"
                         x-text="report.is_conformant ? 'Facture conforme' : 'Non conforme en l\'état'"></h3>
                     <span class="cf-pill" :class="report.is_conformant ? 'cf-pill--pass' : 'cf-pill--fail'"
                           x-text="report.is_conformant ? 'EN 16931' : (report.counts.fail + ' anomalie(s)')"></span>
@@ -146,7 +236,7 @@ oublié.
                     <span x-text="formatLabel"></span>
                     <template x-if="report.profile"><span> · Profil <strong x-text="report.profile"></strong></span></template>
                 </p>
-                <div class="flex items-center gap-3 mt-3 text-xs flex-wrap" style="color:var(--sim-muted);">
+                <div class="flex items-center gap-2 mt-2 text-xs flex-wrap">
                     <span class="cf-pill cf-pill--pass" x-text="report.counts.pass + ' conformes'"></span>
                     <span class="cf-pill cf-pill--fail" x-show="report.counts.fail" x-text="report.counts.fail + ' bloquants'"></span>
                     <span class="cf-pill cf-pill--warn" x-show="report.counts.warn" x-text="report.counts.warn + ' avertissements'"></span>
@@ -156,50 +246,54 @@ oublié.
 
         {# Erreur fatale (format non reconnu) #}
         <template x-if="report.fatal_error">
-            <div class="p-4 rounded-xl text-sm"
-                 style="background:rgba(239,68,68,.08);color:var(--sim-ink);border:1px solid rgba(239,68,68,.25);">
-                <p class="font-semibold mb-1" style="color:#ef4444;">Impossible d'analyser le contenu</p>
-                <p style="color:var(--sim-muted);" x-text="report.fatal_error"></p>
+            <div class="cf-fatal">
+                <p class="cf-fatal-title">Impossible d'analyser le contenu</p>
+                <p class="cf-fatal-text" x-text="report.fatal_error"></p>
             </div>
         </template>
 
         {# Détail des contrôles par section #}
-        <template x-for="sec in sections" :key="sec.key">
-            <div x-show="checksBySection(sec.key).length">
-                <p class="cf-section-title" x-text="sec.label"></p>
-                <div class="space-y-2">
-                    <template x-for="chk in checksBySection(sec.key)" :key="chk.code + chk.label">
-                        <div class="cf-check">
-                            {# Icône statut #}
-                            <span class="cf-check-icon" :style="`color:${statusColor(chk.status)}`">
-                                <template x-if="chk.status === 'pass'">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                </template>
-                                <template x-if="chk.status === 'fail'">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                </template>
-                                <template x-if="chk.status === 'warn'">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-                                </template>
-                                <template x-if="chk.status === 'info'">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                </template>
-                            </span>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="font-medium text-sm" style="color:var(--sim-ink);" x-text="chk.label"></span>
-                                    <span class="cf-code" x-text="chk.code"></span>
+        <div class="cf-sections">
+            <template x-for="sec in sections" :key="sec.key">
+                <section class="cf-section" x-show="checksBySection(sec.key).length">
+                    <header class="cf-section-head">
+                        <span class="cf-section-bar"></span>
+                        <p class="cf-section-title" x-text="sec.label"></p>
+                        <span class="cf-section-count" x-text="checksBySection(sec.key).length"></span>
+                    </header>
+                    <div class="cf-section-list">
+                        <template x-for="chk in checksBySection(sec.key)" :key="chk.code + chk.label">
+                            <div class="cf-check" :class="`cf-check--${chk.status}`">
+                                <span class="cf-check-icon" :style="`color:${statusColor(chk.status)}`">
+                                    <template x-if="chk.status === 'pass'">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    </template>
+                                    <template x-if="chk.status === 'fail'">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </template>
+                                    <template x-if="chk.status === 'warn'">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                                    </template>
+                                    <template x-if="chk.status === 'info'">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </template>
+                                </span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="cf-check-label" x-text="chk.label"></span>
+                                        <span class="cf-code" x-text="chk.code"></span>
+                                    </div>
+                                    <p class="cf-check-detail" x-text="chk.detail" x-show="chk.detail"></p>
                                 </div>
-                                <p class="text-xs mt-.5" style="color:var(--sim-muted);" x-text="chk.detail"></p>
                             </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-        </template>
+                        </template>
+                    </div>
+                </section>
+            </template>
+        </div>
 
         {# Avertissement honnêteté #}
-        <p class="text-xs leading-relaxed" style="color:var(--sim-muted);opacity:.8;">
+        <p class="cf-disclaimer">
             Cet outil contrôle la structure sémantique (EN 16931) : champs obligatoires,
             identifiants, ventilation de TVA et cohérence arithmétique des totaux.
             Il ne remplace pas la validation Schematron officielle ni le contrôle de la
@@ -244,6 +338,12 @@ function conformiteFacture() {
                 unknown: 'Format inconnu',
             };
             return map[this.report.format_detected] || this.report.format_detected;
+        },
+        // Le bouton ne tourne que si une analyse est réellement en cours ET
+        // qu'aucun résultat ni erreur n'est encore affiché. Garantit qu'il ne
+        // peut jamais rester bloqué en rotation.
+        get busy() {
+            return this.loading && !this.report && !this.errorMsg;
         },
         get gaugeColor() {
             if (!this.report) return '#22c55e';
@@ -310,12 +410,28 @@ function conformiteFacture() {
             this.report = null;
             const fd = new FormData();
             fd.append('invoice', this.file);
+            // Watchdog : abort la requête au bout de 30 s pour ne pas laisser
+            // le bouton tourner indéfiniment en cas de réseau bloqué.
+            const ctrl = ('AbortController' in window) ? new AbortController() : null;
+            let timedOut = false;
+            const watchdog = setTimeout(() => {
+                timedOut = true;
+                if (ctrl) ctrl.abort();
+                // Filet de sécurité : même sans AbortController (ou si l'abort
+                // n'interrompt pas le fetch), on rend la main à l'utilisateur
+                // pour que le bouton ne tourne jamais sans fin.
+                if (this.loading && !this.report) {
+                    this.errorMsg = "L'analyse a pris trop de temps (30 s). Réessayez avec un fichier plus léger.";
+                    this.loading = false;
+                }
+            }, 30000);
             try {
                 const res = await fetch("{% url 'simulateur:conformite-facture-check' %}", {
                     method: 'POST',
                     headers: { 'X-CSRFToken': this.getCsrf() },
                     body: fd,
                     credentials: 'same-origin',
+                    signal: ctrl ? ctrl.signal : undefined,
                 });
                 // Réponse non-JSON (page d'erreur HTML 4xx/5xx) : message clair.
                 const ct = res.headers.get('content-type') || '';
@@ -340,8 +456,13 @@ function conformiteFacture() {
                     });
                 }
             } catch (err) {
-                this.errorMsg = 'Connexion impossible. Vérifiez votre réseau et réessayez.';
+                if (err && err.name === 'AbortError') {
+                    this.errorMsg = "L'analyse a pris trop de temps (30 s). Réessayez avec un fichier plus léger.";
+                } else {
+                    this.errorMsg = 'Connexion impossible. Vérifiez votre réseau et réessayez.';
+                }
             } finally {
+                clearTimeout(watchdog);
                 this.loading = false;
             }
         },

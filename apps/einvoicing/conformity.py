@@ -212,11 +212,19 @@ def check_invoice(content: bytes, filename: str = "") -> ConformityReport:
             report.checks.append(chk)
         if xml_bytes is None:
             report.format_detected = "pdf_no_xml"
-            report.fatal_error = (
-                "Aucun XML de facture n'est embarqué dans ce PDF. "
-                "Un PDF imprimé ou scanné n'est pas une facture électronique : "
-                "il faut un Factur-X (PDF/A-3 avec XML `factur-x.xml` attaché)."
-            )
+            # L'extracteur peut déjà avoir posé une erreur fatale précise
+            # (ex. composant pikepdf manquant). On ne l'écrase pas.
+            if not report.fatal_error:
+                report.fatal_error = (
+                    "Aucun XML de facture n'est embarqué dans ce PDF. "
+                    "C'est presque toujours dû à une de ces situations : "
+                    "(1) le fichier a été ré-imprimé ou ré-exporté (« Imprimer en PDF », "
+                    "« Enregistrer sous » depuis un visionneur ou une boîte mail) — "
+                    "l'image visuelle est conservée mais le XML attaché est perdu ; "
+                    "(2) le document est un PDF classique ou un scan, pas un Factur-X. "
+                    "Renvoyez le fichier original généré par votre outil de facturation, "
+                    "ou déposez directement le XML CII / UBL pour analyser le contenu."
+                )
             return report
         report.format_detected = "facturx_pdf"
     else:
@@ -229,50 +237,144 @@ def check_invoice(content: bytes, filename: str = "") -> ConformityReport:
 
 # ─── Extraction PDF → XML ────────────────────────────────────────────
 def _extract_xml_from_pdf(content: bytes, report: ConformityReport):
-    """Extrait le XML embarqué + produit les contrôles PDF/A-3."""
+    """Extrait le XML embarqué dans un PDF + produit les contrôles PDF/A-3.
+
+    Stratégie en 3 niveaux, du plus officiel au plus tolérant :
+
+    1. **/Names/EmbeddedFiles** (structure Adobe / Factur-X officielle) — lu via
+       ``pdf.attachments``.
+    2. **/AF (Associated Files) du Catalog** — exigence ISO 19005-3 ; certains
+       producteurs n'inscrivent l'attachement QUE là (pas dans /Names).
+    3. **Scan de tous les objets stream** du PDF — fallback absolu : on lit
+       chaque flux et on garde celui qui contient un XML de facture connu
+       (CII ou UBL). Couvre les PDF re-emballés ou produits par des outils
+       qui s'écartent du standard (ex. PDF "ZUGFeRD legacy").
+
+    Le scan ne lève jamais : si rien n'est trouvé, on retourne ``None`` et
+    l'appelant produit un message clair pour l'utilisateur.
+    """
     checks: list[CheckResult] = []
     xml_bytes: Optional[bytes] = None
+    found_via: str = ""
+    found_name: str = ""
     try:
         import pikepdf
-    except ImportError:  # pragma: no cover
+    except ImportError:
+        # pikepdf est requis pour ouvrir le PDF et lire l'attachement
+        # `factur-x.xml`. Sans lui, AUCUN PDF ne peut être analysé : on
+        # signale une erreur d'environnement explicite plutôt que de laisser
+        # croire à tort que le PDF ne contient pas de XML (faux négatif).
+        logger.error(
+            "pikepdf indisponible : extraction Factur-X impossible. "
+            "Ajoutez `pikepdf` aux dépendances (requirements.txt)."
+        )
+        report.fatal_error = (
+            "Analyse PDF indisponible sur le serveur (composant manquant). "
+            "Déposez directement le XML (CII / UBL) de la facture, ou "
+            "contactez-nous pour rétablir l'analyse des PDF Factur-X."
+        )
+        checks.append(CheckResult(
+            "Factur-X", "Lecture du PDF", "fail",
+            "Le composant d'extraction PDF (pikepdf) n'est pas installé sur le serveur.",
+            "format",
+        ))
         return None, checks
 
     try:
         with pikepdf.open(io.BytesIO(content)) as pdf:
-            # 1. Attachements
-            attachments = dict(pdf.attachments) if hasattr(pdf, "attachments") else {}
-            found_name = None
-            for name in EMBEDDED_XML_NAMES:
-                if name in attachments:
-                    found_name = name
-                    break
-            # Fallback : n'importe quel .xml attaché.
-            if not found_name:
-                for key in attachments:
-                    if str(key).lower().endswith(".xml"):
-                        found_name = key
-                        break
+            # ── Niveau 1 : /Names/EmbeddedFiles ─────────────────────
+            attachments_names: dict = {}
+            try:
+                if hasattr(pdf, "attachments"):
+                    attachments_names = {str(k): v for k, v in pdf.attachments.items()}
+            except Exception:  # noqa: BLE001
+                pass
 
-            if found_name:
-                try:
-                    filespec = attachments[found_name]
-                    xml_bytes = filespec.get_file().read_bytes()
-                except Exception:  # noqa: BLE001
+            for name in EMBEDDED_XML_NAMES:
+                if name in attachments_names:
                     try:
-                        xml_bytes = bytes(attachments[found_name].obj["/EF"]["/F"].read_bytes())
+                        xml_bytes = bytes(attachments_names[name].get_file().read_bytes())
+                        found_via, found_name = "names", name
+                        break
                     except Exception:  # noqa: BLE001
-                        xml_bytes = None
+                        try:
+                            xml_bytes = bytes(attachments_names[name].obj["/EF"]["/F"].read_bytes())
+                            found_via, found_name = "names", name
+                            break
+                        except Exception:  # noqa: BLE001
+                            continue
+            if xml_bytes is None:
+                for key, spec in attachments_names.items():
+                    if str(key).lower().endswith(".xml"):
+                        try:
+                            xml_bytes = bytes(spec.get_file().read_bytes())
+                            found_via, found_name = "names", key
+                            break
+                        except Exception:  # noqa: BLE001
+                            continue
+
+            # ── Niveau 2 : /AF (Associated Files) du Catalog ────────
+            if xml_bytes is None:
+                try:
+                    af = pdf.Root.get("/AF")
+                    if af is not None:
+                        entries = af if isinstance(af, pikepdf.Array) else [af]
+                        for entry in entries:
+                            try:
+                                name = str(entry.get("/UF") or entry.get("/F") or "")
+                                ef = entry.get("/EF")
+                                if ef is None:
+                                    continue
+                                stream = ef.get("/UF") or ef.get("/F")
+                                if stream is None:
+                                    continue
+                                data = bytes(stream.read_bytes())
+                                if _looks_like_invoice_xml(data):
+                                    xml_bytes = data
+                                    found_via = "AF"
+                                    found_name = name or "factur-x.xml"
+                                    break
+                            except Exception:  # noqa: BLE001
+                                continue
+                except Exception:  # noqa: BLE001
+                    pass
+
+            # ── Niveau 3 : balayage de tous les objets stream ───────
+            # Dernier recours pour les PDF non-conformes : on parcourt chaque
+            # objet stream et on garde celui qui ressemble à un XML de facture.
+            if xml_bytes is None:
+                try:
+                    for obj in pdf.objects:
+                        try:
+                            if not isinstance(obj, pikepdf.Stream):
+                                continue
+                            data = bytes(obj.read_bytes())
+                            if _looks_like_invoice_xml(data):
+                                xml_bytes = data
+                                found_via = "scan"
+                                found_name = "factur-x.xml (extrait par balayage)"
+                                break
+                        except Exception:  # noqa: BLE001
+                            continue
+                except Exception:  # noqa: BLE001
+                    pass
+
+            # ── Reporting du contrôle ──
+            if xml_bytes:
+                detail = {
+                    "names": f"Fichier attaché détecté : « {found_name} ».",
+                    "AF": f"XML extrait via /AF (Associated Files) : « {found_name} ».",
+                    "scan": "XML de facture extrait par balayage du PDF (attachement non conforme).",
+                }.get(found_via, "XML extrait du PDF.")
                 checks.append(CheckResult(
-                    "Factur-X", "XML de facture embarqué",
-                    "pass" if xml_bytes else "fail",
-                    f"Fichier attaché détecté : « {found_name} »." if xml_bytes
-                    else "Attachement trouvé mais illisible.",
-                    "format",
+                    "Factur-X", "XML de facture embarqué", "pass", detail, "format",
                 ))
             else:
                 checks.append(CheckResult(
                     "Factur-X", "XML de facture embarqué", "fail",
-                    "Aucun fichier XML attaché au PDF.", "format",
+                    "Aucun XML de facture trouvé dans le PDF (ni en pièce jointe, "
+                    "ni dans /AF, ni en flux interne).",
+                    "format",
                 ))
 
             # 2. PDF/A-3 via XMP
@@ -321,6 +423,27 @@ def _extract_xml_from_pdf(content: bytes, report: ConformityReport):
         ))
 
     return xml_bytes, checks
+
+
+def _looks_like_invoice_xml(data: bytes) -> bool:
+    """Heuristique : détecte un XML de facture (CII ou UBL) dans un blob d'octets.
+
+    On regarde uniquement les 2 premiers Ko (suffisant pour atteindre la
+    racine du document XML) et on cherche les marqueurs de namespace officiels.
+    """
+    if not data or len(data) < 32:
+        return False
+    head = data[:2048]
+    # Doit commencer par <?xml ou < (BOM toléré).
+    bom_stripped = head.lstrip(b"\xef\xbb\xbf").lstrip()
+    if not bom_stripped.startswith(b"<"):
+        return False
+    return (
+        b"CrossIndustryInvoice" in head                                     # CII / Factur-X
+        or b"urn:un:unece:uncefact" in head                                 # CII namespaces
+        or b"oasis:names:specification:ubl:schema:xsd:Invoice-2" in head    # UBL Invoice
+        or b"oasis:names:specification:ubl:schema:xsd:CreditNote-2" in head # UBL Credit Note
+    )
 
 
 # ─── Parsing XML → InvoiceData ───────────────────────────────────────
@@ -635,13 +758,33 @@ def _msg(err: ValidationError) -> str:
 
 def _check_legal_id(report, code, label, value):
     digits = "".join(ch for ch in value if ch.isdigit())
+    # Cas particulier des administrations / collectivités : les SIREN attribués
+    # par l'INSEE aux services de l'État (préfixe 1) et aux collectivités
+    # territoriales (préfixe 2) ne suivent pas l'algorithme de Luhn — au même
+    # titre que La Poste (356000000). Toute facture émise vers une mairie,
+    # un département, une région ou une administration centrale aurait un
+    # SIRET en 1xx ou 2xx et serait à tort rejetée par un Luhn strict.
+    is_public = digits.startswith(("1", "2")) and len(digits) in (9, 14)
+
     try:
         if len(digits) == 14:
-            validate_siret(digits)
-            report.add(code, label, "pass", f"SIRET valide ({digits}).", "identification")
+            if is_public:
+                report.add(code, label, "pass",
+                           f"SIRET d'administration / collectivité ({digits}) — "
+                           f"hors règle Luhn par convention INSEE.",
+                           "identification")
+            else:
+                validate_siret(digits)
+                report.add(code, label, "pass", f"SIRET valide ({digits}).", "identification")
         elif len(digits) == 9:
-            validate_siren(digits)
-            report.add(code, label, "pass", f"SIREN valide ({digits}).", "identification")
+            if is_public:
+                report.add(code, label, "pass",
+                           f"SIREN d'administration / collectivité ({digits}) — "
+                           f"hors règle Luhn par convention INSEE.",
+                           "identification")
+            else:
+                validate_siren(digits)
+                report.add(code, label, "pass", f"SIREN valide ({digits}).", "identification")
         else:
             report.add(code, label, "warn",
                        f"Identifiant « {value} » non reconnu comme SIREN/SIRET français.",
