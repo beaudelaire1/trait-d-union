@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.http import HttpRequest, HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import http_date
+from django.urls import resolve, Resolver404
 
 logger = logging.getLogger(__name__)
 
@@ -258,6 +259,28 @@ class CanonicalDomainMiddleware(MiddlewareMixin):
     # Cookie used to detect redirect loops
     _LOOP_COOKIE = '_canonical_ok'
 
+    @staticmethod
+    def _looks_like_file_path(path: str) -> bool:
+        """Return True for file-like paths (e.g. /sitemap.xml, /favicon.ico)."""
+        last_segment = path.rsplit('/', 1)[-1]
+        return '.' in last_segment
+
+    @classmethod
+    def _normalized_path_with_trailing_slash(cls, request: HttpRequest) -> str:
+        """Normalize public routes to trailing-slash when a slash route exists."""
+        path = request.path
+        if request.method not in ('GET', 'HEAD'):
+            return path
+        if path == '/' or path.endswith('/') or cls._looks_like_file_path(path):
+            return path
+
+        candidate = f"{path}/"
+        try:
+            resolve(candidate)
+        except Resolver404:
+            return path
+        return candidate
+
     def process_request(self, request: HttpRequest) -> HttpResponse | None:
         from django.conf import settings
 
@@ -271,9 +294,15 @@ class CanonicalDomainMiddleware(MiddlewareMixin):
                 return None
 
         host = request.get_host().split(':')[0].lower()  # Strip port, case-insensitive
+        normalized_path = self._normalized_path_with_trailing_slash(request)
+        query_string = request.META.get('QUERY_STRING', '')
+        normalized_full_path = normalized_path + (f'?{query_string}' if query_string else '')
 
         # Already on canonical domain → nothing to do
         if host == canonical:
+            if normalized_path != request.path:
+                from django.http import HttpResponsePermanentRedirect
+                return HttpResponsePermanentRedirect(f'https://{canonical}{normalized_full_path}')
             return None
 
         # Redirect loop detection: if the browser already carries our loop-
@@ -299,7 +328,7 @@ class CanonicalDomainMiddleware(MiddlewareMixin):
             scheme = 'https'
 
         from django.http import HttpResponsePermanentRedirect
-        new_url = f"{scheme}://{canonical}{request.get_full_path()}"
+        new_url = f"{scheme}://{canonical}{normalized_full_path}"
         response = HttpResponsePermanentRedirect(new_url)
 
         # Set a short-lived cookie so the next request can detect a loop.

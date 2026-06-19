@@ -72,7 +72,7 @@ def _canonical_sitemap(
     sitemaps,
     section=None,
     template_name='sitemap.xml',
-    content_type='application/xml',
+    content_type='application/xml; charset=utf-8',
 ):
     req_protocol = request.scheme
     canonical_domain = getattr(settings, 'CANONICAL_DOMAIN', '') or request.get_host().split(':')[0]

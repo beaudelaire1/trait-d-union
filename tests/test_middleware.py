@@ -120,6 +120,20 @@ class TestCanonicalDomainMiddleware:
         assert response['Location'] == 'https://traitdunion.it/contact/'
 
     @override_settings(CANONICAL_DOMAIN='traitdunion.it', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
+    def test_trailing_slash_redirect_on_canonical_host(self, client):
+        """Public routes should be canonicalized with trailing slash."""
+        response = client.get('/services', HTTP_HOST='traitdunion.it')
+        assert response.status_code == 301
+        assert response['Location'] == 'https://traitdunion.it/services/'
+
+    @override_settings(CANONICAL_DOMAIN='traitdunion.it', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
+    def test_trailing_slash_and_host_canonicalization_in_one_redirect(self, client):
+        """Non-canonical host + missing slash should redirect in a single hop."""
+        response = client.get('/services', HTTP_HOST='www.traitdunion.it')
+        assert response.status_code == 301
+        assert response['Location'] == 'https://traitdunion.it/services/'
+
+    @override_settings(CANONICAL_DOMAIN='traitdunion.it', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
     def test_redirect_loop_detection_breaks_loop(self, client):
         """If the redirect loop cookie is present, do NOT redirect (break loop)."""
         # Simulate a browser that already followed one canonical redirect

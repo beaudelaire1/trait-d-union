@@ -14,12 +14,12 @@ Note : Le script de désobfuscation est dans base.html (fin du <body>)
 {% endcomment %}
 
 <!-- Email obfusqué (affichage non explicite pour limiter le scraping visuel) -->
-<a href="#" 
+<a href="/contact/" 
    class="tus-email-link {{ link_style|default:'text-tus-blue-a11y hover:underline transition-colors' }}" 
    data-email="Y29udGFjdEB0cmFpdGR1bmlvbi5pdA=="
    data-label="{{ link_label|default:'Nous écrire' }}"
    aria-label="Envoyer un email à Trait d'Union Studio"
    rel="nofollow">
     {{ link_label|default:'Nous écrire' }}
-    <noscript>Formulaire de contact</noscript>
+    <noscript><a href="/contact/">Formulaire de contact</a></noscript>
 </a>

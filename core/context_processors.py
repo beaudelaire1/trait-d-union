@@ -7,6 +7,7 @@ def captcha_settings(request):
     """Inject captcha keys and GA4 measurement ID into template context."""
     turnstile_site_key = getattr(settings, 'TURNSTILE_SITE_KEY', '')
     recaptcha_site_key = getattr(settings, 'RECAPTCHA_SITE_KEY', '')
+    canonical_host = (getattr(settings, 'CANONICAL_DOMAIN', '') or request.get_host()).split(':')[0]
     timeout_ms = getattr(settings, 'TURNSTILE_FALLBACK_TIMEOUT_MS', 2500)
     try:
         timeout_ms = int(timeout_ms)
@@ -18,6 +19,7 @@ def captcha_settings(request):
         'recaptcha_site_key': recaptcha_site_key,
         'turnstile_fallback_timeout_ms': timeout_ms,
         'ga4_measurement_id': getattr(settings, 'GA4_MEASUREMENT_ID', ''),
+        'canonical_host': canonical_host,
     }
 
 

@@ -34,13 +34,13 @@
     <meta name="ICBM" content="4.9372, -52.3260">
 
     <!-- Canonical URL — 🔍 SEO: Strip query params to avoid duplicate content from pagination -->
-    <link rel="canonical" href="{% block canonical_url %}{{ request.scheme }}://{{ request.get_host }}{{ request.path }}{% endblock %}">
+    <link rel="canonical" href="{% block canonical_url %}{{ request.scheme }}://{{ canonical_host }}{{ request.path }}{% endblock %}">
     <!-- Hreflang — Ciblage régional Guyane/Outre-mer -->
-    <link rel="alternate" hreflang="fr" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-    <link rel="alternate" hreflang="fr-GF" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-    <link rel="alternate" hreflang="fr-MQ" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-    <link rel="alternate" hreflang="fr-GP" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-    <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="fr" href="{{ request.scheme }}://{{ canonical_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="fr-GF" href="{{ request.scheme }}://{{ canonical_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="fr-MQ" href="{{ request.scheme }}://{{ canonical_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="fr-GP" href="{{ request.scheme }}://{{ canonical_host }}{{ request.path }}">
+    <link rel="alternate" hreflang="x-default" href="{{ request.scheme }}://{{ canonical_host }}{{ request.path }}">
 
     <!-- OpenGraph tags -->
     <meta property="og:title" content="{% block og_title %}Trait d'Union Studio — Architecture Digitale{% endblock %}">
@@ -51,7 +51,7 @@
         content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.png' %}{% endblock %}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:url" content="{{ request.scheme }}://{{ canonical_host }}{{ request.path }}">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="Trait d'Union Studio">

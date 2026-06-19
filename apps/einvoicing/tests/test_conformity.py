@@ -92,9 +92,20 @@ class TestCIIConformity:
         assert any(c.code == "BR-CO-14" for c in report2.checks)
 
     def test_invalid_buyer_siren_flagged(self):
-        report = check_invoice(_cii_xml(buyer_siren="123456789"), "test.xml")
+        # SIREN privé (préfixe 3-9) avec mauvaise clé Luhn → doit échouer.
+        # Les préfixes 1 et 2 sont reserves aux administrations / collectivites
+        # et echappent au controle Luhn (regle INSEE).
+        report = check_invoice(_cii_xml(buyer_siren="987654321"), "test.xml")
         bt47 = [c for c in report.checks if c.code == "BT-47"]
         assert bt47 and bt47[0].status == "fail"
+
+    def test_public_sector_siren_accepted_without_luhn(self):
+        # Mairie de Cayenne : 218000037 — SIREN de collectivite (prefixe 2),
+        # hors regle Luhn par convention INSEE. Doit etre accepte.
+        report = check_invoice(_cii_xml(buyer_siren="218000037"), "test.xml")
+        bt47 = [c for c in report.checks if c.code == "BT-47"]
+        assert bt47 and bt47[0].status == "pass"
+        assert report.is_conformant
 
     def test_missing_number_flagged(self):
         xml = _cii_xml().replace(b"<ram:ID>FAC-TEST-001</ram:ID>", b"<ram:ID></ram:ID>")
@@ -166,3 +177,42 @@ class TestUBLConformity:
         assert report.syntax == "UBL"
         assert report.format_detected == "ubl_xml"
         assert report.is_conformant, [c for c in report.checks if c.status == "fail"]
+
+
+class TestPdfExtractionFallback:
+    """L'extraction doit retrouver le XML même si l'attachement est exclusivement
+    declare via /AF (Associated Files) au niveau Catalog, sans entree dans
+    /Names/EmbeddedFiles. Cas frequent des PDF re-emballes ou produits par
+    des outils qui s'ecartent de la pratique Adobe."""
+
+    def test_xml_extracted_from_af_only(self, tmp_path):
+        import io
+        import pikepdf
+
+        xml = _cii_xml()
+
+        # PDF minimal viable + attachement via AttachedFileSpec puis on
+        # supprime l'entree /Names/EmbeddedFiles pour simuler le cas reel.
+        pdf = pikepdf.Pdf.new()
+        pdf.add_blank_page(page_size=(595, 842))
+        fs = pikepdf.AttachedFileSpec(pdf, xml, mime_type="application/xml")
+        pdf.attachments["factur-x.xml"] = fs
+        af_obj = pdf.attachments["factur-x.xml"].obj
+        af_obj["/AFRelationship"] = pikepdf.Name("/Alternative")
+        pdf.Root["/AF"] = pikepdf.Array([pdf.make_indirect(af_obj)])
+        # On retire l'entree /Names → pikepdf.attachments sera vide,
+        # seul /AF référencera le filespec.
+        try:
+            del pdf.Root["/Names"]
+        except (KeyError, AttributeError):
+            pass
+
+        buf = io.BytesIO()
+        pdf.save(buf)
+        data = buf.getvalue()
+
+        report = check_invoice(data, "af-only.pdf")
+        assert report.format_detected == "facturx_pdf"
+        assert report.fatal_error is None
+        assert report.syntax == "CII"
+        assert report.counts["pass"] > 0

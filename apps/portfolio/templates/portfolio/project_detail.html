@@ -670,8 +670,72 @@
         </div>
     </section>
 
-    {# Ch.05 — Performance & conformité (audit projet) #}
-    {% include 'portfolio/partials/chapter_05_audit.html' %}
+    {# Ch.05 — Performance & conformité (audit projet) — rendu HTML direct #}
+    {% if project.url %}
+    <div class="suspense-divider relative py-24 overflow-hidden" data-color="green">
+        <div class="divider-stage max-w-5xl mx-auto px-6 relative h-[2px]">
+            <div class="divider-track absolute inset-0 h-px top-1/2 w-full bg-gradient-to-r from-transparent via-tus-white/[0.03] to-transparent"></div>
+            <div class="divider-orb absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div class="w-2.5 h-2.5 rounded-full bg-tus-green"></div>
+            </div>
+        </div>
+        <div class="divider-label absolute left-1/2 -translate-x-1/2 bottom-8">
+            <span class="text-[10px] uppercase tracking-[0.35em] text-tus-white/20 font-medium font-display">Audit projet</span>
+        </div>
+    </div>
+
+    <section class="py-40 lg:py-52 relative narrative-chapter" data-chapter="5">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-tus-green/[0.03] to-transparent"></div>
+
+        <div class="max-w-6xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16 lg:mb-20">
+                <div class="inline-flex items-center gap-4 mb-6">
+                    <div class="relative">
+                        <span class="text-7xl lg:text-8xl font-display font-bold text-tus-green/10 select-none leading-none number-display">05</span>
+                    </div>
+                    <div class="text-left">
+                        <span class="text-tus-green text-sm font-semibold uppercase tracking-[0.15em] block">Chapitre</span>
+                        <h2 class="text-3xl md:text-4xl font-display font-bold">Performance &amp; conformité</h2>
+                    </div>
+                </div>
+
+                <p class="prose-chapter text-lg md:text-xl text-tus-white/70 max-w-3xl mx-auto leading-relaxed reveal td-100">
+                    On ne se contente pas de livrer : on mesure. Voici les notes obtenues
+                    par {{ project.client_name|default:project.title }} sur les outils d'audit
+                    publics les plus exigeants du marché — chiffres consultables en un clic.
+                </p>
+
+                {% if project.audit_last_run_at %}
+                <p class="text-xs text-tus-white/40 mt-4 reveal td-150">
+                    Dernière mesure : {{ project.audit_last_run_at|date:"j F Y" }}
+                </p>
+                {% endif %}
+            </div>
+
+            {% with audit=project.audit_results encoded=project.url|urlencode host=project.url|cut:'https://'|cut:'http://'|cut:'/' %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
+                {% include 'portfolio/partials/_audit_card.html' with key='performance' label='Performance' icon='⚡' subtitle='Lighthouse · Core Web Vitals' tool='Google PageSpeed' display='grade' score=audit.performance.score detail_url=audit.performance.detail_url fallback_url='https://pagespeed.web.dev/analysis?url='|add:encoded color='blue' %}
+                {% include 'portfolio/partials/_audit_card.html' with key='seo' label='SEO' icon='🔍' subtitle='Référencement & métadonnées' tool='Google PageSpeed' display='score' score=audit.seo.score detail_url=audit.seo.detail_url fallback_url='https://pagespeed.web.dev/analysis?url='|add:encoded color='blue' %}
+                {% include 'portfolio/partials/_audit_card.html' with key='ui_ux' label='UI / UX' icon='🎨' subtitle='Hiérarchie, lisibilité, parcours' tool='Évaluation TUS' display='score' score=audit.ui_ux.score detail_url='' fallback_url='' is_manual=True color='blue' %}
+                {% include 'portfolio/partials/_audit_card.html' with key='accessibility' label='Accessibilité' icon='♿' subtitle='WCAG 2.1 · lecteurs d’écran' tool='WAVE WebAIM' display='score' score=audit.accessibility.score detail_url=audit.accessibility.detail_url fallback_url='https://wave.webaim.org/report#/'|add:project.url color='green' %}
+                {% include 'portfolio/partials/_audit_card.html' with key='security' label='Sécurité HTTP' icon='🛡' subtitle='Headers, CSP, HSTS, cookies' tool='Mozilla Observatory' display='grade' score=audit.security.score grade=audit.security.grade detail_url=audit.security.detail_url fallback_url='https://developer.mozilla.org/en-US/observatory/analyze?host='|add:host color='green' %}
+                {% include 'portfolio/partials/_audit_card.html' with key='ssl' label='Chiffrement SSL/TLS' icon='🔒' subtitle='Certificat · protocoles · ciphers' tool='SSL Labs' display='grade' grade=audit.ssl.grade detail_url=audit.ssl.detail_url fallback_url='https://www.ssllabs.com/ssltest/analyze.html?d='|add:host color='green' %}
+            </div>
+            {% endwith %}
+
+            <div class="mt-12 text-center reveal">
+                <p class="text-xs text-tus-white/40 max-w-3xl mx-auto leading-relaxed">
+                    Chaque domaine est mesuré par son outil de référence :
+                    <a href="https://pagespeed.web.dev" class="text-tus-blue-a11y/70 hover:text-tus-blue-a11y" rel="noopener" target="_blank">PageSpeed</a> (performance, SEO),
+                    <a href="https://wave.webaim.org" class="text-tus-blue-a11y/70 hover:text-tus-blue-a11y" rel="noopener" target="_blank">WAVE</a> (accessibilité),
+                    <a href="https://developer.mozilla.org/en-US/observatory" class="text-tus-blue-a11y/70 hover:text-tus-blue-a11y" rel="noopener" target="_blank">Mozilla&nbsp;Observatory</a> (sécurité),
+                    <a href="https://www.ssllabs.com" class="text-tus-blue-a11y/70 hover:text-tus-blue-a11y" rel="noopener" target="_blank">SSL&nbsp;Labs</a> (chiffrement).
+                    La note UI/UX est attribuée par l'équipe TUS. Toutes les mesures sont vérifiables via le bouton « Tester ».
+                </p>
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
     <!-- ═══════════════════════════════════════════════════════════════
          GALERIE ADDITIONNELLE
