@@ -8,12 +8,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="client-portal" x-data="{ sidebarOpen: window.innerWidth > 1024, showNotifications: false }">
+<div class="client-portal" x-data="clientPortal">
     <!-- Sidebar Toggle (Mobile) -->
-    <button @click="sidebarOpen = !sidebarOpen" 
+    <button @click="toggleSidebar()" 
             class="sidebar-toggle"
-            :class="{ 'active': sidebarOpen }">
-        <svg x-show="!sidebarOpen" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            :class="activeClass">
+        <svg x-show="notSidebarOpen" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -25,7 +25,7 @@
     </button>
 
     <!-- Sidebar -->
-    <aside class="client-sidebar" :class="{ 'collapsed': !sidebarOpen }">
+    <aside class="client-sidebar" :class="collapsedClass">
         <div class="sidebar-header">
             <div class="user-avatar">
                 <span>{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}</span>
@@ -35,8 +35,8 @@
                 <p>{{ request.user.client_profile.company_name|default:"Client VIP" }}</p>
             </div>
             <!-- Collapse Button (Desktop) -->
-            <button @click="sidebarOpen = !sidebarOpen" class="collapse-btn" title="Réduire le menu">
-                <svg :class="{ 'rotated': !sidebarOpen }" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button @click="toggleSidebar()" class="collapse-btn" title="Réduire le menu">
+                <svg :class="rotatedClass" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="15 18 9 12 15 6"></polyline>
                 </svg>
             </button>
@@ -112,7 +112,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="client-main" :class="{ 'expanded': !sidebarOpen }">
+    <main class="client-main" :class="expandedMainClass">
         <!-- Header -->
         <header class="client-header">
             <div class="header-content">
@@ -134,18 +134,18 @@
                 </div>
                 <div class="header-actions">
                     <!-- Notifications Bell -->
-                    <div class="notification-wrapper" x-data="{ count: {{ notifications_count|default:0 }} }">
-                        <button @click="showNotifications = !showNotifications" class="notification-btn" :class="{ 'has-notifications': count > 0 }">
+                    <div class="notification-wrapper" x-data="notificationWrapper" data-count="{{ notifications_count|default:0 }}">
+                        <button @click="toggleNotifications()" class="notification-btn" :class="hasNotificationsClass">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                             </svg>
-                            <span x-show="count > 0" class="notification-badge" x-text="count"></span>
+                            <span x-show="hasCount" class="notification-badge" x-text="count"></span>
                         </button>
                         
                         <!-- Notifications Dropdown -->
                         <div x-show="showNotifications" 
-                             @click.away="showNotifications = false"
+                             @click.away="closeNotifications()"
                              x-transition:enter="transition ease-out duration-200"
                              x-transition:enter-start="opacity-0 transform scale-95"
                              x-transition:enter-end="opacity-100 transform scale-100"
@@ -257,7 +257,7 @@
                 <p class="transparency-subtitle">Historique complet de vos interactions</p>
             </div>
             
-            <div class="activity-timeline" x-data="{ showAll: false }">
+            <div class="activity-timeline">
                 {% if recent_quotes or recent_invoices or active_projects %}
                 <div class="timeline-items">
                     {% for quote in recent_quotes|slice:":3" %}
@@ -464,7 +464,7 @@
             </div>
 
             <!-- Quick Actions -->
-            <div class="content-card actions-card" x-data="{ showModal: false, modalType: '' }">
+            <div class="content-card actions-card" x-data="quickActions">
                 <div class="card-header">
                     <h2>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -475,7 +475,7 @@
                 </div>
                 <div class="card-body">
                     <div class="quick-actions">
-                        <button @click="showModal = true; modalType = 'quote'" class="action-btn">
+                        <button @click="openModal('quote')" class="action-btn">
                             <div class="action-icon quote">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -486,7 +486,7 @@
                             </div>
                             <span>Demander un devis</span>
                         </button>
-                        <button @click="showModal = true; modalType = 'invoice'" class="action-btn">
+                        <button @click="openModal('invoice')" class="action-btn">
                             <div class="action-icon invoice">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
@@ -495,7 +495,7 @@
                             </div>
                             <span>Demander une facture</span>
                         </button>
-                        <button @click="showModal = true; modalType = 'support'" class="action-btn">
+                        <button @click="openModal('support')" class="action-btn">
                             <div class="action-icon support">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="12" cy="12" r="10"></circle>
@@ -515,7 +515,7 @@
                             </div>
                             <span>Envoyer un fichier</span>
                         </a>
-                        <button @click="showModal = true; modalType = 'duplicate'" class="action-btn">
+                        <button @click="openModal('duplicate')" class="action-btn">
                             <div class="action-icon duplicate">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -524,7 +524,7 @@
                             </div>
                             <span>Duplicata document</span>
                         </button>
-                        <button @click="showModal = true; modalType = 'other'" class="action-btn">
+                        <button @click="openModal('other')" class="action-btn">
                             <div class="action-icon other">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
@@ -544,17 +544,17 @@
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
                      class="quick-modal-overlay"
-                     @click.self="showModal = false">
+                     @click.self="closeModal()">
                     <div class="quick-modal" @click.stop>
                         <div class="modal-header">
                             <h3>
-                                <span x-show="modalType === 'quote'">📄 Demande de devis</span>
-                                <span x-show="modalType === 'invoice'">🧾 Demande de facture</span>
-                                <span x-show="modalType === 'support'">🔧 Support technique</span>
-                                <span x-show="modalType === 'duplicate'">📋 Duplicata de document</span>
-                                <span x-show="modalType === 'other'">💬 Autre demande</span>
+                                <span x-show="isType(\'quote\')">📄 Demande de devis</span>
+                                <span x-show="isType(\'invoice\')">🧾 Demande de facture</span>
+                                <span x-show="isType(\'support\')">🔧 Support technique</span>
+                                <span x-show="isType(\'duplicate\')">📋 Duplicata de document</span>
+                                <span x-show="isType(\'other\')">💬 Autre demande</span>
                             </h3>
-                            <button @click="showModal = false" class="modal-close">
+                            <button @click="closeModal()" class="modal-close">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
                                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -574,7 +574,7 @@
                             </div>
 
                             <!-- Project selector for support/invoice -->
-                            <div x-show="modalType === 'support' || modalType === 'invoice'" class="form-group">
+                            <div x-show="isSupportOrInvoice" class="form-group">
                                 <label>Projet concerné</label>
                                 <select name="project_id" class="form-select">
                                     <option value="">Aucun projet spécifique</option>
@@ -585,30 +585,30 @@
                             </div>
 
                             <!-- Document reference for duplicates -->
-                            <div x-show="modalType === 'duplicate'" class="form-group">
+                            <div x-show="isType(\'duplicate\')" class="form-group">
                                 <label>Référence du document</label>
                                 <input type="text" name="document_ref" placeholder="Ex: DEVIS-2026-001, FAC-2026-042..." class="form-input">
                             </div>
 
                             <div class="form-group">
                                 <label>
-                                    <span x-show="modalType === 'quote'">Décrivez votre nouveau besoin</span>
-                                    <span x-show="modalType === 'invoice'">Précisez votre demande</span>
-                                    <span x-show="modalType === 'support'">Décrivez votre problème</span>
-                                    <span x-show="modalType === 'duplicate'">Motif de la demande (optionnel)</span>
-                                    <span x-show="modalType === 'other'">Votre message</span>
+                                    <span x-show="isType(\'quote\')">Décrivez votre nouveau besoin</span>
+                                    <span x-show="isType(\'invoice\')">Précisez votre demande</span>
+                                    <span x-show="isType(\'support\')">Décrivez votre problème</span>
+                                    <span x-show="isType(\'duplicate\')">Motif de la demande (optionnel)</span>
+                                    <span x-show="isType(\'other\')">Votre message</span>
                                 </label>
                                 <textarea name="message" 
                                           rows="4" 
                                           class="form-textarea"
-                                          :required="modalType !== 'duplicate'"
+                                          :required="isNotDuplicate"
                                           placeholder="Soyez le plus précis possible..."></textarea>
                             </div>
 
                             <div id="quick-request-result"></div>
 
                             <div class="modal-actions">
-                                <button type="button" @click="showModal = false" class="btn-secondary">Annuler</button>
+                                <button type="button" @click="closeModal()" class="btn-secondary">Annuler</button>
                                 <button type="submit" class="btn-primary">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <line x1="22" y1="2" x2="11" y2="13"></line>

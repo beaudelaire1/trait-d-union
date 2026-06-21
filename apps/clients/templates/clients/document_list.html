@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="client-portal" x-data="{ sidebarOpen: window.innerWidth > 1024, activeFilter: 'all' }">
+<div class="client-portal" x-data="clientPortal">
     {% include 'clients/partials/sidebar.html' %}
 
     <!-- Main Content -->
@@ -39,28 +39,28 @@
             
             <!-- Filtres par type -->
             <div class="doc-filter-bar">
-                <button @click="activeFilter = 'all'" 
-                        :class="activeFilter === 'all' ? 'btn-filter-active' : 'btn-filter'"
+                <button @click="setFilter(\'all\')" 
+                        :class="filterBtnClass(\'all\')"
                         class="btn-filter">
                     📁 Tous
                 </button>
-                <button @click="activeFilter = 'devis'" 
-                        :class="activeFilter === 'devis' ? 'btn-filter-active' : 'btn-filter'"
+                <button @click="setFilter(\'devis\')" 
+                        :class="filterBtnClass(\'devis\')"
                         class="btn-filter">
                     💰 Devis
                 </button>
-                <button @click="activeFilter = 'facture'" 
-                        :class="activeFilter === 'facture' ? 'btn-filter-active' : 'btn-filter'"
+                <button @click="setFilter(\'facture\')" 
+                        :class="filterBtnClass(\'facture\')"
                         class="btn-filter">
                     🧾 Factures
                 </button>
-                <button @click="activeFilter = 'contract'" 
-                        :class="activeFilter === 'contract' ? 'btn-filter-active' : 'btn-filter'"
+                <button @click="setFilter(\'contract\')" 
+                        :class="filterBtnClass(\'contract\')"
                         class="btn-filter">
                     📝 Contrats
                 </button>
-                <button @click="activeFilter = 'other'" 
-                        :class="activeFilter === 'other' ? 'btn-filter-active' : 'btn-filter'"
+                <button @click="setFilter(\'other\')" 
+                        :class="filterBtnClass(\'other\')"
                         class="btn-filter">
                     📎 Autres
                 </button>
@@ -80,7 +80,7 @@
                         </thead>
                         <tbody>
                             {% for doc in documents %}
-                            <tr x-show="activeFilter === 'all' || activeFilter === '{{ doc.document_type }}'"
+                            <tr x-show="showDoc('{{ doc.document_type }}')"
                                 x-transition>
                                 <td>
                                     <div class="doc-cell">

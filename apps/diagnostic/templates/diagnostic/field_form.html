@@ -27,7 +27,7 @@
 
 {% block content %}
 <div class="min-h-screen" style="background: #0f0f12;"
-     x-data="fieldForm()">
+     x-data="fieldForm">
   <div class="max-w-3xl mx-auto px-4 py-10 pb-32">
 
     {% if messages %}
@@ -159,11 +159,11 @@
     <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-4">
       <div class="flex-1">
         <div class="flex justify-between text-xs mb-1" style="color: #8e8e93;">
-          <span x-text="answered + ' / ' + total + ' questions renseignées'"></span>
-          <span x-text="Math.round(answered / total * 100) + ' %'"></span>
+          <span x-text="progressText"></span>
+          <span x-text="percentText"></span>
         </div>
         <div class="h-2 rounded-full overflow-hidden" style="background: #2a2a30;">
-          <div class="h-full rounded-full transition-all" style="background: #30d158;" :style="'width:' + (answered / total * 100) + '%'"></div>
+          <div class="h-full rounded-full transition-all" style="background: #30d158;" :style="barStyle"></div>
         </div>
       </div>
       <button type="button" @click="$refs.form.requestSubmit()"
@@ -180,6 +180,10 @@
     return {
       total: {{ sections|length|default:0 }},
       answered: 0,
+      // CSP-safe getters (expressions déplacées à l'identique depuis le template)
+      get progressText() { return this.answered + ' / ' + this.total + ' questions renseignées'; },
+      get percentText() { return Math.round(this.answered / this.total * 100) + ' %'; },
+      get barStyle() { return 'width:' + (this.answered / this.total * 100) + '%'; },
       init() {
         // total réel = nombre de champs de question (hors notes)
         this.total = this.$refs.form.querySelectorAll('[name]:not([name=notes]):not([name=csrfmiddlewaretoken])').length;
@@ -203,5 +207,8 @@
       },
     };
   }
+  document.addEventListener('alpine:init', function () {
+    window.Alpine.data('fieldForm', fieldForm);
+  });
 </script>
 {% endblock %}

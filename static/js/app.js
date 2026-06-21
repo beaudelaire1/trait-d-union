@@ -20,13 +20,98 @@
 // interactive surface has been migrated and browser-QA'd.
 // ============================================================================
 document.addEventListener('alpine:init', function () {
+    var Alpine = window.Alpine;
+
     // FAQ accordion — single panel open at a time.
-    window.Alpine.data('faqAccordion', function () {
+    Alpine.data('faqAccordion', function () {
         return {
             activeTab: null,
             toggle(n) { this.activeTab = this.activeTab === n ? null : n; },
             isOpen(n) { return this.activeTab === n; },
             chevron(n) { return this.activeTab === n ? 'rotate-180' : ''; },
+        };
+    });
+
+    // Generic show-more / expandable block.
+    Alpine.data('expandable', function () {
+        return {
+            expanded: false,
+            toggle() { this.expanded = !this.expanded; },
+            get collapsed() { return !this.expanded; },
+            get rotatedClass() { return this.expanded ? 'rotated' : ''; },
+            get rotate180Class() { return this.expanded ? 'rotate-180' : ''; },
+        };
+    });
+
+    // Client portal shell — sidebar + optional notifications/filter state.
+    Alpine.data('clientPortal', function () {
+        return {
+            sidebarOpen: true,
+            showNotifications: false,
+            activeFilter: 'all',
+            init() { this.sidebarOpen = window.innerWidth > 1024; },
+            toggleSidebar() { this.sidebarOpen = !this.sidebarOpen; },
+            get notSidebarOpen() { return !this.sidebarOpen; },
+            // class bindings (objet littéral interdit en CSP → getters de chaîne)
+            get collapsedClass() { return this.sidebarOpen ? '' : 'collapsed'; },
+            get expandedMainClass() { return this.sidebarOpen ? '' : 'expanded'; },
+            get rotatedClass() { return this.sidebarOpen ? '' : 'rotated'; },
+            get activeClass() { return this.sidebarOpen ? 'active' : ''; },
+            // notifications
+            toggleNotifications() { this.showNotifications = !this.showNotifications; },
+            closeNotifications() { this.showNotifications = false; },
+            // document filter
+            setFilter(f) { this.activeFilter = f; },
+            isFilter(f) { return this.activeFilter === f; },
+            filterBtnClass(f) { return this.activeFilter === f ? 'btn-filter-active' : 'btn-filter'; },
+            showDoc(type) { return this.activeFilter === 'all' || this.activeFilter === type; },
+        };
+    });
+
+    // Notification bell counter (count provided via data-count attribute).
+    Alpine.data('notificationWrapper', function () {
+        return {
+            count: 0,
+            init() { this.count = parseInt(this.$el.dataset.count || '0', 10); },
+            get hasCount() { return this.count > 0; },
+            get hasNotificationsClass() { return this.count > 0 ? 'has-notifications' : ''; },
+        };
+    });
+
+    // Dashboard quick-actions modal.
+    Alpine.data('quickActions', function () {
+        return {
+            showModal: false,
+            modalType: '',
+            openModal(type) { this.showModal = true; this.modalType = type; },
+            closeModal() { this.showModal = false; },
+            isType(t) { return this.modalType === t; },
+            get isSupportOrInvoice() { return this.modalType === 'support' || this.modalType === 'invoice'; },
+        };
+    });
+
+    // New-request radio form.
+    Alpine.data('requestForm', function () {
+        return {
+            requestType: 'quote',
+            isType(t) { return this.requestType === t; },
+            selectedClass(t) { return this.requestType === t ? 'selected' : ''; },
+            get notQuote() { return this.requestType !== 'quote'; },
+        };
+    });
+
+    // Diagnostic field profile selector (initial value via data-profile).
+    Alpine.data('profileSelector', function () {
+        return {
+            profile: '',
+            init() { this.profile = this.$el.dataset.profile || ''; },
+            isProfile(k) { return this.profile === k; },
+            ringClass(k) { return this.profile === k ? 'ring-2' : ''; },
+            profileStyle(k) {
+                return this.profile === k
+                    ? 'border-color:#30d158; background:#30d15811;'
+                    : 'border-color:#2a2a30; background:#18181c;';
+            },
         };
     });
 });

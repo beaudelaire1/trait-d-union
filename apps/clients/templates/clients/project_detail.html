@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="project-detail-page" x-data="projectTracker({{ milestone_progress.percent|default:0 }}, {{ project_timeline.time_percent|default:0 }})">
+<div class="project-detail-page" x-data="projectTracker" data-progress="{{ milestone_progress.percent|default:0 }}" data-time="{{ project_timeline.time_percent|default:0 }}">
     
     <!-- Blobs lumineux arrière-plan -->
     <div class="blob blob-blue"></div>
@@ -74,11 +74,11 @@
                             </defs>
                             <circle class="ring-bg" cx="60" cy="60" r="52"/>
                             <circle class="ring-fill" cx="60" cy="60" r="52" 
-                                    :stroke-dashoffset="326.7 - (326.7 * animatedProgress / 100)"
+                                    :stroke-dashoffset="ringOffset"
                                     stroke-dasharray="326.7"/>
                         </svg>
                         <div class="ring-content">
-                            <span class="ring-value" x-text="Math.round(animatedProgress) + '%'">0%</span>
+                            <span class="ring-value" x-text="progressLabel">0%</span>
                             <span class="ring-label">Complété</span>
                         </div>
                     </div>
@@ -91,7 +91,7 @@
     {% if milestone_progress %}
     <section class="tracker-section">
         <div class="container">
-            <div class="tracker-card glass-card" x-data="{ expanded: false }">
+            <div class="tracker-card glass-card" x-data="expandable">
                 <div class="tracker-header">
                     <div class="tracker-title">
                         <div class="tracker-icon">
@@ -122,12 +122,12 @@
                 <!-- Barre de progression -->
                 <div class="progress-wrapper">
                     <div class="progress-track">
-                        <div class="progress-fill" :style="'width: ' + animatedProgress + '%'"></div>
-                        <div class="progress-marker" :style="'left: ' + animatedProgress + '%'"></div>
+                        <div class="progress-fill" :style="progressWidthStyle"></div>
+                        <div class="progress-marker" :style="progressLeftStyle"></div>
                     </div>
                     <div class="progress-labels">
                         <span>Début</span>
-                        <span class="progress-percent" x-text="Math.round(animatedProgress) + '%'"></span>
+                        <span class="progress-percent" x-text="progressLabel"></span>
                         <span>Fin</span>
                     </div>
                 </div>
@@ -147,8 +147,8 @@
                         </span>
                     </div>
                     <div class="timeline-track">
-                        <div class="timeline-fill {% if project_timeline.is_overdue %}overdue{% endif %}" :style="'width: ' + animatedTime + '%'"></div>
-                        <div class="timeline-marker" :style="'left: ' + animatedTime + '%'"></div>
+                        <div class="timeline-fill {% if project_timeline.is_overdue %}overdue{% endif %}" :style="timeWidthStyle"></div>
+                        <div class="timeline-marker" :style="timeLeftStyle"></div>
                     </div>
                     <div class="timeline-labels">
                         <span>{{ project.start_date|date:"d/m" }}</span>
@@ -158,9 +158,9 @@
                 </div>
                 {% endif %}
 
-                <button class="expand-btn" @click="expanded = !expanded">
-                    <span x-text="expanded ? 'Masquer les détails' : 'Voir toutes les étapes'"></span>
-                    <svg :class="{ 'rotated': expanded }" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="expand-btn" @click="toggle()">
+                    <span x-show="collapsed">Voir toutes les étapes</span><span x-show="expanded">Masquer les détails</span>
+                    <svg :class="rotatedClass" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                 </button>
@@ -879,12 +879,22 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.14.8/dist/cdn.min.js" nonce="{{ request.csp_nonce }}" integrity="sha384-NArNwzWsUSF+kY2lgW4YriEkjLqi+J+za6HrENUn/3nZqkBnWbxV22kCJEK5Uu6n" crossorigin="anonymous"></script>
 
 <script nonce="{{ request.csp_nonce }}">
-function projectTracker(targetProgress, targetTime) {
+function projectTracker() {
     return {
         animatedProgress: 0,
         animatedTime: 0,
-        
+
+        // CSP-safe getters (expressions déplacées à l'identique depuis le template)
+        get ringOffset() { return 326.7 - (326.7 * this.animatedProgress / 100); },
+        get progressLabel() { return Math.round(this.animatedProgress) + '%'; },
+        get progressWidthStyle() { return 'width: ' + this.animatedProgress + '%'; },
+        get progressLeftStyle() { return 'left: ' + this.animatedProgress + '%'; },
+        get timeWidthStyle() { return 'width: ' + this.animatedTime + '%'; },
+        get timeLeftStyle() { return 'left: ' + this.animatedTime + '%'; },
+
         init() {
+            const targetProgress = parseFloat(this.$el.dataset.progress || '0');
+            const targetTime = parseFloat(this.$el.dataset.time || '0');
             setTimeout(() => {
                 this.animateValue('animatedProgress', targetProgress, 1500);
                 this.animateValue('animatedTime', targetTime, 1500);
@@ -908,5 +918,8 @@ function projectTracker(targetProgress, targetTime) {
         }
     }
 }
+document.addEventListener('alpine:init', function () {
+    window.Alpine.data('projectTracker', projectTracker);
+});
 </script>
 {% endblock %}

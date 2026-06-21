@@ -41,7 +41,7 @@
             {% for t in testimonials %}
             {# Préparation : on calcule la version tronquée côté serveur (220 c.) #}
             {% with full=t.content|striptags %}
-            <article {% if full|length > 220 %}x-data="{ expanded: false }"{% endif %}
+            <article {% if full|length > 220 %}x-data="expandable"{% endif %}
                      class="group relative rounded-3xl border border-white/10 bg-white/[0.02] hover:border-tus-blue/30 hover:-translate-y-1 transition-all duration-micro ease-standard p-6 flex flex-col reveal card-tilt">
 
                 {# Étoiles + badge Google #}
@@ -74,7 +74,7 @@
                                 [&>p]:m-0 [&>p+p]:mt-3">
                         {% if full|length > 220 %}
                             {# Version courte, propre — affiché tant que !expanded #}
-                            <span x-show="!expanded">{{ full|truncatechars:220|linebreaksbr }}</span>
+                            <span x-show="collapsed">{{ full|truncatechars:220|linebreaksbr }}</span>
                             {# Version complète — affiché quand expanded #}
                             <span x-show="expanded" x-cloak>{{ full|linebreaksbr }}</span>
                         {% else %}
@@ -88,12 +88,12 @@
                 {# Voir plus / Voir moins — UNIQUEMENT si réellement tronqué #}
                 {% if full|length > 220 %}
                 <button type="button"
-                        @click="expanded = !expanded"
+                        @click="toggle()"
                         class="self-start text-sm font-display font-semibold text-tus-blue-a11y hover:text-cyan-400 inline-flex items-center gap-1.5 transition-colors duration-micro ease-standard mb-5"
                         :aria-expanded="expanded.toString()">
-                    <span x-text="expanded ? 'Voir moins' : 'Voir plus'">Voir plus</span>
+                    <span x-show="collapsed">Voir plus</span><span x-show="expanded" x-cloak>Voir moins</span>
                     <svg class="w-3.5 h-3.5 transition-transform duration-micro ease-standard"
-                         :class="{ 'rotate-180': expanded }"
+                         :class="rotate180Class"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
                     </svg>
