@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS conçoit des stratégies promotionnelles digitales calibrées pour votre rentabilité.{% endblock %}
 
 {% block tool_content %}
-<div x-data="coutPromoSim()" x-cloak>
+<div x-data="coutPromoSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -29,7 +29,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Marge habituelle</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="margeHabituelle + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="margeHabituelle" min="5" max="90" step="5">
                 </div>
@@ -44,7 +44,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Taux de remise</label>
-                        <span class="text-lg font-bold font-mono" style="color: #ef4444;" x-text="'-' + tauxRemise + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #ef4444;" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="tauxRemise" min="5" max="60" step="5">
                 </div>
@@ -53,28 +53,28 @@
 
         <div class="lg:col-span-3 space-y-6">
 
-            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + (estRealiste() ? '#22c55e' : '#ef4444')">
+            <div class="result-block text-center py-8 mo-scale-in" :style="_g2">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ec4899;">Volume additionnel requis</p>
-                <p class="result-big text-5xl" style="color: #ec4899;" x-text="volumeAdditionnel() === '∞' ? '∞' : '+' + volumeAdditionnel() + ' unités'"></p>
-                <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="pctAugmentation() + '% de ventes en plus'"></strong> pour être neutre en marge</p>
+                <p class="result-big text-5xl" style="color: #ec4899;" x-text="_g3"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="_g4"></strong> pour être neutre en marge</p>
             </div>
 
             <div class="grid sm:grid-cols-4 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Prix promo</p>
-                    <p class="result-big text-2xl" style="color: #ec4899;" x-text="fmt(prixPromo()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #ec4899;" x-text="_g5"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">Marge/unité promo</p>
-                    <p class="result-big text-2xl" :style="'color:' + (margeUnitairePromo() > 0 ? '#f59e0b' : '#ef4444')" x-text="fmt(margeUnitairePromo()) + ' €'"></p>
+                    <p class="result-big text-2xl" :style="_g6" x-text="_g7"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Marge sans promo</p>
-                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(margeTotaleSansPromo()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="_g8"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
                     <p class="result-label mb-1">Point mort (unités)</p>
-                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="pointMort() === '∞' ? '∞' : pointMort()"></p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="_g9"></p>
                 </div>
             </div>
 
@@ -85,11 +85,11 @@
                 </div>
             </div>
 
-            <div class="result-block mo-fade-up" data-delay="350" :style="'border-color:' + (estRealiste() ? '#22c55e' : '#ef4444')">
+            <div class="result-block mo-fade-up" data-delay="350" :style="_g2">
                 <div class="flex items-start gap-3">
-                    <span class="text-2xl" x-text="estRealiste() ? '✅' : '⚠️'"></span>
+                    <span class="text-2xl" x-text="_g10"></span>
                     <div>
-                        <p class="font-semibold" :style="'color:' + (estRealiste() ? '#22c55e' : '#ef4444')" x-text="estRealiste() ? 'Volume à valider' : 'Promo risquée'"></p>
+                        <p class="font-semibold" :style="_g11" x-text="_g12"></p>
                         <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
                     </div>
                 </div>
@@ -105,6 +105,21 @@
     let chart = null;
     function coutPromoSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.margeHabituelle + '%'; },
+            get _g1() { return '-' + this.tauxRemise + '%'; },
+            get _g2() { return 'border-color:' + (this.estRealiste() ? '#22c55e' : '#ef4444'); },
+            get _g3() { return this.volumeAdditionnel() === '∞' ? '∞' : '+' + this.volumeAdditionnel() + ' unités'; },
+            get _g4() { return this.pctAugmentation() + '% de ventes en plus'; },
+            get _g5() { return this.fmt(this.prixPromo()) + ' €'; },
+            get _g6() { return 'color:' + (this.margeUnitairePromo() > 0 ? '#f59e0b' : '#ef4444'); },
+            get _g7() { return this.fmt(this.margeUnitairePromo()) + ' €'; },
+            get _g8() { return this.fmt(this.margeTotaleSansPromo()) + ' €'; },
+            get _g9() { return this.pointMort() === '∞' ? '∞' : this.pointMort(); },
+            get _g10() { return this.estRealiste() ? '✅' : '⚠️'; },
+            get _g11() { return 'color:' + (this.estRealiste() ? '#22c55e' : '#ef4444'); },
+            get _g12() { return this.estRealiste() ? 'Volume à valider' : 'Promo risquée'; },
+
             prixNormal: 100, margeHabituelle: 40, volumeHabituel: 50, tauxRemise: 20,
             prixPromo() { return this.prixNormal * (1 - this.tauxRemise / 100); },
             coutUnitaire() { return this.prixNormal * (1 - this.margeHabituelle / 100); },
@@ -175,6 +190,7 @@
         };
     }
     window.coutPromoSim = coutPromoSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("coutPromoSim", coutPromoSim); });
 })();
 </script>
 {% endblock %}

@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les scénarios réalistes : SaaS conservés, intégration hybride ou outil propriétaire.{% endblock %}
 
 {% block tool_content %}
-<div x-data="fragmentationSim()" x-cloak>
+<div x-data="fragmentationSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── Formulaire ── #}
@@ -29,7 +29,7 @@
                     <input type="range" class="tool-range" x-model.number="nbOutils" min="1" max="30" step="1">
                     <div class="flex justify-between mt-1">
                         <span class="tool-sublabel">CRM, devis, compta, signature, emailing…</span>
-                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="nbOutils + ' outils'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="_g0"></span>
                     </div>
                 </div>
                 <div>
@@ -49,7 +49,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Maintenance annuelle</label>
-                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="maintenance + '% / an'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="maintenance" min="0" max="30" step="1">
                     <p class="tool-sublabel">Mises à jour, corrections, évolutions (typiquement 10-20%)</p>
@@ -59,7 +59,7 @@
                     <input type="range" class="tool-range" x-model.number="horizon" min="1" max="10" step="1">
                     <div class="flex justify-between mt-1">
                         <span class="tool-sublabel">Durée de comparaison</span>
-                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="horizon + ' ans'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="_g2"></span>
                     </div>
                 </div>
             </div>
@@ -73,12 +73,12 @@
                 <p class="result-label mb-2">Indice de fragmentation</p>
                 <div class="flex items-center justify-center gap-6">
                     <div>
-                        <p class="result-big text-4xl" :style="'color:' + niveauColor()" x-text="nbOutils"></p>
+                        <p class="result-big text-4xl" :style="_g3" x-text="nbOutils"></p>
                         <p class="text-xs mt-1" style="color: var(--sim-muted);">outils empilés</p>
                     </div>
                     <div class="text-4xl" style="color: var(--sim-divider);">→</div>
                     <div>
-                        <p class="result-big text-4xl" :style="'color:' + niveauColor()" x-text="niveauLabel()"></p>
+                        <p class="result-big text-4xl" :style="_g3" x-text="niveauLabel()"></p>
                         <p class="text-xs mt-1" style="color: var(--sim-muted);">complexité opérationnelle</p>
                     </div>
                 </div>
@@ -88,12 +88,12 @@
             <div class="grid sm:grid-cols-2 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Total SaaS sur <span x-text="horizon"></span> ans</p>
-                    <p class="result-big text-2xl" style="color: #ef4444;" x-text="fmt(totalSaas()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #ef4444;" x-text="_g4"></p>
                     <p class="text-xs mt-1" style="color: var(--sim-muted);">coûts directs d'abonnement</p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">TCO propriétaire sur <span x-text="horizon"></span> ans</p>
-                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(totalPropre()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="_g5"></p>
                     <p class="text-xs mt-1" style="color: var(--sim-muted);">invest. + serveur + maintenance</p>
                 </div>
             </div>
@@ -101,8 +101,8 @@
             {# Économie nette #}
             <div class="result-block text-center py-5 mo-fade-up" data-delay="175">
                 <p class="result-label mb-1">Économie nette sur <span x-text="horizon"></span> ans</p>
-                <p class="result-big text-3xl" :style="'color:' + (economie() > 0 ? '#22c55e' : '#ef4444')" x-text="(economie() > 0 ? '+' : '') + fmt(economie()) + ' €'"></p>
-                <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="economie() > 0 ? 'après serveurs et maintenance inclus' : 'le SaaS reste moins cher sur cet horizon'"></p>
+                <p class="result-big text-3xl" :style="_g6" x-text="_g7"></p>
+                <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g8"></p>
             </div>
 
             {# Point de bascule + Décision #}
@@ -113,21 +113,21 @@
                         <p class="font-semibold" style="color: var(--sim-ink);">Point de bascule</p>
                         <p class="text-sm mt-2" style="color: var(--sim-muted);">
                             Vos SaaS vous coûtent
-                            <strong x-text="fmt(coutMensuel) + ' €/mois'" style="color: var(--sim-ink);"></strong>.
+                            <strong x-text="_g9" style="color: var(--sim-ink);"></strong>.
                             L'écosystème propre revient à
-                            <strong x-text="fmt(Math.round(coutPropreMensuel())) + ' €/mois'" style="color: var(--sim-ink);"></strong>
+                            <strong x-text="_g10" style="color: var(--sim-ink);"></strong>
                             (hébergement <span x-text="fmt(hebergement)"></span> € + maintenance <span x-text="fmt(Math.round(maintenanceMensuelle()))"></span> €).
                         </p>
 
                         {# Cas 1 : le propre coûte plus cher mensuellement → jamais amorti #}
-                        <template x-if="moisAmortissement() >= 999">
+                        <template x-if="_g11">
                             <div class="mt-3 p-3 rounded-xl" style="background: rgba(239,68,68,0.1);">
                                 <p class="text-sm" style="color: #ef4444;">
                                     <strong>Pas d'amortissement possible.</strong>
                                     Votre coût propre mensuel (<span x-text="fmt(Math.round(coutPropreMensuel()))"></span> €)
                                     dépasse le coût SaaS (<span x-text="fmt(coutMensuel)"></span> €).
-                                    Vous payeriez <strong x-text="fmt(Math.round(coutPropreMensuel() - coutMensuel)) + ' €/mois de plus'"></strong>,
-                                    soit <strong x-text="fmt(Math.abs(Math.round(economie()))) + ' € de surcoût sur ' + horizon + ' ans'"></strong>.
+                                    Vous payeriez <strong x-text="_g12"></strong>,
+                                    soit <strong x-text="_g13"></strong>.
                                 </p>
                                 <p class="text-sm mt-2 font-semibold" style="color: #ef4444;">
                                     → Conservez vos SaaS actuels ou renégociez le devis propriétaire.
@@ -136,15 +136,15 @@
                         </template>
 
                         {# Cas 2 : amorti mais au-delà de l'horizon #}
-                        <template x-if="moisAmortissement() < 999 && moisAmortissement() > horizon * 12">
+                        <template x-if="_g14">
                             <div class="mt-3 p-3 rounded-xl" style="background: rgba(245,158,11,0.1);">
                                 <p class="text-sm" style="color: #f59e0b;">
-                                    L'investissement de <strong x-text="fmt(coutEcosysteme) + ' €'"></strong>
-                                    sera amorti en <strong x-text="moisAmortissement() + ' mois'" style="color: var(--tool-glow);"></strong>
-                                    (<span x-text="(moisAmortissement() / 12).toFixed(1)"></span> ans),
+                                    L'investissement de <strong x-text="_g15"></strong>
+                                    sera amorti en <strong x-text="_g16" style="color: var(--tool-glow);"></strong>
+                                    (<span x-text="_g17"></span> ans),
                                     mais c'est au-delà de votre horizon de <span x-text="horizon"></span> ans.
                                     Sur cet horizon, le SaaS reste moins cher de
-                                    <strong x-text="fmt(Math.abs(Math.round(economie()))) + ' €'"></strong>.
+                                    <strong x-text="_g18"></strong>.
                                 </p>
                                 <p class="text-sm mt-2 font-semibold" style="color: #f59e0b;">
                                     → Conservez les SaaS à court terme, ou allongez votre horizon si vous comptez garder l'outil plus longtemps.
@@ -153,15 +153,15 @@
                         </template>
 
                         {# Cas 3 : amorti dans l'horizon → bon investissement #}
-                        <template x-if="moisAmortissement() < 999 && moisAmortissement() <= horizon * 12">
+                        <template x-if="_g19">
                             <div class="mt-3 p-3 rounded-xl" style="background: rgba(34,197,94,0.1);">
                                 <p class="text-sm" style="color: #22c55e;">
-                                    L'investissement de <strong x-text="fmt(coutEcosysteme) + ' €'"></strong>
-                                    sera amorti en <strong x-text="moisAmortissement() + ' mois'" style="color: var(--tool-glow);"></strong>.
+                                    L'investissement de <strong x-text="_g15"></strong>
+                                    sera amorti en <strong x-text="_g16" style="color: var(--tool-glow);"></strong>.
                                     Après ça, vous économisez
-                                    <strong x-text="fmt(Math.round(coutMensuel - coutPropreMensuel())) + ' €/mois'"></strong> net.
+                                    <strong x-text="_g20"></strong> net.
                                     Sur <span x-text="horizon"></span> ans, c'est
-                                    <strong x-text="'+' + fmt(Math.round(economie())) + ' €'"></strong> d'économie totale.
+                                    <strong x-text="_g21"></strong> d'économie totale.
                                 </p>
                                 <p class="text-sm mt-2 font-semibold" style="color: #22c55e;">
                                     → Sur les coûts directs saisis, l'investissement est rentable sur votre horizon. À confirmer avec les risques de livraison, migration, formation et dépendance prestataire.
@@ -195,6 +195,30 @@
 
     function fragmentationSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.nbOutils + ' outils'; },
+            get _g1() { return this.maintenance + '% / an'; },
+            get _g2() { return this.horizon + ' ans'; },
+            get _g3() { return 'color:' + this.niveauColor(); },
+            get _g4() { return this.fmt(this.totalSaas()) + ' €'; },
+            get _g5() { return this.fmt(this.totalPropre()) + ' €'; },
+            get _g6() { return 'color:' + (this.economie() > 0 ? '#22c55e' : '#ef4444'); },
+            get _g7() { return (this.economie() > 0 ? '+' : '') + this.fmt(this.economie()) + ' €'; },
+            get _g8() { return this.economie() > 0 ? 'après serveurs et maintenance inclus' : 'le SaaS reste moins cher sur cet horizon'; },
+            get _g9() { return this.fmt(this.coutMensuel) + ' €/mois'; },
+            get _g10() { return this.fmt(Math.round(this.coutPropreMensuel())) + ' €/mois'; },
+            get _g11() { return this.moisAmortissement() >= 999; },
+            get _g12() { return this.fmt(Math.round(this.coutPropreMensuel() - this.coutMensuel)) + ' €/mois de plus'; },
+            get _g13() { return this.fmt(Math.abs(Math.round(this.economie()))) + ' € de surcoût sur ' + this.horizon + ' ans'; },
+            get _g14() { return this.moisAmortissement() < 999 && this.moisAmortissement() > this.horizon * 12; },
+            get _g15() { return this.fmt(this.coutEcosysteme) + ' €'; },
+            get _g16() { return this.moisAmortissement() + ' mois'; },
+            get _g17() { return (this.moisAmortissement() / 12).toFixed(1); },
+            get _g18() { return this.fmt(Math.abs(Math.round(this.economie()))) + ' €'; },
+            get _g19() { return this.moisAmortissement() < 999 && this.moisAmortissement() <= this.horizon * 12; },
+            get _g20() { return this.fmt(Math.round(this.coutMensuel - this.coutPropreMensuel())) + ' €/mois'; },
+            get _g21() { return '+' + this.fmt(Math.round(this.economie())) + ' €'; },
+
             nbOutils: 8,
             coutMensuel: 500,
             coutEcosysteme: 12000,
@@ -278,6 +302,7 @@
         };
     }
     window.fragmentationSim = fragmentationSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("fragmentationSim", fragmentationSim); });
 })();
 </script>
 {% endblock %}

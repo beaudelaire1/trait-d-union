@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS conçoit des tableaux de bord connectés à vos flux bancaires pour anticiper chaque mois sereinement.{% endblock %}
 
 {% block tool_content %}
-<div x-data="tresorerieSim()" x-cloak>
+<div x-data="tresorerieSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -62,25 +62,25 @@
 
         <div class="lg:col-span-3 space-y-6">
 
-            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + (soldeFin() >= 0 ? '#22c55e' : '#ef4444')">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + (soldeFin() >= 0 ? '#22c55e' : '#ef4444')">
+            <div class="result-block text-center py-8 mo-scale-in" :style="_g0">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="_g1">
                     Solde fin de mois
                 </p>
-                <p class="result-big text-5xl" :style="'color:' + (soldeFin() >= 0 ? '#22c55e' : '#ef4444')" x-text="(soldeFin() >= 0 ? '+' : '') + fmt(soldeFin()) + ' €'"></p>
+                <p class="result-big text-5xl" :style="_g1" x-text="_g2"></p>
             </div>
 
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Solde minimum</p>
-                    <p class="result-big text-2xl" :style="'color:' + (soldeMin() >= 0 ? '#f59e0b' : '#ef4444')" x-text="fmt(soldeMin()) + ' €'"></p>
+                    <p class="result-big text-2xl" :style="_g3" x-text="_g4"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">Jour critique</p>
-                    <p class="result-big text-2xl" :style="'color:' + (jourCritique() === '-' ? '#22c55e' : '#ef4444')" x-text="jourCritique() === '-' ? 'Aucun' : 'J' + jourCritique()"></p>
+                    <p class="result-big text-2xl" :style="_g5" x-text="_g6"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Jours en négatif</p>
-                    <p class="result-big text-2xl" :style="'color:' + (joursNegatifs() === 0 ? '#22c55e' : '#ef4444')" x-text="joursNegatifs()"></p>
+                    <p class="result-big text-2xl" :style="_g7" x-text="joursNegatifs()"></p>
                 </div>
             </div>
 
@@ -91,11 +91,11 @@
                 </div>
             </div>
 
-            <div class="result-block mo-fade-up" data-delay="300" :style="'border-color:' + (soldeFin() >= 0 ? '#22c55e' : '#ef4444')">
+            <div class="result-block mo-fade-up" data-delay="300" :style="_g0">
                 <div class="flex items-start gap-3">
-                    <span class="text-2xl" x-text="soldeFin() >= 0 ? '✅' : '🚨'"></span>
+                    <span class="text-2xl" x-text="_g8"></span>
                     <div>
-                        <p class="font-semibold" :style="'color:' + (soldeFin() >= 0 ? '#22c55e' : '#ef4444')" x-text="soldeFin() >= 0 ? 'Mois passable' : 'Alerte trésorerie'"></p>
+                        <p class="font-semibold" :style="_g1" x-text="_g9"></p>
                         <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
                     </div>
                 </div>
@@ -111,6 +111,18 @@
     let chart = null;
     function tresorerieSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return 'border-color:' + (this.soldeFin() >= 0 ? '#22c55e' : '#ef4444'); },
+            get _g1() { return 'color:' + (this.soldeFin() >= 0 ? '#22c55e' : '#ef4444'); },
+            get _g2() { return (this.soldeFin() >= 0 ? '+' : '') + this.fmt(this.soldeFin()) + ' €'; },
+            get _g3() { return 'color:' + (this.soldeMin() >= 0 ? '#f59e0b' : '#ef4444'); },
+            get _g4() { return this.fmt(this.soldeMin()) + ' €'; },
+            get _g5() { return 'color:' + (this.jourCritique() === '-' ? '#22c55e' : '#ef4444'); },
+            get _g6() { return this.jourCritique() === '-' ? 'Aucun' : 'J' + this.jourCritique(); },
+            get _g7() { return 'color:' + (this.joursNegatifs() === 0 ? '#22c55e' : '#ef4444'); },
+            get _g8() { return this.soldeFin() >= 0 ? '✅' : '🚨'; },
+            get _g9() { return this.soldeFin() >= 0 ? 'Mois passable' : 'Alerte trésorerie'; },
+
             soldeActuel: 12000, entreesCertaines: 8000, jourEncaissement: 15,
             chargesFixes: 5000, jourCharges: 5, depensesVariables: 3000,
             projection() {
@@ -180,6 +192,7 @@
         };
     }
     window.tresorerieSim = tresorerieSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("tresorerieSim", tresorerieSim); });
 })();
 </script>
 {% endblock %}

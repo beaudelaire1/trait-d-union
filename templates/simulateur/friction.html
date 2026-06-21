@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les automatisations et les outils que TUS peut construire pour réduire le temps consacré aux tâches répétitives.{% endblock %}
 
 {% block tool_content %}
-<div x-data="frictionSim()" x-cloak>
+<div x-data="frictionSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── Formulaire ── #}
@@ -29,7 +29,7 @@
                     <input type="range" class="tool-range" x-model.number="heuresRepetitives" min="1" max="40" step="1">
                     <div class="flex justify-between mt-1">
                         <span class="tool-sublabel">Copier-coller, relances, recherche de docs…</span>
-                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="heuresRepetitives + 'h'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="_g0"></span>
                     </div>
                 </div>
                 <div>
@@ -50,7 +50,7 @@
                     <input type="range" class="tool-range" x-model.number="automatisable" min="10" max="90" step="5">
                     <div class="flex justify-between mt-1">
                         <span class="tool-sublabel">Estimation réaliste : 40-70%</span>
-                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="automatisable + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="_g1"></span>
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ef4444;">
                     L'angle mort financier
                 </p>
-                <p class="result-big text-4xl md:text-5xl" style="color: #ef4444;" x-text="fmt(perteAnnuelle()) + ' €/an'"></p>
+                <p class="result-big text-4xl md:text-5xl" style="color: #ef4444;" x-text="_g2"></p>
                 <p class="text-sm mt-3" style="color: var(--sim-muted);">
                     consacrés aux tâches manuelles répétitives
                 </p>
@@ -89,11 +89,11 @@
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Par semaine</p>
-                    <p class="result-big text-xl" style="color: var(--sim-ink);" x-text="fmt(perteSemaine()) + ' €'"></p>
+                    <p class="result-big text-xl" style="color: var(--sim-ink);" x-text="_g3"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">Par mois</p>
-                    <p class="result-big text-xl" style="color: var(--sim-ink);" x-text="fmt(perteMois()) + ' €'"></p>
+                    <p class="result-big text-xl" style="color: var(--sim-ink);" x-text="_g4"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Heures perdues / an</p>
@@ -102,19 +102,19 @@
             </div>
 
             {# Gain potentiel #}
-            <div class="result-block mo-fade-up" data-delay="250" :style="'border-color:' + (roiNet() > 0 ? '#22c55e' : '#f59e0b')">
+            <div class="result-block mo-fade-up" data-delay="250" :style="_g5">
                 <div class="flex items-start gap-3">
-                    <span class="text-2xl" x-text="roiNet() > 0 ? '💡' : '⚖️'"></span>
+                    <span class="text-2xl" x-text="_g6"></span>
                     <div>
-                        <p class="font-semibold" :style="'color:' + (roiNet() > 0 ? '#22c55e' : '#f59e0b')" x-text="roiNet() > 0 ? 'ROI net positif' : 'Amortissement en cours'"></p>
+                        <p class="font-semibold" :style="_g7" x-text="_g8"></p>
                         <p class="text-sm mt-1" style="color: var(--sim-muted);">
-                            Gain brut : <strong x-text="fmt(gainPotentiel()) + ' €/an'" style="color: #22c55e;"></strong>
-                            — Coût automatisation : <strong x-text="fmt(coutAutoAn1()) + ' € (an 1)'" style="color: #ef4444;"></strong>
+                            Gain brut : <strong x-text="_g9" style="color: #22c55e;"></strong>
+                            — Coût automatisation : <strong x-text="_g10" style="color: #ef4444;"></strong>
                         </p>
                         <p class="text-sm mt-1" style="color: var(--sim-muted);">
                             <strong>ROI net année 1 :</strong>
-                            <strong :style="'color:' + (roiNet() > 0 ? '#22c55e' : '#ef4444')" x-text="(roiNet() > 0 ? '+' : '') + fmt(roiNet()) + ' €'"></strong>
-                            — Amortissement en <strong x-text="moisAmortissement() < 999 ? moisAmortissement() + ' mois' : '—'" style="color: var(--tool-glow);"></strong>
+                            <strong :style="_g11" x-text="_g12"></strong>
+                            — Amortissement en <strong x-text="_g13" style="color: var(--tool-glow);"></strong>
                         </p>
                     </div>
                 </div>
@@ -139,6 +139,22 @@
 
     function frictionSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.heuresRepetitives + 'h'; },
+            get _g1() { return this.automatisable + '%'; },
+            get _g2() { return this.fmt(this.perteAnnuelle()) + ' €/an'; },
+            get _g3() { return this.fmt(this.perteSemaine()) + ' €'; },
+            get _g4() { return this.fmt(this.perteMois()) + ' €'; },
+            get _g5() { return 'border-color:' + (this.roiNet() > 0 ? '#22c55e' : '#f59e0b'); },
+            get _g6() { return this.roiNet() > 0 ? '💡' : '⚖️'; },
+            get _g7() { return 'color:' + (this.roiNet() > 0 ? '#22c55e' : '#f59e0b'); },
+            get _g8() { return this.roiNet() > 0 ? 'ROI net positif' : 'Amortissement en cours'; },
+            get _g9() { return this.fmt(this.gainPotentiel()) + ' €/an'; },
+            get _g10() { return this.fmt(this.coutAutoAn1()) + ' € (an 1)'; },
+            get _g11() { return 'color:' + (this.roiNet() > 0 ? '#22c55e' : '#ef4444'); },
+            get _g12() { return (this.roiNet() > 0 ? '+' : '') + this.fmt(this.roiNet()) + ' €'; },
+            get _g13() { return this.moisAmortissement() < 999 ? this.moisAmortissement() + ' mois' : '—'; },
+
             heuresRepetitives: 8,
             tauxHoraire: 45,
             collaborateurs: 3,
@@ -212,6 +228,7 @@
         };
     }
     window.frictionSim = frictionSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("frictionSim", frictionSim); });
 })();
 </script>
 {% endblock %}

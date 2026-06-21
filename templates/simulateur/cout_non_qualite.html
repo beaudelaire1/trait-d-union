@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les processus digitaux qualité qui éliminent les coûts cachés de la non-qualité.{% endblock %}
 
 {% block tool_content %}
-<div x-data="coutNonQualiteSim()" x-cloak>
+<div x-data="coutNonQualiteSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -71,7 +71,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Réduction attendue</label>
-                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="reductionQualite + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="reductionQualite" min="10" max="90" step="5">
                 </div>
@@ -82,20 +82,20 @@
 
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #dc2626;">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #dc2626;">Coût total de non-qualité / mois</p>
-                <p class="result-big text-5xl" style="color: #dc2626;" x-text="fmt(coutTotalMensuel()) + ' €'"></p>
-                <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="fmt(coutTotalMensuel() * 12) + ' € / an'"></strong></p>
+                <p class="result-big text-5xl" style="color: #dc2626;" x-text="_g1"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="_g2"></strong></p>
             </div>
 
             <div class="grid sm:grid-cols-2 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Coûts visibles</p>
-                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="fmt(coutsVisibles()) + ' € / mois'"></p>
-                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="pctVisible() + '% du total'"></p>
+                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="_g3"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g4"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">Coûts cachés</p>
-                    <p class="result-big text-2xl" style="color: #dc2626;" x-text="fmt(coutsCaches()) + ' € / mois'"></p>
-                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="(100 - pctVisible()) + '% du total'"></p>
+                    <p class="result-big text-2xl" style="color: #dc2626;" x-text="_g5"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g6"></p>
                 </div>
             </div>
 
@@ -104,16 +104,16 @@
                 <div class="grid sm:grid-cols-3 gap-4 mt-4">
                     <div>
                         <p class="result-label mb-1">Économie nette / mois</p>
-                        <p class="result-big text-xl" :style="'color:' + (economieNette() >= 0 ? '#22c55e' : '#ef4444')" x-text="(economieNette() >= 0 ? '' : '-') + fmt(Math.abs(economieNette())) + ' €'"></p>
-                        <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="'brute ' + fmt(economieMensuelle()) + ' € − maintien ' + fmt(coutRecurrent) + ' €'"></p>
+                        <p class="result-big text-xl" :style="_g7" x-text="_g8"></p>
+                        <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g9"></p>
                     </div>
                     <div>
                         <p class="result-label mb-1">Amortissement</p>
-                        <p class="result-big text-xl" style="color: #06b6d4;" x-text="moisAmortissement() + ' mois'"></p>
+                        <p class="result-big text-xl" style="color: #06b6d4;" x-text="_g10"></p>
                     </div>
                     <div>
                         <p class="result-label mb-1">ROI à 12 mois</p>
-                        <p class="result-big text-xl" :style="'color:' + (roi12() >= 0 ? '#22c55e' : '#ef4444')" x-text="roi12() + '%'"></p>
+                        <p class="result-big text-xl" :style="_g11" x-text="_g12"></p>
                     </div>
                 </div>
             </div>
@@ -145,6 +145,21 @@
     let chart = null;
     function coutNonQualiteSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.reductionQualite + '%'; },
+            get _g1() { return this.fmt(this.coutTotalMensuel()) + ' €'; },
+            get _g2() { return this.fmt(this.coutTotalMensuel() * 12) + ' € / an'; },
+            get _g3() { return this.fmt(this.coutsVisibles()) + ' € / mois'; },
+            get _g4() { return this.pctVisible() + '% du total'; },
+            get _g5() { return this.fmt(this.coutsCaches()) + ' € / mois'; },
+            get _g6() { return (100 - this.pctVisible()) + '% du total'; },
+            get _g7() { return 'color:' + (this.economieNette() >= 0 ? '#22c55e' : '#ef4444'); },
+            get _g8() { return (this.economieNette() >= 0 ? '' : '-') + this.fmt(Math.abs(this.economieNette())) + ' €'; },
+            get _g9() { return 'brute ' + this.fmt(this.economieMensuelle()) + ' € − maintien ' + this.fmt(this.coutRecurrent) + ' €'; },
+            get _g10() { return this.moisAmortissement() + ' mois'; },
+            get _g11() { return 'color:' + (this.roi12() >= 0 ? '#22c55e' : '#ef4444'); },
+            get _g12() { return this.roi12() + '%'; },
+
             retouches: 2000, reclamations: 500, penalites: 300,
             clientsPerdus: 3000, heuresPerdu: 20, coutHoraire: 45, reputation: 1000,
             investQualite: 10000, coutRecurrent: 500, reductionQualite: 60,
@@ -212,6 +227,7 @@
         };
     }
     window.coutNonQualiteSim = coutNonQualiteSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("coutNonQualiteSim", coutNonQualiteSim); });
 })();
 </script>
 {% endblock %}

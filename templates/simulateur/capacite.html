@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS automatise l'administratif et la gestion pour libérer vos heures les plus précieuses.{% endblock %}
 
 {% block tool_content %}
-<div x-data="capaciteSim()" @theme-changed.document="updateChart()" x-cloak>
+<div x-data="capaciteSim" @theme-changed.document="updateChart()" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -44,33 +44,33 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Production facturable</label>
-                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="pctFacturable + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="pctFacturable" min="0" max="100" step="5">
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Administration</label>
-                        <span class="text-sm font-bold font-mono" style="color: #f59e0b;" x-text="pctAdmin + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: #f59e0b;" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="pctAdmin" min="0" max="100" step="5">
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Prospection / commercial</label>
-                        <span class="text-sm font-bold font-mono" style="color: #06b6d4;" x-text="pctProspection + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: #06b6d4;" x-text="_g2"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="pctProspection" min="0" max="100" step="5">
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Management / réunions</label>
-                        <span class="text-sm font-bold font-mono" style="color: #a855f7;" x-text="pctManagement + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: #a855f7;" x-text="_g3"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="pctManagement" min="0" max="100" step="5">
                 </div>
 
-                <p class="text-xs font-semibold" :style="'color:' + (totalPct() === 100 ? '#22c55e' : '#ef4444')" x-text="'Total : ' + totalPct() + '%'"></p>
+                <p class="text-xs font-semibold" :style="_g4" x-text="_g5"></p>
             </div>
 
             <div class="tool-card space-y-6 mo-fade-up" data-delay="200">
@@ -78,7 +78,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Taux de facturation cible</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="tauxCible + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_g6"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="tauxCible" min="40" max="90" step="5">
                 </div>
@@ -89,22 +89,22 @@
 
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #22c55e;">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ef4444;">CA annuel perdu</p>
-                <p class="result-big text-5xl" style="color: #ef4444;" x-text="fmt(caPerdu()) + ' €'"></p>
-                <p class="text-base mt-3" style="color: var(--sim-muted);">par écart entre <span x-text="pctFacturable + '%'"></span> réel et <span x-text="tauxCible + '%'"></span> cible</p>
+                <p class="result-big text-5xl" style="color: #ef4444;" x-text="_g7"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">par écart entre <span x-text="_g0"></span> réel et <span x-text="_g6"></span> cible</p>
             </div>
 
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Taux facturation réel</p>
-                    <p class="result-big text-2xl" :style="'color:' + (pctFacturable >= tauxCible ? '#22c55e' : '#ef4444')" x-text="pctFacturable + '%'"></p>
+                    <p class="result-big text-2xl" :style="_g8" x-text="_g0"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">CA réel / an</p>
-                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(caReel()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="_g9"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">CA potentiel / an</p>
-                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(caPotentiel()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="_g10"></p>
                 </div>
             </div>
 
@@ -135,6 +135,19 @@
     let chart = null;
     function capaciteSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.pctFacturable + '%'; },
+            get _g1() { return this.pctAdmin + '%'; },
+            get _g2() { return this.pctProspection + '%'; },
+            get _g3() { return this.pctManagement + '%'; },
+            get _g4() { return 'color:' + (this.totalPct() === 100 ? '#22c55e' : '#ef4444'); },
+            get _g5() { return 'Total : ' + this.totalPct() + '%'; },
+            get _g6() { return this.tauxCible + '%'; },
+            get _g7() { return this.fmt(this.caPerdu()) + ' €'; },
+            get _g8() { return 'color:' + (this.pctFacturable >= this.tauxCible ? '#22c55e' : '#ef4444'); },
+            get _g9() { return this.fmt(this.caReel()) + ' €'; },
+            get _g10() { return this.fmt(this.caPotentiel()) + ' €'; },
+
             heuresTotales: 50, tarifHoraire: 80, semainesFacturables: 47,
             pctFacturable: 40, pctAdmin: 25, pctProspection: 20, pctManagement: 15,
             tauxCible: 65,
@@ -182,6 +195,7 @@
         };
     }
     window.capaciteSim = capaciteSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("capaciteSim", capaciteSim); });
 })();
 </script>
 {% endblock %}

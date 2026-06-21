@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS structure vos offres digitales avec un pricing psychologique qui convertit.{% endblock %}
 
 {% block tool_content %}
-<div x-data="pricingPaliersSim()" x-cloak>
+<div x-data="pricingPaliersSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -46,7 +46,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Basic = Pro × </label>
-                        <span class="text-lg font-bold font-mono" style="color: #f59e0b;" x-text="ratioBasic + 'x'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #f59e0b;" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="ratioBasic" min="0.3" max="0.8" step="0.05">
                     <p class="tool-sublabel">Hypothèse de départ : 0.5 – 0.65x, à tester selon la valeur perçue.</p>
@@ -54,7 +54,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Premium = Pro ×</label>
-                        <span class="text-lg font-bold font-mono" style="color: #a855f7;" x-text="ratioPremium + 'x'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #a855f7;" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="ratioPremium" min="1.5" max="4" step="0.1">
                     <p class="tool-sublabel">Hypothèse de départ : 2.0 – 2.5x, à tester selon votre marché.</p>
@@ -66,20 +66,20 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">% Basic</label>
-                        <span class="text-sm font-mono font-bold" style="color: #f59e0b;" x-text="pctBasic + '%'"></span>
+                        <span class="text-sm font-mono font-bold" style="color: #f59e0b;" x-text="_g2"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="pctBasic" min="5" max="60" step="5">
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">% Pro</label>
-                        <span class="text-sm font-mono font-bold" style="color: #14b8a6;" x-text="pctPro() + '%'"></span>
+                        <span class="text-sm font-mono font-bold" style="color: #14b8a6;" x-text="_g3"></span>
                     </div>
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">% Premium</label>
-                        <span class="text-sm font-mono font-bold" style="color: #a855f7;" x-text="pctPremium + '%'"></span>
+                        <span class="text-sm font-mono font-bold" style="color: #a855f7;" x-text="_g4"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="pctPremium" min="5" max="40" step="5">
                 </div>
@@ -95,34 +95,34 @@
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-6 mo-scale-in" style="border-color: #f59e0b;">
                     <p class="text-xs font-bold tracking-widest uppercase mb-1" style="color: #f59e0b;">BASIC</p>
-                    <p class="result-big text-3xl" style="color: #f59e0b;" x-text="fmt(prixBasic()) + ' €'"></p>
-                    <p class="text-xs mt-2" style="color: var(--sim-muted);">Marge : <span x-text="fmt(margeBasic()) + ' €'"></span></p>
+                    <p class="result-big text-3xl" style="color: #f59e0b;" x-text="_g5"></p>
+                    <p class="text-xs mt-2" style="color: var(--sim-muted);">Marge : <span x-text="_g6"></span></p>
                 </div>
                 <div class="result-block text-center py-6 mo-scale-in relative" style="border-color: #14b8a6; border-width: 2px;">
                     <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-0.5 rounded-full" style="background: #14b8a6; color: white;">POPULAIRE</span>
                     <p class="text-xs font-bold tracking-widest uppercase mb-1" style="color: #14b8a6;">PRO</p>
-                    <p class="result-big text-3xl" style="color: #14b8a6;" x-text="fmt(prixPro) + ' €'"></p>
-                    <p class="text-xs mt-2" style="color: var(--sim-muted);">Marge : <span x-text="fmt(margePro()) + ' €'"></span></p>
+                    <p class="result-big text-3xl" style="color: #14b8a6;" x-text="_g7"></p>
+                    <p class="text-xs mt-2" style="color: var(--sim-muted);">Marge : <span x-text="_g8"></span></p>
                 </div>
                 <div class="result-block text-center py-6 mo-scale-in" style="border-color: #a855f7;">
                     <p class="text-xs font-bold tracking-widest uppercase mb-1" style="color: #a855f7;">PREMIUM</p>
-                    <p class="result-big text-3xl" style="color: #a855f7;" x-text="fmt(prixPremium()) + ' €'"></p>
-                    <p class="text-xs mt-2" style="color: var(--sim-muted);">Marge : <span x-text="fmt(margePremium()) + ' €'"></span></p>
+                    <p class="result-big text-3xl" style="color: #a855f7;" x-text="_g9"></p>
+                    <p class="text-xs mt-2" style="color: var(--sim-muted);">Marge : <span x-text="_g10"></span></p>
                 </div>
             </div>
 
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">CA moyen pondéré</p>
-                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(caMoyenPondere()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="_g11"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">CA mensuel total</p>
-                    <p class="result-big text-2xl" style="color: #14b8a6;" x-text="fmt(caMensuel()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #14b8a6;" x-text="_g12"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Marge mensuelle</p>
-                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(margeMensuelle()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="_g13"></p>
                 </div>
             </div>
 
@@ -153,6 +153,22 @@
     let chart = null;
     function pricingPaliersSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.ratioBasic + 'x'; },
+            get _g1() { return this.ratioPremium + 'x'; },
+            get _g2() { return this.pctBasic + '%'; },
+            get _g3() { return this.pctPro() + '%'; },
+            get _g4() { return this.pctPremium + '%'; },
+            get _g5() { return this.fmt(this.prixBasic()) + ' €'; },
+            get _g6() { return this.fmt(this.margeBasic()) + ' €'; },
+            get _g7() { return this.fmt(this.prixPro) + ' €'; },
+            get _g8() { return this.fmt(this.margePro()) + ' €'; },
+            get _g9() { return this.fmt(this.prixPremium()) + ' €'; },
+            get _g10() { return this.fmt(this.margePremium()) + ' €'; },
+            get _g11() { return this.fmt(this.caMoyenPondere()) + ' €'; },
+            get _g12() { return this.fmt(this.caMensuel()) + ' €'; },
+            get _g13() { return this.fmt(this.margeMensuelle()) + ' €'; },
+
             prixPro: 500, coutPro: 200, coutBasicVal: 120, coutPremiumVal: 260, ratioBasic: 0.6, ratioPremium: 2.2,
             pctBasic: 25, pctPremium: 15, volumeTotal: 100,
             pctPro() { return Math.max(0, 100 - this.pctBasic - this.pctPremium); },
@@ -215,6 +231,7 @@
         };
     }
     window.pricingPaliersSim = pricingPaliersSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("pricingPaliersSim", pricingPaliersSim); });
 })();
 </script>
 {% endblock %}

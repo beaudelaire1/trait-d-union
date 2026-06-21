@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS vous aide à cartographier votre marché digital et identifier les segments à fort potentiel.{% endblock %}
 
 {% block tool_content %}
-<div x-data="tailleMarcheSim()" x-cloak>
+<div x-data="tailleMarcheSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -38,7 +38,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">% du TAM que vous pouvez servir</label>
-                        <span class="text-lg font-bold font-mono" style="color: #f59e0b;" x-text="pctSAM + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #f59e0b;" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="pctSAM" min="1" max="80" step="1">
                     <p class="tool-sublabel">Filtré par zone géo, langue, segment</p>
@@ -50,7 +50,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Part de marché visée (du SAM)</label>
-                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="pctSOM + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="pctSOM" min="0.5" max="30" step="0.5">
                     <p class="tool-sublabel">SOM = part visée du SAM. La plage réaliste dépend de la concurrence et du canal d'acquisition.</p>
@@ -63,25 +63,25 @@
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-6 mo-scale-in" style="border-color: #6B8AFF;">
                     <p class="text-xs font-bold tracking-widest uppercase mb-1" style="color: #6B8AFF;">TAM</p>
-                    <p class="result-big text-2xl" style="color: #6B8AFF;" x-text="fmtM(tam()) + ' €'"></p>
-                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="fmt(populationTotale) + ' cibles'"></p>
+                    <p class="result-big text-2xl" style="color: #6B8AFF;" x-text="_g2"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g3"></p>
                 </div>
                 <div class="result-block text-center py-6 mo-scale-in" style="border-color: #f59e0b;">
                     <p class="text-xs font-bold tracking-widest uppercase mb-1" style="color: #f59e0b;">SAM</p>
-                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="fmtM(sam()) + ' €'"></p>
-                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="fmt(Math.round(populationTotale * pctSAM / 100)) + ' cibles'"></p>
+                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="_g4"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g5"></p>
                 </div>
                 <div class="result-block text-center py-6 mo-scale-in" style="border-color: #22c55e;">
                     <p class="text-xs font-bold tracking-widest uppercase mb-1" style="color: #22c55e;">SOM</p>
-                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmtM(som()) + ' €'"></p>
-                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="fmt(clientsSOM()) + ' clients'"></p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="_g6"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g7"></p>
                 </div>
             </div>
 
             <div class="result-block text-center py-6 mo-fade-up" data-delay="100" style="border-color: #22c55e;">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #22c55e;">Objectif CA indicatif (SOM)</p>
-                <p class="result-big text-4xl" style="color: #22c55e;" x-text="fmtM(som()) + ' € / an'"></p>
-                <p class="text-base mt-2" style="color: var(--sim-muted);">soit ~<strong x-text="fmt(Math.round(som() / 12))"></strong> € / mois</p>
+                <p class="result-big text-4xl" style="color: #22c55e;" x-text="_g8"></p>
+                <p class="text-base mt-2" style="color: var(--sim-muted);">soit ~<strong x-text="_g9"></strong> € / mois</p>
             </div>
 
             <div class="result-block mo-fade-up" data-delay="200">
@@ -111,6 +111,18 @@
     let chart = null;
     function tailleMarcheSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.pctSAM + '%'; },
+            get _g1() { return this.pctSOM + '%'; },
+            get _g2() { return this.fmtM(this.tam()) + ' €'; },
+            get _g3() { return this.fmt(this.populationTotale) + ' cibles'; },
+            get _g4() { return this.fmtM(this.sam()) + ' €'; },
+            get _g5() { return this.fmt(Math.round(this.populationTotale * this.pctSAM / 100)) + ' cibles'; },
+            get _g6() { return this.fmtM(this.som()) + ' €'; },
+            get _g7() { return this.fmt(this.clientsSOM()) + ' clients'; },
+            get _g8() { return this.fmtM(this.som()) + ' € / an'; },
+            get _g9() { return this.fmt(Math.round(this.som() / 12)); },
+
             populationTotale: 100000, depenseMoyenne: 5000, pctSAM: 20, pctSOM: 3,
             tam() { return this.populationTotale * this.depenseMoyenne; },
             sam() { return this.tam() * this.pctSAM / 100; },
@@ -158,6 +170,7 @@
         };
     }
     window.tailleMarcheSim = tailleMarcheSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("tailleMarcheSim", tailleMarcheSim); });
 })();
 </script>
 {% endblock %}
