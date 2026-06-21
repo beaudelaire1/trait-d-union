@@ -408,6 +408,17 @@ CONTENT_SECURITY_POLICY = {
         "script-src": [
             "'self'",
             _CSP_NONCE,
+            # ⚠️ RISQUE ACCEPTÉ — 'unsafe-eval' requis par le build standard
+            # d'Alpine.js (évaluation des expressions inline via new Function()).
+            # Mitigation : 'strict-dynamic' + nonce par requête empêchent
+            # l'injection de tout script exécutable, donc un attaquant ne peut
+            # PAS introduire de code que 'unsafe-eval' exécuterait. Le résidu
+            # est de la défense en profondeur, pas une faille directe.
+            # Retrait planifié : migrer les templates vers le sous-ensemble CSP
+            # (Alpine.data + méthodes nommées, cf. static/js/app.js → faqAccordion),
+            # puis basculer sur @alpinejs/csp self-hébergé et supprimer cette ligne.
+            # La bascule est ATOMIQUE (build Alpine global) : ne retirer
+            # 'unsafe-eval' qu'une fois les 48 templates migrés ET QA navigateur OK.
             "'unsafe-eval'",
             "'strict-dynamic'",
             "https://cdn.jsdelivr.net",

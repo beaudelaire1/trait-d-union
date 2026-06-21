@@ -7,6 +7,30 @@
    - Maintainability
    ============================================================================== */
 
+// ============================================================================
+// Alpine components (CSP-compatible build)
+// ----------------------------------------------------------------------------
+// Registered via the `alpine:init` event so they work with BOTH the current
+// standard Alpine build AND the future `@alpinejs/csp` build. The CSP build
+// forbids inline expressions in directives, so all logic must live here as
+// named methods/getters referenced from the template (e.g. `x-data="faqAccordion"`,
+// `@click="toggle(1)"`, `x-show="isOpen(1)"`).
+// This lets templates be migrated file-by-file with zero production risk; the
+// global build swap + removal of 'unsafe-eval' is the LAST step once every
+// interactive surface has been migrated and browser-QA'd.
+// ============================================================================
+document.addEventListener('alpine:init', function () {
+    // FAQ accordion — single panel open at a time.
+    window.Alpine.data('faqAccordion', function () {
+        return {
+            activeTab: null,
+            toggle(n) { this.activeTab = this.activeTab === n ? null : n; },
+            isOpen(n) { return this.activeTab === n; },
+            chevron(n) { return this.activeTab === n ? 'rotate-180' : ''; },
+        };
+    });
+});
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // ============================================

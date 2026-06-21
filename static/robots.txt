@@ -6,7 +6,7 @@ Allow: /
 
 # Pages publiques autorisées explicitement
 Allow: /services/
-Allow: /portfolio/
+Allow: /nos-signatures/
 Allow: /chroniques/
 Allow: /contact/
 Allow: /faq/

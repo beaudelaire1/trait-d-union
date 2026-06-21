@@ -89,3 +89,5 @@ package-lock.json
 *.tmp
 *.temp
 *.bak
+tmp_*
+temp_*

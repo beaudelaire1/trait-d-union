@@ -5,21 +5,20 @@ Ce dépôt contient le code source du site vitrine de **Trait d’Union Studio*
 ## Structure du projet
 
 ```
-tus_website/
-├── config/            # Configuration (settings, urls, middleware, wsgi)
-├── apps/              # Applications Django (pages, portfolio, leads, resources)
+trait-d-union/
+├── config/            # Configuration (settings, urls, middleware, wsgi, sitemaps)
+├── apps/              # Applications Django (pages, portfolio, leads, devis, factures, …)
+├── core/              # Services transverses (email, paiement, PDF, captcha, storage)
+├── services/          # Catalogue de services (modèle Service)
 ├── templates/         # Gabarits Django (base, partials, pages, etc.)
 ├── static/            # Fichiers statiques (CSS, JS, images)
-├── media/             # Fichiers uploadés par les utilisateurs
-├── manage.py          # Point d’entrée Django
-├── requirement.md     # Cahier des exigences
-├── design.md          # Document de design
-└── tasks.md           # Plan détaillé des tâches
+├── tests/             # Suite de tests transverses (pytest)
+└── manage.py          # Point d’entrée Django
 ```
 
 ## Prérequis
 
-* Python 3.11
+* Python 3.12 (version CI ; 3.11 reste compatible)
 * [Pipenv](https://pipenv.pypa.io/) ou `pip` pour la gestion des dépendances
 * [Node.js](https://nodejs.org/) et `npm`/`yarn` pour construire Tailwind CSS (facultatif si vous utilisez `django-tailwind`)
 
@@ -76,7 +75,7 @@ Les tests property‑based reposent sur `hypothesis` et sont configurés dans `c
 
 ## Contribution
 
-Le projet suit les exigences décrites dans `requirements.md`, le document de design `design.md` et le plan d’implémentation `tasks.md`. Avant de soumettre un correctif ou une fonctionnalité, merci de consulter ces documents et de mettre à jour les tests en conséquence. Les contributions sont les bienvenues via des branches et Pull Requests.
+Avant de soumettre un correctif ou une fonctionnalité, merci de mettre à jour les tests en conséquence et de vérifier que la suite `pytest` ainsi que `python manage.py check` passent. Les contributions se font via des branches et Pull Requests.
 
 ## Licence
 
