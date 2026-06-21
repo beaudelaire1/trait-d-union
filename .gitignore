@@ -80,3 +80,8 @@ deploy_*.sh
 pytest_output.txt
 test_output.txt
 templates/pdf/poc_*.html
+
+# Artefacts temporaires de rapports / debug (générés localement)
+tmp_*
+temp_*
+/temp_out.txt

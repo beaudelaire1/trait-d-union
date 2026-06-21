@@ -48,7 +48,7 @@
         content="{% block og_description %}Studio d'architecture digitale en Guyane, Martinique et Guadeloupe. Création de sites internet et plateformes sur mesure.{% endblock %}">
     {# 📸 SEO: og:image MUST be ≥1200×630 for rich social previews. Place the file at static/img/og-default.png #}
     <meta property="og:image"
-        content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.png' %}{% endblock %}">
+        content="{% block og_image %}{{ request.scheme }}://{{ canonical_host }}{% static 'img/og-default.png' %}{% endblock %}">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:url" content="{{ request.scheme }}://{{ canonical_host }}{{ request.path }}">
@@ -63,7 +63,7 @@
     <meta name="twitter:description"
         content="{% block twitter_description %}Studio d'architecture digitale en Guyane (Cayenne, Kourou, Saint-Laurent), Martinique et Guadeloupe. Création de sites internet et plateformes sur mesure.{% endblock %}">
     <meta name="twitter:image"
-        content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.png' %}{% endblock %}">
+        content="{% block twitter_image %}{{ request.scheme }}://{{ canonical_host }}{% static 'img/og-default.png' %}{% endblock %}">
 
     <!-- Google Analytics (G4) — chargé dynamiquement après consentement RGPD -->
     {% if not debug %}
