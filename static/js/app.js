@@ -100,6 +100,37 @@ document.addEventListener('alpine:init', function () {
         };
     });
 
+    // Simulator hub category filter.
+    Alpine.data('toolFilter', function () {
+        return {
+            filter: 'all',
+            set(f) { this.filter = f; },
+            is(f) { return this.filter === f; },
+            btnClass(f) {
+                return this.filter === f
+                    ? 'opacity-100 ring-2 ring-offset-2'
+                    : 'opacity-60 hover:opacity-80';
+            },
+            // Carte visible si filtre 'all' OU si le filtre courant ∈ catégories de la carte.
+            show(c1, c2, c3) {
+                return this.filter === 'all'
+                    || this.filter === c1 || this.filter === c2 || this.filter === c3;
+            },
+        };
+    });
+
+    // Report CTA buttons (dispatch the modal-open events without inline expressions).
+    Alpine.data('reportCta', function () {
+        return {
+            openDownload() {
+                window.dispatchEvent(new CustomEvent('open-report-modal', { detail: { delivery: 'download' } }));
+            },
+            openEmail() {
+                window.dispatchEvent(new CustomEvent('open-report-modal', { detail: { delivery: 'email' } }));
+            },
+        };
+    });
+
     // Diagnostic field profile selector (initial value via data-profile).
     Alpine.data('profileSelector', function () {
         return {

@@ -162,11 +162,10 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
     }
 </style>
 
-<div x-data="simulatorReportModal({
-       toolSlug: '{{ tool_slug|escapejs }}',
-       toolName: '{{ tool_name|escapejs }}',
-       endpoint: '{% url 'simulateur:report_submit' %}',
-     })"
+<div x-data="simulatorReportModal"
+     data-tool-slug="{{ tool_slug|escapejs }}"
+     data-tool-name="{{ tool_name|escapejs }}"
+     data-endpoint="{% url 'simulateur:report_submit' %}"
      @open-report-modal.window="open($event.detail)">
 
   <template x-teleport="body">
@@ -190,23 +189,21 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
     </button>
 
     {# ── État : formulaire ── #}
-    <template x-if="!success">
+    <template x-if="notSuccess">
       <div>
         <div class="srm-delivery-badge">
-          <template x-if="form.delivery === 'download'">
+          <template x-if="isDownload">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 6h16M5 20h14a2 2 0 002-2V8H3v10a2 2 0 002 2z"/></svg>
           </template>
-          <template x-if="form.delivery === 'email'">
+          <template x-if="isEmail">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
           </template>
-          <span x-text="form.delivery === 'download' ? 'Téléchargement + copie email' : 'Envoi par email'"></span>
+          <span x-text="badgeLabel"></span>
         </div>
 
         <p class="srm-eyebrow">Votre rapport</p>
-        <h3 class="srm-title" x-text="form.delivery === 'download' ? 'Téléchargez votre rapport PDF' : 'Recevez votre rapport par email'"></h3>
-        <p class="srm-subtitle" x-text="form.delivery === 'download'
-          ? 'Téléchargement immédiat. Une copie est également envoyée à votre adresse pour y revenir plus tard.'
-          : 'Synthèse + pistes d\'action concrètes, en PDF dans votre boîte mail d\'ici 2 minutes.'"></p>
+        <h3 class="srm-title" x-text="titleLabel"></h3>
+        <p class="srm-subtitle" x-text="subtitleLabel"></p>
 
         <form @submit.prevent="submit()" novalidate>
           <div class="srm-field">
@@ -243,15 +240,15 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
           <p x-show="error" x-text="error" class="srm-error"></p>
 
           <button type="submit" :disabled="loading" class="srm-submit">
-            <template x-if="!loading">
+            <template x-if="notLoading">
               <span class="inline-flex items-center gap-2">
-                <template x-if="form.delivery === 'download'">
+                <template x-if="isDownload">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 6h16M5 20h14a2 2 0 002-2V8H3v10a2 2 0 002 2z"/></svg>
                 </template>
-                <template x-if="form.delivery === 'email'">
+                <template x-if="isEmail">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 </template>
-                <span x-text="form.delivery === 'download' ? 'Télécharger le PDF' : 'Envoyer à mon email'"></span>
+                <span x-text="submitLabel"></span>
               </span>
             </template>
             <template x-if="loading">
@@ -289,18 +286,39 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
 </div>
 
 <script nonce="{{ request.csp_nonce }}">
-  function simulatorReportModal({ toolSlug, toolName, endpoint }) {
+  function simulatorReportModal() {
     return {
       isOpen: false,
       loading: false,
       success: false,
       successMessage: '',
       error: '',
+      toolSlug: '',
+      toolName: '',
+      endpoint: '',
       form: {
         email: '', name: '', company: '',
         website: '',
         consent: false,
         delivery: 'email',
+      },
+      // CSP-safe getters (expressions/ternaires déplacés à l'identique depuis le template)
+      get notSuccess() { return !this.success; },
+      get notLoading() { return !this.loading; },
+      get isDownload() { return this.form.delivery === 'download'; },
+      get isEmail() { return this.form.delivery === 'email'; },
+      get badgeLabel() { return this.form.delivery === 'download' ? 'Téléchargement + copie email' : 'Envoi par email'; },
+      get titleLabel() { return this.form.delivery === 'download' ? 'Téléchargez votre rapport PDF' : 'Recevez votre rapport par email'; },
+      get subtitleLabel() {
+        return this.form.delivery === 'download'
+          ? 'Téléchargement immédiat. Une copie est également envoyée à votre adresse pour y revenir plus tard.'
+          : 'Synthèse + pistes d\'action concrètes, en PDF dans votre boîte mail d\'ici 2 minutes.';
+      },
+      get submitLabel() { return this.form.delivery === 'download' ? 'Télécharger le PDF' : 'Envoyer à mon email'; },
+      init() {
+        this.toolSlug = this.$el.dataset.toolSlug || '';
+        this.toolName = this.$el.dataset.toolName || '';
+        this.endpoint = this.$el.dataset.endpoint || '';
       },
       open(detail) {
         this.isOpen = true;
@@ -772,12 +790,12 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
             company: this.form.company,
             website: this.form.website,
             consent: this.form.consent,
-            tool_slug: toolSlug,
-            tool_name: toolName,
+            tool_slug: this.toolSlug,
+            tool_name: this.toolName,
             delivery: this.form.delivery,
             snapshot: this.collectSnapshot(),
           };
-          const res = await fetch(endpoint, {
+          const res = await fetch(this.endpoint, {
             method: 'POST',
             credentials: 'same-origin',
             headers: {
@@ -809,4 +827,7 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
       },
     };
   }
+  document.addEventListener('alpine:init', function () {
+    window.Alpine.data('simulatorReportModal', simulatorReportModal);
+  });
 </script>
