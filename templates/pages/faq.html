@@ -145,22 +145,22 @@
     <div class="max-w-4xl mx-auto">
         
         <!-- FAQ Items -->
-        <div class="space-y-4" x-data="{ activeTab: null }">
+        <div class="space-y-4" x-data="faqAccordion">
             
             <!-- Question 1 -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 1 ? null : 1"
+                <button @click="toggle(1)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Combien coûte la création d'un site internet en Guyane ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 1 }"
+                         :class="chevron(1)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 1" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(1)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Le coût d'un site internet en Guyane varie selon la complexité du projet :
                     </p>
@@ -179,18 +179,18 @@
 
             <!-- Question 2 -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 2 ? null : 2"
+                <button @click="toggle(2)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Quel est le délai de création d'un site web à Cayenne ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 2 }"
+                         :class="chevron(2)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 2" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(2)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Les délais varient selon le type de projet et sa complexité :
                     </p>
@@ -207,18 +207,18 @@
 
             <!-- Question 3 -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 3 ? null : 3"
+                <button @click="toggle(3)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Travaillez-vous avec des clients en Martinique et Guadeloupe ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 3 }"
+                         :class="chevron(3)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 3" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(3)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Absolument ! Nous travaillons dans toute la région Caraïbes :
                     </p>
@@ -236,18 +236,18 @@
 
             <!-- Question 4 -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 4 ? null : 4"
+                <button @click="toggle(4)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Quelle est votre expertise technique ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 4 }"
+                         :class="chevron(4)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 4" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(4)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Notre stack technique garantit des sites performants, sécurisés et durables :
                     </p>
@@ -266,18 +266,18 @@
 
             <!-- Question 5 -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 5 ? null : 5"
+                <button @click="toggle(5)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Proposez-vous la maintenance et l'hébergement ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 5 }"
+                         :class="chevron(5)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 5" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(5)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Oui, nous proposons plusieurs forfaits maintenance adaptés à vos besoins :
                     </p>
@@ -294,18 +294,18 @@
 
             <!-- Question 6 -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 6 ? null : 6"
+                <button @click="toggle(6)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Comment optimisez-vous le référencement SEO local ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 6 }"
+                         :class="chevron(6)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 6" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(6)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Nous optimisons chaque site pour dominer le SEO local Guyane et Antilles :
                     </p>
@@ -325,18 +325,18 @@
 
             <!-- Question 7 -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 7 ? null : 7"
+                <button @click="toggle(7)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Acceptez-vous les paiements échelonnés ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 7 }"
+                         :class="chevron(7)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 7" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(7)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Oui, nous proposons des paiements échelonnés pour faciliter votre investissement :
                     </p>
@@ -356,18 +356,18 @@
 
             <!-- Question 8 -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 8 ? null : 8"
+                <button @click="toggle(8)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Quels sont vos horaires et comment vous contacter ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 8 }"
+                         :class="chevron(8)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 8" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(8)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Nous sommes disponibles pour répondre à vos questions :
                     </p>
@@ -385,18 +385,18 @@
 
             <!-- Question 9 — Code sur mesure & dépendance -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 9 ? null : 9"
+                <button @click="toggle(9)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Le code sur mesure veut-il dire que je serai dépendant de Trait d'Union Studio ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 9 }"
+                         :class="chevron(9)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 9" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(9)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         C'est l'inverse. « Sur mesure » ne signifie pas « propriétaire fermé ». Votre solution est écrite en <strong class="text-tus-white">Python avec Django</strong>, des technologies open source parmi les plus utilisées au monde — pas un langage de niche.
                     </p>
@@ -413,18 +413,18 @@
 
             <!-- Question 10 — Propriété du code -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 10 ? null : 10"
+                <button @click="toggle(10)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         À qui appartient le code une fois le projet livré ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 10 }"
+                         :class="chevron(10)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 10" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(10)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Le code source vous appartient <strong class="text-tus-white">intégralement</strong> à la livraison. Vous recevez :
                     </p>
@@ -441,18 +441,18 @@
 
             <!-- Question 11 — Facturation électronique 2026 -->
             <div class="bg-surface-dark rounded-lg border border-stroke-dark overflow-hidden">
-                <button @click="activeTab = activeTab === 11 ? null : 11"
+                <button @click="toggle(11)"
                         class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
                     <h3 class="font-display text-lg font-semibold text-tus-white pr-4">
                         Vos solutions sont-elles prêtes pour la facturation électronique obligatoire de 2026 ?
                     </h3>
                     <svg class="w-5 h-5 text-tus-blue flex-shrink-0 transform transition-transform"
-                         :class="{ 'rotate-180': activeTab === 11 }"
+                         :class="chevron(11)"
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div x-show="activeTab === 11" x-collapse class="px-6 pb-5">
+                <div x-show="isOpen(11)" x-collapse class="px-6 pb-5">
                     <p class="text-tus-white/70 leading-relaxed mb-4">
                         Oui. La réforme rend la facturation électronique progressivement obligatoire pour toutes les entreprises assujetties à la TVA à partir de septembre 2026. Nos plateformes métier l'intègrent nativement :
                     </p>
