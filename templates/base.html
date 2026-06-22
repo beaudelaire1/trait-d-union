@@ -156,16 +156,20 @@
         {% block content %}{% endblock %}
     </main>
     {% include 'partials/footer.html' %}
-    {# ⚠️ ORDRE CRITIQUE : app.js enregistre les composants Alpine via l'évènement
+    {% comment %}
+       ORDRE CRITIQUE : app.js enregistre les composants Alpine via l'évènement
        `alpine:init`. Il DOIT être chargé AVANT le script Alpine (les scripts defer
        s'exécutent dans l'ordre du document, et Alpine démarre dès son exécution).
        Sinon les composants (faqAccordion, clientPortal, …) ne sont pas enregistrés
-       à temps → accordéons/portail cassés. Ne pas déplacer après Alpine. #}
+       à temps → accordéons/portail cassés. Ne pas déplacer après Alpine.
+    {% endcomment %}
     <script defer src="{% static 'js/app.js' %}" nonce="{{ request.csp_nonce }}"></script>
-    {# 🔻 CSP : templates migrés au sous-ensemble CSP (Alpine.data + méthodes).
+    {% comment %}
+       CSP : templates migrés au sous-ensemble CSP (Alpine.data + méthodes).
        Bascule pilotée par env (cf. config/settings/base.py) :
          ALPINE_CSP_BUILD=1 → build @alpinejs/csp + retrait auto de 'unsafe-eval'.
-       Activer uniquement après QA navigateur. ALPINE_CSP_SRI = hash optionnel. #}
+       Activer uniquement après QA navigateur. ALPINE_CSP_SRI = hash optionnel.
+    {% endcomment %}
     {% if alpine_csp_build %}
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/csp@{{ alpine_version }}/dist/cdn.min.js" nonce="{{ request.csp_nonce }}"{% if alpine_csp_sri %} integrity="{{ alpine_csp_sri }}" crossorigin="anonymous"{% endif %}></script>
     {% else %}
