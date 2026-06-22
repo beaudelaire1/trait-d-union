@@ -323,6 +323,18 @@
         transform: scale(1.06);
     }
 
+    /* ── Anti-débordement horizontal (mobile) ──
+       Les enfants de grille/flex ont `min-width: auto` par défaut et refusent
+       de rétrécir sous la largeur intrinsèque de leur contenu (tables/matrice,
+       longs libellés). Combiné à `.tool-shell { overflow: clip }`, cela rognait
+       le contenu hors écran sans possibilité de scroll. `min-width: 0` autorise
+       le rétrécissement ; les tables larges restent accessibles via leur propre
+       conteneur `.overflow-x-auto`. Sans effet quand le contenu tient déjà. */
+    .tool-shell .grid > *,
+    .tool-shell .flex > * { min-width: 0; }
+    .tool-shell table { max-width: 100%; }
+    .tool-shell .overflow-x-auto { max-width: 100%; }
+
     /* ── Mobile responsive ── */
     @media (max-width: 639px) {
         .result-big { font-size: 1.75rem; }
