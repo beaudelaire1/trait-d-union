@@ -16,22 +16,22 @@
 {% block tool_cta_text %}TUS vous aide à digitaliser et diversifier vos processus pour réduire la dépendance fournisseur.{% endblock %}
 
 {% block tool_content %}
-<div x-data="vulnerabiliteFournisseurSim()" x-cloak>
+<div x-data="vulnerabiliteFournisseurSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
             <div class="tool-card space-y-4 mo-fade-up">
                 <div class="flex items-center justify-between">
                     <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Fournisseurs</h2>
-                    <button @click="addFournisseur()" :disabled="fournisseurs.length >= 6"
+                    <button @click="addFournisseur()" :disabled="_x0"
                         class="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
-                        :style="fournisseurs.length >= 6 ? 'opacity:.4;cursor:not-allowed;' : ''"
+                        :style="_x1"
                         style="background: var(--tool-glow); color: #fff;">+ Fournisseur</button>
                 </div>
                 <template x-for="(f, i) in fournisseurs" :key="i">
                     <div class="p-4 rounded-xl space-y-3" style="background: var(--sim-surface);">
                         <div class="flex items-center justify-between gap-2">
-                            <input type="text" class="tool-input flex-1 !py-1.5 text-sm" x-model="f.nom" :placeholder="'Fournisseur ' + (i+1)">
+                            <input type="text" class="tool-input flex-1 !py-1.5 text-sm" x-model="f.nom" :placeholder="_x2(i)">
                             <button @click="removeFournisseur(i)" class="text-xs opacity-50 hover:opacity-100 transition-opacity" title="Supprimer">&times;</button>
                         </div>
                         <div>
@@ -41,7 +41,7 @@
                         <div>
                             <div class="flex justify-between mb-1">
                                 <span class="tool-sublabel">Remplaçabilité</span>
-                                <span class="text-xs font-mono font-bold" :style="'color:' + (f.remplacabilite >= 4 ? '#22c55e' : f.remplacabilite >= 2 ? '#f59e0b' : '#ef4444')" x-text="f.remplacabilite + '/5'"></span>
+                                <span class="text-xs font-mono font-bold" :style="_x3(f)" x-text="_x4(f)"></span>
                             </div>
                             <input type="range" class="tool-range" x-model.number="f.remplacabilite" min="1" max="5" step="1">
                             <p class="tool-sublabel text-xs">1 = irremplaçable, 5 = facilement substituable</p>
@@ -49,23 +49,23 @@
                         <div>
                             <div class="flex justify-between mb-1">
                                 <span class="tool-sublabel">Fiabilité historique</span>
-                                <span class="text-xs font-mono font-bold" :style="'color:' + (f.fiabilite >= 4 ? '#22c55e' : f.fiabilite >= 2 ? '#f59e0b' : '#ef4444')" x-text="f.fiabilite + '/5'"></span>
+                                <span class="text-xs font-mono font-bold" :style="_x5(f)" x-text="_x6(f)"></span>
                             </div>
                             <input type="range" class="tool-range" x-model.number="f.fiabilite" min="1" max="5" step="1">
                         </div>
                     </div>
                 </template>
-                <p class="text-xs font-semibold" :style="'color:' + (totalPart() === 100 ? '#22c55e' : '#f59e0b')" x-text="'Total achats saisis : ' + totalPart() + '%'"></p>
-                <p x-show="totalPart() !== 100" class="text-xs" style="color: #f59e0b;" x-text="partWarning()"></p>
+                <p class="text-xs font-semibold" :style="_x7" x-text="_x8"></p>
+                <p x-show="_x9" class="text-xs" style="color: #f59e0b;" x-text="partWarning()"></p>
             </div>
         </div>
 
         <div class="lg:col-span-3 space-y-6">
 
-            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + scoreColor()">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + scoreColor()">Indice de Vulnérabilité</p>
-                <p class="result-big text-5xl" :style="'color:' + scoreColor()" x-text="indiceVulnerabilite() + ' / 100'"></p>
-                <p class="text-base mt-3" style="color: var(--sim-muted);" x-text="indiceVulnerabilite() < 30 ? 'Risque maîtrisé' : indiceVulnerabilite() < 60 ? 'Vigilance requise' : 'Risque élevé'"></p>
+            <div class="result-block text-center py-8 mo-scale-in" :style="_x10">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="_x11">Indice de Vulnérabilité</p>
+                <p class="result-big text-5xl" :style="_x11" x-text="_x12"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);" x-text="_x13"></p>
             </div>
 
             <div class="result-block mo-fade-up" data-delay="100">
@@ -75,9 +75,9 @@
                         <div class="flex items-center gap-3">
                             <span class="text-sm font-medium w-32 truncate" style="color: var(--sim-ink);" x-text="f.nom"></span>
                             <div class="flex-1 h-4 rounded-full overflow-hidden" style="background: var(--sim-surface);">
-                                <div class="h-full rounded-full transition-all" :style="'width:' + f.score + '%;background:' + f.color"></div>
+                                <div class="h-full rounded-full transition-all" :style="_x14(f)"></div>
                             </div>
-                            <span class="text-sm font-mono font-bold w-10 text-right" :style="'color:' + f.color" x-text="f.score"></span>
+                            <span class="text-sm font-mono font-bold w-10 text-right" :style="_x15(f)" x-text="f.score"></span>
                         </div>
                     </template>
                 </div>
@@ -90,11 +90,11 @@
                 </div>
             </div>
 
-            <div class="result-block mo-fade-up" data-delay="300" :style="'border-color:' + scoreColor()">
+            <div class="result-block mo-fade-up" data-delay="300" :style="_x10">
                 <div class="flex items-start gap-3">
-                    <span class="text-2xl" x-text="indiceVulnerabilite() < 30 ? '✅' : indiceVulnerabilite() < 60 ? '⚠️' : '🚨'"></span>
+                    <span class="text-2xl" x-text="_x16"></span>
                     <div>
-                        <p class="font-semibold" :style="'color:' + scoreColor()" x-text="indiceVulnerabilite() < 30 ? 'Bonne diversification' : indiceVulnerabilite() < 60 ? 'Points de vigilance' : 'Vulnérabilité critique'"></p>
+                        <p class="font-semibold" :style="_x11" x-text="_x17"></p>
                         <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
                     </div>
                 </div>
@@ -110,6 +110,28 @@
     let chart = null;
     function vulnerabiliteFournisseurSim() {
         return {
+            // ⚙️ CSP getters/méthodes (expressions déplacées à l'identique)
+
+
+            get _x0() { return this.fournisseurs.length >= 6; },
+            get _x1() { return this.fournisseurs.length >= 6 ? 'opacity:.4;cursor:not-allowed;' : ''; },
+            _x2(i) { return 'Fournisseur ' + (i+1); },
+            _x3(f) { return 'color:' + (f.remplacabilite >= 4 ? '#22c55e' : f.remplacabilite >= 2 ? '#f59e0b' : '#ef4444'); },
+            _x4(f) { return f.remplacabilite + '/5'; },
+            _x5(f) { return 'color:' + (f.fiabilite >= 4 ? '#22c55e' : f.fiabilite >= 2 ? '#f59e0b' : '#ef4444'); },
+            _x6(f) { return f.fiabilite + '/5'; },
+            get _x7() { return 'color:' + (this.totalPart() === 100 ? '#22c55e' : '#f59e0b'); },
+            get _x8() { return 'Total achats saisis : ' + this.totalPart() + '%'; },
+            get _x9() { return this.totalPart() !== 100; },
+            get _x10() { return 'border-color:' + this.scoreColor(); },
+            get _x11() { return 'color:' + this.scoreColor(); },
+            get _x12() { return this.indiceVulnerabilite() + ' / 100'; },
+            get _x13() { return this.indiceVulnerabilite() < 30 ? 'Risque maîtrisé' : this.indiceVulnerabilite() < 60 ? 'Vigilance requise' : 'Risque élevé'; },
+            _x14(f) { return 'width:' + f.score + '%;background:' + f.color; },
+            _x15(f) { return 'color:' + f.color; },
+            get _x16() { return this.indiceVulnerabilite() < 30 ? '✅' : this.indiceVulnerabilite() < 60 ? '⚠️' : '🚨'; },
+            get _x17() { return this.indiceVulnerabilite() < 30 ? 'Bonne diversification' : this.indiceVulnerabilite() < 60 ? 'Points de vigilance' : 'Vulnérabilité critique'; },
+
             fournisseurs: [
                 { nom: 'Fournisseur A', part: 45, remplacabilite: 2, fiabilite: 4 },
                 { nom: 'Fournisseur B', part: 30, remplacabilite: 3, fiabilite: 3 },
@@ -179,6 +201,7 @@
         };
     }
     window.vulnerabiliteFournisseurSim = vulnerabiliteFournisseurSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("vulnerabiliteFournisseurSim", vulnerabiliteFournisseurSim); });
 })();
 </script>
 {% endblock %}

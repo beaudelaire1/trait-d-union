@@ -323,6 +323,18 @@
         transform: scale(1.06);
     }
 
+    /* ── Anti-débordement horizontal (mobile) ──
+       Les enfants de grille/flex ont `min-width: auto` par défaut et refusent
+       de rétrécir sous la largeur intrinsèque de leur contenu (tables/matrice,
+       longs libellés). Combiné à `.tool-shell { overflow: clip }`, cela rognait
+       le contenu hors écran sans possibilité de scroll. `min-width: 0` autorise
+       le rétrécissement ; les tables larges restent accessibles via leur propre
+       conteneur `.overflow-x-auto`. Sans effet quand le contenu tient déjà. */
+    .tool-shell .grid > *,
+    .tool-shell .flex > * { min-width: 0; }
+    .tool-shell table { max-width: 100%; }
+    .tool-shell .overflow-x-auto { max-width: 100%; }
+
     /* ── Mobile responsive ── */
     @media (max-width: 639px) {
         .result-big { font-size: 1.75rem; }
@@ -396,16 +408,16 @@
                     </p>
 
                     {% if tool_slug %}
-                    <div class="report-cta-actions" x-data>
+                    <div class="report-cta-actions" x-data="reportCta">
                         <button type="button"
                                 class="report-btn report-btn--primary"
-                                @click="window.dispatchEvent(new CustomEvent('open-report-modal', { detail: { delivery: 'download' } }))">
+                                @click="openDownload()">
                             <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M4 6h16M5 20h14a2 2 0 002-2V8H3v10a2 2 0 002 2z"/></svg>
                             <span>Télécharger le PDF</span>
                         </button>
                         <button type="button"
                                 class="report-btn report-btn--ghost"
-                                @click="window.dispatchEvent(new CustomEvent('open-report-modal', { detail: { delivery: 'email' } }))">
+                                @click="openEmail()">
                             <svg aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                             <span>Recevoir par email</span>
                         </button>

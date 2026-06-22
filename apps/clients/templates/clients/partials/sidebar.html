@@ -1,6 +1,6 @@
 <!-- Mobile Sidebar Toggle -->
-<button @click="sidebarOpen = !sidebarOpen" class="sidebar-toggle" aria-label="Menu">
-    <svg x-show="!sidebarOpen" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<button @click="toggleSidebar()" class="sidebar-toggle" aria-label="Menu">
+    <svg x-show="notSidebarOpen" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="3" y1="12" x2="21" y2="12"></line>
         <line x1="3" y1="6" x2="21" y2="6"></line>
         <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -12,7 +12,7 @@
 </button>
 
 <!-- Client Portal Sidebar -->
-<aside class="client-sidebar" :class="{ 'collapsed': !sidebarOpen }">
+<aside class="client-sidebar" :class="collapsedClass">
     <div class="sidebar-header">
         <div class="user-avatar">
             <span>{{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}</span>
@@ -22,8 +22,8 @@
             <p>{{ request.user.client_profile.company_name|default:"Client VIP" }}</p>
         </div>
         <!-- Collapse Button (Desktop) -->
-        <button @click="sidebarOpen = !sidebarOpen" class="collapse-btn" title="Réduire le menu">
-            <svg :class="{ 'rotated': !sidebarOpen }" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button @click="toggleSidebar()" class="collapse-btn" title="Réduire le menu">
+            <svg :class="rotatedClass" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
         </button>

@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS vous accompagne dans la transition digitale de votre modèle économique.{% endblock %}
 
 {% block tool_content %}
-<div x-data="scenarioPivotSim()" x-cloak>
+<div x-data="scenarioPivotSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -29,14 +29,14 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Croissance mensuelle</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--sim-ink);" x-text="croissanceActuel + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--sim-ink);" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="croissanceActuel" min="-10" max="10" step="0.5">
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Marge nette</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--sim-ink);" x-text="margeActuel + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--sim-ink);" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="margeActuel" min="5" max="80" step="5">
                 </div>
@@ -56,7 +56,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Marge nette cible</label>
-                        <span class="text-lg font-bold font-mono" style="color: #06b6d4;" x-text="margePivot + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #06b6d4;" x-text="_g2"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="margePivot" min="5" max="80" step="5">
                 </div>
@@ -73,23 +73,23 @@
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-scale-in">
                     <p class="result-label mb-1">Creux de transition</p>
-                    <p class="result-big text-2xl" style="color: #ef4444;" x-text="fmt(creuxTransition()) + ' €'"></p>
-                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="'au mois ' + moisCreux()"></p>
+                    <p class="result-big text-2xl" style="color: #ef4444;" x-text="_g3"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g4"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-scale-in">
                     <p class="result-label mb-1">Profit cumulé actuel (12m)</p>
-                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(profitCumuleActuel12()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="_g5"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-scale-in">
                     <p class="result-label mb-1">Profit cumulé pivot (12m)</p>
-                    <p class="result-big text-2xl" style="color: #06b6d4;" x-text="fmt(profitCumulePivot12()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #06b6d4;" x-text="_g6"></p>
                 </div>
             </div>
 
             <div class="result-block text-center py-6 mo-fade-up" data-delay="100"
-                 :style="'border-color:' + (profitCumulePivot12() > profitCumuleActuel12() ? '#22c55e' : '#f59e0b')">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + (profitCumulePivot12() > profitCumuleActuel12() ? '#22c55e' : '#f59e0b')">Gain net du pivot à 12 mois</p>
-                <p class="result-big text-4xl" :style="'color:' + (gainNet12() >= 0 ? '#22c55e' : '#ef4444')" x-text="(gainNet12() >= 0 ? '+' : '') + fmt(gainNet12()) + ' €'"></p>
+                 :style="_g7">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="_g8">Gain net du pivot à 12 mois</p>
+                <p class="result-big text-4xl" :style="_g9" x-text="_g10"></p>
             </div>
 
             <div class="result-block mo-fade-up" data-delay="200">
@@ -119,6 +119,19 @@
     let chart = null;
     function scenarioPivotSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.croissanceActuel + '%'; },
+            get _g1() { return this.margeActuel + '%'; },
+            get _g2() { return this.margePivot + '%'; },
+            get _g3() { return this.fmt(this.creuxTransition()) + ' €'; },
+            get _g4() { return 'au mois ' + this.moisCreux(); },
+            get _g5() { return this.fmt(this.profitCumuleActuel12()) + ' €'; },
+            get _g6() { return this.fmt(this.profitCumulePivot12()) + ' €'; },
+            get _g7() { return 'border-color:' + (this.profitCumulePivot12() > this.profitCumuleActuel12() ? '#22c55e' : '#f59e0b'); },
+            get _g8() { return 'color:' + (this.profitCumulePivot12() > this.profitCumuleActuel12() ? '#22c55e' : '#f59e0b'); },
+            get _g9() { return 'color:' + (this.gainNet12() >= 0 ? '#22c55e' : '#ef4444'); },
+            get _g10() { return (this.gainNet12() >= 0 ? '+' : '') + this.fmt(this.gainNet12()) + ' €'; },
+
             caActuel: 25000, croissanceActuel: 1, margeActuel: 25,
             caCible: 40000, investPivot: 20000, margePivot: 35, rampUp: 6,
             projActuel(m) {
@@ -200,6 +213,7 @@
         };
     }
     window.scenarioPivotSim = scenarioPivotSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("scenarioPivotSim", scenarioPivotSim); });
 })();
 </script>
 {% endblock %}

@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les outils digitaux qui peuvent réduire vos charges fixes — automatisation, facturation, suivi client.{% endblock %}
 
 {% block tool_content %}
-<div x-data="pointMort()" x-cloak>
+<div x-data="pointMort" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── Formulaire ── #}
@@ -57,47 +57,47 @@
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5">
                     <p class="result-label mb-1">Point mort</p>
-                    <p class="result-big" style="color: var(--tool-glow);" x-text="seuilUnites() + ' ventes'"></p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="_g0"></p>
                     <p class="text-xs mt-1" style="color: var(--sim-muted);">par mois</p>
                 </div>
                 <div class="result-block text-center py-5">
                     <p class="result-label mb-1">CA minimum</p>
-                    <p class="result-big" style="color: var(--tool-glow);" x-text="fmt(seuilCA()) + ' €'"></p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="_g1"></p>
                     <p class="text-xs mt-1" style="color: var(--sim-muted);">par mois</p>
                 </div>
                 <div class="result-block text-center py-5">
                     <p class="result-label mb-1">Marge de contribution</p>
-                    <p class="result-big" style="color: var(--tool-glow);" x-text="fmt(margeContrib()) + ' €'"></p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="_g2"></p>
                     <p class="text-xs mt-1" style="color: var(--sim-muted);">par unité</p>
                 </div>
             </div>
 
             {# Verdict #}
-            <div class="result-block" x-show="ventesEstimees > 0 || margeContrib() <= 0">
-                <template x-if="ventesEstimees >= seuilUnites() && margeContrib() > 0">
+            <div class="result-block" x-show="_g3">
+                <template x-if="_g4">
                     <div class="flex items-start gap-3">
                         <span class="text-2xl">✅</span>
                         <div>
                             <p class="font-semibold" style="color: #22c55e;">Vous êtes au-dessus du seuil</p>
                             <p class="text-sm mt-1" style="color: var(--sim-muted);">
                                 Avec <span x-text="ventesEstimees"></span> ventes/mois, vous dégagez un bénéfice mensuel estimé de
-                                <strong x-text="fmt(benefice()) + ' €'" style="color: var(--sim-ink);"></strong>.
+                                <strong x-text="_g5" style="color: var(--sim-ink);"></strong>.
                             </p>
                         </div>
                     </div>
                 </template>
-                <template x-if="ventesEstimees < seuilUnites() && margeContrib() > 0">
+                <template x-if="_g6">
                     <div class="flex items-start gap-3">
                         <span class="text-2xl">⚠️</span>
                         <div>
-                            <p class="font-semibold" style="color: #f59e0b;">Sous le seuil — il manque <span x-text="seuilUnites() - ventesEstimees"></span> ventes</p>
+                            <p class="font-semibold" style="color: #f59e0b;">Sous le seuil — il manque <span x-text="_g7"></span> ventes</p>
                             <p class="text-sm mt-1" style="color: var(--sim-muted);">
-                                Déficit mensuel estimé : <strong x-text="fmt(benefice()) + ' €'" style="color: #ef4444;"></strong>
+                                Déficit mensuel estimé : <strong x-text="_g5" style="color: #ef4444;"></strong>
                             </p>
                         </div>
                     </div>
                 </template>
-                <template x-if="margeContrib() <= 0">
+                <template x-if="_g8">
                     <div class="flex items-start gap-3">
                         <span class="text-2xl">🚫</span>
                         <div>
@@ -130,6 +130,17 @@
 
     function pointMort() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.seuilUnites() + ' ventes'; },
+            get _g1() { return this.fmt(this.seuilCA()) + ' €'; },
+            get _g2() { return this.fmt(this.margeContrib()) + ' €'; },
+            get _g3() { return this.ventesEstimees > 0 || this.margeContrib() <= 0; },
+            get _g4() { return this.ventesEstimees >= this.seuilUnites() && this.margeContrib() > 0; },
+            get _g5() { return this.fmt(this.benefice()) + ' €'; },
+            get _g6() { return this.ventesEstimees < this.seuilUnites() && this.margeContrib() > 0; },
+            get _g7() { return this.seuilUnites() - this.ventesEstimees; },
+            get _g8() { return this.margeContrib() <= 0; },
+
             chargesFixes: 3000,
             coutVariable: 50,
             prixVente: 150,
@@ -237,6 +248,7 @@
         };
     }
     window.pointMort = pointMort;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("pointMort", pointMort); });
 })();
 </script>
 {% endblock %}

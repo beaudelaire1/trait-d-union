@@ -20,6 +20,11 @@ def captcha_settings(request):
         'turnstile_fallback_timeout_ms': timeout_ms,
         'ga4_measurement_id': getattr(settings, 'GA4_MEASUREMENT_ID', ''),
         'canonical_host': canonical_host,
+        # 🔻 Bascule build Alpine CSP (cf. config/settings/base.py)
+        'alpine_version': getattr(settings, 'ALPINE_VERSION', '3.14.8'),
+        'alpine_csp_build': getattr(settings, 'ALPINE_CSP_BUILD', False),
+        'alpine_csp_sri': getattr(settings, 'ALPINE_CSP_SRI', ''),
+        'alpine_std_sri': getattr(settings, 'ALPINE_STD_SRI', ''),
     }
 
 

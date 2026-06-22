@@ -167,21 +167,21 @@ oublié.
 {% endblock %}
 
 {% block tool_content %}
-<div x-data="conformiteFacture()" x-cloak>
+<div x-data="conformiteFacture" x-cloak>
 
     {# ── Zone d'upload ── #}
     <div class="tool-card mo-fade-up">
         <form @submit.prevent="submit" enctype="multipart/form-data">
             <label class="cf-drop block"
-                   :class="{ 'is-drag': dragging }"
-                   @dragover.prevent="dragging = true"
-                   @dragleave.prevent="dragging = false"
+                   :class="_x0"
+                   @dragover.prevent="_x1()"
+                   @dragleave.prevent="_x2()"
                    @drop.prevent="onDrop($event)">
                 <input type="file" accept=".pdf,.xml" class="hidden" x-ref="file" @change="onPick($event)">
                 <div class="flex flex-col items-center gap-3">
                     <svg class="w-10 h-10" style="color:#22c55e" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M7 16a4 4 0 01-.88-7.9A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                     <div>
-                        <p class="font-semibold" style="color:var(--sim-ink);" x-text="fileName || 'Glissez votre facture ici'"></p>
+                        <p class="font-semibold" style="color:var(--sim-ink);" x-text="_x3"></p>
                         <p class="text-sm mt-1" style="color:var(--sim-muted);">
                             <span x-show="!fileName">PDF Factur-X ou XML (CII / UBL) — 15 Mo max</span>
                             <span x-show="fileName" x-text="fileSize"></span>
@@ -197,11 +197,11 @@ oublié.
                 </p>
                 <button type="submit" class="tool-cta cf-test-btn" style="background:#22c55e;"
                         data-no-loading
-                        :disabled="!file || busy"
-                        :style="(!file || busy) ? 'opacity:.5;cursor:not-allowed;background:#22c55e;' : 'background:#22c55e;'">
+                        :disabled="_x4"
+                        :style="_x5">
                     <svg x-show="!busy" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <svg x-show="busy" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                    <span x-text="busy ? 'Analyse en cours…' : 'Tester la conformité'"></span>
+                    <span x-text="_x6"></span>
                 </button>
             </div>
         </form>
@@ -220,29 +220,29 @@ oublié.
          x-transition:enter-end="opacity-100 translate-y-0">
 
         {# Verdict global #}
-        <div class="cf-verdict tool-card" :class="report.is_conformant ? 'cf-verdict--ok' : 'cf-verdict--ko'">
+        <div class="cf-verdict tool-card" :class="_x7">
             <div class="cf-gauge"
-                 :style="`background: conic-gradient(${gaugeColor} ${report.score*3.6}deg, rgba(127,127,127,.12) 0deg);`">
+                 :style="_x8">
                 <div class="cf-gauge cf-gauge-inner">
-                    <span class="cf-gauge-val" :style="`color:${gaugeColor}`" x-text="report.score"></span>
+                    <span class="cf-gauge-val" :style="_x9" x-text="report.score"></span>
                     <span class="cf-gauge-unit">/ 100</span>
                 </div>
             </div>
             <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap mb-1">
                     <h3 class="text-lg md:text-xl font-bold leading-tight" style="color:var(--sim-ink);"
-                        x-text="report.is_conformant ? 'Facture conforme' : 'Non conforme en l\'état'"></h3>
-                    <span class="cf-pill" :class="report.is_conformant ? 'cf-pill--pass' : 'cf-pill--fail'"
-                          x-text="report.is_conformant ? 'EN 16931' : (report.counts.fail + ' anomalie(s)')"></span>
+                        x-text="_x10"></h3>
+                    <span class="cf-pill" :class="_x11"
+                          x-text="_x12"></span>
                 </div>
                 <p class="text-sm" style="color:var(--sim-muted);">
                     <span x-text="formatLabel"></span>
                     <template x-if="report.profile"><span> · Profil <strong x-text="report.profile"></strong></span></template>
                 </p>
                 <div class="flex items-center gap-2 mt-2 text-xs flex-wrap">
-                    <span class="cf-pill cf-pill--pass" x-text="report.counts.pass + ' conformes'"></span>
-                    <span class="cf-pill cf-pill--fail" x-show="report.counts.fail" x-text="report.counts.fail + ' bloquants'"></span>
-                    <span class="cf-pill cf-pill--warn" x-show="report.counts.warn" x-text="report.counts.warn + ' avertissements'"></span>
+                    <span class="cf-pill cf-pill--pass" x-text="_x13"></span>
+                    <span class="cf-pill cf-pill--fail" x-show="report.counts.fail" x-text="_x14"></span>
+                    <span class="cf-pill cf-pill--warn" x-show="report.counts.warn" x-text="_x15"></span>
                 </div>
             </div>
         </div>
@@ -265,19 +265,19 @@ oublié.
                         <span class="cf-section-count" x-text="checksBySection(sec.key).length"></span>
                     </header>
                     <div class="cf-section-list">
-                        <template x-for="chk in checksBySection(sec.key)" :key="chk.code + chk.label">
-                            <div class="cf-check" :class="`cf-check--${chk.status}`">
-                                <span class="cf-check-icon" :style="`color:${statusColor(chk.status)}`">
-                                    <template x-if="chk.status === 'pass'">
+                        <template x-for="chk in checksBySection(sec.key)" :key="_x16(chk)">
+                            <div class="cf-check" :class="_x17(chk)">
+                                <span class="cf-check-icon" :style="_x18(chk)">
+                                    <template x-if="_x19(chk)">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     </template>
-                                    <template x-if="chk.status === 'fail'">
+                                    <template x-if="_x20(chk)">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                     </template>
-                                    <template x-if="chk.status === 'warn'">
+                                    <template x-if="_x21(chk)">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
                                     </template>
-                                    <template x-if="chk.status === 'info'">
+                                    <template x-if="_x22(chk)">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     </template>
                                 </span>
@@ -315,6 +315,33 @@ oublié.
 <script nonce="{{ request.csp_nonce }}">
 function conformiteFacture() {
     return {
+            // ⚙️ CSP getters/méthodes (expressions déplacées à l'identique)
+
+
+            get _x0() { return { 'is-drag': this.dragging }; },
+            _x1() { this.dragging = true; },
+            _x2() { this.dragging = false; },
+            get _x3() { return this.fileName || 'Glissez votre facture ici'; },
+            get _x4() { return !this.file || this.busy; },
+            get _x5() { return (!this.file || this.busy) ? 'opacity:.5;cursor:not-allowed;background:#22c55e;' : 'background:#22c55e;'; },
+            get _x6() { return this.busy ? 'Analyse en cours…' : 'Tester la conformité'; },
+            get _x7() { return this.report.is_conformant ? 'cf-verdict--ok' : 'cf-verdict--ko'; },
+            get _x8() { return 'background: conic-gradient(' + (this.gaugeColor) + ' ' + (this.report.score*3.6) + 'deg, rgba(127,127,127,.12) 0deg);'; },
+            get _x9() { return 'color:' + (this.gaugeColor); },
+            get _x10() { return this.report.is_conformant ? 'Facture conforme' : 'Non conforme en l\'état'; },
+            get _x11() { return this.report.is_conformant ? 'cf-pill--pass' : 'cf-pill--fail'; },
+            get _x12() { return this.report.is_conformant ? 'EN 16931' : (this.report.counts.fail + ' anomalie(s)'); },
+            get _x13() { return this.report.counts.pass + ' conformes'; },
+            get _x14() { return this.report.counts.fail + ' bloquants'; },
+            get _x15() { return this.report.counts.warn + ' avertissements'; },
+            _x16(chk) { return chk.code + chk.label; },
+            _x17(chk) { return 'cf-check--' + (chk.status); },
+            _x18(chk) { return 'color:' + (this.statusColor(chk.status)); },
+            _x19(chk) { return chk.status === 'pass'; },
+            _x20(chk) { return chk.status === 'fail'; },
+            _x21(chk) { return chk.status === 'warn'; },
+            _x22(chk) { return chk.status === 'info'; },
+
         file: null,
         fileName: '',
         fileSize: '',
@@ -472,5 +499,6 @@ function conformiteFacture() {
     };
 }
 window.conformiteFacture = conformiteFacture;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("conformiteFacture", conformiteFacture); });
 </script>
 {% endblock %}

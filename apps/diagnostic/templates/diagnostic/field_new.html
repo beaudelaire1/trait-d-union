@@ -6,7 +6,7 @@
 {% block content %}
 <div class="min-h-screen" style="background: #0f0f12;">
   <div class="max-w-3xl mx-auto px-4 py-10"
-       x-data="{ profile: '{{ posted.profile|default:'' }}' }">
+       x-data="profileSelector" data-profile="{{ posted.profile|default:'' }}">
 
     <a href="{% url 'diagnostic:field_list' %}" class="inline-flex items-center gap-1 text-sm font-medium mb-6 transition-colors hover:text-white" style="color: #8e8e93;">
       ← Historique terrain
@@ -35,8 +35,8 @@
       <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
         {% for key, meta in profiles.items %}
         <label class="relative cursor-pointer rounded-xl border p-4 transition-all"
-               :class="profile === '{{ key }}' ? 'ring-2' : ''"
-               :style="profile === '{{ key }}' ? 'border-color:#30d158; background:#30d15811;' : 'border-color:#2a2a30; background:#18181c;'"
+               :class="ringClass('{{ key }}')"
+               :style="profileStyle('{{ key }}')"
                style="border-color:#2a2a30; background:#18181c;">
           <input type="radio" name="profile" value="{{ key }}" class="sr-only" x-model="profile" required>
           <div class="text-2xl mb-2">{{ meta.icon }}</div>
@@ -48,7 +48,7 @@
 
       {# Description dynamique du profil #}
       {% for key, meta in profiles.items %}
-      <div x-show="profile === '{{ key }}'" x-cloak class="rounded-lg p-3 mb-6 text-xs" style="background:#0f0f12; color:#a1a1a6; border:1px solid #2a2a30;">
+      <div x-show="isProfile('{{ key }}')" x-cloak class="rounded-lg p-3 mb-6 text-xs" style="background:#0f0f12; color:#a1a1a6; border:1px solid #2a2a30;">
         {{ meta.description }}
       </div>
       {% endfor %}

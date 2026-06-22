@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les outils que TUS peut mettre en place pour capter et convertir vos prospects plus efficacement.{% endblock %}
 
 {% block tool_content %}
-<div x-data="cacSimulator()" x-cloak>
+<div x-data="cacSimulator" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── Formulaire ── #}
@@ -64,7 +64,7 @@
                 </div>
                 <div class="result-block text-center py-5 mo-scale-in" data-delay="200">
                     <p class="result-label mb-1">CAC</p>
-                    <p class="result-big" style="color: var(--tool-glow);" x-text="clientsParMois() > 0 ? fmt(cac()) + ' \u20ac' : '\u2014'"></p>
+                    <p class="result-big" style="color: var(--tool-glow);" x-text="_g0"></p>
                 </div>
             </div>
 
@@ -72,16 +72,16 @@
             <div class="result-block mo-fade-up" data-delay="150">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-sm font-semibold" style="color: var(--sim-ink);">Ratio LTV / CAC</h3>
-                    <span class="text-2xl font-bold font-mono" :style="'color:' + ratioColor()" x-text="ratioLtv().toFixed(1) + 'x'"></span>
+                    <span class="text-2xl font-bold font-mono" :style="_g1" x-text="_g2"></span>
                 </div>
                 <div class="w-full h-4 rounded-full overflow-hidden" style="background: var(--sim-field-bg);">
-                    <div class="h-full rounded-full transition-all duration-700" :style="'width:' + Math.min(ratioLtv()/5*100, 100) + '%; background:' + ratioColor()"></div>
+                    <div class="h-full rounded-full transition-all duration-700" :style="_g3"></div>
                 </div>
                 <div class="flex justify-between mt-2 text-xs" style="color: var(--sim-sublabel);">
                     <span>Danger &lt; 1x</span><span>Fragile 1-3x</span><span>Sain &gt; 3x</span>
                 </div>
-                <div class="mt-4 p-3 rounded-xl" :style="'background:' + ratioColor() + '12'">
-                    <p class="text-sm" :style="'color:' + ratioColor()" x-text="ratioVerdict()"></p>
+                <div class="mt-4 p-3 rounded-xl" :style="_g4">
+                    <p class="text-sm" :style="_g1" x-text="ratioVerdict()"></p>
                 </div>
             </div>
 
@@ -99,15 +99,15 @@
                 <div class="space-y-3">
                     <div class="flex justify-between items-center">
                         <span class="text-sm" style="color: var(--sim-muted);">Coût par visiteur</span>
-                        <span class="font-mono font-semibold text-sm" style="color: var(--sim-ink);" x-text="coutParVisiteur() + ' €'"></span>
+                        <span class="font-mono font-semibold text-sm" style="color: var(--sim-ink);" x-text="_g5"></span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-sm" style="color: var(--sim-muted);">Coût par lead</span>
-                        <span class="font-mono font-semibold text-sm" style="color: var(--sim-ink);" x-text="coutParLead() + ' €'"></span>
+                        <span class="font-mono font-semibold text-sm" style="color: var(--sim-ink);" x-text="_g6"></span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-sm" style="color: var(--sim-muted);">Coût par client (CAC)</span>
-                        <span class="font-mono font-bold" style="color: var(--tool-glow);" x-text="clientsParMois() > 0 ? fmt(cac()) + ' \u20ac' : '\u2014'"></span>
+                        <span class="font-mono font-bold" style="color: var(--tool-glow);" x-text="_g0"></span>
                     </div>
                 </div>
             </div>
@@ -123,6 +123,15 @@
 
     function cacSimulator() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.clientsParMois() > 0 ? this.fmt(this.cac()) + ' \u20ac' : '\u2014'; },
+            get _g1() { return 'color:' + this.ratioColor(); },
+            get _g2() { return this.ratioLtv().toFixed(1) + 'x'; },
+            get _g3() { return 'width:' + Math.min(this.ratioLtv()/5*100, 100) + '%; background:' + this.ratioColor(); },
+            get _g4() { return 'background:' + this.ratioColor() + '12'; },
+            get _g5() { return this.coutParVisiteur() + ' €'; },
+            get _g6() { return this.coutParLead() + ' €'; },
+
             budgetMarketing: 2000,
             visiteurs: 5000,
             tauxLead: 3,
@@ -196,6 +205,7 @@
         };
     }
     window.cacSimulator = cacSimulator;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("cacSimulator", cacSimulator); });
 })();
 </script>
 {% endblock %}

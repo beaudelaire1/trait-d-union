@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les outils que TUS peut construire — espace client, onboarding automatisé, suivi — pour améliorer chaque point de contact.{% endblock %}
 
 {% block tool_content %}
-<div x-data="retentionSim()" x-cloak>
+<div x-data="retentionSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── Formulaire ── #}
@@ -37,7 +37,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Marge sur CA additionnel</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="margeAdditionnelle + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_x0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="margeAdditionnelle" min="5" max="90" step="5" title="Marge sur CA additionnel">
                     <p class="tool-sublabel">Le gain net utilise la marge, pas le CA brut.</p>
@@ -46,7 +46,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Taux de rétention actuel</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="retentionActuelle + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_x1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="retentionActuelle" min="30" max="99" step="1">
                     <p class="tool-sublabel">% de clients qui restent d'une année sur l'autre</p>
@@ -55,7 +55,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Amélioration visée</label>
-                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="'+' + amelioration + ' pts'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="_x2"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="amelioration" min="1" max="20" step="1">
                 </div>
@@ -89,10 +89,10 @@
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #8b5cf6;">
                     Gain net estimé à 5 ans
                 </p>
-                <p class="result-big text-5xl" :style="'color:' + (roiNet5Ans() >= 0 ? '#22c55e' : '#ef4444')" x-text="(roiNet5Ans() >= 0 ? '+' : '') + fmt(roiNet5Ans()) + ' €'"></p>
+                <p class="result-big text-5xl" :style="_x3" x-text="_x4"></p>
                 <p class="text-base mt-3" style="color: var(--sim-muted);">
-                    Marge additionnelle <strong x-text="'+' + fmt(ecartMarge5Ans()) + ' €'" style="color: #8b5cf6;"></strong>
-                    − Coût programme <strong x-text="fmt(coutProgramme5Ans()) + ' €'" style="color: #ef4444;"></strong>
+                    Marge additionnelle <strong x-text="_x5" style="color: #8b5cf6;"></strong>
+                    − Coût programme <strong x-text="_x6" style="color: #ef4444;"></strong>
                 </p>
             </div>
 
@@ -108,11 +108,11 @@
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Marge add. an 5</p>
-                    <p class="result-big text-2xl" style="color: #8b5cf6;" x-text="'+' + fmt(gainMargeAn5()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #8b5cf6;" x-text="_x7"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
                     <p class="result-label mb-1">Mois d'amortissement</p>
-                    <p class="result-big text-2xl" :style="'color:' + (moisAmortissement() <= 12 ? '#22c55e' : moisAmortissement() <= 24 ? '#f59e0b' : '#ef4444')" x-text="moisAmortissement() === '∞' ? '∞' : moisAmortissement() + ' mois'"></p>
+                    <p class="result-big text-2xl" :style="_x8" x-text="_x9"></p>
                 </div>
             </div>
 
@@ -145,15 +145,15 @@
                         <tbody>
                             <template x-for="row in tableau()" :key="row.annee">
                                 <tr style="border-bottom: 1px solid var(--sim-border);">
-                                    <td class="py-2 pr-4 font-semibold" x-text="'An ' + row.annee"></td>
+                                    <td class="py-2 pr-4 font-semibold" x-text="_x10(row)"></td>
                                     <td class="text-right py-2 px-2" x-text="row.clientsAct"></td>
-                                    <td class="text-right py-2 px-2" x-text="fmt(row.caAct) + ' €'"></td>
+                                    <td class="text-right py-2 px-2" x-text="_x11(row)"></td>
                                     <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="row.clientsAmel"></td>
-                                    <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="fmt(row.caAmel) + ' €'"></td>
-                                    <td class="text-right py-2 px-2 font-semibold" style="color: #8b5cf6;" x-text="'+' + fmt(row.delta) + ' €'"></td>
-                                    <td class="text-right py-2 px-2" style="color: #ef4444;" x-text="fmt(budgetAnnuel) + ' €'"></td>
-                                    <td class="text-right py-2 px-2 font-semibold" style="color: #8b5cf6;" x-text="'+' + fmt(row.margeDelta) + ' €'"></td>
-                                    <td class="text-right py-2 pl-2 font-semibold" :style="'color:' + (row.margeDelta - budgetAnnuel >= 0 ? '#22c55e' : '#ef4444')" x-text="(row.margeDelta - budgetAnnuel >= 0 ? '+' : '') + fmt(row.margeDelta - budgetAnnuel) + ' €'"></td>
+                                    <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="_x12(row)"></td>
+                                    <td class="text-right py-2 px-2 font-semibold" style="color: #8b5cf6;" x-text="_x13(row)"></td>
+                                    <td class="text-right py-2 px-2" style="color: #ef4444;" x-text="_x14"></td>
+                                    <td class="text-right py-2 px-2 font-semibold" style="color: #8b5cf6;" x-text="_x15(row)"></td>
+                                    <td class="text-right py-2 pl-2 font-semibold" :style="_x16(row)" x-text="_x17(row)"></td>
                                 </tr>
                             </template>
                         </tbody>
@@ -183,6 +183,28 @@
 
     function retentionSim() {
         return {
+            // ⚙️ CSP getters/méthodes (expressions déplacées à l'identique)
+
+
+            get _x0() { return this.margeAdditionnelle + '%'; },
+            get _x1() { return this.retentionActuelle + '%'; },
+            get _x2() { return '+' + this.amelioration + ' pts'; },
+            get _x3() { return 'color:' + (this.roiNet5Ans() >= 0 ? '#22c55e' : '#ef4444'); },
+            get _x4() { return (this.roiNet5Ans() >= 0 ? '+' : '') + this.fmt(this.roiNet5Ans()) + ' €'; },
+            get _x5() { return '+' + this.fmt(this.ecartMarge5Ans()) + ' €'; },
+            get _x6() { return this.fmt(this.coutProgramme5Ans()) + ' €'; },
+            get _x7() { return '+' + this.fmt(this.gainMargeAn5()) + ' €'; },
+            get _x8() { return 'color:' + (this.moisAmortissement() <= 12 ? '#22c55e' : this.moisAmortissement() <= 24 ? '#f59e0b' : '#ef4444'); },
+            get _x9() { return this.moisAmortissement() === '∞' ? '∞' : this.moisAmortissement() + ' mois'; },
+            _x10(row) { return 'An ' + row.annee; },
+            _x11(row) { return this.fmt(row.caAct) + ' €'; },
+            _x12(row) { return this.fmt(row.caAmel) + ' €'; },
+            _x13(row) { return '+' + this.fmt(row.delta) + ' €'; },
+            get _x14() { return this.fmt(this.budgetAnnuel) + ' €'; },
+            _x15(row) { return '+' + this.fmt(row.margeDelta) + ' €'; },
+            _x16(row) { return 'color:' + (row.margeDelta - this.budgetAnnuel >= 0 ? '#22c55e' : '#ef4444'); },
+            _x17(row) { return (row.margeDelta - this.budgetAnnuel >= 0 ? '+' : '') + this.fmt(row.margeDelta - this.budgetAnnuel) + ' €'; },
+
             clientsActifs: 200,
             revenuMoyen: 1200,
             margeAdditionnelle: 40,
@@ -368,6 +390,7 @@
         };
     }
     window.retentionSim = retentionSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("retentionSim", retentionSim); });
 })();
 </script>
 {% endblock %}

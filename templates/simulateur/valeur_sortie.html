@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS structure votre présence digitale pour augmenter la valeur perçue de votre entreprise.{% endblock %}
 
 {% block tool_content %}
-<div x-data="valeurSortieSim()" x-cloak>
+<div x-data="valeurSortieSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -58,22 +58,22 @@
 
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #8b5cf6;">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #8b5cf6;">Fourchette indicative de valorisation</p>
-                <p class="result-big text-4xl" style="color: #8b5cf6;" x-text="fmt(valorMin()) + ' € — ' + fmt(valorMax()) + ' €'"></p>
-                <p class="text-lg mt-2 font-semibold" style="color: var(--sim-ink);">Médiane : <span style="color: #8b5cf6;" x-text="fmt(valorMediane()) + ' €'"></span></p>
+                <p class="result-big text-4xl" style="color: #8b5cf6;" x-text="_g0"></p>
+                <p class="text-lg mt-2 font-semibold" style="color: var(--sim-ink);">Médiane : <span style="color: #8b5cf6;" x-text="_g1"></span></p>
             </div>
 
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Multiple CA</p>
-                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="fmt(valorBasse()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="_g2"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">Multiple EBITDA</p>
-                    <p class="result-big text-2xl" style="color: #8b5cf6;" x-text="fmt(valorMediane()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #8b5cf6;" x-text="_g1"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">EBITDA + prime croissance</p>
-                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(valorHaute()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="_g3"></p>
                 </div>
             </div>
 
@@ -104,6 +104,12 @@
     let chart = null;
     function valeurSortieSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.fmt(this.valorMin()) + ' € — ' + this.fmt(this.valorMax()) + ' €'; },
+            get _g1() { return this.fmt(this.valorMediane()) + ' €'; },
+            get _g2() { return this.fmt(this.valorBasse()) + ' €'; },
+            get _g3() { return this.fmt(this.valorHaute()) + ' €'; },
+
             ca: 500000, ebitda: 100000, croissance: 15,
             secteur: 'Services B2B / Conseil',
             secteurs: [
@@ -172,6 +178,7 @@
         };
     }
     window.valeurSortieSim = valeurSortieSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("valeurSortieSim", valeurSortieSim); });
 })();
 </script>
 {% endblock %}

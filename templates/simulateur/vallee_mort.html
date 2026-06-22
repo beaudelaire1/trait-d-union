@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les outils que TUS peut mettre en place — facturation automatique, relances, suivi de trésorerie — pour fluidifier vos encaissements.{% endblock %}
 
 {% block tool_content %}
-<div x-data="valleeMortSim()" x-cloak>
+<div x-data="valleeMortSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── Formulaire ── #}
@@ -32,7 +32,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Croissance mensuelle visée</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="croissance + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="croissance" min="1" max="30" step="1">
                 </div>
@@ -40,7 +40,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Délai paiement clients (jours)</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="delaiClients + 'j'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="delaiClients" min="0" max="120" step="5">
                     <p class="tool-sublabel">Quand vos clients vous paient (0 = comptant)</p>
@@ -49,7 +49,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Délai paiement fournisseurs (jours)</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="delaiFournisseurs + 'j'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_g2"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="delaiFournisseurs" min="0" max="90" step="5">
                     <p class="tool-sublabel">Quand vous payez vos fournisseurs</p>
@@ -58,7 +58,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Marge brute</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="marge + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_g3"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="marge" min="5" max="80" step="5">
                     <p class="tool-sublabel">(CA − achats variables) / CA</p>
@@ -81,34 +81,32 @@
         <div class="lg:col-span-3 space-y-6">
 
             {# KPI principal — Creux max #}
-            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + (besoinFinancement() > 0 ? '#ef4444' : '#22c55e')">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + (besoinFinancement() > 0 ? '#ef4444' : '#22c55e')">
-                    <span x-text="besoinFinancement() > 0 ? 'Besoin de financement' : 'Trésorerie suffisante'"></span>
+            <div class="result-block text-center py-8 mo-scale-in" :style="_g4">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="_g5">
+                    <span x-text="_g6"></span>
                 </p>
-                <p class="result-big text-5xl" :style="'color:' + (besoinFinancement() > 0 ? '#ef4444' : '#22c55e')"
-                   x-text="besoinFinancement() > 0 ? fmt(besoinFinancement()) + ' €' : '0 €'"></p>
+                <p class="result-big text-5xl" :style="_g5"
+                   x-text="_g7"></p>
                 <p class="text-sm mt-2" style="color: var(--sim-muted);"
-                   x-text="besoinFinancement() > 0
-                       ? 'Cash minimum à sécuriser pour traverser le creux (mois ' + moisCreux() + ')'
-                       : 'Votre trésorerie reste positive sur les 18 mois de projection'"></p>
+                   x-text="_g8"></p>
             </div>
 
             {# KPIs secondaires #}
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Décalage BFR</p>
-                    <p class="result-big text-2xl" :style="'color:' + (bfrGap() > 0 ? '#ef4444' : '#22c55e')" x-text="bfrGap() + ' jours'"></p>
-                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="bfrGap() > 0 ? 'vous payez avant d\'encaisser' : 'fournisseurs financent votre cycle'"></p>
+                    <p class="result-big text-2xl" :style="_g9" x-text="_g10"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g11"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">Creux le plus bas</p>
-                    <p class="result-big text-2xl" :style="'color:' + (creuxMin() < 0 ? '#ef4444' : '#22c55e')" x-text="fmt(creuxMin()) + ' €'"></p>
+                    <p class="result-big text-2xl" :style="_g12" x-text="_g13"></p>
                     <p class="text-xs mt-1" style="color: var(--sim-muted);">mois <span x-text="moisCreux()"></span></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Retour au positif</p>
                     <p class="result-big text-2xl" style="color: var(--tool-glow);"
-                       x-text="moisRetour() ? 'Mois ' + moisRetour() : (creuxMin() >= 0 ? 'Toujours positif' : 'Jamais sur 18 mois')"></p>
+                       x-text="_g14"></p>
                 </div>
             </div>
 
@@ -130,11 +128,11 @@
             </div>
 
             {# Diagnostic détaillé #}
-            <div class="result-block mo-fade-up" data-delay="300" :style="'border-color:' + diagnosticColor()">
+            <div class="result-block mo-fade-up" data-delay="300" :style="_g15">
                 <div class="flex items-start gap-3">
                     <span class="text-2xl" x-text="diagnosticIcon()"></span>
                     <div>
-                        <p class="font-semibold" :style="'color:' + diagnosticColor()" x-text="diagnosticTitre()"></p>
+                        <p class="font-semibold" :style="_g16" x-text="diagnosticTitre()"></p>
                         <p class="text-sm mt-2 leading-relaxed" style="color: var(--sim-muted);" x-html="diagnostic()"></p>
                     </div>
                 </div>
@@ -151,6 +149,27 @@
 
     function valleeMortSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.croissance + '%'; },
+            get _g1() { return this.delaiClients + 'j'; },
+            get _g2() { return this.delaiFournisseurs + 'j'; },
+            get _g3() { return this.marge + '%'; },
+            get _g4() { return 'border-color:' + (this.besoinFinancement() > 0 ? '#ef4444' : '#22c55e'); },
+            get _g5() { return 'color:' + (this.besoinFinancement() > 0 ? '#ef4444' : '#22c55e'); },
+            get _g6() { return this.besoinFinancement() > 0 ? 'Besoin de financement' : 'Trésorerie suffisante'; },
+            get _g7() { return this.besoinFinancement() > 0 ? this.fmt(this.besoinFinancement()) + ' €' : '0 €'; },
+            get _g8() { return this.besoinFinancement() > 0
+                       ? 'Cash minimum à sécuriser pour traverser le creux (mois ' + this.moisCreux() + ')'
+                       : 'Votre trésorerie reste positive sur les 18 mois de projection'; },
+            get _g9() { return 'color:' + (this.bfrGap() > 0 ? '#ef4444' : '#22c55e'); },
+            get _g10() { return this.bfrGap() + ' jours'; },
+            get _g11() { return this.bfrGap() > 0 ? 'vous payez avant d\'encaisser' : 'fournisseurs financent votre cycle'; },
+            get _g12() { return 'color:' + (this.creuxMin() < 0 ? '#ef4444' : '#22c55e'); },
+            get _g13() { return this.fmt(this.creuxMin()) + ' €'; },
+            get _g14() { return this.moisRetour() ? 'Mois ' + this.moisRetour() : (this.creuxMin() >= 0 ? 'Toujours positif' : 'Jamais sur 18 mois'); },
+            get _g15() { return 'border-color:' + this.diagnosticColor(); },
+            get _g16() { return 'color:' + this.diagnosticColor(); },
+
             /* ── Inputs ── */
             caActuel: 30000,
             croissance: 10,
@@ -422,6 +441,7 @@
         };
     }
     window.valleeMortSim = valleeMortSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("valleeMortSim", valleeMortSim); });
 })();
 </script>
 {% endblock %}

@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS met en place des stratégies d'acquisition digitale automatisées pour alimenter votre pipeline même en période creuse.{% endblock %}
 
 {% block tool_content %}
-<div x-data="saisonnaliteSim()" x-cloak>
+<div x-data="saisonnaliteSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -36,7 +36,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Seuil de mois creux</label>
-                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="seuilCreux + '% de la moyenne'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="seuilCreux" min="60" max="100" step="5" title="Seuil de mois creux">
                     <p class="tool-sublabel">Un mois est traité comme creux s'il passe sous ce seuil.</p>
@@ -52,7 +52,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Effet estimé du lissage</label>
-                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="effetLissage + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="effetLissage" min="5" max="50" step="5">
                     <p class="tool-sublabel">% d'augmentation du CA dans les mois creux</p>
@@ -60,7 +60,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Marge brute sur CA additionnel</label>
-                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="margeAdd + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="_g2"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="margeAdd" min="5" max="80" step="5">
                     <p class="tool-sublabel">Marge brute moyenne réalisée sur le CA gagné — sert au calcul du gain réel</p>
@@ -79,15 +79,15 @@
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">CA actuel / an</p>
-                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(caAnnuel()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="_g3"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">CA avec lissage</p>
-                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="fmt(caLisse()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="_g4"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Gain net lissage</p>
-                    <p class="result-big text-2xl" :style="'color:' + (gainNetLissage() >= 0 ? '#22c55e' : '#ef4444')" x-text="(gainNetLissage() >= 0 ? '+' : '') + fmt(gainNetLissage()) + ' €'"></p>
+                    <p class="result-big text-2xl" :style="_g5" x-text="_g6"></p>
                 </div>
             </div>
 
@@ -118,6 +118,15 @@
     let chart = null;
     function saisonnaliteSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.seuilCreux + '% de la moyenne'; },
+            get _g1() { return this.effetLissage + '%'; },
+            get _g2() { return this.margeAdd + '%'; },
+            get _g3() { return this.fmt(this.caAnnuel()) + ' €'; },
+            get _g4() { return this.fmt(this.caLisse()) + ' €'; },
+            get _g5() { return 'color:' + (this.gainNetLissage() >= 0 ? '#22c55e' : '#ef4444'); },
+            get _g6() { return (this.gainNetLissage() >= 0 ? '+' : '') + this.fmt(this.gainNetLissage()) + ' €'; },
+
             labels: ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'],
             mois: [8000,7000,12000,15000,18000,10000,5000,4000,14000,16000,13000,9000],
             seuilCreux: 85, budgetLissage: 1000, effetLissage: 20, margeAdd: 30,
@@ -195,6 +204,7 @@
         };
     }
     window.saisonnaliteSim = saisonnaliteSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("saisonnaliteSim", saisonnaliteSim); });
 })();
 </script>
 {% endblock %}

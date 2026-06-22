@@ -8,10 +8,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="client-portal" x-data="{ sidebarOpen: window.innerWidth > 1024 }">
+<div class="client-portal" x-data="clientPortal">
     {% include 'clients/partials/sidebar.html' %}
     
-    <main class="client-main" :class="{ 'expanded': !sidebarOpen }">
+    <main class="client-main" :class="expandedMainClass">
         <header class="client-header">
             <div class="header-content">
                 <div>
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <form method="post" class="request-form" x-data="{ requestType: 'quote' }">
+            <form method="post" class="request-form" x-data="requestForm">
                 {% csrf_token %}
                 
                 <!-- Client Info (Read-only) -->
@@ -92,7 +92,7 @@
                         Type de demande
                     </h3>
                     <div class="request-type-grid">
-                        <label class="type-option" :class="{ 'selected': requestType === 'quote' }">
+                        <label class="type-option" :class="selectedClass(\'quote\')">
                             <input type="radio" name="request_type" value="quote" x-model="requestType">
                             <div class="type-card">
                                 <div class="type-icon quote">
@@ -107,7 +107,7 @@
                                 <span class="type-desc">Nouveau projet ou évolution</span>
                             </div>
                         </label>
-                        <label class="type-option" :class="{ 'selected': requestType === 'support' }">
+                        <label class="type-option" :class="selectedClass(\'support\')">
                             <input type="radio" name="request_type" value="support" x-model="requestType">
                             <div class="type-card">
                                 <div class="type-icon support">
@@ -121,7 +121,7 @@
                                 <span class="type-desc">Assistance technique</span>
                             </div>
                         </label>
-                        <label class="type-option" :class="{ 'selected': requestType === 'modification' }">
+                        <label class="type-option" :class="selectedClass(\'modification\')">
                             <input type="radio" name="request_type" value="modification" x-model="requestType">
                             <div class="type-card">
                                 <div class="type-icon modification">
@@ -139,7 +139,7 @@
 
                 <!-- Previous Projects (if any) -->
                 {% if previous_projects %}
-                <div class="form-section" x-show="requestType !== 'quote'">
+                <div class="form-section" x-show="notQuote">
                     <h3>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>

@@ -156,14 +156,27 @@
         {% block content %}{% endblock %}
     </main>
     {% include 'partials/footer.html' %}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js" nonce="{{ request.csp_nonce }}" integrity="sha384-X9kJyAubVxnP0hcA+AMMs21U445qsnqhnUF8EBlEpP3a42Kh/JwWjlv2ZcvGfphb" crossorigin="anonymous"></script>
+    {# ⚠️ ORDRE CRITIQUE : app.js enregistre les composants Alpine via l'évènement
+       `alpine:init`. Il DOIT être chargé AVANT le script Alpine (les scripts defer
+       s'exécutent dans l'ordre du document, et Alpine démarre dès son exécution).
+       Sinon les composants (faqAccordion, clientPortal, …) ne sont pas enregistrés
+       à temps → accordéons/portail cassés. Ne pas déplacer après Alpine. #}
+    <script defer src="{% static 'js/app.js' %}" nonce="{{ request.csp_nonce }}"></script>
+    {# 🔻 CSP : templates migrés au sous-ensemble CSP (Alpine.data + méthodes).
+       Bascule pilotée par env (cf. config/settings/base.py) :
+         ALPINE_CSP_BUILD=1 → build @alpinejs/csp + retrait auto de 'unsafe-eval'.
+       Activer uniquement après QA navigateur. ALPINE_CSP_SRI = hash optionnel. #}
+    {% if alpine_csp_build %}
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/csp@{{ alpine_version }}/dist/cdn.min.js" nonce="{{ request.csp_nonce }}"{% if alpine_csp_sri %} integrity="{{ alpine_csp_sri }}" crossorigin="anonymous"{% endif %}></script>
+    {% else %}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@{{ alpine_version }}/dist/cdn.min.js" nonce="{{ request.csp_nonce }}" integrity="{{ alpine_std_sri }}" crossorigin="anonymous"></script>
+    {% endif %}
     <!-- Lenis — premium smooth scroll (~5KB) -->
     <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" nonce="{{ request.csp_nonce }}" integrity="sha384-tKsJDT6PlUI0pSBt9/sBKJluKgA19/a6mBrDsZaXotLB4ZYfMGM6xt6/WgGpYhTm" crossorigin="anonymous"></script>
     <!-- HTMX with View Transitions support -->
     <script defer src="https://unpkg.com/htmx.org@2.0.0/dist/htmx.min.js"
         integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw"
         crossorigin="anonymous" nonce="{{ request.csp_nonce }}"></script>
-    <script defer src="{% static 'js/app.js' %}" nonce="{{ request.csp_nonce }}"></script>
     <script defer src="{% static 'js/theme-toggle.js' %}" nonce="{{ request.csp_nonce }}"></script>
     <script defer src="{% static 'js/micro-interactions.js' %}" nonce="{{ request.csp_nonce }}"></script>
     {% block extra_js %}{% endblock %}

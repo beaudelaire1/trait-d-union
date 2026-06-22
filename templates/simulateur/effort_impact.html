@@ -16,35 +16,35 @@
 {% block tool_cta_text %}TUS vous aide à prioriser vos investissements digitaux pour un impact maximum.{% endblock %}
 
 {% block tool_content %}
-<div x-data="effortImpactSim()" x-cloak>
+<div x-data="effortImpactSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
             <div class="tool-card space-y-4 mo-fade-up">
                 <div class="flex items-center justify-between">
                     <h2 class="text-base font-semibold" style="color: var(--sim-ink);">Vos projets</h2>
-                    <button @click="addProjet()" :disabled="projets.length >= 8"
+                    <button @click="addProjet()" :disabled="_x0"
                         class="text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
-                        :style="projets.length >= 8 ? 'opacity:.4;cursor:not-allowed;' : ''"
+                        :style="_x1"
                         style="background: var(--tool-glow); color: #fff;">+ Projet</button>
                 </div>
                 <template x-for="(p, i) in projets" :key="i">
                     <div class="p-4 rounded-xl space-y-3" style="background: var(--sim-surface);">
                         <div class="flex items-center justify-between gap-2">
-                            <input type="text" class="tool-input flex-1 !py-1.5 text-sm" x-model="p.nom" :placeholder="'Projet ' + (i+1)">
+                            <input type="text" class="tool-input flex-1 !py-1.5 text-sm" x-model="p.nom" :placeholder="_x2(i)">
                             <button @click="removeProjet(i)" class="text-xs opacity-50 hover:opacity-100 transition-opacity" title="Supprimer">&times;</button>
                         </div>
                         <div>
                             <div class="flex justify-between mb-1">
                                 <span class="tool-sublabel">Effort</span>
-                                <span class="text-xs font-mono font-bold" style="color: #ef4444;" x-text="p.effort + '/5'"></span>
+                                <span class="text-xs font-mono font-bold" style="color: #ef4444;" x-text="_x3(p)"></span>
                             </div>
                             <input type="range" class="tool-range" x-model.number="p.effort" min="1" max="5" step="1">
                         </div>
                         <div>
                             <div class="flex justify-between mb-1">
                                 <span class="tool-sublabel">Impact</span>
-                                <span class="text-xs font-mono font-bold" style="color: #22c55e;" x-text="p.impact + '/5'"></span>
+                                <span class="text-xs font-mono font-bold" style="color: #22c55e;" x-text="_x4(p)"></span>
                             </div>
                             <input type="range" class="tool-range" x-model.number="p.impact" min="1" max="5" step="1">
                         </div>
@@ -67,16 +67,16 @@
                 <div class="space-y-4">
                     <template x-for="(q, qi) in sequencement()" :key="qi">
                         <div>
-                            <p class="text-xs font-bold tracking-widest uppercase mb-2" :style="'color:' + q.color" x-text="q.label"></p>
+                            <p class="text-xs font-bold tracking-widest uppercase mb-2" :style="_x5(q)" x-text="q.label"></p>
                             <div class="space-y-1">
                                 <template x-for="(p, pi) in q.projets" :key="pi">
                                     <div class="flex items-center gap-3 px-3 py-2 rounded-lg" style="background: var(--sim-surface);">
                                         <span class="text-lg" x-text="q.icon"></span>
-                                        <span class="flex-1 text-sm font-medium" style="color: var(--sim-ink);" x-text="p.nom || 'Projet ' + (p.idx+1)"></span>
-                                        <span class="text-xs" style="color: var(--sim-muted);" x-text="'E:' + p.effort + ' I:' + p.impact"></span>
+                                        <span class="flex-1 text-sm font-medium" style="color: var(--sim-ink);" x-text="_x6(p)"></span>
+                                        <span class="text-xs" style="color: var(--sim-muted);" x-text="_x7(p)"></span>
                                     </div>
                                 </template>
-                                <p x-show="q.projets.length === 0" class="text-xs italic" style="color: var(--sim-muted);">Aucun projet dans ce quadrant</p>
+                                <p x-show="_x8(q)" class="text-xs italic" style="color: var(--sim-muted);">Aucun projet dans ce quadrant</p>
                             </div>
                         </div>
                     </template>
@@ -103,6 +103,19 @@
     let chart = null;
     function effortImpactSim() {
         return {
+            // ⚙️ CSP getters/méthodes (expressions déplacées à l'identique)
+
+
+            get _x0() { return this.projets.length >= 8; },
+            get _x1() { return this.projets.length >= 8 ? 'opacity:.4;cursor:not-allowed;' : ''; },
+            _x2(i) { return 'Projet ' + (i+1); },
+            _x3(p) { return p.effort + '/5'; },
+            _x4(p) { return p.impact + '/5'; },
+            _x5(q) { return 'color:' + q.color; },
+            _x6(p) { return p.nom || 'Projet ' + (p.idx+1); },
+            _x7(p) { return 'E:' + p.effort + ' I:' + p.impact; },
+            _x8(q) { return q.projets.length === 0; },
+
             projets: [
                 { nom: 'Refonte site web', effort: 4, impact: 5 },
                 { nom: 'SEO local', effort: 2, impact: 4 },
@@ -185,6 +198,7 @@
         };
     }
     window.effortImpactSim = effortImpactSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("effortImpactSim", effortImpactSim); });
 })();
 </script>
 {% endblock %}

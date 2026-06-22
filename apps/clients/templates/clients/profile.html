@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="client-portal" x-data="{ sidebarOpen: window.innerWidth > 1024 }">
+<div class="client-portal" x-data="clientPortal">
     {% include 'clients/partials/sidebar.html' %}
 
     <!-- Main Content -->

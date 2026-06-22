@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS peut vous aider à chiffrer plusieurs scénarios avant d'investir.{% endblock %}
 
 {% block tool_content %}
-<div x-data="coutInactionSim()" x-cloak>
+<div x-data="coutInactionSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -30,7 +30,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Aggravation mensuelle</label>
-                        <span class="text-lg font-bold font-mono" style="color: #ef4444;" x-text="aggravation + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #ef4444;" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="aggravation" min="0" max="20" step="1">
                     <p class="tool-sublabel">0 % = coût stable ; au-dessus, la perte est composée mois après mois.</p>
@@ -50,7 +50,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Réduction du problème</label>
-                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="reductionProbleme + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="reductionProbleme" min="10" max="100" step="10">
                 </div>
@@ -61,22 +61,22 @@
 
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #ef4444;">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ef4444;">Coût cumulé de l'inaction à 24 mois</p>
-                <p class="result-big text-5xl" style="color: #ef4444;" x-text="fmt(coutInaction24()) + ' €'"></p>
+                <p class="result-big text-5xl" style="color: #ef4444;" x-text="_g2"></p>
                 <p class="text-base mt-3" style="color: var(--sim-muted);">soit <strong x-text="ratioSolution24()"></strong> le coût de la solution</p>
             </div>
 
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">À 6 mois</p>
-                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="fmt(coutInactionN(6)) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #f59e0b;" x-text="_g3"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">À 12 mois</p>
-                    <p class="result-big text-2xl" style="color: #ef4444;" x-text="fmt(coutInactionN(12)) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #ef4444;" x-text="_g4"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Point de bascule</p>
-                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="pointBascule() + ' mois'"></p>
+                    <p class="result-big text-2xl" style="color: #22c55e;" x-text="_g5"></p>
                 </div>
             </div>
 
@@ -107,6 +107,14 @@
     let chart = null;
     function coutInactionSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.aggravation + '%'; },
+            get _g1() { return this.reductionProbleme + '%'; },
+            get _g2() { return this.fmt(this.coutInaction24()) + ' €'; },
+            get _g3() { return this.fmt(this.coutInactionN(6)) + ' €'; },
+            get _g4() { return this.fmt(this.coutInactionN(12)) + ' €'; },
+            get _g5() { return this.pointBascule() + ' mois'; },
+
             perteMensuelle: 3000, aggravation: 0, coutSolution: 15000, delaiMiseEnPlace: 3, reductionProbleme: 80,
             coutInactionN(n) {
                 let total = 0; let perte = this.perteMensuelle;
@@ -177,6 +185,7 @@
         };
     }
     window.coutInactionSim = coutInactionSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("coutInactionSim", coutInactionSim); });
 })();
 </script>
 {% endblock %}

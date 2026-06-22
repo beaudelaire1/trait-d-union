@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les outils digitaux — site, tunnel de vente, espace client — que TUS peut construire pour soutenir votre positionnement tarifaire.{% endblock %}
 
 {% block tool_content %}
-<div x-data="elasticiteSim()" x-cloak>
+<div x-data="elasticiteSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── Formulaire ── #}
@@ -29,17 +29,13 @@
                     <label class="tool-label">Direction du changement</label>
                     <div class="flex gap-2 mt-1">
                         <button type="button" class="flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold text-center transition-all"
-                                :style="direction === 'hausse'
-                                    ? 'background: rgba(20,184,166,0.15); color: #14b8a6; border: 2px solid #14b8a6;'
-                                    : 'background: var(--sim-field-bg); color: var(--sim-muted); border: 2px solid var(--sim-field-border);'"
-                                @click="direction = 'hausse'">
+                                :style="_g0"
+                                @click="_g1">
                             ↑ Hausse de prix
                         </button>
                         <button type="button" class="flex-1 py-2.5 px-3 rounded-xl text-sm font-semibold text-center transition-all"
-                                :style="direction === 'baisse'
-                                    ? 'background: rgba(239,68,68,0.15); color: #ef4444; border: 2px solid #ef4444;'
-                                    : 'background: var(--sim-field-bg); color: var(--sim-muted); border: 2px solid var(--sim-field-border);'"
-                                @click="direction = 'baisse'">
+                                :style="_g2"
+                                @click="_g3">
                             ↓ Baisse de prix
                         </button>
                     </div>
@@ -48,7 +44,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Marge brute actuelle</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="margeBrute + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_g4"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="margeBrute" min="5" max="80" step="1">
                     <p class="tool-sublabel">(Prix de vente - Coût de revient) / Prix de vente</p>
@@ -56,11 +52,11 @@
 
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <label class="tool-label mb-0" x-text="direction === 'hausse' ? 'Augmentation de prix envisagée' : 'Baisse de prix envisagée'"></label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="(direction === 'hausse' ? '+' : '−') + variation + '%'"></span>
+                        <label class="tool-label mb-0" x-text="_g5"></label>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_g6"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="variation" min="1" max="50" step="1">
-                    <p class="tool-sublabel" x-show="direction === 'baisse' && variation >= margeBrute" style="color: #ef4444;">
+                    <p class="tool-sublabel" x-show="_g7" style="color: #ef4444;">
                         ⚠ La baisse dépasse votre marge brute — vous vendez à perte.
                     </p>
                 </div>
@@ -82,20 +78,20 @@
 
             {# La marge de sécurité — le chiffre clé #}
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #14b8a6;">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + accentColor()">
-                    <span x-text="direction === 'hausse' ? 'Marge de sécurité volumétrique' : 'Volume supplémentaire requis'"></span>
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="_g8">
+                    <span x-text="_g9"></span>
                 </p>
-                <p class="result-big text-5xl" :style="'color:' + accentColor()" x-text="seuilVolume().toFixed(1) + '%'"></p>
-                <p class="text-base mt-3 max-w-md mx-auto" style="color: var(--sim-muted);" x-show="direction === 'hausse'">
-                    Vous pouvez perdre jusqu'à <strong x-text="seuilVolume().toFixed(1) + '%'" style="color: var(--sim-ink);"></strong>
+                <p class="result-big text-5xl" :style="_g8" x-text="_g10"></p>
+                <p class="text-base mt-3 max-w-md mx-auto" style="color: var(--sim-muted);" x-show="_g11">
+                    Vous pouvez perdre jusqu'à <strong x-text="_g10" style="color: var(--sim-ink);"></strong>
                     de vos clients sans perdre 1 € de bénéfice.
                 </p>
-                <p class="text-base mt-3 max-w-md mx-auto" style="color: var(--sim-muted);" x-show="direction === 'baisse'">
-                    <template x-if="variation < margeBrute">
-                        <span>Vous devez gagner au moins <strong x-text="seuilVolume().toFixed(1) + '%'" style="color: var(--sim-ink);"></strong>
+                <p class="text-base mt-3 max-w-md mx-auto" style="color: var(--sim-muted);" x-show="_g12">
+                    <template x-if="_g13">
+                        <span>Vous devez gagner au moins <strong x-text="_g10" style="color: var(--sim-ink);"></strong>
                         de clients supplémentaires pour maintenir votre bénéfice.</span>
                     </template>
-                    <template x-if="variation >= margeBrute">
+                    <template x-if="_g14">
                         <span style="color: #ef4444;">Impossible : la baisse dépasse votre marge brute. Chaque vente génère une perte.</span>
                     </template>
                 </p>
@@ -104,28 +100,28 @@
             {# Détail chiffré #}
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
-                    <p class="result-label mb-1" x-text="direction === 'hausse' ? 'Clients « perdables »' : 'Clients à gagner'"></p>
+                    <p class="result-label mb-1" x-text="_g15"></p>
                     <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="clientsDelta()"></p>
-                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="direction === 'hausse' ? 'sur ' + volumeActuel : 'en plus des ' + volumeActuel + ' actuels'"></p>
+                    <p class="text-xs mt-1" style="color: var(--sim-muted);" x-text="_g16"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">Nouveau prix</p>
-                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(nouveauPrix()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="_g17"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Nouvelle marge</p>
-                    <p class="result-big text-2xl" :style="'color:' + (nouvelleMarge() > 0 ? '#22c55e' : '#ef4444')" x-text="nouvelleMarge().toFixed(1) + '%'"></p>
+                    <p class="result-big text-2xl" :style="_g18" x-text="_g19"></p>
                 </div>
             </div>
 
             {# Graphique de bascule #}
             <div class="result-block mo-fade-up" data-delay="250">
-                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);" x-text="direction === 'hausse' ? 'Bénéfice selon la perte de volume' : 'Bénéfice selon le gain de volume'"></h3>
+                <h3 class="text-sm font-semibold mb-4" style="color: var(--sim-ink);" x-text="_g20"></h3>
                 <div class="chart-container">
                     <canvas id="elasticiteChart"></canvas>
                 </div>
                 <div class="mt-4 pt-3" style="border-top: 1px solid var(--sim-divider);">
-                    <p class="text-xs leading-relaxed" style="color: var(--sim-sublabel);" x-show="direction === 'hausse'">
+                    <p class="text-xs leading-relaxed" style="color: var(--sim-sublabel);" x-show="_g11">
                         <strong style="color: var(--sim-muted);">Lecture :</strong>
                         La courbe montre votre bénéfice après augmentation en fonction du % de clients perdus.
                         La ligne pointillée est votre bénéfice actuel.
@@ -133,7 +129,7 @@
                         Le croisement correspond à la marge de sécurité affichée ci-dessus.
                         Ce calcul est purement arithmétique — la réaction réelle de vos clients dépend du marché, de la concurrence et de la valeur perçue.
                     </p>
-                    <p class="text-xs leading-relaxed" style="color: var(--sim-sublabel);" x-show="direction === 'baisse'">
+                    <p class="text-xs leading-relaxed" style="color: var(--sim-sublabel);" x-show="_g12">
                         <strong style="color: var(--sim-muted);">Lecture :</strong>
                         La courbe montre votre bénéfice après baisse en fonction du % de clients gagnés en plus.
                         La ligne pointillée est votre bénéfice actuel.
@@ -166,6 +162,33 @@
 
     function elasticiteSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.direction === 'hausse'
+                                    ? 'background: rgba(20,184,166,0.15); color: #14b8a6; border: 2px solid #14b8a6;'
+                                    : 'background: var(--sim-field-bg); color: var(--sim-muted); border: 2px solid var(--sim-field-border);'; },
+            get _g1() { return this.direction = 'hausse'; },
+            get _g2() { return this.direction === 'baisse'
+                                    ? 'background: rgba(239,68,68,0.15); color: #ef4444; border: 2px solid #ef4444;'
+                                    : 'background: var(--sim-field-bg); color: var(--sim-muted); border: 2px solid var(--sim-field-border);'; },
+            get _g3() { return this.direction = 'baisse'; },
+            get _g4() { return this.margeBrute + '%'; },
+            get _g5() { return this.direction === 'hausse' ? 'Augmentation de prix envisagée' : 'Baisse de prix envisagée'; },
+            get _g6() { return (this.direction === 'hausse' ? '+' : '−') + this.variation + '%'; },
+            get _g7() { return this.direction === 'baisse' && this.variation >= this.margeBrute; },
+            get _g8() { return 'color:' + this.accentColor(); },
+            get _g9() { return this.direction === 'hausse' ? 'Marge de sécurité volumétrique' : 'Volume supplémentaire requis'; },
+            get _g10() { return this.seuilVolume().toFixed(1) + '%'; },
+            get _g11() { return this.direction === 'hausse'; },
+            get _g12() { return this.direction === 'baisse'; },
+            get _g13() { return this.variation < this.margeBrute; },
+            get _g14() { return this.variation >= this.margeBrute; },
+            get _g15() { return this.direction === 'hausse' ? 'Clients « perdables »' : 'Clients à gagner'; },
+            get _g16() { return this.direction === 'hausse' ? 'sur ' + this.volumeActuel : 'en plus des ' + this.volumeActuel + ' actuels'; },
+            get _g17() { return this.fmt(this.nouveauPrix()) + ' €'; },
+            get _g18() { return 'color:' + (this.nouvelleMarge() > 0 ? '#22c55e' : '#ef4444'); },
+            get _g19() { return this.nouvelleMarge().toFixed(1) + '%'; },
+            get _g20() { return this.direction === 'hausse' ? 'Bénéfice selon la perte de volume' : 'Bénéfice selon le gain de volume'; },
+
             direction: 'hausse',
             margeBrute: 30,
             variation: 10,
@@ -317,6 +340,7 @@
         };
     }
     window.elasticiteSim = elasticiteSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("elasticiteSim", elasticiteSim); });
 })();
 </script>
 {% endblock %}

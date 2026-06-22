@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS optimise vos campagnes digitales pour maximiser chaque euro investi.{% endblock %}
 
 {% block tool_content %}
-<div x-data="roiMarketingSim()" x-cloak>
+<div x-data="roiMarketingSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
@@ -37,14 +37,14 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Taux visiteur → lead</label>
-                        <span class="text-lg font-bold font-mono" style="color: #f59e0b;" x-text="tauxLead + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #f59e0b;" x-text="_g0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="tauxLead" min="0.5" max="20" step="0.5">
                 </div>
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Taux lead → client</label>
-                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="tauxClient + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: #22c55e;" x-text="_g1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="tauxClient" min="1" max="50" step="1">
                 </div>
@@ -59,7 +59,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Marge sur vente</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--sim-ink);" x-text="marge + '%'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--sim-ink);" x-text="_g2"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="marge" min="10" max="90" step="5">
                 </div>
@@ -68,11 +68,11 @@
 
         <div class="lg:col-span-3 space-y-6">
 
-            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + (marketingRentable() ? '#22c55e' : '#ef4444')">
+            <div class="result-block text-center py-8 mo-scale-in" :style="_g3">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #ec4899;">ROAS (Return On Ad Spend)</p>
-                <p class="result-big text-5xl" :style="'color:' + (marketingRentable() ? '#22c55e' : '#ef4444')" x-text="roas() + 'x'"></p>
-                <p class="text-base mt-3" style="color: var(--sim-muted);" x-text="marketingRentable() ? 'Marge nette positive apres budget' : 'ROAS sous le seuil de rentabilite marge'"></p>
-                <p class="text-xs mt-1" style="color: var(--sim-sublabel);" x-text="'Seuil rentabilite: ' + roasSeuil() + 'x avec ' + marge + '% de marge'"></p>
+                <p class="result-big text-5xl" :style="_g4" x-text="_g5"></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);" x-text="_g6"></p>
+                <p class="text-xs mt-1" style="color: var(--sim-sublabel);" x-text="_g7"></p>
             </div>
 
             <div class="grid sm:grid-cols-4 gap-4">
@@ -86,22 +86,22 @@
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">Coût / lead</p>
-                    <p class="result-big text-2xl" style="color: #ec4899;" x-text="coutParLead() + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #ec4899;" x-text="_g8"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
                     <p class="result-label mb-1">Coût / client</p>
-                    <p class="result-big text-2xl" style="color: #ec4899;" x-text="coutParClient() + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #ec4899;" x-text="_g9"></p>
                 </div>
             </div>
 
             <div class="grid sm:grid-cols-2 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="300">
                     <p class="result-label mb-1">CA généré / mois</p>
-                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="fmt(caGenere()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: var(--sim-ink);" x-text="_g10"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="350">
                     <p class="result-label mb-1">Marge nette marketing</p>
-                    <p class="result-big text-2xl" :style="'color:' + (margeNette() >= 0 ? '#22c55e' : '#ef4444')" x-text="(margeNette() >= 0 ? '+' : '') + fmt(margeNette()) + ' €'"></p>
+                    <p class="result-big text-2xl" :style="_g11" x-text="_g12"></p>
                 </div>
             </div>
 
@@ -132,6 +132,21 @@
     let chart = null;
     function roiMarketingSim() {
         return {
+            // ⚙️ CSP getters (expressions déplacées à l'identique depuis le template)
+            get _g0() { return this.tauxLead + '%'; },
+            get _g1() { return this.tauxClient + '%'; },
+            get _g2() { return this.marge + '%'; },
+            get _g3() { return 'border-color:' + (this.marketingRentable() ? '#22c55e' : '#ef4444'); },
+            get _g4() { return 'color:' + (this.marketingRentable() ? '#22c55e' : '#ef4444'); },
+            get _g5() { return this.roas() + 'x'; },
+            get _g6() { return this.marketingRentable() ? 'Marge nette positive apres budget' : 'ROAS sous le seuil de rentabilite marge'; },
+            get _g7() { return 'Seuil rentabilite: ' + this.roasSeuil() + 'x avec ' + this.marge + '% de marge'; },
+            get _g8() { return this.coutParLead() + ' €'; },
+            get _g9() { return this.coutParClient() + ' €'; },
+            get _g10() { return this.fmt(this.caGenere()) + ' €'; },
+            get _g11() { return 'color:' + (this.margeNette() >= 0 ? '#22c55e' : '#ef4444'); },
+            get _g12() { return (this.margeNette() >= 0 ? '+' : '') + this.fmt(this.margeNette()) + ' €'; },
+
             budget: 2000, visiteurs: 5000, tauxLead: 3, tauxClient: 20, panierMoyen: 1500, marge: 40,
             leads() { return Math.round(this.visiteurs * this.tauxLead / 100); },
             clients() { return Math.round(this.leads() * this.tauxClient / 100); },
@@ -181,6 +196,7 @@
         };
     }
     window.roiMarketingSim = roiMarketingSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("roiMarketingSim", roiMarketingSim); });
 })();
 </script>
 {% endblock %}
