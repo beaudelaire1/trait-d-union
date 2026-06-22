@@ -778,11 +778,24 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
           this.error = 'Merci de confirmer votre consentement.';
           return;
         }
-        if (!this.form.email) {
+        const email = (this.form.email || '').trim();
+        if (!email) {
           this.error = 'Merci de renseigner votre email.';
           return;
         }
+        // 🛡️ Validation format CÔTÉ CLIENT : évite un aller-retour serveur (et le
+        // spinner qui tourne dans le vide) quand l'adresse est manifestement invalide.
+        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!EMAIL_RE.test(email)) {
+          this.error = 'Adresse email invalide. Vérifiez le format (ex. nom@domaine.fr).';
+          return;
+        }
+        this.form.email = email;
         this.loading = true;
+        // 🛡️ Timeout dur : si le serveur ne répond pas, on libère le bouton au lieu
+        // de mouliner indéfiniment (l'utilisateur peut alors réessayer / changer de mode).
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
         try {
           const payload = {
             email: this.form.email,
@@ -804,6 +817,7 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
               'X-Requested-With': 'XMLHttpRequest',
             },
             body: JSON.stringify(payload),
+            signal: controller.signal,
           });
           const data = await res.json().catch(() => ({}));
           if (!res.ok || data.ok === false) {
@@ -820,8 +834,11 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
             this.successMessage = data.message || 'Votre rapport vous a été envoyé.';
           }
         } catch (e) {
-          this.error = "Problème réseau. Vérifiez votre connexion.";
+          this.error = (e && e.name === 'AbortError')
+            ? "Délai dépassé. Réessayez, ou utilisez l'autre mode de réception."
+            : "Problème réseau. Vérifiez votre connexion.";
         } finally {
+          clearTimeout(timeoutId);
           this.loading = false;
         }
       },
