@@ -478,6 +478,13 @@ CONTENT_SECURITY_POLICY = {
     "EXCLUDE_URL_PREFIXES": ["/tus-gestion-secure/"],
 }
 
+# 🔻 Bascule build Alpine CSP : quand ALPINE_CSP_BUILD=1, le build @alpinejs/csp
+# est servi (cf. base.html) et 'unsafe-eval' n'est plus nécessaire → on le retire.
+if ALPINE_CSP_BUILD:  # noqa: F405 (défini dans base.py)
+    CONTENT_SECURITY_POLICY["DIRECTIVES"]["script-src"] = [
+        d for d in CONTENT_SECURITY_POLICY["DIRECTIVES"]["script-src"] if d != "'unsafe-eval'"
+    ]
+
 _csp_report_uri = os.environ.get('CSP_REPORT_URI', '')
 if _csp_report_uri:
     CONTENT_SECURITY_POLICY["DIRECTIVES"]["report-uri"] = _csp_report_uri

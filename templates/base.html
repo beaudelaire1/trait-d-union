@@ -157,11 +157,14 @@
     </main>
     {% include 'partials/footer.html' %}
     {# 🔻 CSP : templates migrés au sous-ensemble CSP (Alpine.data + méthodes).
-       Pour retirer 'unsafe-eval' de la CSP, basculer ce <script> sur le build
-       "@alpinejs/csp@3.14.8" (+ recalculer l'integrity SRI), QA navigateur,
-       puis supprimer 'unsafe-eval' dans config/settings/production.py.
-       Cf. note détaillée dans production.py (script-src). #}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js" nonce="{{ request.csp_nonce }}" integrity="sha384-X9kJyAubVxnP0hcA+AMMs21U445qsnqhnUF8EBlEpP3a42Kh/JwWjlv2ZcvGfphb" crossorigin="anonymous"></script>
+       Bascule pilotée par env (cf. config/settings/base.py) :
+         ALPINE_CSP_BUILD=1 → build @alpinejs/csp + retrait auto de 'unsafe-eval'.
+       Activer uniquement après QA navigateur. ALPINE_CSP_SRI = hash optionnel. #}
+    {% if alpine_csp_build %}
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/csp@{{ alpine_version }}/dist/cdn.min.js" nonce="{{ request.csp_nonce }}"{% if alpine_csp_sri %} integrity="{{ alpine_csp_sri }}" crossorigin="anonymous"{% endif %}></script>
+    {% else %}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@{{ alpine_version }}/dist/cdn.min.js" nonce="{{ request.csp_nonce }}" integrity="{{ alpine_std_sri }}" crossorigin="anonymous"></script>
+    {% endif %}
     <!-- Lenis — premium smooth scroll (~5KB) -->
     <script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" nonce="{{ request.csp_nonce }}" integrity="sha384-tKsJDT6PlUI0pSBt9/sBKJluKgA19/a6mBrDsZaXotLB4ZYfMGM6xt6/WgGpYhTm" crossorigin="anonymous"></script>
     <!-- HTMX with View Transitions support -->

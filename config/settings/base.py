@@ -449,6 +449,21 @@ if any(h in _raw_site_url for h in ('localhost', '127.0.0.1', '0.0.0.0')):
 else:
     SITE_URL = _raw_site_url.rstrip('/')
 
+# ==============================================================================
+# 🔻 ALPINE.JS — Bascule build CSP (retrait de 'unsafe-eval')
+# ==============================================================================
+# Les templates sont migrés au sous-ensemble CSP (Alpine.data + méthodes/getters).
+# Activer le build @alpinejs/csp permet de retirer 'unsafe-eval' de la CSP.
+# Bascule pilotée par variable d'environnement (zéro déploiement de code) :
+#   ALPINE_CSP_BUILD=1   → charge @alpinejs/csp + retire 'unsafe-eval' (cf. production.py)
+#   ALPINE_CSP_SRI=...   → hash d'intégrité SRI du build CSP (calculé après fetch) ; optionnel
+# ⚠️ N'activer ALPINE_CSP_BUILD=1 qu'après QA navigateur (FAQ, simulateurs, portail).
+ALPINE_VERSION = os.environ.get('ALPINE_VERSION', '3.14.8')
+ALPINE_CSP_BUILD = os.environ.get('ALPINE_CSP_BUILD', '0') == '1'
+ALPINE_CSP_SRI = os.environ.get('ALPINE_CSP_SRI', '').strip()
+# Integrity du build STANDARD (connu, fixe) — utilisé tant que la bascule est off.
+ALPINE_STD_SRI = 'sha384-X9kJyAubVxnP0hcA+AMMs21U445qsnqhnUF8EBlEpP3a42Kh/JwWjlv2ZcvGfphb'
+
 # Jazzmin Admin Theme Configuration
 JAZZMIN_SETTINGS = {
     # Branding
