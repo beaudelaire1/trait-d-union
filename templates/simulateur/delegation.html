@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les outils de pilotage RH et les automatisations qui libèrent du temps dirigeant.{% endblock %}
 
 {% block tool_content %}
-<div x-data="delegationSim()" x-cloak>
+<div x-data="delegationSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── PANNEAU GAUCHE ── #}
@@ -33,7 +33,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Heures/sem. sur cette tâche</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="hSem + 'h'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_x0"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="hSem" min="2" max="40" step="1">
                 </div>
@@ -45,7 +45,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-2">
                         <label class="tool-label mb-0">Horizon d'analyse</label>
-                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="horizon + ' ans'"></span>
+                        <span class="text-lg font-bold font-mono" style="color: var(--tool-glow);" x-text="_x1"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="horizon" min="1" max="5" step="1">
                 </div>
@@ -64,7 +64,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-1">
                         <label class="tool-label mb-0">Taux de charges patronales</label>
-                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="emb.charges + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="_x2"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="emb.charges" min="20" max="60" step="1">
                 </div>
@@ -83,7 +83,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-1">
                         <label class="tool-label mb-0">Augmentation annuelle estimée</label>
-                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="emb.augmentation + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: #22c55e;" x-text="_x3"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="emb.augmentation" min="0" max="8" step="0.5">
                 </div>
@@ -111,7 +111,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-1">
                         <label class="tool-label mb-0">Revalorisation TJM / an</label>
-                        <span class="text-sm font-bold font-mono" style="color: #6B8AFF;" x-text="st.reval + '%'"></span>
+                        <span class="text-sm font-bold font-mono" style="color: #6B8AFF;" x-text="_x4"></span>
                     </div>
                     <input type="range" class="tool-range" x-model.number="st.reval" min="0" max="10" step="0.5">
                 </div>
@@ -127,11 +127,11 @@
         <div class="lg:col-span-3 space-y-6">
 
             {# Verdict #}
-            <div class="result-block text-center py-8 mo-scale-in" :style="'border-color:' + verdictColor()">
-                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="'color:' + verdictColor()" x-text="verdict()"></p>
-                <p class="result-big text-4xl" :style="'color:' + verdictColor()" x-text="'Économie : ' + fmt(Math.abs(ecartTotal())) + ' €'"></p>
+            <div class="result-block text-center py-8 mo-scale-in" :style="_x5">
+                <p class="text-sm font-semibold tracking-widest uppercase mb-2" :style="_x6" x-text="verdict()"></p>
+                <p class="result-big text-4xl" :style="_x6" x-text="_x7"></p>
                 <p class="text-base mt-3" style="color: var(--sim-muted);">
-                    sur <span x-text="horizon"></span> an<span x-text="horizon > 1 ? 's' : ''"></span>
+                    sur <span x-text="horizon"></span> an<span x-text="_x8"></span>
                 </p>
             </div>
 
@@ -139,19 +139,19 @@
             <div class="grid sm:grid-cols-4 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Coût embauche total</p>
-                    <p class="result-big text-xl" style="color: #22c55e;" x-text="fmt(coutEmbTotal()) + ' €'"></p>
+                    <p class="result-big text-xl" style="color: #22c55e;" x-text="_x9"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">Coût sous-trait. total</p>
-                    <p class="result-big text-xl" style="color: #6B8AFF;" x-text="fmt(coutStTotal()) + ' €'"></p>
+                    <p class="result-big text-xl" style="color: #6B8AFF;" x-text="_x10"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="200">
                     <p class="result-label mb-1">CA récupéré total</p>
-                    <p class="result-big text-xl" style="color: var(--tool-glow);" x-text="fmt(caRecupere()) + ' €'"></p>
+                    <p class="result-big text-xl" style="color: var(--tool-glow);" x-text="_x11"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
                     <p class="result-label mb-1">Point de bascule</p>
-                    <p class="result-big text-xl" :style="'color:' + (bascule() ? '#f59e0b' : 'var(--sim-muted)')" x-text="bascule() || 'Aucun'"></p>
+                    <p class="result-big text-xl" :style="_x12" x-text="_x13"></p>
                 </div>
             </div>
 
@@ -172,10 +172,10 @@
                     <tbody>
                         <template x-for="(r, i) in tableau()" :key="i">
                             <tr style="border-bottom: 1px solid var(--sim-card-border);">
-                                <td class="py-2 pr-2 font-medium" style="color: var(--sim-ink);" x-text="'An ' + r.an"></td>
+                                <td class="py-2 pr-2 font-medium" style="color: var(--sim-ink);" x-text="_x14(r)"></td>
                                 <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="fmt(r.emb)"></td>
                                 <td class="text-right py-2 px-2" style="color: #6B8AFF;" x-text="fmt(r.st)"></td>
-                                <td class="text-right py-2 px-2 font-semibold" :style="'color:' + (r.emb < r.st ? '#22c55e' : r.emb > r.st ? '#6B8AFF' : 'var(--sim-muted)')" x-text="(r.emb <= r.st ? '' : '+') + fmt(r.emb - r.st)"></td>
+                                <td class="text-right py-2 px-2 font-semibold" :style="_x15(r)" x-text="_x16(r)"></td>
                                 <td class="text-right py-2 px-2" x-text="fmt(r.cumulEmb)"></td>
                                 <td class="text-right py-2 pl-2" x-text="fmt(r.cumulSt)"></td>
                             </tr>
@@ -201,11 +201,11 @@
             </div>
 
             {# Insight #}
-            <div class="result-block mo-fade-up" data-delay="450" :style="'border-color:' + verdictColor()">
+            <div class="result-block mo-fade-up" data-delay="450" :style="_x5">
                 <div class="flex items-start gap-3">
                     <span class="text-2xl">🎯</span>
                     <div>
-                        <p class="font-semibold" :style="'color:' + verdictColor()" x-text="verdict()"></p>
+                        <p class="font-semibold" :style="_x6" x-text="verdict()"></p>
                         <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="insight()"></p>
                     </div>
                 </div>
@@ -222,6 +222,27 @@
 
     function delegationSim() {
         return {
+            // ⚙️ CSP getters/méthodes (expressions déplacées à l'identique)
+
+
+            get _x0() { return this.hSem + 'h'; },
+            get _x1() { return this.horizon + ' ans'; },
+            get _x2() { return this.emb.charges + '%'; },
+            get _x3() { return this.emb.augmentation + '%'; },
+            get _x4() { return this.st.reval + '%'; },
+            get _x5() { return 'border-color:' + this.verdictColor(); },
+            get _x6() { return 'color:' + this.verdictColor(); },
+            get _x7() { return 'Économie : ' + this.fmt(Math.abs(this.ecartTotal())) + ' €'; },
+            get _x8() { return this.horizon > 1 ? 's' : ''; },
+            get _x9() { return this.fmt(this.coutEmbTotal()) + ' €'; },
+            get _x10() { return this.fmt(this.coutStTotal()) + ' €'; },
+            get _x11() { return this.fmt(this.caRecupere()) + ' €'; },
+            get _x12() { return 'color:' + (this.bascule() ? '#f59e0b' : 'var(--sim-muted)'); },
+            get _x13() { return this.bascule() || 'Aucun'; },
+            _x14(r) { return 'An ' + r.an; },
+            _x15(r) { return 'color:' + (r.emb < r.st ? '#22c55e' : r.emb > r.st ? '#6B8AFF' : 'var(--sim-muted)'); },
+            _x16(r) { return (r.emb <= r.st ? '' : '+') + this.fmt(r.emb - r.st); },
+
             tauxDirigeant: 80, hSem: 12, caGagne: 4000, horizon: 3,
             emb: { salaireBrut: 2800, charges: 42, recrutement: 5000, formation: 2000, annexes: 3600, augmentation: 2.5 },
             st:  { tjm: 450, joursSem: 2, pilotage: 300, reval: 3, semAn: 46 },
@@ -374,6 +395,7 @@
         };
     }
     window.delegationSim = delegationSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("delegationSim", delegationSim); });
 })();
 </script>
 {% endblock %}

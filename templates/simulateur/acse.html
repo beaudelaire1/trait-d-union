@@ -16,7 +16,7 @@
 {% block tool_cta_text %}Échangeons sur les outils digitaux que TUS peut construire pour agir concrètement sur le pilier qui freine votre croissance.{% endblock %}
 
 {% block tool_content %}
-<div x-data="acseSim()" x-cloak>
+<div x-data="acseSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── Sliders ── #}
@@ -28,11 +28,11 @@
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <label class="tool-label mb-0" x-text="pilier.label"></label>
-                            <span class="text-lg font-bold font-mono" :style="'color:' + pilier.color" x-text="pilier.score + '/10'"></span>
+                            <span class="text-lg font-bold font-mono" :style="_x0(pilier)" x-text="_x1(pilier)"></span>
                         </div>
                         <input type="range" class="tool-range" x-model.number="pilier.score" min="1" max="10" step="1"
-                               :style="'--tool-glow:' + pilier.color">
-                        <p class="tool-sublabel" x-text="pilier.help + ' • Coef: ' + pilier.importance.toFixed(1) + 'x • Impact: ' + prioritePilier(pilier).toFixed(1)"></p>
+                               :style="_x2(pilier)">
+                        <p class="tool-sublabel" x-text="_x3(pilier)"></p>
                     </div>
                 </template>
             </div>
@@ -43,10 +43,10 @@
                     Les quatre piliers sont pondérés à égalité par défaut pour éviter d'orienter la priorité vers un levier métier précis.
                 </p>
                 <div class="space-y-2 text-xs" style="color: var(--sim-muted);">
-                    <template x-for="pilier in piliers" :key="'coef-' + pilier.label">
+                    <template x-for="pilier in piliers" :key="_x4(pilier)">
                         <div class="flex items-center justify-between">
                             <span x-text="pilier.label"></span>
-                            <span class="font-mono font-semibold" :style="'color:' + pilier.color" x-text="pilier.importance.toFixed(1) + 'x'"></span>
+                            <span class="font-mono font-semibold" :style="_x0(pilier)" x-text="_x5(pilier)"></span>
                         </div>
                     </template>
                 </div>
@@ -65,9 +65,9 @@
             {# Score global #}
             <div class="result-block text-center py-6 mo-scale-in">
                 <p class="result-label mb-2">Score global (brut)</p>
-                <p class="result-big text-5xl" :style="'color:' + globalColor()" x-text="scoreGlobal() + '/40'"></p>
-                <p class="text-sm mt-2" :style="'color:' + globalColor()" x-text="globalVerdict()"></p>
-                <p class="text-xs mt-2" style="color: var(--sim-sublabel);" x-text="'Indice pondere: ' + scorePonderePct().toFixed(0) + '% (coef d\'importance applique)'"></p>
+                <p class="result-big text-5xl" :style="_x6" x-text="_x7"></p>
+                <p class="text-sm mt-2" :style="_x6" x-text="globalVerdict()"></p>
+                <p class="text-xs mt-2" style="color: var(--sim-sublabel);" x-text="_x8"></p>
             </div>
 
             {# Radar Chart #}
@@ -85,7 +85,7 @@
                     <div>
                         <p class="font-semibold" style="color: var(--sim-ink);">
                             Zone prioritaire :
-                            <span :style="'color:' + goulot().color" x-text="goulot().label"></span>
+                            <span :style="_x9" x-text="goulot().label"></span>
                         </p>
                         <p class="text-sm mt-2" style="color: var(--sim-muted);" x-text="goulot().diagnostic"></p>
                         <p class="text-xs mt-3" style="color: var(--sim-sublabel);" x-text="prioritesResume()"></p>
@@ -123,6 +123,18 @@
         });
 
         return {
+            // ⚙️ CSP getters/méthodes (expressions déplacées à l'identique)
+            _x0(pilier) { return 'color:' + pilier.color; },
+            _x1(pilier) { return pilier.score + '/10'; },
+            _x2(pilier) { return '--tool-glow:' + pilier.color; },
+            _x3(pilier) { return pilier.help + ' • Coef: ' + pilier.importance.toFixed(1) + 'x • Impact: ' + this.prioritePilier(pilier).toFixed(1); },
+            _x4(pilier) { return 'coef-' + pilier.label; },
+            _x5(pilier) { return pilier.importance.toFixed(1) + 'x'; },
+            get _x6() { return 'color:' + this.globalColor(); },
+            get _x7() { return this.scoreGlobal() + '/40'; },
+            get _x8() { return 'Indice pondere: ' + this.scorePonderePct().toFixed(0) + '% (coef d\'importance applique)'; },
+            get _x9() { return 'color:' + this.goulot().color; },
+
             piliers: [
                 { label: 'Attirer', score: 5, color: '#f59e0b', help: 'Visibilité, SEO, réseaux, bouche-à-oreille, publicité',
                     importance: IMPORTANCE['Attirer'],
@@ -301,6 +313,7 @@
         };
     }
     window.acseSim = acseSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("acseSim", acseSim); });
 })();
 </script>
 {% endblock %}

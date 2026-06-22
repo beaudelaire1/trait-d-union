@@ -16,7 +16,7 @@
 {% block tool_cta_text %}TUS vous accompagne dans l'optimisation de votre portefeuille de services — pricing, packaging, priorisation.{% endblock %}
 
 {% block tool_content %}
-<div x-data="mixProduitsSim()" x-cloak>
+<div x-data="mixProduitsSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         {# ── Formulaire ── #}
@@ -30,14 +30,14 @@
             </div>
 
             <template x-for="(p, i) in produits" :key="i">
-                <div class="tool-card space-y-4 mo-fade-up" :data-delay="(i+1)*100">
+                <div class="tool-card space-y-4 mo-fade-up" :data-delay="_x0(i)">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-base font-semibold" style="color: var(--sim-ink);" x-text="'Offre x' + (i+1)"></h2>
-                        <button x-show="produits.length > 2" @click="produits.splice(i, 1)" class="text-xs" style="color: var(--sim-muted);">✕ Retirer</button>
+                        <h2 class="text-base font-semibold" style="color: var(--sim-ink);" x-text="_x1(i)"></h2>
+                        <button x-show="_x2" @click="produits.splice(i, 1)" class="text-xs" style="color: var(--sim-muted);">✕ Retirer</button>
                     </div>
                     <div>
                         <label class="tool-label">Nom</label>
-                        <input type="text" class="tool-input" x-model="p.nom" :placeholder="'Prestation ' + (i+1)">
+                        <input type="text" class="tool-input" x-model="p.nom" :placeholder="_x3(i)">
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -63,7 +63,7 @@
                 </div>
             </template>
 
-            <button x-show="produits.length < 5" @click="produits.push({nom:'', prix:0, cout:0, heures:1, demande:10})"
+            <button x-show="_x4" @click="_x5()"
                     class="w-full py-2 rounded-xl text-sm font-semibold transition"
                     style="border: 1px dashed var(--sim-card-border); color: var(--sim-muted);">
                 + Ajouter une offre
@@ -77,11 +77,11 @@
             <div class="result-block mo-fade-up" style="border-color: #22c55e;">
                 <h3 class="text-xs font-bold tracking-widest uppercase mb-3" style="color: #22c55e;">Formulation du programme linéaire</h3>
                 <div class="space-y-2 text-sm font-mono" style="color: var(--sim-ink);">
-                    <p><span class="font-bold" style="color: #22c55e;">max</span> Z = <template x-for="(p, i) in validItems()" :key="i"><span><span x-text="fmt(p.marge)"></span>·x<sub x-text="i+1"></sub><span x-show="i < validItems().length - 1"> + </span></span></template></p>
+                    <p><span class="font-bold" style="color: #22c55e;">max</span> Z = <template x-for="(p, i) in validItems()" :key="i"><span><span x-text="fmt(p.marge)"></span>·x<sub x-text="_x6(i)"></sub><span x-show="_x7(i)"> + </span></span></template></p>
                     <p style="color: var(--sim-muted);">sous contraintes :</p>
-                    <p class="pl-4"><template x-for="(p, i) in validItems()" :key="i"><span><span x-text="p.heures"></span>·x<sub x-text="i+1"></sub><span x-show="i < validItems().length - 1"> + </span></span></template> ≤ <span x-text="heuresDispo"></span> <span style="color: var(--sim-muted);">(capacité)</span></p>
+                    <p class="pl-4"><template x-for="(p, i) in validItems()" :key="i"><span><span x-text="p.heures"></span>·x<sub x-text="_x6(i)"></sub><span x-show="_x7(i)"> + </span></span></template> ≤ <span x-text="heuresDispo"></span> <span style="color: var(--sim-muted);">(capacité)</span></p>
                     <template x-for="(p, i) in validItems()" :key="i">
-                        <p class="pl-4">0 ≤ x<sub x-text="i+1"></sub> ≤ <span x-text="p.demande"></span> <span style="color: var(--sim-muted);" x-text="'(' + (p.nom || 'offre ' + (i+1)) + ')'"></span></p>
+                        <p class="pl-4">0 ≤ x<sub x-text="_x6(i)"></sub> ≤ <span x-text="p.demande"></span> <span style="color: var(--sim-muted);" x-text="_x8(p,i)"></span></p>
                     </template>
                 </div>
             </div>
@@ -89,7 +89,7 @@
             {# Résultat principal #}
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #22c55e;">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #22c55e;">Solution optimale entière (IP)</p>
-                <p class="result-big text-5xl" style="color: #22c55e;" x-text="fmt(ipSolution().totalMarge) + ' €'"></p>
+                <p class="result-big text-5xl" style="color: #22c55e;" x-text="_x9"></p>
                 <p class="text-base mt-3" style="color: var(--sim-muted);">marge maximale sur <span x-text="heuresDispo"></span> heures</p>
             </div>
 
@@ -97,12 +97,12 @@
             <div class="grid sm:grid-cols-2 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="100">
                     <p class="result-label mb-1">Relaxation LP (borne sup.)</p>
-                    <p class="result-big text-2xl" style="color: #a855f7;" x-text="fmt(lpRelaxation().totalMarge) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: #a855f7;" x-text="_x10"></p>
                     <p class="text-xs mt-1" style="color: var(--sim-muted);">solution continue optimale</p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="150">
                     <p class="result-label mb-1">Gap LP → IP</p>
-                    <p class="result-big text-2xl" :style="'color:' + (gapPct() < 2 ? '#22c55e' : '#f59e0b')" x-text="gapPct() + '%'"></p>
+                    <p class="result-big text-2xl" :style="_x11" x-text="_x12"></p>
                     <p class="text-xs mt-1" style="color: var(--sim-muted);">perte due à la contrainte entière</p>
                 </div>
             </div>
@@ -113,14 +113,14 @@
                 <div class="space-y-3">
                     <template x-for="(r, i) in ipSolution().items" :key="i">
                         <div class="flex items-center gap-4 p-3 rounded-xl" style="background: var(--sim-surface);">
-                            <span class="text-2xl font-bold font-mono" :style="'color:' + (r.unites > 0 ? '#22c55e' : 'var(--sim-muted)')" x-text="'x' + (i+1)"></span>
+                            <span class="text-2xl font-bold font-mono" :style="_x13(r)" x-text="_x14(i)"></span>
                             <div class="flex-1 min-w-0">
-                                <p class="font-semibold text-sm" style="color: var(--sim-ink);" x-text="r.nom || 'Offre ' + (i+1)"></p>
-                                <p class="text-xs" style="color: var(--sim-muted);" x-text="fmt(r.margeH) + ' €/h · ' + r.heures + 'h/u · demande ' + r.demande"></p>
+                                <p class="font-semibold text-sm" style="color: var(--sim-ink);" x-text="_x15(r,i)"></p>
+                                <p class="text-xs" style="color: var(--sim-muted);" x-text="_x16(r)"></p>
                             </div>
                             <div class="text-right">
-                                <p class="text-sm font-bold" :style="'color:' + (r.unites > 0 ? '#22c55e' : 'var(--sim-muted)')" x-text="r.unites + ' / ' + r.demande + ' u'"></p>
-                                <p class="text-xs" style="color: var(--sim-muted);" x-text="fmt(r.margeTotale) + ' € · ' + r.heuresUtilisees + 'h'"></p>
+                                <p class="text-sm font-bold" :style="_x13(r)" x-text="_x17(r)"></p>
+                                <p class="text-xs" style="color: var(--sim-muted);" x-text="_x18(r)"></p>
                             </div>
                         </div>
                     </template>
@@ -131,15 +131,15 @@
             <div class="grid sm:grid-cols-3 gap-4">
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="250">
                     <p class="result-label mb-1">Heures utilisées</p>
-                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="ipSolution().totalHeures + ' / ' + heuresDispo"></p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="_x19"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="300">
                     <p class="result-label mb-1">Taux d'occupation</p>
-                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="tauxOccupation() + '%'"></p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="_x20"></p>
                 </div>
                 <div class="result-block text-center py-5 mo-fade-up" data-delay="350">
                     <p class="result-label mb-1">Marge moyenne / h</p>
-                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="fmt(margeMoyH()) + ' €'"></p>
+                    <p class="result-big text-2xl" style="color: var(--tool-glow);" x-text="_x21"></p>
                 </div>
             </div>
 
@@ -173,6 +173,32 @@
 
     function mixProduitsSim() {
         return {
+            // ⚙️ CSP getters/méthodes (expressions déplacées à l'identique)
+
+
+            _x0(i) { return (i+1)*100; },
+            _x1(i) { return 'Offre x' + (i+1); },
+            get _x2() { return this.produits.length > 2; },
+            _x3(i) { return 'Prestation ' + (i+1); },
+            get _x4() { return this.produits.length < 5; },
+            _x5() { this.produits.push({nom:'', prix:0, cout:0, heures:1, demande:10}); },
+            _x6(i) { return i+1; },
+            _x7(i) { return i < this.validItems().length - 1; },
+            _x8(p,i) { return '(' + (p.nom || 'offre ' + (i+1)) + ')'; },
+            get _x9() { return this.fmt(this.ipSolution().totalMarge) + ' €'; },
+            get _x10() { return this.fmt(this.lpRelaxation().totalMarge) + ' €'; },
+            get _x11() { return 'color:' + (this.gapPct() < 2 ? '#22c55e' : '#f59e0b'); },
+            get _x12() { return this.gapPct() + '%'; },
+            _x13(r) { return 'color:' + (r.unites > 0 ? '#22c55e' : 'var(--sim-muted)'); },
+            _x14(i) { return 'x' + (i+1); },
+            _x15(r,i) { return r.nom || 'Offre ' + (i+1); },
+            _x16(r) { return this.fmt(r.margeH) + ' €/h · ' + r.heures + 'h/u · demande ' + r.demande; },
+            _x17(r) { return r.unites + ' / ' + r.demande + ' u'; },
+            _x18(r) { return this.fmt(r.margeTotale) + ' € · ' + r.heuresUtilisees + 'h'; },
+            get _x19() { return this.ipSolution().totalHeures + ' / ' + this.heuresDispo; },
+            get _x20() { return this.tauxOccupation() + '%'; },
+            get _x21() { return this.fmt(this.margeMoyH()) + ' €'; },
+
             heuresDispo: 500,
             produits: [
                 { nom: 'Création de site', prix: 3000, cout: 1200, heures: 40, demande: 8 },
@@ -354,6 +380,7 @@
         };
     }
     window.mixProduitsSim = mixProduitsSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("mixProduitsSim", mixProduitsSim); });
 })();
 </script>
 {% endblock %}

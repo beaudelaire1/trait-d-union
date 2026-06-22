@@ -16,15 +16,15 @@
 {% block tool_cta_text %}TUS vous aide à structurer votre CRM et vos segments pour mieux cibler et convertir.{% endblock %}
 
 {% block tool_content %}
-<div x-data="jumeauxSim()" x-cloak>
+<div x-data="jumeauxSim" x-cloak>
     <div class="grid lg:grid-cols-5 gap-8">
 
         <div class="lg:col-span-2 space-y-5">
             <template x-for="(c, i) in clients" :key="i">
-                <div class="tool-card space-y-4 mo-fade-up" :data-delay="i*100">
+                <div class="tool-card space-y-4 mo-fade-up" :data-delay="_x0(i)">
                     <div class="flex items-center justify-between">
-                        <h2 class="text-base font-semibold" style="color: var(--sim-ink);" x-text="'Profil ' + (i+1)"></h2>
-                        <button x-show="clients.length > 2" @click="clients.splice(i, 1)" class="text-xs" style="color: var(--sim-muted);">✕</button>
+                        <h2 class="text-base font-semibold" style="color: var(--sim-ink);" x-text="_x1(i)"></h2>
+                        <button x-show="_x2" @click="clients.splice(i, 1)" class="text-xs" style="color: var(--sim-muted);">✕</button>
                     </div>
                     <div>
                         <label class="tool-label">Nom du segment</label>
@@ -53,7 +53,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <label class="tool-label mb-0">Facilité de service</label>
-                            <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="c.facilite + '/5'"></span>
+                            <span class="text-sm font-bold font-mono" style="color: var(--tool-glow);" x-text="_x3(c)"></span>
                         </div>
                         <input type="range" class="tool-range" x-model.number="c.facilite" min="1" max="5" step="1">
                         <p class="tool-sublabel">1 = très chronophage, 5 = autonome</p>
@@ -61,7 +61,7 @@
                 </div>
             </template>
 
-            <button x-show="clients.length < 5" @click="clients.push({nom:'',panier:0,frequence:1,cac:0,reachat:50,facilite:3})"
+            <button x-show="_x4" @click="_x5()"
                     class="w-full py-2 rounded-xl text-sm font-semibold transition"
                     style="border: 1px dashed var(--sim-card-border); color: var(--sim-muted);">
                 + Ajouter un profil
@@ -73,7 +73,7 @@
             <div class="result-block text-center py-8 mo-scale-in" style="border-color: #a855f7;">
                 <p class="text-sm font-semibold tracking-widest uppercase mb-2" style="color: #a855f7;">Meilleur profil dans vos hypothèses</p>
                 <p class="result-big text-4xl" style="color: #a855f7;" x-text="bestNom()"></p>
-                <p class="text-base mt-3" style="color: var(--sim-muted);">Score relatif : <strong style="color: #22c55e;" x-text="bestScore() + ' pts'"></strong></p>
+                <p class="text-base mt-3" style="color: var(--sim-muted);">Score relatif : <strong style="color: #22c55e;" x-text="_x6"></strong></p>
             </div>
 
             <div class="result-block mo-fade-up" data-delay="150">
@@ -92,10 +92,10 @@
                         <tbody>
                             <template x-for="(r, i) in ranking()" :key="r.nom">
                                 <tr style="border-bottom: 1px solid var(--sim-border);">
-                                    <td class="py-2 pr-3 font-semibold" x-text="r.nom || 'Profil ' + (r.idx+1)"></td>
-                                    <td class="text-right py-2 px-2" x-text="fmt(r.caAn) + ' €'"></td>
-                                    <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="fmt(r.ltv) + ' €'"></td>
-                                    <td class="text-right py-2 px-2" x-text="r.roi + 'x'"></td>
+                                    <td class="py-2 pr-3 font-semibold" x-text="_x7(r)"></td>
+                                    <td class="text-right py-2 px-2" x-text="_x8(r)"></td>
+                                    <td class="text-right py-2 px-2" style="color: #22c55e;" x-text="_x9(r)"></td>
+                                    <td class="text-right py-2 px-2" x-text="_x10(r)"></td>
                                     <td class="text-right py-2 px-2 font-bold" style="color: #a855f7;" x-text="r.score"></td>
                                 </tr>
                             </template>
@@ -131,6 +131,21 @@
     let chart = null;
     function jumeauxSim() {
         return {
+            // ⚙️ CSP getters/méthodes (expressions déplacées à l'identique)
+
+
+            _x0(i) { return i*100; },
+            _x1(i) { return 'Profil ' + (i+1); },
+            get _x2() { return this.clients.length > 2; },
+            _x3(c) { return c.facilite + '/5'; },
+            get _x4() { return this.clients.length < 5; },
+            _x5() { this.clients.push({nom:'',panier:0,frequence:1,cac:0,reachat:50,facilite:3}); },
+            get _x6() { return this.bestScore() + ' pts'; },
+            _x7(r) { return r.nom || 'Profil ' + (r.idx+1); },
+            _x8(r) { return this.fmt(r.caAn) + ' €'; },
+            _x9(r) { return this.fmt(r.ltv) + ' €'; },
+            _x10(r) { return r.roi + 'x'; },
+
             clients: [
                 { nom: 'PME locale', panier: 2000, frequence: 3, cac: 300, reachat: 60, facilite: 4 },
                 { nom: 'Grand compte', panier: 8000, frequence: 1, cac: 2000, reachat: 40, facilite: 2 },
@@ -190,6 +205,7 @@
         };
     }
     window.jumeauxSim = jumeauxSim;
+    document.addEventListener("alpine:init", function(){ window.Alpine.data("jumeauxSim", jumeauxSim); });
 })();
 </script>
 {% endblock %}
