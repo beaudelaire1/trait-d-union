@@ -5,6 +5,7 @@ import json
 import logging
 from typing import Any
 
+from django.conf import settings
 from django.http import HttpRequest, JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -395,11 +396,10 @@ class ReportSubmitView(View):
             delivery = 'email'
 
         pdf_bytes: bytes | None = None
-        email_ok = True
-        email_error: str | None = None
 
-        # 1) En mode download, on génère d'abord le PDF — c'est la livraison
-        #    prioritaire, une erreur email ne doit pas bloquer le téléchargement.
+        # 1) En mode download, le PDF doit être généré de façon synchrone :
+        #    il est renvoyé dans la réponse (base64) pour téléchargement immédiat.
+        #    Une erreur de génération est donc bloquante.
         if delivery == 'download':
             try:
                 pdf_bytes = SimulatorReportService.generate_pdf(
@@ -417,26 +417,14 @@ class ReportSubmitView(View):
                     status=500,
                 )
 
-        # 2) Envoi email (copie). On tolère un échec en mode download.
-        try:
-            SimulatorReportService.send(
-                report, pdf_bytes=pdf_bytes, charts=transient_charts,
-            )
-        except Exception as exc:  # noqa: BLE001
-            email_ok = False
-            email_error = str(exc)
-            logger.error(
-                "Échec envoi email rapport simulateur #%s : %s",
-                report.pk, exc, exc_info=True,
-            )
-            if delivery == 'email':
-                # Sans PDF en main, l'utilisateur n'a rien — on remonte l'erreur.
-                return JsonResponse(
-                    {'ok': False,
-                     'message': "Nous n'avons pas pu envoyer le rapport. "
-                                'Réessayez ou contactez-nous.'},
-                    status=500,
-                )
+        # 2) Envoi email en ARRIÈRE-PLAN : la génération PDF (WeasyPrint) et
+        #    l'appel API Brevo sont lents. On libère immédiatement la réponse
+        #    HTTP — donc le bouton côté client — sans attendre l'email. Le
+        #    rapport est déjà persisté ; un échec d'envoi est seulement
+        #    journalisé. En mode download, l'utilisateur a déjà son PDF.
+        self._dispatch_report_email(
+            report, pdf_bytes=pdf_bytes, charts=transient_charts,
+        )
 
         response: dict[str, Any] = {
             'ok': True,
@@ -446,21 +434,60 @@ class ReportSubmitView(View):
             import base64
             response['pdf_base64'] = base64.b64encode(pdf_bytes).decode('ascii')
             response['filename'] = f"rapport_{report.tool_slug or 'simulateur'}.pdf"
-            if email_ok:
-                response['message'] = (
-                    "Téléchargement prêt. Une copie a aussi été envoyée par email."
-                )
-            else:
-                response['message'] = (
-                    "Téléchargement prêt. (La copie email n'a pas pu partir, "
-                    "mais vous avez le PDF.)"
-                )
+            response['message'] = (
+                "Téléchargement prêt. Une copie vous est envoyée par email."
+            )
         else:
             response['message'] = (
-                'Votre rapport a été envoyé. Vérifiez votre boîte mail '
+                'Votre rapport arrive par email d\'ici 2 minutes '
                 '(pensez à regarder dans les spams).'
             )
         return JsonResponse(response)
+
+    @staticmethod
+    def _dispatch_report_email(
+        report: Any, *, pdf_bytes: bytes | None = None, charts: Any = None,
+    ) -> None:
+        """Envoie le rapport par email sans bloquer la réponse HTTP.
+
+        Par défaut l'envoi part dans un thread démon : la génération PDF et
+        l'appel API Brevo n'allongent plus le temps de réponse (le bouton se
+        libère tout de suite). Le rapport étant déjà persisté, un échec est
+        seulement journalisé.
+
+        ``SIMULATEUR_REPORT_EMAIL_ASYNC = False`` force l'envoi synchrone
+        (utilisé par les tests pour rester déterministe).
+        """
+        def _run() -> None:
+            try:
+                SimulatorReportService.send(
+                    report, pdf_bytes=pdf_bytes, charts=charts,
+                )
+            except Exception as exc:  # noqa: BLE001
+                logger.error(
+                    "Échec envoi email rapport simulateur #%s : %s",
+                    report.pk, exc, exc_info=True,
+                )
+
+        if not getattr(settings, 'SIMULATEUR_REPORT_EMAIL_ASYNC', True):
+            _run()
+            return
+
+        import threading
+
+        def _run_threaded() -> None:
+            try:
+                _run()
+            finally:
+                # Ne pas laisser fuiter une connexion DB ouverte dans le thread.
+                from django.db import connections
+                connections.close_all()
+
+        threading.Thread(
+            target=_run_threaded,
+            name=f"report-email-{report.pk}",
+            daemon=True,
+        ).start()
 
     def _is_rate_limited(self, ip: str) -> bool:
         if not ip:

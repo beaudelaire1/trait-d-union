@@ -54,6 +54,11 @@ CACHES = {
 # ==============================================================================
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# Envoi du rapport simulateur en synchrone pendant les tests (déterminisme :
+# pas de thread d'arrière-plan, les assertions sur SimulatorReportService.send
+# restent fiables). En production le défaut (True) garde l'envoi non bloquant.
+SIMULATEUR_REPORT_EMAIL_ASYNC = False
+
 # ==============================================================================
 # STATIC FILES
 # ==============================================================================
