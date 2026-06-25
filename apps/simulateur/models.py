@@ -32,6 +32,10 @@ class SimulatorReport(models.Model):
     # État d'envoi.
     pdf_sent_at = models.DateTimeField("Envoyé le", null=True, blank=True)
     send_error = models.TextField("Erreur d'envoi", blank=True)
+    send_attempts = models.PositiveSmallIntegerField(
+        "Tentatives d'envoi", default=0,
+        help_text="Incrémenté à chaque tentative ; plafonne les renvois du cron.",
+    )
 
     # Conversion commerciale.
     converted_to_lead = models.ForeignKey(

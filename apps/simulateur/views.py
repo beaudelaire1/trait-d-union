@@ -452,22 +452,19 @@ class ReportSubmitView(View):
 
         Par défaut l'envoi part dans un thread démon : la génération PDF et
         l'appel API Brevo n'allongent plus le temps de réponse (le bouton se
-        libère tout de suite). Le rapport étant déjà persisté, un échec est
-        seulement journalisé.
+        libère tout de suite). ``deliver()`` enregistre l'état d'envoi de façon
+        durable (``pdf_sent_at`` / ``send_attempts``) : si le thread est tué
+        (recyclage worker, déploiement, crash), la commande planifiée
+        ``resend_unsent_simulator_reports`` renverra le rapport — la livraison
+        est donc garantie même en best-effort côté thread.
 
         ``SIMULATEUR_REPORT_EMAIL_ASYNC = False`` force l'envoi synchrone
         (utilisé par les tests pour rester déterministe).
         """
         def _run() -> None:
-            try:
-                SimulatorReportService.send(
-                    report, pdf_bytes=pdf_bytes, charts=charts,
-                )
-            except Exception as exc:  # noqa: BLE001
-                logger.error(
-                    "Échec envoi email rapport simulateur #%s : %s",
-                    report.pk, exc, exc_info=True,
-                )
+            SimulatorReportService.deliver(
+                report, pdf_bytes=pdf_bytes, charts=charts,
+            )
 
         if not getattr(settings, 'SIMULATEUR_REPORT_EMAIL_ASYNC', True):
             _run()

@@ -69,6 +69,46 @@ class SimulatorReportService:
         return DocumentGenerator._render_pdf(html)
 
     @classmethod
+    def deliver(
+        cls,
+        report: SimulatorReport,
+        *,
+        pdf_bytes: bytes | None = None,
+        charts: list | None = None,
+    ) -> bool:
+        """Envoie le rapport ET enregistre l'état d'envoi de façon durable.
+
+        - succès : ``pdf_sent_at`` est horodaté, ``send_error`` vidé ;
+        - échec  : ``send_error`` stocké, ``send_attempts`` incrémenté.
+
+        Le flag persisté permet à la commande ``resend_unsent_simulator_reports``
+        (cron) de renvoyer les rapports non partis — garantissant la livraison
+        même si le thread d'envoi est tué (recyclage worker / déploiement).
+        Retourne ``True`` si l'email est parti.
+        """
+        from django.db.models import F
+
+        try:
+            cls.send(report, pdf_bytes=pdf_bytes, charts=charts)
+        except Exception as exc:  # noqa: BLE001
+            logger.error(
+                "Échec envoi rapport simulateur #%s : %s",
+                report.pk, exc, exc_info=True,
+            )
+            SimulatorReport.objects.filter(pk=report.pk).update(
+                send_attempts=F('send_attempts') + 1,
+                send_error=str(exc)[:2000],
+            )
+            return False
+
+        SimulatorReport.objects.filter(pk=report.pk).update(
+            pdf_sent_at=timezone.now(),
+            send_attempts=F('send_attempts') + 1,
+            send_error='',
+        )
+        return True
+
+    @classmethod
     def send(
         cls,
         report: SimulatorReport,
