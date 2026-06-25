@@ -13,6 +13,7 @@ import re
 import socket
 import ssl
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone as tz
 from urllib.parse import urljoin, urlparse
 
@@ -23,6 +24,8 @@ from bs4 import BeautifulSoup
 # ── Timeouts & limits ────────────────────────────────────────────────
 REQUEST_TIMEOUT = 15
 MAX_INTERNAL_LINKS_CHECK = 20
+_LINK_CHECK_WORKERS = 5   # parallélisme pour les HEAD requests
+_CATEGORY_WORKERS = 7     # une catégorie par thread
 USER_AGENT = (
     "Mozilla/5.0 (compatible; TUS-Diagnostic/1.0; "
     "+https://www.traitdunion.it)"
@@ -63,15 +66,30 @@ def run_diagnostic(url: str) -> dict:
 
     hostname = parsed.hostname or ""
 
-    # ── Lancer chaque catégorie ──────────────────────────────────────
+    # ── Lancer les 7 catégories en parallèle ────────────────────────
+    # Chaque check est indépendant ; on les soumet tous en même temps et on
+    # collecte les résultats au fur et à mesure qu'ils arrivent.
+    _checks = {
+        "performance": lambda: _check_performance(resp),
+        "seo":         lambda: _check_seo(url, resp, soup),
+        "securite":    lambda: _check_security(resp),
+        "accessibilite": lambda: _check_accessibility(soup),
+        "mobile":      lambda: _check_mobile(soup),
+        "ssl":         lambda: _check_ssl(hostname),
+        "standards":   lambda: _check_standards(url, resp, soup, session),
+    }
     categories = {}
-    categories["performance"] = _check_performance(resp)
-    categories["seo"] = _check_seo(url, resp, soup)
-    categories["securite"] = _check_security(resp)
-    categories["accessibilite"] = _check_accessibility(soup)
-    categories["mobile"] = _check_mobile(soup)
-    categories["ssl"] = _check_ssl(hostname)
-    categories["standards"] = _check_standards(url, resp, soup, session)
+    with ThreadPoolExecutor(max_workers=_CATEGORY_WORKERS) as _pool:
+        _futures = {_pool.submit(fn): name for name, fn in _checks.items()}
+        for _fut in as_completed(_futures):
+            _name = _futures[_fut]
+            try:
+                categories[_name] = _fut.result()
+            except Exception as _exc:
+                categories[_name] = _score(
+                    [{"name": "Erreur", "passed": False, "detail": str(_exc)}],
+                    _name,
+                )
 
     # ── Score global (moyenne pondérée) ──────────────────────────────
     weights = {
@@ -195,23 +213,32 @@ def _check_seo(url, resp, soup):
         "passed": len(ld_scripts) > 0,
         "detail": f"{len(ld_scripts)} bloc(s) JSON-LD" if ld_scripts else "Aucun",
     })
-    # robots.txt
-    try:
-        r_robots = requests.get(urljoin(url, "/robots.txt"), timeout=5, headers={"User-Agent": USER_AGENT})
-        has_robots = r_robots.status_code == 200 and len(r_robots.text) > 10
-    except Exception:
-        has_robots = False
+    # robots.txt + sitemap.xml en parallèle
+    def _fetch_robots():
+        try:
+            r = requests.get(urljoin(url, "/robots.txt"), timeout=5, headers={"User-Agent": USER_AGENT})
+            return r.status_code == 200 and len(r.text) > 10
+        except Exception:
+            return False
+
+    def _fetch_sitemap():
+        try:
+            r = requests.get(urljoin(url, "/sitemap.xml"), timeout=5, headers={"User-Agent": USER_AGENT})
+            return r.status_code == 200 and "urlset" in r.text.lower()
+        except Exception:
+            return False
+
+    with ThreadPoolExecutor(max_workers=2) as _pool:
+        _f_robots = _pool.submit(_fetch_robots)
+        _f_sitemap = _pool.submit(_fetch_sitemap)
+        has_robots = _f_robots.result()
+        has_sitemap = _f_sitemap.result()
+
     items.append({
         "name": "robots.txt",
         "passed": has_robots,
         "detail": "Présent" if has_robots else "Absent ou vide",
     })
-    # sitemap.xml
-    try:
-        r_sitemap = requests.get(urljoin(url, "/sitemap.xml"), timeout=5, headers={"User-Agent": USER_AGENT})
-        has_sitemap = r_sitemap.status_code == 200 and "urlset" in r_sitemap.text.lower()
-    except Exception:
-        has_sitemap = False
     items.append({
         "name": "sitemap.xml",
         "passed": has_sitemap,
@@ -474,13 +501,21 @@ def _check_standards(url, resp, soup, session):
             if full not in internal_links:
                 internal_links.append(full)
     broken = []
-    for link in internal_links[:MAX_INTERNAL_LINKS_CHECK]:
+    links_to_check = internal_links[:MAX_INTERNAL_LINKS_CHECK]
+
+    def _head(link):
         try:
             r = session.head(link, timeout=5, allow_redirects=True)
-            if r.status_code >= 400:
-                broken.append(f"{link} → {r.status_code}")
+            return link, r.status_code
         except Exception:
-            broken.append(f"{link} → timeout")
+            return link, None
+
+    with ThreadPoolExecutor(max_workers=_LINK_CHECK_WORKERS) as _pool:
+        for link, code in _pool.map(_head, links_to_check):
+            if code is None:
+                broken.append(f"{link} → timeout")
+            elif code >= 400:
+                broken.append(f"{link} → {code}")
     items.append({
         "name": f"Liens internes ({min(len(internal_links), MAX_INTERNAL_LINKS_CHECK)} testés)",
         "passed": len(broken) == 0,

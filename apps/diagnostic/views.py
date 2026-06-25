@@ -5,6 +5,7 @@ Deux familles de diagnostic :
   • Terrain : entretien client structuré et scoré (FieldDiagnostic).
 """
 import math
+import threading
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render, redirect, get_object_or_404
@@ -45,6 +46,35 @@ def diagnostic_list(request):
     return render(request, "diagnostic/diagnostic_list.html", {"diagnostics": diagnostics})
 
 
+def _run_diagnostic_async(diag) -> None:
+    """Lance run_diagnostic() en arrière-plan et persiste le résultat.
+
+    Libère la réponse HTTP immédiatement : l'utilisateur est redirigé vers
+    la page de résultats qui affiche un spinner et interroge le statut toutes
+    les 2 secondes via l'endpoint JSON /status/.
+    """
+    from django.db import connections
+
+    def _worker():
+        try:
+            results = run_diagnostic(diag.url)
+            diag.status = SiteDiagnostic.Status.COMPLETED
+            diag.overall_score = results.get("overall_score", 0)
+            diag.results = results
+            diag.duration_seconds = results.get("duration", 0)
+        except Exception as exc:
+            diag.status = SiteDiagnostic.Status.FAILED
+            diag.error_message = str(exc)
+        finally:
+            try:
+                diag.save()
+            except Exception:
+                pass
+            connections.close_all()
+
+    threading.Thread(target=_worker, name=f"diag-{diag.pk}", daemon=True).start()
+
+
 @staff_member_required
 def diagnostic_new(request):
     """Formulaire + lancement d'un nouveau diagnostic."""
@@ -59,24 +89,16 @@ def diagnostic_new(request):
             status=SiteDiagnostic.Status.RUNNING,
         )
 
-        try:
-            results = run_diagnostic(url)
-            diag.status = SiteDiagnostic.Status.COMPLETED
-            diag.overall_score = results.get("overall_score", 0)
-            diag.results = results
-            diag.duration_seconds = results.get("duration", 0)
-        except Exception as exc:
-            diag.status = SiteDiagnostic.Status.FAILED
-            diag.error_message = str(exc)
-        diag.save()
+        # Lance l'analyse en arrière-plan ; répond immédiatement.
+        _run_diagnostic_async(diag)
 
         AuditLog.log_action(
             action_type="admin_action",
             actor=request.user,
             content_type="diagnostic.SiteDiagnostic",
             object_id=diag.pk,
-            description=f"Diagnostic lancé pour {url} → score {diag.overall_score}/100",
-            metadata={"url": url, "score": diag.overall_score},
+            description=f"Diagnostic lancé pour {url}",
+            metadata={"url": url},
         )
 
         return redirect("diagnostic:diagnostic_detail", pk=diag.pk)
@@ -101,17 +123,22 @@ def diagnostic_rerun(request, pk):
         created_by=request.user,
         status=SiteDiagnostic.Status.RUNNING,
     )
-    try:
-        results = run_diagnostic(old.url)
-        diag.status = SiteDiagnostic.Status.COMPLETED
-        diag.overall_score = results.get("overall_score", 0)
-        diag.results = results
-        diag.duration_seconds = results.get("duration", 0)
-    except Exception as exc:
-        diag.status = SiteDiagnostic.Status.FAILED
-        diag.error_message = str(exc)
-    diag.save()
+    # Lance l'analyse en arrière-plan ; répond immédiatement.
+    _run_diagnostic_async(diag)
     return redirect("diagnostic:diagnostic_detail", pk=diag.pk)
+
+
+@staff_member_required
+def diagnostic_status(request, pk):
+    """API JSON : statut d'un diagnostic (utilisé pour le polling côté client)."""
+    diag = get_object_or_404(SiteDiagnostic, pk=pk)
+    return JsonResponse({
+        "status": diag.status,
+        "pk": diag.pk,
+        "overall_score": diag.overall_score,
+        "duration_seconds": diag.duration_seconds,
+        "error_message": diag.error_message or "",
+    })
 
 
 @staff_member_required

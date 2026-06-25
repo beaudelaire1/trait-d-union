@@ -13,6 +13,7 @@ urlpatterns = [
     path("numerique/nouveau/", views.diagnostic_new, name="diagnostic_new"),
     path("numerique/<int:pk>/", views.diagnostic_detail, name="diagnostic_detail"),
     path("numerique/<int:pk>/relancer/", views.diagnostic_rerun, name="diagnostic_rerun"),
+    path("numerique/<int:pk>/status/", views.diagnostic_status, name="diagnostic_status"),
     path("numerique/<int:pk>/json/", views.diagnostic_api_json, name="diagnostic_json"),
 
     # ── Diagnostic terrain (entretien structuré) ────────────────────

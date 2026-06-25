@@ -254,7 +254,7 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
             <template x-if="loading">
               <span class="inline-flex items-center gap-2">
                 <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-opacity="0.25" stroke-width="3"></circle><path d="M21 12a9 9 0 00-9-9" stroke-width="3" stroke-linecap="round"></path></svg>
-                <span>Envoi en cours…</span>
+                <span x-text="loadingStep || 'Envoi en cours…'"></span>
               </span>
             </template>
           </button>
@@ -290,6 +290,7 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
     return {
       isOpen: false,
       loading: false,
+      loadingStep: '',
       success: false,
       successMessage: '',
       error: '',
@@ -331,6 +332,7 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
       close() {
         this.isOpen = false;
         this.loading = false;
+        this.loadingStep = '';
         document.body.style.overflow = '';
       },
       getCsrf() {
@@ -783,8 +785,8 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
           this.error = 'Merci de renseigner votre email.';
           return;
         }
-        // 🛡️ Validation format CÔTÉ CLIENT : évite un aller-retour serveur (et le
-        // spinner qui tourne dans le vide) quand l'adresse est manifestement invalide.
+        // Validation format côté client : évite un aller-retour serveur quand
+        // l'adresse est manifestement invalide.
         const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!EMAIL_RE.test(email)) {
           this.error = 'Adresse email invalide. Vérifiez le format (ex. nom@domaine.fr).';
@@ -792,11 +794,19 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
         }
         this.form.email = email;
         this.loading = true;
-        // 🛡️ Timeout dur : si le serveur ne répond pas, on libère le bouton au lieu
-        // de mouliner indéfiniment (l'utilisateur peut alors réessayer / changer de mode).
+        this.loadingStep = 'Capture des données…';
+
+        // Cède deux frames au navigateur pour que le spinner s'affiche AVANT
+        // que collectSnapshot() (synchrone et potentiellement lent) s'exécute.
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+        // Timeout dur : libère le bouton si le serveur ne répond pas.
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000);
         try {
+          const snapshot = this.collectSnapshot();
+          this.loadingStep = 'Envoi…';
+
           const payload = {
             email: this.form.email,
             name: this.form.name,
@@ -806,7 +816,7 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
             tool_slug: this.toolSlug,
             tool_name: this.toolName,
             delivery: this.form.delivery,
-            snapshot: this.collectSnapshot(),
+            snapshot,
           };
           const res = await fetch(this.endpoint, {
             method: 'POST',
