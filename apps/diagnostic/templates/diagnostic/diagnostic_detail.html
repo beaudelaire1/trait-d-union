@@ -29,7 +29,42 @@
       </div>
     </div>
 
-    {% if diag.status == 'failed' %}
+    {% if diag.status == 'running' %}
+    {# ── État : analyse en cours (polling toutes les 2 s) ─────────── #}
+    <div id="diag-running"
+         class="rounded-xl border p-10 text-center"
+         style="background: #18181c; border-color: #2a2a30;"
+         data-status-url="{% url 'diagnostic:diagnostic_status' diag.pk %}">
+      <div class="flex justify-center mb-5">
+        <svg class="w-12 h-12 animate-spin" style="color:#0B2DFF;" fill="none" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-opacity="0.2" stroke-width="3"/>
+          <path d="M21 12a9 9 0 00-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h2 class="text-xl font-bold text-white mb-2">Analyse en cours…</h2>
+      <p class="text-sm mb-1" style="color: #8e8e93;">{{ diag.url }}</p>
+      <p class="text-xs" style="color: #56565c;">Performance · SEO · Sécurité · SSL · Accessibilité · Mobile · Standards</p>
+    </div>
+    <script nonce="{{ request.csp_nonce }}">
+    (function () {
+      var el = document.getElementById('diag-running');
+      if (!el) return;
+      var url = el.dataset.statusUrl;
+      var timer = setInterval(function () {
+        fetch(url, { credentials: 'same-origin' })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            if (data.status !== 'running') {
+              clearInterval(timer);
+              window.location.reload();
+            }
+          })
+          .catch(function () { /* réseau indisponible, on réessaie */ });
+      }, 2000);
+    })();
+    </script>
+
+    {% elif diag.status == 'failed' %}
     {# ── Error state ────────────────────────────── #}
     <div class="rounded-xl border p-8 text-center" style="background: #18181c; border-color: #ff453a33;">
       <div class="text-4xl mb-4">❌</div>
