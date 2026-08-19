@@ -69,9 +69,14 @@ EOFTOTP
 #    provisoire interne assure un badge en attendant, et le prochain déploiement
 #    (ou le cron hebdo) récupère le grade officiel.
 echo ""
-echo "📊 Audit portfolio (remplissage initial des projets sans mesure)..."
-python manage.py audit_portfolio_projects --only-missing || \
-    echo "⚠️  Audit portfolio ignoré (non bloquant) — sera relancé par le cron."
+if [ "${SKIP_DEPLOY_AUDIT:-0}" = "1" ]; then
+    echo "📊 Audit portfolio ignoré (SKIP_DEPLOY_AUDIT=1) — pris en charge"
+    echo "   par la tâche planifiée hebdomadaire."
+else
+    echo "📊 Audit portfolio (remplissage initial des projets sans mesure)..."
+    python manage.py audit_portfolio_projects --only-missing || \
+        echo "⚠️  Audit portfolio ignoré (non bloquant) — sera relancé par le cron."
+fi
 
 echo ""
 echo "=========================================="

@@ -1,0 +1,223 @@
+# ==============================================================================
+# Stack de production — OVH VPS + Coolify
+# ==============================================================================
+# Remplace l'infrastructure Render décrite dans render.yaml.
+#
+# Ce que Render facturait comme 5 services distincts tient ici dans une seule
+# stack : web, worker de tâches asynchrones, Postgres et Redis. Les 3 services
+# cron Render sont remplacés par des tâches planifiées Coolify (voir
+# deploy/README.md) qui s'exécutent dans le conteneur `web` déjà lancé.
+#
+# Le TLS, le reverse proxy et le renouvellement Let's Encrypt sont assurés par
+# le Traefik intégré à Coolify : rien à configurer ici.
+#
+# Dimensionné pour un VPS 4 vCPU / 12 Go.
+
+services:
+
+  # ============================================================================
+  # POSTGRESQL
+  # ============================================================================
+  # La version majeure doit correspondre à celle de la base Render dont on
+  # restaure le dump : un dump PG 16 ne se restaure pas dans un PG 15.
+  # Vérifier avec `SELECT version();` sur Render avant la bascule.
+  postgres:
+    image: postgres:${POSTGRES_VERSION:-16}-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-traitdunion}
+      POSTGRES_USER: ${POSTGRES_USER:-tus_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD requis}
+      # Accélère nettement la restauration du dump initial.
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tus_admin} -d ${POSTGRES_DB:-traitdunion}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    # Postgres n'est jamais exposé hors du réseau interne de la stack.
+    networks:
+      - tus
+
+  # ============================================================================
+  # REDIS — cache + rate limiting
+  # ============================================================================
+  # Absent de render.yaml : le cache retombait sur LocMem, cloisonné par worker
+  # gunicorn, et le rate limiting du middleware fonctionnait en mode dégradé.
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD requis}
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --appendonly no
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - tus
+
+  # ============================================================================
+  # MIGRATIONS — équivalent du preDeployCommand Render
+  # ============================================================================
+  # Conteneur éphémère : il applique les migrations puis s'arrête. `web` et
+  # `worker` attendent sa sortie en succès, ce qui garantit qu'aucun code neuf
+  # ne sert de requêtes sur un schéma non migré.
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: "no"
+    command: ["./build.sh"]
+    environment:
+      <<: &django_env
+        DJANGO_SETTINGS_MODULE: config.settings.production
+        DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?DJANGO_SECRET_KEY requis}
+        DATABASE_URL: postgresql://${POSTGRES_USER:-tus_admin}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-traitdunion}
+        REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+        # Redis local en réseau privé : pas de TLS, donc pas de vérification.
+        REDIS_SSL_CERT_REQS: none
+
+        DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-}
+        CSRF_TRUSTED_ORIGINS: ${CSRF_TRUSTED_ORIGINS:-}
+        CANONICAL_DOMAIN: ${CANONICAL_DOMAIN:-www.traitdunion.it}
+        SITE_URL: ${SITE_URL:-https://www.traitdunion.it}
+
+        # ── Médias : OVH Object Storage (S3) ──────────────────────
+        S3_BUCKET_NAME: ${S3_BUCKET_NAME:-}
+        S3_ENDPOINT_URL: ${S3_ENDPOINT_URL:-}
+        S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+        S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+        S3_REGION_NAME: ${S3_REGION_NAME:-gra}
+        S3_CUSTOM_DOMAIN: ${S3_CUSTOM_DOMAIN:-}
+
+        # ── Email (Brevo) ─────────────────────────────────────────
+        BREVO_API_KEY: ${BREVO_API_KEY:-}
+        DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-contact@traitdunion.it}
+        DEFAULT_FROM_NAME: ${DEFAULT_FROM_NAME:-Trait d'Union Studio}
+        ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@traitdunion.it}
+        TASK_NOTIFICATION_EMAIL: ${TASK_NOTIFICATION_EMAIL:-info@traitdunion.it}
+
+        # ── Paiements ─────────────────────────────────────────────
+        STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+        STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+        STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+
+        # ── Anti-spam ─────────────────────────────────────────────
+        RECAPTCHA_SITE_KEY: ${RECAPTCHA_SITE_KEY:-}
+        RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY:-}
+        TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+        TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+        TURNSTILE_FALLBACK_TIMEOUT_MS: ${TURNSTILE_FALLBACK_TIMEOUT_MS:-2500}
+
+        # ── Intégrations ──────────────────────────────────────────
+        GOOGLE_PLACES_API_KEY: ${GOOGLE_PLACES_API_KEY:-}
+        GOOGLE_PLACE_ID: ${GOOGLE_PLACE_ID:-}
+        GOOGLE_REVIEWS_LANGUAGE: ${GOOGLE_REVIEWS_LANGUAGE:-fr}
+        PAGESPEED_API_KEY: ${PAGESPEED_API_KEY:-}
+
+        # ── Observabilité ─────────────────────────────────────────
+        SENTRY_DSN: ${SENTRY_DSN:-}
+        GIT_COMMIT_SHA: ${SOURCE_COMMIT:-unknown}
+
+        # ── Superuser initial (première installation) ─────────────
+        DJANGO_SUPERUSER_USERNAME: ${DJANGO_SUPERUSER_USERNAME:-admin}
+        DJANGO_SUPERUSER_EMAIL: ${DJANGO_SUPERUSER_EMAIL:-admin@traitdunion.it}
+        DJANGO_SUPERUSER_PASSWORD: ${DJANGO_SUPERUSER_PASSWORD:-}
+      # L'audit portfolio fait des appels réseau lents (SSL Labs). Sur Render
+      # il tournait au pre-deploy ; ici il bloquerait le démarrage du site.
+      # La tâche planifiée hebdomadaire s'en charge.
+      SKIP_DEPLOY_AUDIT: "1"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - tus
+
+  # ============================================================================
+  # WEB — Django / Gunicorn
+  # ============================================================================
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # Coolify (Traefik) route le domaine public vers ce port.
+    expose:
+      - "8000"
+    environment:
+      <<: *django_env
+      # 4 vCPU : 4 workers × 4 threads. WeasyPrint étant gourmand en mémoire
+      # au rendu PDF, on privilégie des workers en nombre modéré plutôt que la
+      # formule (2×CPU)+1, qui multiplierait les pics mémoire simultanés.
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-4}
+      GUNICORN_THREADS: ${GUNICORN_THREADS:-4}
+      GUNICORN_TIMEOUT: ${GUNICORN_TIMEOUT:-120}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - tus
+    deploy:
+      resources:
+        limits:
+          memory: 4g
+
+  # ============================================================================
+  # WORKER — tâches asynchrones (django-q2)
+  # ============================================================================
+  # Absent de l'infrastructure Render : `async_task` était appelé mais aucun
+  # cluster ne tournait. core/tasks.py rattrapait le coup avec un repli
+  # synchrone — les emails et PDF partaient donc en pleine requête HTTP.
+  # Avec ce worker, ils repassent réellement en arrière-plan.
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["python", "manage.py", "qcluster"]
+    environment:
+      <<: *django_env
+      Q_WORKERS: ${Q_WORKERS:-2}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import django,os;os.environ.setdefault('DJANGO_SETTINGS_MODULE','config.settings.production');django.setup();from django_q.monitor import Stat;exit(0 if Stat.get_all() else 1)\""]
+      interval: 60s
+      timeout: 15s
+      retries: 3
+      start_period: 60s
+    networks:
+      - tus
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  tus:
+    driver: bridge

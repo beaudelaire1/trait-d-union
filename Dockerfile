@@ -29,7 +29,10 @@ FROM python:3.12-slim-bookworm
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.production \
-    PORT=8000
+    PORT=8000 \
+    GUNICORN_WORKERS=2 \
+    GUNICORN_THREADS=4 \
+    GUNICORN_TIMEOUT=120
 
 WORKDIR /app
 
@@ -44,6 +47,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-liberation \
     fonts-dejavu-core \
     libpq5 \
+    # pg_dump : sauvegarde de la base vers le stockage objet, PostgreSQL
+    # n'étant plus managé par la plateforme (voir core/management/commands/
+    # backup_database.py).
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed Python packages from builder
@@ -77,4 +84,7 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
 # les workers. Garantit que SECRET_KEY, settings et connexions DB sont
 # identiques dans tous les workers (élimine le risque de clé aléatoire
 # différente par worker si DJANGO_SECRET_KEY est absent/faible).
-CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.production gunicorn config.wsgi:application --preload --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]
+# Le dimensionnement vient de l'environnement : 2 workers suffisaient sur le
+# plan Render (512 Mo), un VPS 4 vCPU / 12 Go en supporte bien davantage sans
+# changer d'image.
+CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.production gunicorn config.wsgi:application --preload --bind 0.0.0.0:${PORT} --workers ${GUNICORN_WORKERS} --threads ${GUNICORN_THREADS} --timeout ${GUNICORN_TIMEOUT}"]

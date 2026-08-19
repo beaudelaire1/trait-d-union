@@ -23,7 +23,11 @@ dj-database-url>=2.1.0
 # WhiteNoise pour les fichiers statiques (Render)
 whitenoise>=6.6.0
 
-# Stockage Cloudinary pour les médias
+# Stockage des médias
+# django-storages + boto3 : OVH Object Storage (S3-compatible).
+# Cloudinary est conservé le temps de la bascule (voir config/settings/production.py).
+django-storages>=1.14.4
+boto3>=1.34.0
 cloudinary>=1.36.0
 django-cloudinary-storage>=0.3.0
 

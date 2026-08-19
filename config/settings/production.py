@@ -19,22 +19,50 @@ DEBUG = False
 # HOSTS & SECURITY
 # ==============================================================================
 # 🛡️ ZERO TRUST: Strict domain whitelist - NO wildcards
-ALLOWED_HOSTS = [
-    'trait-d-union.onrender.com',  # Render exact subdomain
+#
+# Les domaines de base sont ceux du site ; l'hébergeur ajoute le sien via
+# DJANGO_ALLOWED_HOSTS (liste séparée par des virgules). Cela évite de coder
+# en dur un domaine de plateforme — c'est ce qui rendait ces settings
+# dépendants de Render.
+_BASE_ALLOWED_HOSTS = [
     'traitdunion.it',
     'www.traitdunion.it',
 ]
 
+
+def _env_list(name: str) -> list[str]:
+    """Liste depuis une variable d'env séparée par des virgules."""
+    raw = os.environ.get(name, '')
+    return [item.strip() for item in raw.split(',') if item.strip()]
+
+
+ALLOWED_HOSTS = list(dict.fromkeys(
+    _BASE_ALLOWED_HOSTS + _env_list('DJANGO_ALLOWED_HOSTS')
+))
+
 # CSRF trusted origins - DOIT inclure le scheme https://
-CSRF_TRUSTED_ORIGINS = [
-    'https://trait-d-union.onrender.com',
-    'https://traitdunion.it',
-    'https://www.traitdunion.it',
-]
+# Dérivé des hôtes autorisés : déclarer un domaine à deux endroits est une
+# source d'erreur classique au déploiement (CSRF qui échoue en silence sur le
+# domaine de la plateforme). CSRF_TRUSTED_ORIGINS reste disponible pour les
+# cas particuliers (port non standard, autre schéma).
+def _as_origin(value: str) -> str:
+    if '://' in value:
+        return value
+    # '.exemple.fr' (sous-domaines) → 'https://*.exemple.fr'
+    if value.startswith('.'):
+        return f'https://*{value}'
+    return f'https://{value}'
+
+
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(
+    [_as_origin(host) for host in ALLOWED_HOSTS if host != '*']
+    + [_as_origin(origin) for origin in _env_list('CSRF_TRUSTED_ORIGINS')]
+))
 
 # Sécurité HTTPS
-# SSL redirect is handled by Render's load balancer — do NOT duplicate it here
-# or it causes ERR_TOO_MANY_REDIRECTS (Render terminates SSL then forwards HTTP)
+# Le reverse proxy (load balancer Render, Traefik chez Coolify) termine déjà
+# le TLS et redirige HTTP→HTTPS. Dupliquer la redirection ici provoquerait un
+# ERR_TOO_MANY_REDIRECTS, le proxy transmettant ensuite la requête en clair.
 SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
@@ -124,25 +152,87 @@ _HASHED_FILE_RE = re.compile(r'\.[a-f0-9]{8,32}\.')
 WHITENOISE_IMMUTABLE_FILE_TEST = lambda path, url: bool(_HASHED_FILE_RE.search(url))
 
 # ==============================================================================
-# MEDIA FILES (Cloudinary - recommandé pour simplicité)
+# MEDIA FILES — OVH Object Storage (S3) > Cloudinary > disque local
 # ==============================================================================
+# L'ordre est volontaire : il permet de basculer de Cloudinary vers OVH en
+# ajoutant simplement les variables S3_*, sans toucher au code ni redéployer
+# deux fois. Tant qu'elles sont absentes, Cloudinary continue de servir.
+
+import sys
+
+# Vérifier si on est en train de builder (collectstatic)
+IS_BUILDING = 'collectstatic' in sys.argv
+
+_STATIC_STORAGE = {'BACKEND': 'core.storage.ResilientManifestStaticFilesStorage'}
+
+
+def _log_settings():
+    import logging as _log
+    return _log.getLogger('config.settings')
+
+
+# ── OVH Object Storage (S3-compatible) ───────────────────────────
+AWS_STORAGE_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = os.environ.get('S3_ENDPOINT_URL')
+AWS_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('S3_SECRET_ACCESS_KEY')
+AWS_S3_REGION_NAME = os.environ.get('S3_REGION_NAME', 'gra')
+
+# Domaine public servant les médias : conteneur public OVH, ou CDN devant.
+AWS_S3_CUSTOM_DOMAIN = os.environ.get('S3_CUSTOM_DOMAIN') or None
+
+_S3_CONFIGURED = bool(
+    AWS_STORAGE_BUCKET_NAME
+    and AWS_S3_ENDPOINT_URL
+    and AWS_ACCESS_KEY_ID
+    and AWS_SECRET_ACCESS_KEY
+)
+
+# ── Cloudinary (historique) ──────────────────────────────────────
 CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME')
 CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY')
 CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
 CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
 
-# Vérifier si on est en train de builder (collectstatic)
-import sys
-IS_BUILDING = 'collectstatic' in sys.argv
+_CLOUDINARY_CONFIGURED = bool(
+    CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY)
+)
 
-if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY):
+if _S3_CONFIGURED:
     if not IS_BUILDING:
-        import logging as _log
-        _log.getLogger('config.settings').info('Cloudinary configuration found')
-    
-    # Configuration Cloudinary
+        _log_settings().info(
+            'Media storage: OVH Object Storage (bucket=%s)',
+            AWS_STORAGE_BUCKET_NAME,
+        )
+
+    # Les objets sont servis publiquement en lecture : pas de signature dans
+    # l'URL, donc des liens stables et cachables par le navigateur/CDN.
+    AWS_QUERYSTRING_AUTH = False
+    AWS_DEFAULT_ACL = None  # OVH refuse les ACL par objet ; le conteneur porte la policy.
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
+    AWS_S3_ADDRESSING_STYLE = 'virtual'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'public, max-age=31536000, immutable',
+    }
+
+    STORAGES = {
+        'default': {'BACKEND': 'storages.backends.s3.S3Storage'},
+        'staticfiles': _STATIC_STORAGE,
+    }
+
+    if AWS_S3_CUSTOM_DOMAIN:
+        MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+    else:
+        _endpoint_host = AWS_S3_ENDPOINT_URL.split('://', 1)[-1].rstrip('/')
+        MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.{_endpoint_host}/'
+
+elif _CLOUDINARY_CONFIGURED:
+    if not IS_BUILDING:
+        _log_settings().info('Media storage: Cloudinary')
+
     INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
-    
+
     if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY:
         CLOUDINARY_STORAGE = {
             'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
@@ -152,44 +242,30 @@ if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY):
     else:
         # Si CLOUDINARY_URL est défini, on laisse la lib le gérer
         CLOUDINARY_STORAGE = {}
-    
-    # Configuration moderne Django 5+
-    # ⚡ PERFORMANCE: CompressedManifestStaticFilesStorage for hash-based filenames
-    # This enables immutable caching with automatic cache busting
+
     STORAGES = {
-        "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "core.storage.ResilientManifestStaticFilesStorage",
-        },
+        'default': {'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage'},
+        'staticfiles': _STATIC_STORAGE,
     }
-    
-    # Fallback pour compatibilité
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
+
     # IMPORTANT : Ne pas surcharger MEDIA_URL avec l'URL Cloudinary brute.
-    # La librairie cloudinary_storage génère elle-même les URLs complètes (incluant /image/upload/...).
-    # En laissant /media/, on évite de casser les liens.
+    # La librairie génère elle-même les URLs complètes (incluant /image/upload/).
     MEDIA_URL = '/media/'
+
 else:
-    # Mode Build ou Config manquante
     if IS_BUILDING:
-        import logging as _log
-        _log.getLogger('config.settings').info('Build mode detected: Skipping Cloudinary checks')
+        _log_settings().info('Build mode detected: skipping media storage checks')
     else:
-        import logging as _log
-        _log.getLogger('config.settings').warning('CLOUDINARY ENV VARS MISSING! External media storage will NOT work.')
-    
-    # Configuration minimale pour le build
-    # ⚡ PERFORMANCE: CompressedManifestStaticFilesStorage for hash-based filenames
+        _log_settings().warning(
+            'AUCUN STOCKAGE MEDIA EXTERNE CONFIGURE ! '
+            'Definir S3_* (OVH Object Storage) ou CLOUDINARY_*. '
+            'Les fichiers uploades resteront sur le disque du conteneur '
+            'et seront perdus au redeploiement.'
+        )
+
     STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "core.storage.ResilientManifestStaticFilesStorage",
-        },
+        'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+        'staticfiles': _STATIC_STORAGE,
     }
 
 # ==============================================================================
@@ -385,7 +461,9 @@ if SENTRY_DSN:
         
         # Environnement
         environment='production',
-        release=os.environ.get('RENDER_GIT_COMMIT', 'unknown'),
+        release=(os.environ.get('GIT_COMMIT_SHA')
+                 or os.environ.get('SOURCE_COMMIT')
+                 or os.environ.get('RENDER_GIT_COMMIT', 'unknown')),
         
         # Options
         send_default_pii=False,  # RGPD: pas de données personnelles
@@ -477,6 +555,18 @@ CONTENT_SECURITY_POLICY = {
     },
     "EXCLUDE_URL_PREFIXES": ["/tus-gestion-secure/"],
 }
+
+# Le stockage médias est choisi à l'exécution (OVH Object Storage ou
+# Cloudinary) : la CSP doit suivre, sinon les images et PDF servis depuis le
+# nouveau domaine sont bloqués par le navigateur après la bascule.
+_MEDIA_CSP_ORIGIN = ''
+if _S3_CONFIGURED:
+    _MEDIA_CSP_ORIGIN = MEDIA_URL.rstrip('/')
+if _MEDIA_CSP_ORIGIN:
+    for _directive in ('img-src', 'media-src'):
+        _sources = CONTENT_SECURITY_POLICY['DIRECTIVES'][_directive]
+        if _MEDIA_CSP_ORIGIN not in _sources:
+            _sources.append(_MEDIA_CSP_ORIGIN)
 
 # 🔻 Bascule build Alpine CSP : quand ALPINE_CSP_BUILD=1, le build @alpinejs/csp
 # est servi (cf. base.html) et 'unsafe-eval' n'est plus nécessaire → on le retire.
