@@ -162,9 +162,12 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
     }
 </style>
 
+{# Attributs HTML : l'auto-échappement Django suffit. `escapejs` (destiné aux
+   littéraux JS) transformerait « point-mort » en « point\u002Dmort » — le
+   tiret est échappé — et le slug envoyé au serveur serait invalide. #}
 <div x-data="simulatorReportModal"
-     data-tool-slug="{{ tool_slug|escapejs }}"
-     data-tool-name="{{ tool_name|escapejs }}"
+     data-tool-slug="{{ tool_slug }}"
+     data-tool-name="{{ tool_name }}"
      data-endpoint="{% url 'simulateur:report_submit' %}"
      @open-report-modal.window="open($event.detail)">
 

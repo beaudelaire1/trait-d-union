@@ -299,3 +299,80 @@ class TestSimulatorReportRobustness:
         body = res.json()
         assert body['ok'] is False
         assert 'PDF' in body['message']
+
+
+@pytest.mark.django_db
+class TestSimulatorReportModalMarkup:
+    """Le modal doit exposer un `tool_slug` que le serveur accepte.
+
+    Régression : les attributs `data-tool-*` passaient par `escapejs`, filtre
+    destiné aux littéraux JavaScript, qui échappe le tiret (`-` → `\\u002D`).
+    Dans un attribut HTML, `dataset.toolSlug` relisait « point\\u002Dmort » :
+    le SlugField rejetait la valeur et aucun rapport n'était généré pour les
+    22 outils (sur 30) dont le slug contient un tiret.
+    """
+
+    @staticmethod
+    def _tool_url_names():
+        from apps.simulateur import urls as simulateur_urls
+
+        skipped = {'hub', 'report_submit', 'conformite-facture-check'}
+        return [
+            pattern.name
+            for pattern in simulateur_urls.urlpatterns
+            if pattern.name and pattern.name not in skipped
+        ]
+
+    @staticmethod
+    def _data_attr(html: str, attr: str) -> str:
+        import re
+
+        match = re.search(rf'{attr}="([^"]*)"', html)
+        assert match, f'{attr} absent du modal'
+        return match.group(1)
+
+    def test_every_tool_page_exposes_a_valid_slug(self):
+        import html as html_lib
+
+        from apps.simulateur.forms import SimulatorReportForm
+
+        client = Client()
+        checked = 0
+        for url_name in self._tool_url_names():
+            url = reverse(f'simulateur:{url_name}')
+            res = client.get(url)
+            if res.status_code != 200:
+                continue
+            body = res.content.decode()
+            if 'data-tool-slug' not in body:
+                continue
+            checked += 1
+
+            slug = html_lib.unescape(self._data_attr(body, 'data-tool-slug'))
+            assert '\\u' not in slug, f'{url_name}: slug échappé « {slug} »'
+
+            # Le slug rendu doit passer la validation serveur telle quelle.
+            form = SimulatorReportForm({
+                'email': 'dirigeant@acme.fr',
+                'tool_slug': slug,
+                'tool_name': 'Outil',
+                'snapshot': {},
+                'consent': True,
+                'website': '',
+            })
+            assert form.is_valid(), f'{url_name}: {form.errors.as_json()}'
+
+        assert checked >= 20, f'seulement {checked} pages outils vérifiées'
+
+    def test_tool_name_is_not_js_escaped(self):
+        """Les apostrophes ne doivent pas fuir en « \\u0027 » dans le PDF."""
+        import html as html_lib
+
+        client = Client()
+        res = client.get(reverse('simulateur:cac'))
+        assert res.status_code == 200
+
+        name = html_lib.unescape(
+            self._data_attr(res.content.decode(), 'data-tool-name')
+        )
+        assert name == "Coût d'Acquisition", name
