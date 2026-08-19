@@ -82,14 +82,47 @@ class TestRetention:
         assert deleted == []
 
 
+# Le moteur est forcé explicitement dans les tests de garde : la suite tourne
+# sur SQLite en local mais sur PostgreSQL en CI. Une garde vérifiée « par
+# hasard », au gré du moteur ambiant, ne prouve rien — c'est ce qui avait fait
+# passer ce test en local puis échouer en CI.
+SQLITE_DB = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}
+POSTGRES_DB = {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'traitdunion', 'HOST': 'db', 'PORT': 5432,
+    'USER': 'tus_admin', 'PASSWORD': 'secret',
+}
+
+
 class TestGuards:
     def test_refuses_non_postgres_database(self):
-        """La suite de tests tourne sur SQLite : le refus doit être explicite."""
-        with pytest.raises(CommandError, match='PostgreSQL'):
+        with (
+            patch.dict('django.conf.settings.DATABASES', {'default': SQLITE_DB}),
+            pytest.raises(CommandError, match='PostgreSQL'),
+        ):
             call_command('backup_database', '--dry-run')
 
+    def test_proceeds_on_postgres(self):
+        """Contrepartie : sur PostgreSQL, la garde ne doit pas bloquer."""
+        with (
+            patch.dict('django.conf.settings.DATABASES', {'default': POSTGRES_DB}),
+            patch.object(Command, '_pg_dump') as dump,
+            patch.object(Command, '_upload'),
+            patch.object(Command, '_prune', return_value=0),
+        ):
+            # _pg_dump est neutralisé : on vérifie qu'il est atteint, pas qu'il
+            # produise un vrai dump (aucun serveur joignable depuis les tests).
+            dump.side_effect = lambda db, path: path.write_bytes(b'PGDMP-stub')
+            call_command('backup_database', '--bucket', 'tus-backups')
+
+        dump.assert_called_once()
+        passed_db = dump.call_args.args[0]
+        assert passed_db['NAME'] == 'traitdunion'
+
     def test_requires_a_destination_bucket(self):
-        with patch.object(Command, '_pg_dump'), \
-             patch('django.conf.settings.AWS_STORAGE_BUCKET_NAME', '', create=True):
-            with pytest.raises(CommandError, match='bucket'):
-                call_command('backup_database', '--bucket', '')
+        with (
+            patch.object(Command, '_pg_dump'),
+            patch('django.conf.settings.AWS_STORAGE_BUCKET_NAME', '', create=True),
+            pytest.raises(CommandError, match='bucket'),
+        ):
+            call_command('backup_database', '--bucket', '')
