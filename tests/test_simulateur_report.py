@@ -154,3 +154,148 @@ class TestSimulatorReportEndpoint:
         mock_send.assert_called_once()
         _, kwargs = mock_send.call_args
         assert kwargs['charts'] == chart_payload
+
+
+@pytest.mark.django_db
+class TestSimulatorReportRobustness:
+    """Garde-fous du téléchargement PDF (régression : erreur générique).
+
+    Des graphiques haute résolution suffisaient à faire dépasser le cap de
+    taille du snapshot : la requête était rejetée en 400 sans `message`, et
+    l'utilisateur ne voyait qu'un « Une erreur est survenue » opaque.
+    """
+
+    endpoint = '/simulateur/report/'
+
+    @staticmethod
+    def _chart(size_bytes: int, title: str = 'Graphique'):
+        return {
+            'title': title,
+            'x_label': 'Ventes',
+            'y_label': 'Euros (€)',
+            'series': ['Coûts'],
+            'data_url': 'data:image/png;base64,' + ('A' * size_bytes),
+        }
+
+    def _payload(self, charts, **overrides):
+        base = {
+            'email': 'dirigeant@acme.fr',
+            'name': 'Jean Dupont',
+            'company': 'Acme PME',
+            'tool_slug': 'point-mort',
+            'tool_name': 'Seuil de Rentabilité',
+            'delivery': 'download',
+            'consent': True,
+            'website': '',
+            'snapshot': {
+                'user_inputs': [{'label': 'Charges fixes', 'value': '4200'}],
+                'results': [{'label': 'Point mort', 'value': '18 400 €'}],
+                'charts': charts,
+            },
+        }
+        base.update(overrides)
+        return base
+
+    def _post(self, payload):
+        client = Client()
+        with patch('apps.simulateur.services.SimulatorReportService.send'):
+            return client.post(
+                self.endpoint,
+                data=json.dumps(payload),
+                content_type='application/json',
+            )
+
+    def test_heavy_charts_still_return_a_pdf(self):
+        """4 graphiques haute résolution (~2,4 Mo) : téléchargement OK."""
+        import base64
+
+        charts = [self._chart(600_000, f'Graphique {i}') for i in range(4)]
+        res = self._post(self._payload(charts))
+
+        assert res.status_code == 200, res.content
+        body = res.json()
+        assert body['ok'] is True
+        assert base64.b64decode(body['pdf_base64'])[:5] == b'%PDF-'
+
+    def test_charts_over_budget_are_trimmed_not_rejected(self):
+        """Au-delà du budget, les graphiques sont écartés — pas la demande."""
+        from apps.simulateur.forms import SimulatorReportForm
+
+        oversized = SimulatorReportForm.MAX_CHARTS_BYTES // 2 + 1
+        charts = [self._chart(oversized, f'Graphique {i}') for i in range(4)]
+
+        with patch(
+            'apps.simulateur.services.SimulatorReportService.generate_pdf',
+            return_value=b'%PDF-stub',
+        ) as mock_pdf, patch(
+            'apps.simulateur.services.SimulatorReportService.send'
+        ):
+            client = Client()
+            res = client.post(
+                self.endpoint,
+                data=json.dumps(self._payload(charts)),
+                content_type='application/json',
+            )
+
+        assert res.status_code == 200, res.content
+        forwarded = mock_pdf.call_args.kwargs['charts']
+        assert len(forwarded) == 1, 'budget must cap the forwarded charts'
+        assert forwarded[0]['title'] == 'Graphique 0'
+
+    def test_validation_error_carries_a_readable_message(self):
+        """Le front affiche `message` : il doit toujours être renseigné."""
+        payload = self._payload([], consent=False)
+        res = self._post(payload)
+
+        assert res.status_code == 400
+        body = res.json()
+        assert body['ok'] is False
+        message = body.get('message')
+        assert message, 'message is required by the front-end'
+        assert message != 'Une erreur est survenue. Réessayez.'
+        assert 'errors' in body
+
+    def test_pdf_render_falls_back_to_no_charts(self):
+        """Si le rendu échoue avec les graphiques, on retente sans eux."""
+        import base64
+
+        calls = []
+
+        def _generate(report, *, charts=None):
+            calls.append(charts)
+            if charts:
+                raise RuntimeError('WeasyPrint: image décodée invalide')
+            return b'%PDF-fallback'
+
+        with patch(
+            'apps.simulateur.services.SimulatorReportService.generate_pdf',
+            side_effect=_generate,
+        ), patch('apps.simulateur.services.SimulatorReportService.send'):
+            client = Client()
+            res = client.post(
+                self.endpoint,
+                data=json.dumps(self._payload([self._chart(1000)])),
+                content_type='application/json',
+            )
+
+        assert res.status_code == 200, res.content
+        assert base64.b64decode(res.json()['pdf_base64']) == b'%PDF-fallback'
+        assert len(calls) == 2 and calls[1] is None
+
+    def test_pdf_failure_without_charts_reports_a_message(self):
+        """Échec irrécupérable : message explicite, pas de fallback opaque."""
+        with patch(
+            'apps.simulateur.services.SimulatorReportService.generate_pdf',
+            side_effect=RuntimeError('boom'),
+        ), patch('apps.simulateur.services.SimulatorReportService.send'):
+            client = Client()
+            res = client.post(
+                self.endpoint,
+                data=json.dumps(self._payload([])),
+                content_type='application/json',
+            )
+
+        assert res.status_code == 500
+        body = res.json()
+        assert body['ok'] is False
+        assert 'PDF' in body['message']
