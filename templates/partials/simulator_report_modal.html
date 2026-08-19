@@ -297,6 +297,10 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
       toolSlug: '',
       toolName: '',
       endpoint: '',
+      // Budgets d'export des graphiques (longueur des data URL base64).
+      // Doivent rester <= SimulatorReportForm.MAX_CHARTS_BYTES côté serveur.
+      CHART_MAX_BYTES: 1200000,
+      CHART_BUDGET_BYTES: 3600000,
       form: {
         email: '', name: '', company: '',
         website: '',
@@ -695,11 +699,17 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
         // Capture chaque instance Chart.js visible en PNG base64.
         // Exporte une variante "print-safe" pour conserver axes, graduations
         // et légendes en PDF, même quand la page est en thème sombre.
+        //
+        // Budget cumulé (CHART_BUDGET_BYTES) aligné sur le cap serveur : un
+        // graphique de plus ne doit jamais faire échouer tout le rapport, il
+        // est simplement écarté de l'export.
         const out = [];
+        let budget = this.CHART_BUDGET_BYTES;
         try {
           if (!window.Chart || !window.Chart.instances) return out;
           Object.values(window.Chart.instances).forEach(chart => {
             try {
+              if (out.length >= 4 || budget <= 0) return;
               const canvas = chart && chart.canvas;
               if (!canvas || !canvas.isConnected || canvas.offsetParent === null) return;
               // Titre : chercher un h3 parent proche
@@ -716,7 +726,8 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
                 dataUrl = this.fallbackChartCapture(chart);
               }
 
-              if (dataUrl && dataUrl.length < 800000) { // garde-fou ~600KB binaire
+              if (dataUrl && dataUrl.length <= this.CHART_MAX_BYTES && dataUrl.length <= budget) {
+                budget -= dataUrl.length;
                 out.push({ ...meta, data_url: dataUrl });
               }
             } catch (e) { /* ignore single chart failure */ }
@@ -773,6 +784,30 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
         } catch (e) {
           return false;
         }
+      },
+      describeError(res, data) {
+        // Le serveur renvoie toujours `message`. On garde `errors` en second
+        // recours (400 de validation), et un message explicite par statut :
+        // afficher "Une erreur est survenue" sans rien d'autre laissait
+        // l'utilisateur sans aucune piste sur ce qu'il devait corriger.
+        if (data && data.message) return data.message;
+        if (data && data.errors) {
+          const first = Object.values(data.errors)[0];
+          const entry = Array.isArray(first) ? first[0] : first;
+          const text = entry && (entry.message || entry);
+          if (typeof text === 'string' && text) return text;
+        }
+        const status = res && res.status;
+        if (status === 413) {
+          return "Le rapport est trop volumineux à envoyer. Relancez le calcul puis réessayez.";
+        }
+        if (status === 429) {
+          return 'Trop de demandes. Merci de réessayer dans quelques minutes.';
+        }
+        if (status >= 500) {
+          return "Le serveur n'a pas pu produire le rapport. Réessayez dans un instant ou demandez-le par email.";
+        }
+        return 'Une erreur est survenue. Réessayez.';
       },
       async submit() {
         this.error = '';
@@ -831,7 +866,7 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
           });
           const data = await res.json().catch(() => ({}));
           if (!res.ok || data.ok === false) {
-            this.error = data.message || 'Une erreur est survenue. Réessayez.';
+            this.error = this.describeError(res, data);
           } else {
             if (data.pdf_base64) {
               const ok = this.triggerDownload(data.pdf_base64, data.filename);

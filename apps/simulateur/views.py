@@ -363,8 +363,13 @@ class ReportSubmitView(View):
 
         form = SimulatorReportForm(payload)
         if not form.is_valid():
+            # `message` est indispensable : le front affiche `data.message`
+            # et retombait sinon sur un « Une erreur est survenue » opaque,
+            # sans jamais dire à l'utilisateur ce qu'il devait corriger.
             return JsonResponse(
-                {'ok': False, 'errors': form.errors.get_json_data()},
+                {'ok': False,
+                 'message': self._readable_error(form),
+                 'errors': form.errors.get_json_data()},
                 status=400,
             )
 
@@ -398,22 +403,15 @@ class ReportSubmitView(View):
         pdf_bytes: bytes | None = None
 
         # 1) En mode download, le PDF doit être généré de façon synchrone :
-        #    il est renvoyé dans la réponse (base64) pour téléchargement immédiat.
-        #    Une erreur de génération est donc bloquante.
+        #    il est renvoyé dans la réponse (base64) pour téléchargement
+        #    immédiat. Un échec est bloquant, d'où le repli sans graphiques.
         if delivery == 'download':
-            try:
-                pdf_bytes = SimulatorReportService.generate_pdf(
-                    report, charts=transient_charts,
-                )
-            except Exception as exc:  # noqa: BLE001
-                logger.error(
-                    "Échec génération PDF rapport simulateur #%s : %s",
-                    report.pk, exc, exc_info=True,
-                )
+            pdf_bytes = self._render_pdf_resilient(report, transient_charts)
+            if pdf_bytes is None:
                 return JsonResponse(
                     {'ok': False,
                      'message': "Nous n'avons pas pu générer le PDF. "
-                                'Réessayez ou contactez-nous.'},
+                                'Réessayez ou demandez-le par email.'},
                     status=500,
                 )
 
@@ -443,6 +441,55 @@ class ReportSubmitView(View):
                 '(pensez à regarder dans les spams).'
             )
         return JsonResponse(response)
+
+    @staticmethod
+    def _render_pdf_resilient(report: Any, charts: Any) -> bytes | None:
+        """Rend le PDF, en réessayant sans graphiques si le rendu échoue.
+
+        Les graphiques sont des images base64 produites par le navigateur :
+        c'est la partie la plus fragile du rendu. Plutôt que de refuser le
+        téléchargement, on retente sans eux — l'utilisateur repart avec son
+        rapport (texte, saisies, KPI, recommandations) au lieu d'une erreur.
+        Retourne ``None`` seulement si le rendu échoue même sans graphiques.
+        """
+        try:
+            return SimulatorReportService.generate_pdf(report, charts=charts)
+        except Exception as exc:  # noqa: BLE001
+            logger.error(
+                "Échec génération PDF rapport simulateur #%s : %s",
+                report.pk, exc, exc_info=True,
+            )
+
+        if not charts:
+            return None
+
+        try:
+            pdf_bytes = SimulatorReportService.generate_pdf(report, charts=None)
+        except Exception as exc:  # noqa: BLE001
+            logger.error(
+                "Échec génération PDF sans graphiques #%s : %s",
+                report.pk, exc, exc_info=True,
+            )
+            return None
+
+        logger.warning(
+            "PDF rapport simulateur #%s généré sans graphiques (repli).",
+            report.pk,
+        )
+        return pdf_bytes
+
+    @staticmethod
+    def _readable_error(form: SimulatorReportForm) -> str:
+        """Première erreur de validation, formulée pour l'utilisateur final."""
+        for field, errors in form.errors.items():
+            if not errors:
+                continue
+            text = str(errors[0])
+            if field in ('__all__', 'snapshot', 'website'):
+                return text
+            label = form.fields[field].label or field
+            return f"{label} : {text}"
+        return 'Une erreur est survenue. Réessayez.'
 
     @staticmethod
     def _dispatch_report_email(
