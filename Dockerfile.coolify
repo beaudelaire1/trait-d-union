@@ -23,8 +23,7 @@ FROM python:3.12-slim-bookworm
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=config.settings.coolify \
-    PORT=8000 \
-    PROCESS_TYPE=web
+    PORT=8000
 
 WORKDIR /app
 
@@ -61,9 +60,9 @@ USER appuser
 
 EXPOSE 8000
 
-# The web service is probed over HTTP. A Django-Q worker has no HTTP listener;
-# if qcluster exits, the container itself exits and Coolify can restart it.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD if [ "${PROCESS_TYPE:-web}" = "worker" ]; then exit 0; else python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz/', timeout=4)"; fi || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz/', timeout=4)" || exit 1
 
-CMD ["sh", "-c", "if [ \"${PROCESS_TYPE:-web}\" = \"worker\" ]; then exec python manage.py qcluster; else exec gunicorn config.wsgi:application --preload --bind 0.0.0.0:${PORT:-8000} --workers ${GUNICORN_WORKERS:-2} --threads ${GUNICORN_THREADS:-4} --timeout ${GUNICORN_TIMEOUT:-120}; fi"]
+# One Coolify application/container: the runner supervises Gunicorn and
+# Django-Q2 together and exits if either critical process dies.
+CMD ["python", "deploy/run_coolify.py"]
