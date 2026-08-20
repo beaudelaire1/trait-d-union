@@ -1,0 +1,66 @@
+# ==============================================================================
+# Dockerfile.coolify - Trait d'Union Studio on Coolify/OVH
+# ==============================================================================
+FROM python:3.12-slim-bookworm AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libffi-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+FROM python:3.12-slim-bookworm
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DJANGO_SETTINGS_MODULE=config.settings.coolify \
+    PORT=8000
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf2.0-0 \
+    libffi8 \
+    shared-mime-info \
+    fonts-liberation \
+    fonts-dejavu-core \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /install /usr/local
+COPY . .
+
+RUN mkdir -p /app/staticfiles /app/media
+
+# collectstatic does not need the production PostgreSQL database. A temporary
+# SQLite URL keeps image builds deterministic and independent from runtime
+# infrastructure.
+RUN DJANGO_SECRET_KEY="$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')" \
+    DATABASE_URL=sqlite:///dummy.db \
+    python manage.py collectstatic --noinput --clear
+
+RUN addgroup --system appgroup \
+    && adduser --system --ingroup appgroup --home /home/appuser appuser \
+    && mkdir -p /home/appuser \
+    && chown -R appuser:appgroup /app /home/appuser
+
+USER appuser
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz/', timeout=4)" || exit 1
+
+CMD ["sh", "-c", "gunicorn config.wsgi:application --preload --bind 0.0.0.0:${PORT:-8000} --workers ${GUNICORN_WORKERS:-2} --threads ${GUNICORN_THREADS:-4} --timeout ${GUNICORN_TIMEOUT:-120}"]
