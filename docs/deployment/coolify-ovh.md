@@ -24,7 +24,7 @@ Créer une Application depuis GitHub :
 - Build Pack: `Dockerfile`
 - Dockerfile: `/Dockerfile.coolify`
 - Port exposé: `8000`
-- Domaine principal: `https://www.traitdunion.it`
+- Domaine principal: `https://traitdunion.studio`
 
 Le conteneur démarre `deploy/run_coolify.py`, qui supervise :
 
@@ -42,10 +42,10 @@ Valeurs obligatoires au minimum :
 ```env
 DJANGO_SETTINGS_MODULE=config.settings.coolify
 DJANGO_SECRET_KEY=<secret stable et long>
-DJANGO_ALLOWED_HOSTS=traitdunion.it,www.traitdunion.it,localhost,127.0.0.1
-CSRF_TRUSTED_ORIGINS=https://traitdunion.it,https://www.traitdunion.it
-CANONICAL_DOMAIN=www.traitdunion.it
-SITE_URL=https://www.traitdunion.it
+DJANGO_ALLOWED_HOSTS=traitdunion.studio,www.traitdunion.studio,localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=https://traitdunion.studio,https://www.traitdunion.studio
+CANONICAL_DOMAIN=traitdunion.studio
+SITE_URL=https://traitdunion.studio
 DATABASE_URL=<internal PostgreSQL URL>
 DB_SSLMODE=prefer
 Q_WORKERS=1

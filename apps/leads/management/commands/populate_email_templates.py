@@ -9,8 +9,8 @@ SIGNATURE = '''
 <p style="margin: 0;"><strong>L'équipe Trait d'Union Studio</strong></p>
 <p style="margin: 5px 0; color: rgba(246, 247, 251, 0.7);"><em>Architecture Digitale</em></p>
 <p style="margin: 10px 0;">
-    🌐 <a href="https://www.traitdunion.it" style="color: #0B2DFF;">www.traitdunion.it</a><br>
-    📧 <a href="mailto:contact@traitdunion.it" style="color: #0B2DFF;">contact@traitdunion.it</a><br>
+    🌐 <a href="https://traitdunion.studio" style="color: #0B2DFF;">traitdunion.studio</a><br>
+    📧 <a href="mailto:contact@traitdunion.studio" style="color: #0B2DFF;">contact@traitdunion.studio</a><br>
     📞 <a href="tel:+594694358041" style="color: #0B2DFF;">+594 694 35 80 41</a>
 </p>
 '''
@@ -294,7 +294,7 @@ class Command(BaseCommand):
 <ul>
     <li>Guide d'utilisation (en pièce jointe)</li>
     <li>Accès administration : [URL ADMIN]</li>
-    <li>Support technique : support@traitdunion.it</li>
+    <li>Support technique : contact@traitdunion.studio</li>
 </ul>
 
 <p>⭐ <strong>Un petit service ?</strong></p>
@@ -575,7 +575,7 @@ class Command(BaseCommand):
 <p>📱 <strong>Vos contacts :</strong></p>
 <ul>
     <li><strong>Chef de projet :</strong> [NOM] - [EMAIL]</li>
-    <li><strong>Support technique :</strong> support@traitdunion.it</li>
+    <li><strong>Support technique :</strong> contact@traitdunion.studio</li>
     <li><strong>Urgences :</strong> [TÉLÉPHONE]</li>
 </ul>
 

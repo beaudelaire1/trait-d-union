@@ -29,7 +29,7 @@ class BrevoEmailService:
 
     def __init__(self):
         self.api_key = getattr(settings, 'BREVO_API_KEY', None)
-        self.default_from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it')
+        self.default_from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio')
         self.default_from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
         self._api_instance = None
 
@@ -330,7 +330,7 @@ def send_simple_email(
     
     # Fallback Django EmailMessage
     try:
-        _from_email = from_email or getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it')
+        _from_email = from_email or getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio')
         
         email = EmailMessage(
             subject=subject,

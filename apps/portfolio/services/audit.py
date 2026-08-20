@@ -104,7 +104,7 @@ class _Session:
                 import requests
                 cls._instance = requests.Session()
                 cls._instance.headers["User-Agent"] = (
-                    "TUS-Portfolio-Audit/1.0 (+https://www.traitdunion.it)"
+                    "TUS-Portfolio-Audit/1.0 (+https://traitdunion.studio)"
                 )
             except ImportError:  # pragma: no cover
                 cls._instance = None

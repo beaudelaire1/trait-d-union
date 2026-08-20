@@ -240,8 +240,8 @@ class CanonicalDomainMiddleware(MiddlewareMixin):
     canonical domain. Only active when CANONICAL_DOMAIN is set (production).
 
     Redirects:
-    - traitdunion.it → www.traitdunion.it (301) when CANONICAL_DOMAIN=www.traitdunion.it
-    - trait-d-union.onrender.com → www.traitdunion.it (301)
+    - www.traitdunion.studio → traitdunion.studio (301)
+    - trait-d-union.onrender.com → traitdunion.studio (301)
 
     Protection anti-boucle :
     - Un cookie ``_canonical_ok`` est posé lors du redirect.

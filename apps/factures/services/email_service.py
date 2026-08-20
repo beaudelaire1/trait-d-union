@@ -42,7 +42,7 @@ class PremiumEmailService:
                 client_name = getattr(client, 'full_name', '') or getattr(client, 'nom', '')
                 client_email = getattr(client, 'email', None)
         
-        admin_email = getattr(settings, "ADMIN_EMAIL", None) or "contact@traitdunion.it"
+        admin_email = getattr(settings, "ADMIN_EMAIL", None) or "contact@traitdunion.studio"
         
         # Destinataire principal (client si disponible, sinon admin)
         recipient = client_email if client_email else admin_email
@@ -53,10 +53,10 @@ class PremiumEmailService:
         subject = f"Facture {invoice.number} – {company_name}"
         
         # Construire l'URL de vue en ligne
-        site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+        site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
         # Sécurité : ne jamais envoyer un lien localhost par email
         if any(h in site_url for h in ('localhost', '127.0.0.1', '0.0.0.0')):
-            site_url = 'https://traitdunion.it'
+            site_url = 'https://traitdunion.studio'
         view_url = None
         if hasattr(invoice, 'public_token') and invoice.public_token:
             try:

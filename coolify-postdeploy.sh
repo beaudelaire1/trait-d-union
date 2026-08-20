@@ -21,7 +21,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
-email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@traitdunion.it")
+email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "contact@traitdunion.studio")
 password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "")
 
 if password and not User.objects.filter(username=username).exists():

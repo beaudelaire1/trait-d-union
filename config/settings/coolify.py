@@ -24,12 +24,12 @@ def _csv_env(name: str, default: str) -> list[str]:
 # public whitelist strict while explicitly allowing local container probes.
 ALLOWED_HOSTS = _csv_env(
     "DJANGO_ALLOWED_HOSTS",
-    "traitdunion.it,www.traitdunion.it,localhost,127.0.0.1",
+    "traitdunion.studio,www.traitdunion.studio,localhost,127.0.0.1",
 )
 
 CSRF_TRUSTED_ORIGINS = _csv_env(
     "CSRF_TRUSTED_ORIGINS",
-    "https://traitdunion.it,https://www.traitdunion.it",
+    "https://traitdunion.studio,https://www.traitdunion.studio",
 )
 
 # Coolify terminates HTTPS at its reverse proxy and forwards the original

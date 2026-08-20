@@ -67,7 +67,7 @@ class Command(BaseCommand):
     def _create_test_client(self):
         """Crée un client de test."""
         client, created = ClientProfile.objects.get_or_create(
-            email="test@traitdunion.it",
+            email="test@traitdunion.studio",
             defaults={
                 "full_name": "Test Client",
                 "phone": "+594695358041",

@@ -79,7 +79,7 @@ class EmailComposeView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
             
             # Build HTML with premium template
             branding = getattr(settings, 'INVOICE_BRANDING', {})
-            site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it').rstrip('/')
+            site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.studio').rstrip('/')
             
             html_body = render_to_string('emails/modele_email_premium.html', {
                 'subject': email_composition.subject,
@@ -210,7 +210,7 @@ class SendEmailView(View):
             from core.services.email_backends import brevo_service, send_transactional_email
             
             branding = getattr(settings, 'INVOICE_BRANDING', {})
-            site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it').rstrip('/')
+            site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.studio').rstrip('/')
             
             html_body = render_to_string('emails/modele_email_premium.html', {
                 'subject': email_obj.subject,
@@ -297,7 +297,7 @@ class BulkEmailView(View):
         
         # Préparer le HTML avec le template premium
         branding = getattr(settings, 'INVOICE_BRANDING', {})
-        site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it').rstrip('/')
+        site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.studio').rstrip('/')
         
         html_body = render_to_string('emails/modele_email_premium.html', {
             'subject': subject,

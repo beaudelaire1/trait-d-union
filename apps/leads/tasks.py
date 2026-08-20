@@ -124,9 +124,9 @@ def send_newsletter_campaign_task(campaign_id: int) -> dict:
 
     # Build HTML with premium template + unsubscribe link
     branding = getattr(settings, 'INVOICE_BRANDING', {})
-    site_url = str(getattr(settings, 'SITE_URL', 'https://www.traitdunion.it')).rstrip('/')
+    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
     if 'localhost' in site_url or '127.0.0.1' in site_url:
-        site_url = 'https://www.traitdunion.it'
+        site_url = 'https://traitdunion.studio'
 
     success_count = 0
     failed_emails = []
@@ -217,9 +217,9 @@ def send_article_as_newsletter_task(article_id: int) -> dict:
         campaign.save(update_fields=['status', 'sent_at'])
         return {'total': 0, 'success': 0, 'failed': []}
 
-    site_url = str(getattr(settings, 'SITE_URL', 'https://www.traitdunion.it')).rstrip('/')
+    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
     if 'localhost' in site_url or '127.0.0.1' in site_url:
-        site_url = 'https://www.traitdunion.it'
+        site_url = 'https://traitdunion.studio'
 
     article_url = f"{site_url}{article.get_absolute_url()}"
 

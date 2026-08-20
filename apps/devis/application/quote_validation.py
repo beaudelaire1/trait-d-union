@@ -161,7 +161,7 @@ def _notify_admin_quote_accepted(quote: Quote, audit_trail: dict) -> None:
     admin_email = (
         getattr(settings, "TASK_NOTIFICATION_EMAIL", None)
         or getattr(settings, "ADMIN_EMAIL", None)
-        or "contact@traitdunion.it"
+        or "contact@traitdunion.studio"
     )
 
     client = getattr(quote, "client", None)
@@ -197,7 +197,7 @@ def _notify_admin_quote_accepted(quote: Quote, audit_trail: dict) -> None:
     email = EmailMessage(
         subject=subject,
         body=html_body,
-        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "contact@traitdunion.it"),
+        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "contact@traitdunion.studio"),
         to=[admin_email],
     )
     email.content_subtype = "html"

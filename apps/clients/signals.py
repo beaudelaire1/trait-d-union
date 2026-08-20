@@ -152,13 +152,13 @@ def _send_milestone_email(profile, project, milestone):
     """Send milestone completion email to client (best-effort)."""
     from django.conf import settings
 
-    site_url = str(getattr(settings, 'SITE_URL', 'https://www.traitdunion.it')).rstrip('/')
+    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
     if 'localhost' in site_url or '127.0.0.1' in site_url:
-        site_url = 'https://www.traitdunion.it'
+        site_url = 'https://traitdunion.studio'
 
     user = profile.user
     first_name = user.first_name or profile.full_name.split()[0] if profile.full_name else 'Bonjour'
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it')
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio')
     project_url = f"{site_url}/ecosysteme-tus/projets/{project.pk}/"
 
     # Count progress
@@ -205,7 +205,7 @@ def _send_milestone_email(profile, project, milestone):
   <tr><td style="padding:24px 40px;border-top:1px solid rgba(246,247,251,0.08);text-align:center;">
     <p style="margin:0;font-size:0.78rem;color:rgba(246,247,251,0.35);">
       Trait d'Union Studio · Guyane<br>
-      <a href="mailto:contact@traitdunion.it" style="color:#4D6FFF;text-decoration:none;">contact@traitdunion.it</a>
+      <a href="mailto:contact@traitdunion.studio" style="color:#4D6FFF;text-decoration:none;">contact@traitdunion.studio</a>
     </p>
   </td></tr>
 </table>

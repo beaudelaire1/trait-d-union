@@ -15,13 +15,13 @@ def obfuscate_email(email: str) -> Dict[str, str]:
     """Obfusque une adresse email pour affichage sécurisé.
     
     Args:
-        email: Adresse email en clair (ex: contact@traitdunion.it)
+        email: Adresse email en clair (ex: contact@traitdunion.studio)
     
     Returns:
         Dict avec 'encoded' (base64) et 'display' (texte masqué)
     
     Examples:
-        >>> obfuscate_email('contact@traitdunion.it')
+        >>> obfuscate_email('contact@traitdunion.studio')
         {'encoded': 'Y29udGFjdEB0cmFpdGR1bmlvbi5pdA==', 'display': 'contact [at] traitdunion [dot] it'}
     """
     encoded = base64.b64encode(email.encode('utf-8')).decode('utf-8')
@@ -38,6 +38,6 @@ def get_company_email_obfuscated() -> Dict[str, str]:
     """Retourne l'email de Trait d'Union Studio obfusqué.
     
     Returns:
-        Dict avec versions encodée et masquée de contact@traitdunion.it
+        Dict avec versions encodée et masquée de contact@traitdunion.studio
     """
-    return obfuscate_email('contact@traitdunion.it')
+    return obfuscate_email('contact@traitdunion.studio')

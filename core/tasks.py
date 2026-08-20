@@ -251,7 +251,7 @@ def _task_notify_quote_request(quote_request_id: int):
 
     qr = QuoteRequest.objects.get(pk=quote_request_id)
     branding = getattr(settings, 'INVOICE_BRANDING', {}) or {}
-    site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it').rstrip('/')
+    site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.studio').rstrip('/')
 
     # 1) Email client
     if qr.email:
@@ -332,7 +332,7 @@ def _task_notify_invoice_created(invoice_id: int):
     # Essai Brevo puis fallback Django
     try:
         from core.services.email_backends import send_transactional_email, brevo_service
-        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it')
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio')
         from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
 
         if brevo_service.is_configured():
@@ -351,7 +351,7 @@ def _task_notify_invoice_created(invoice_id: int):
 
     email = EmailMessage(
         subject=subject, body=html_body,
-        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it'),
+        from_email=getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio'),
         to=[recipient],
     )
     email.content_subtype = 'html'
@@ -384,7 +384,7 @@ def _task_send_generic_email(to_email: str, subject: str, html_content: str, fro
     email = EmailMessage(
         subject=subject,
         body=html_content,
-        from_email=from_email or getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it'),
+        from_email=from_email or getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio'),
         to=[to_email],
     )
     email.content_subtype = 'html'

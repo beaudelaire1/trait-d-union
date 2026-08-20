@@ -21,15 +21,15 @@ DEBUG = False
 # 🛡️ ZERO TRUST: Strict domain whitelist - NO wildcards
 ALLOWED_HOSTS = [
     'trait-d-union.onrender.com',  # Render exact subdomain
-    'traitdunion.it',
-    'www.traitdunion.it',
+    'traitdunion.studio',
+    'www.traitdunion.studio',
 ]
 
 # CSRF trusted origins - DOIT inclure le scheme https://
 CSRF_TRUSTED_ORIGINS = [
     'https://trait-d-union.onrender.com',
-    'https://traitdunion.it',
-    'https://www.traitdunion.it',
+    'https://traitdunion.studio',
+    'https://www.traitdunion.studio',
 ]
 
 # Sécurité HTTPS
@@ -49,9 +49,8 @@ SECURE_CONTENT_TYPE_NOSNIFF = True  # X-Content-Type-Options: nosniff
 X_FRAME_OPTIONS = 'DENY'  # Protection clickjacking
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-# 🔍 SEO: Canonical domain (www ↔ apex). Default aligns with Cloudflare redirect
-# to www to avoid redirect loops. Override via env if you want apex.
-CANONICAL_DOMAIN = os.environ.get('CANONICAL_DOMAIN', 'www.traitdunion.it')
+# 🔍 SEO: the apex .studio domain is canonical; www is redirected to it.
+CANONICAL_DOMAIN = os.environ.get('CANONICAL_DOMAIN', 'traitdunion.studio')
 
 # Permissions Policy (anciennement Feature-Policy)
 # 🛡️ BANK-GRADE: Exhaustive permissions lockdown
@@ -78,7 +77,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 # 🛡️ BANK-GRADE: Restrict session cookie to production domain
 # Ne PAS fixer SESSION_COOKIE_DOMAIN : Django utilise automatiquement le
 # domaine de la requête, ce qui évite les problèmes de cookies rejetés
-# pendant les redirections (ex: .onrender.com → traitdunion.it).
+# pendant les redirections (ex: .onrender.com → traitdunion.studio).
 # Avec la valeur par défaut (None), le cookie s'applique uniquement à l'hôte
 # qui sert la page, ce qui est le comportement correct derrière un reverse proxy.
 

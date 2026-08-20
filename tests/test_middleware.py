@@ -95,45 +95,45 @@ class TestCacheControlHeaders:
 class TestCanonicalDomainMiddleware:
     """Test CanonicalDomainMiddleware redirect & loop protection."""
 
-    _ALLOWED = ['traitdunion.it', 'www.traitdunion.it', 'trait-d-union.onrender.com',
+    _ALLOWED = ['traitdunion.studio', 'www.traitdunion.studio', 'trait-d-union.onrender.com',
                 'internal-hostname.render.com', 'any-host.example.com', 'testserver']
 
-    @override_settings(CANONICAL_DOMAIN='traitdunion.it', ALLOWED_HOSTS=_ALLOWED)
+    @override_settings(CANONICAL_DOMAIN='traitdunion.studio', ALLOWED_HOSTS=_ALLOWED)
     def test_canonical_host_no_redirect(self, client):
         """Requests to the canonical domain should not be redirected."""
-        response = client.get('/', HTTP_HOST='traitdunion.it')
+        response = client.get('/', HTTP_HOST='traitdunion.studio')
         assert response.status_code == 200
 
-    @override_settings(CANONICAL_DOMAIN='traitdunion.it', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
+    @override_settings(CANONICAL_DOMAIN='traitdunion.studio', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
     def test_non_canonical_host_redirects(self, client):
         """Requests to a non-canonical host should 301 to canonical."""
-        response = client.get('/', HTTP_HOST='www.traitdunion.it')
+        response = client.get('/', HTTP_HOST='www.traitdunion.studio')
         assert response.status_code == 301
-        assert 'traitdunion.it' in response['Location']
+        assert 'traitdunion.studio' in response['Location']
         assert 'www.' not in response['Location']
 
-    @override_settings(CANONICAL_DOMAIN='traitdunion.it', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
+    @override_settings(CANONICAL_DOMAIN='traitdunion.studio', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
     def test_render_subdomain_redirects(self, client):
         """Requests to the Render subdomain should redirect to canonical."""
         response = client.get('/contact/', HTTP_HOST='trait-d-union.onrender.com')
         assert response.status_code == 301
-        assert response['Location'] == 'https://traitdunion.it/contact/'
+        assert response['Location'] == 'https://traitdunion.studio/contact/'
 
-    @override_settings(CANONICAL_DOMAIN='traitdunion.it', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
+    @override_settings(CANONICAL_DOMAIN='traitdunion.studio', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
     def test_trailing_slash_redirect_on_canonical_host(self, client):
         """Public routes should be canonicalized with trailing slash."""
-        response = client.get('/services', HTTP_HOST='traitdunion.it')
+        response = client.get('/services', HTTP_HOST='traitdunion.studio')
         assert response.status_code == 301
-        assert response['Location'] == 'https://traitdunion.it/services/'
+        assert response['Location'] == 'https://traitdunion.studio/services/'
 
-    @override_settings(CANONICAL_DOMAIN='traitdunion.it', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
+    @override_settings(CANONICAL_DOMAIN='traitdunion.studio', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
     def test_trailing_slash_and_host_canonicalization_in_one_redirect(self, client):
         """Non-canonical host + missing slash should redirect in a single hop."""
-        response = client.get('/services', HTTP_HOST='www.traitdunion.it')
+        response = client.get('/services', HTTP_HOST='www.traitdunion.studio')
         assert response.status_code == 301
-        assert response['Location'] == 'https://traitdunion.it/services/'
+        assert response['Location'] == 'https://traitdunion.studio/services/'
 
-    @override_settings(CANONICAL_DOMAIN='traitdunion.it', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
+    @override_settings(CANONICAL_DOMAIN='traitdunion.studio', SESSION_COOKIE_SECURE=False, ALLOWED_HOSTS=_ALLOWED)
     def test_redirect_loop_detection_breaks_loop(self, client):
         """If the redirect loop cookie is present, do NOT redirect (break loop)."""
         # Simulate a browser that already followed one canonical redirect
@@ -143,13 +143,13 @@ class TestCanonicalDomainMiddleware:
         # Must NOT redirect — serve the page instead
         assert response.status_code != 301
 
-    @override_settings(CANONICAL_DOMAIN='traitdunion.it', ALLOWED_HOSTS=_ALLOWED)
+    @override_settings(CANONICAL_DOMAIN='traitdunion.studio', ALLOWED_HOSTS=_ALLOWED)
     def test_healthz_exempt_from_redirect(self, client):
         """Health check endpoint must never be redirected."""
         response = client.get('/healthz/', HTTP_HOST='internal-hostname.render.com')
         assert response.status_code == 200
 
-    @override_settings(CANONICAL_DOMAIN='traitdunion.it', ALLOWED_HOSTS=_ALLOWED)
+    @override_settings(CANONICAL_DOMAIN='traitdunion.studio', ALLOWED_HOSTS=_ALLOWED)
     def test_static_exempt_from_redirect(self, client):
         """Static files must not trigger canonical redirect."""
         response = client.get('/static/robots.txt', HTTP_HOST='trait-d-union.onrender.com')
@@ -162,12 +162,12 @@ class TestCanonicalDomainMiddleware:
         response = client.get('/', HTTP_HOST='any-host.example.com')
         assert response.status_code != 301
 
-    @override_settings(CANONICAL_DOMAIN='traitdunion.it', ALLOWED_HOSTS=_ALLOWED + ['traitdunion.it'])
+    @override_settings(CANONICAL_DOMAIN='traitdunion.studio', ALLOWED_HOSTS=_ALLOWED)
     def test_host_comparison_case_insensitive(self, client):
         """Host comparison should be case-insensitive."""
         # Note: Django's ALLOWED_HOSTS check is case-insensitive,
-        # so 'traitdunion.it' matches 'TraitDunion.IT'
-        response = client.get('/', HTTP_HOST='traitdunion.it')
+        # so 'traitdunion.studio' matches 'TraitDunion.STUDIO'
+        response = client.get('/', HTTP_HOST='TraitDunion.STUDIO')
         assert response.status_code == 200
 
 

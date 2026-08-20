@@ -26,8 +26,8 @@ DEFAULT_BRANDING = {
     'region': 'Guyane française',
     'country': 'Guyane française',
     'phone': '+594 695 35 80 41',
-    'email': 'contact@traitdunion.it',
-    'website': 'https://traitdunion.it',
+    'email': 'contact@traitdunion.studio',
+    'website': 'https://traitdunion.studio',
     'siret': '908 264 112 00016',
     'tva_intra': '',
     'iban': '',  # 🛡️ Loaded from settings.INVOICE_BRANDING (env vars)

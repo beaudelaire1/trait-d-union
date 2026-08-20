@@ -257,15 +257,15 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Configuration expéditeur
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'contact@traitdunion.it')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio')
 DEFAULT_FROM_NAME = os.environ.get('DEFAULT_FROM_NAME', "Trait d'Union Studio")
 
 # Email admin pour les notifications internes
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.it')
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.studio')
 
 # Email pour les notifications de tâches async et alertes critiques
 # Si non défini, utilise ADMIN_EMAIL comme fallback
-TASK_NOTIFICATION_EMAIL = os.environ.get('TASK_NOTIFICATION_EMAIL', os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.it'))
+TASK_NOTIFICATION_EMAIL = os.environ.get('TASK_NOTIFICATION_EMAIL', os.environ.get('ADMIN_EMAIL', 'contact@traitdunion.studio'))
 
 # ==============================================================================
 # DJANGO-Q2 : Tâches asynchrones (emails, PDF, notifications)
@@ -349,8 +349,8 @@ INVOICE_BRANDING = {
     'region': 'Guyane',
     'country': 'Guyane française',
     'phone': '+594 695 35 80 41',
-    'email': 'contact@traitdunion.it',
-    'website': 'https://www.traitdunion.it',
+    'email': 'contact@traitdunion.studio',
+    'website': 'https://traitdunion.studio',
     'siret': '908 264 112 00016',
     'tva_intra': '',
     'iban': os.environ.get('INVOICE_IBAN', ''),
@@ -439,13 +439,13 @@ INVOICING = {
 
 
 # Site URL (pour les emails) — garde-fou : jamais localhost en production
-_raw_site_url = os.environ.get('SITE_URL', 'https://www.traitdunion.it')
+_raw_site_url = os.environ.get('SITE_URL', 'https://traitdunion.studio')
 if any(h in _raw_site_url for h in ('localhost', '127.0.0.1', '0.0.0.0')):
     import logging as _logging
     _logging.getLogger(__name__).warning(
-        "SITE_URL contient localhost (%r), fallback → https://www.traitdunion.it", _raw_site_url
+        "SITE_URL contient localhost (%r), fallback → https://traitdunion.studio", _raw_site_url
     )
-    SITE_URL = 'https://www.traitdunion.it'
+    SITE_URL = 'https://traitdunion.studio'
 else:
     SITE_URL = _raw_site_url.rstrip('/')
 

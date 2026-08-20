@@ -229,8 +229,8 @@ def make_unsubscribe_url(email: str) -> str:
         _settings.SECRET_KEY.encode(), email.lower().encode(), hashlib.sha256,
     ).hexdigest()[:32]
 
-    site_url = str(getattr(_settings, 'SITE_URL', 'https://www.traitdunion.it')).rstrip('/')
+    site_url = str(getattr(_settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
     if 'localhost' in site_url or '127.0.0.1' in site_url:
-        site_url = 'https://www.traitdunion.it'
+        site_url = 'https://traitdunion.studio'
 
     return f"{site_url}/contact/newsletter/unsubscribe/?email={email}&token={token}"

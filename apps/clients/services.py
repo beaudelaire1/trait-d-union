@@ -169,14 +169,14 @@ def send_welcome_email(
         temporary_password: Le mot de passe temporaire généré
         context_label: Libellé optionnel (ex: "Devis DEV-2026-042")
     """
-    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
     # Sécurité : ne jamais envoyer un lien localhost/127.0.0.1 par email
     if 'localhost' in site_url or '127.0.0.1' in site_url or '0.0.0.0' in site_url:
-        logger.warning(f"SITE_URL contient localhost ({site_url!r}), fallback sur https://traitdunion.it")
-        site_url = 'https://traitdunion.it'
+        logger.warning(f"SITE_URL contient localhost ({site_url!r}), fallback sur https://traitdunion.studio")
+        site_url = 'https://traitdunion.studio'
     login_url = f"{site_url}/accounts/login/"
     first_name = user.first_name or user.username
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@traitdunion.it')
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio')
 
     subject = "Bienvenue chez Trait d'Union Studio — accès portail client"
 
@@ -197,7 +197,7 @@ Connectez-vous : {login_url}
 
 IMPORTANT : À votre première connexion, vous devrez changer ce mot de passe temporaire.
 
-Questions ? Contactez-nous : contact@traitdunion.it
+Questions ? Contactez-nous : contact@traitdunion.studio
 
 — Trait d'Union Studio"""
 
@@ -271,7 +271,7 @@ Questions ? Contactez-nous : contact@traitdunion.it
   <tr><td style="padding:24px 40px; border-top:1px solid rgba(246,247,251,0.08); text-align:center;">
     <p style="margin:0; font-size:0.78rem; color:rgba(246,247,251,0.35);">
       Trait d'Union Studio · Guyane<br>
-      Questions ? <a href="mailto:contact@traitdunion.it" style="color:#4D6FFF; text-decoration:none;">contact@traitdunion.it</a>
+      Questions ? <a href="mailto:contact@traitdunion.studio" style="color:#4D6FFF; text-decoration:none;">contact@traitdunion.studio</a>
     </p>
   </td></tr>
 
@@ -336,12 +336,12 @@ def send_password_changed_email(user: User) -> None:
     Informe le client que son mot de passe a bien été modifié.
     Inclut un appel à l'action si ce n'est pas lui.
     """
-    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
     if 'localhost' in site_url or '127.0.0.1' in site_url or '0.0.0.0' in site_url:
-        site_url = 'https://traitdunion.it'
+        site_url = 'https://traitdunion.studio'
 
     first_name = user.first_name or user.username
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@traitdunion.it')
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio')
     subject = "Mot de passe modifié — Trait d'Union Studio"
 
     text_content = f"""Bonjour {first_name},
@@ -349,7 +349,7 @@ def send_password_changed_email(user: User) -> None:
 Votre mot de passe Trait d'Union Studio a été modifié avec succès.
 
 Si vous n'êtes pas à l'origine de ce changement, contactez-nous immédiatement :
-contact@traitdunion.it
+contact@traitdunion.studio
 
 — Trait d'Union Studio"""
 
@@ -397,7 +397,7 @@ contact@traitdunion.it
     <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); border-radius:8px;">
       <tr><td style="padding:14px 18px; font-size:0.85rem; color:#FCA5A5;">
         ⚠️ Si vous n'êtes <strong>pas à l'origine</strong> de ce changement, contactez-nous immédiatement à
-        <a href="mailto:contact@traitdunion.it" style="color:#F87171; text-decoration:underline;">contact@traitdunion.it</a>.
+        <a href="mailto:contact@traitdunion.studio" style="color:#F87171; text-decoration:underline;">contact@traitdunion.studio</a>.
       </td></tr>
     </table>
   </td></tr>
@@ -413,7 +413,7 @@ contact@traitdunion.it
   <tr><td style="padding:24px 40px; border-top:1px solid rgba(246,247,251,0.08); text-align:center;">
     <p style="margin:0; font-size:0.78rem; color:rgba(246,247,251,0.35);">
       Trait d'Union Studio · Guyane<br>
-      Questions ? <a href="mailto:contact@traitdunion.it" style="color:#4D6FFF; text-decoration:none;">contact@traitdunion.it</a>
+      Questions ? <a href="mailto:contact@traitdunion.studio" style="color:#4D6FFF; text-decoration:none;">contact@traitdunion.studio</a>
     </p>
   </td></tr>
 
@@ -455,12 +455,12 @@ def send_new_comment_notification_to_admin(comment) -> None:
     Args:
         comment: instance de ProjectComment (avec project et author chargés)
     """
-    admin_email = getattr(settings, 'ADMIN_EMAIL', 'contact@traitdunion.it')
-    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+    admin_email = getattr(settings, 'ADMIN_EMAIL', 'contact@traitdunion.studio')
+    site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
     if 'localhost' in site_url or '127.0.0.1' in site_url or '0.0.0.0' in site_url:
-        site_url = 'https://traitdunion.it'
+        site_url = 'https://traitdunion.studio'
 
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@traitdunion.it')
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio')
     author_name = comment.author.get_full_name() or comment.author.username
     project_name = comment.project.name
     message_preview = comment.message[:200] + ('...' if len(comment.message) > 200 else '')

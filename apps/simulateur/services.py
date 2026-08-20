@@ -129,14 +129,14 @@ class SimulatorReportService:
         context = {
             'report': report,
             'tool_name': report.tool_name,
-            'site_url': getattr(settings, 'SITE_URL', 'https://traitdunion.it'),
+            'site_url': getattr(settings, 'SITE_URL', 'https://traitdunion.studio'),
         }
         html_body = render_to_string('emails/simulateur_report.html', context)
         text_body = render_to_string('emails/simulateur_report.txt', context)
 
         subject = f"Votre rapport : {report.tool_name}"
         from_email = getattr(
-            settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it'
+            settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio'
         )
 
         msg = EmailMultiAlternatives(
