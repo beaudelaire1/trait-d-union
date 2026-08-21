@@ -1,6 +1,5 @@
 """Forms pour le portfolio admin."""
 from django import forms
-from django.contrib import admin
 from tinymce.widgets import TinyMCE
 from .models import Project
 
@@ -31,6 +30,12 @@ class ProjectAdminForm(forms.ModelForm):
         widget=TinyMCE(attrs={'cols': 80, 'rows': 20}),
         label='Résultat',
         help_text='Ch.04 — Résultat : impact et livrables',
+    )
+    url = forms.URLField(
+        required=False,
+        max_length=200,
+        assume_scheme='https',
+        label='URL',
     )
 
     # ── Ch.05 — note UI/UX manuelle ────────────────────────────────────
