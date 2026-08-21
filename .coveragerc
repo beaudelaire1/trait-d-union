@@ -1,0 +1,11 @@
+[run]
+omit =
+    */migrations/*
+    apps/*/tests/*
+    apps/*/tests.py
+    apps/*/tests_*.py
+
+[report]
+fail_under = 57.5
+precision = 2
+show_missing = True
