@@ -161,8 +161,8 @@ jobs:
           )
           replace_once(
               'tests/test_middleware_tasks.py',
-              "        with patch('core.tasks.async_send_password_changed_email'):\n            result = mw.process_response(request, response)\n",
-              "        with patch('core.tasks.async_send_password_changed_email'):\n            mw.process_response(request, response)\n",
+              "        response = HttpResponse(status=302)\n        with patch('core.tasks.async_send_password_changed_email'):\n            result = mw.process_response(request, response)\n\n        assert 'must_change_password' not in request.session\n",
+              "        response = HttpResponse(status=302)\n        with patch('core.tasks.async_send_password_changed_email'):\n            mw.process_response(request, response)\n\n        assert 'must_change_password' not in request.session\n",
           )
           replace_once(
               'tests/test_middleware_tasks.py',
