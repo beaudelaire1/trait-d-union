@@ -3,10 +3,13 @@ from django.urls import path
 
 from .p0_views import HomeP0View, LegalP0View
 from .views import (
-    ServicesView, MethodView,
-    FAQView, MentionsLegalesView, ConfidentialiteView, CGVView,
+    CGVView,
+    ConfidentialiteView,
+    FAQView,
+    MentionsLegalesView,
+    MethodView,
+    ServicesView,
 )
-
 
 app_name = 'pages'
 
