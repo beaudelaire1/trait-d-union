@@ -14,7 +14,8 @@ from django.utils import timezone
 from core.services.document_generator import DocumentGenerator
 
 from .models import SimulatorReport
-from .report_content import get_content_for, interpret
+from .report_content import interpret
+from .report_content_overrides import get_content_for
 
 logger = logging.getLogger(__name__)
 
