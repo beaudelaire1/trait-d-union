@@ -1,8 +1,6 @@
 """Modèles pour la traçabilité centralisée : journal d'audit des actions critiques."""
-import json
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
