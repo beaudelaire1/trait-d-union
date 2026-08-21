@@ -14,7 +14,6 @@ from django.urls import path
 
 from . import public_views, views
 
-
 app_name = "devis"
 
 urlpatterns = [
@@ -32,12 +31,10 @@ urlpatterns = [
         views.admin_generate_quote_pdf,
         name="quote-generate-pdf",
     ),
-
     # Validation client (2 facteurs) + accès PDF sécurisé
     path("valider/<str:token>/", views.quote_validate_start, name="quote_validate_start"),
     path("valider/<str:token>/code/", views.quote_validate_code, name="quote_validate_code"),
     path("pdf/<str:token>/", public_views.quote_public_pdf, name="quote_public_pdf"),
-
     # ===========================================
     # PHASE 3 : Signature électronique & Paiement
     # ===========================================
