@@ -5,7 +5,6 @@ Génère le rapport PDF d'un simulateur et l'envoie par email au lead.
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -91,10 +90,11 @@ class SimulatorReportService:
 
         try:
             cls.send(report, pdf_bytes=pdf_bytes, charts=charts)
-        except Exception as exc:  # noqa: BLE001
-            logger.error(
+        except Exception as exc:
+            logger.exception(
                 "Échec envoi rapport simulateur #%s : %s",
-                report.pk, exc, exc_info=True,
+                report.pk,
+                exc,
             )
             SimulatorReport.objects.filter(pk=report.pk).update(
                 send_attempts=F('send_attempts') + 1,
@@ -152,10 +152,12 @@ class SimulatorReportService:
 
         try:
             msg.send(fail_silently=False)
-        except Exception as exc:  # noqa: BLE001
-            logger.error(
+        except Exception as exc:
+            logger.exception(
                 "Échec envoi rapport simulateur %s à %s : %s",
-                report.tool_slug, report.email, exc, exc_info=True,
+                report.tool_slug,
+                report.email,
+                exc,
             )
             report.send_error = str(exc)[:500]
             report.save(update_fields=['send_error'])
@@ -169,6 +171,7 @@ class SimulatorReportService:
             admin_email = getattr(settings, 'ADMIN_EMAIL', None)
             if admin_email:
                 from django.core.mail import send_mail
+
                 send_mail(
                     subject=f"[Lead simulateur] {report.tool_name} – {report.email}",
                     message=(
@@ -183,5 +186,5 @@ class SimulatorReportService:
                     recipient_list=[admin_email],
                     fail_silently=True,
                 )
-        except Exception:  # noqa: BLE001
+        except Exception:
             logger.exception("Échec notification admin lead simulateur")
