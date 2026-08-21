@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import base64
 import logging
-from typing import Optional
 
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
