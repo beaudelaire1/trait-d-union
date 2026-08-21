@@ -94,4 +94,5 @@ def safe_html(value):
     )
     # Post-process: only keep safe CSS properties
     clean = _STYLE_ATTR_RE.sub(_sanitize_style_attr, clean)
-    return mark_safe(clean)
+    # The value is trusted only after nh3 allow-list sanitization and CSS filtering.
+    return mark_safe(clean)  # nosec B308, B703
