@@ -13,6 +13,12 @@ class ContactForm(forms.ModelForm):
     """Main contact form with dynamic fields based on project type."""
 
     phone = SplitPhoneNumberField(label="Téléphone", required=False)
+    existing_url = forms.URLField(
+        label="Site existant",
+        required=False,
+        max_length=500,
+        assume_scheme='https',
+    )
 
     # Magic bytes signatures for file type validation
     _MAGIC_SIGNATURES = {
