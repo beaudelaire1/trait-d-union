@@ -1,0 +1,184 @@
+name: One-time targeted Ruff cleanup
+
+on:
+  push:
+    branches:
+      - fix/p0-audit-2026-08-21
+
+permissions:
+  contents: write
+
+jobs:
+  targeted-fix:
+    if: >-
+      github.repository == 'beaudelaire1/trait-d-union' &&
+      github.ref == 'refs/heads/fix/p0-audit-2026-08-21' &&
+      github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: fix/p0-audit-2026-08-21
+
+      - name: Apply reviewed exact replacements
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected exactly one match, found {count}: {old!r}')
+              p.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+          replace_once(
+              'apps/clients/signals.py',
+              'from apps.clients.models import ClientNotification\n',
+              'from apps.clients.models import ClientNotification, ProjectMilestone\n',
+          )
+          replace_once(
+              'apps/clients/signals.py',
+              '\nfrom apps.clients.models import ProjectMilestone\n\n\n@receiver(post_save, sender=ProjectMilestone)',
+              '\n@receiver(post_save, sender=ProjectMilestone)',
+          )
+          replace_once(
+              'apps/clients/views.py',
+              '    lead = Lead.objects.create(\n',
+              '    Lead.objects.create(\n',
+          )
+          replace_once(
+              'apps/devis/forms.py',
+              '        for magic, _ in self._IMAGE_MAGIC.items():\n',
+              '        for magic in self._IMAGE_MAGIC:\n',
+          )
+          replace_once(
+              'apps/devis/signals.py',
+              'from allauth.account.signals import user_logged_in as allauth_user_logged_in\n',
+              'from allauth.account.signals import user_logged_in as allauth_user_logged_in\nfrom django.contrib.auth.signals import user_logged_in as django_user_logged_in\n',
+          )
+          replace_once(
+              'apps/devis/signals.py',
+              '\nfrom django.contrib.auth.signals import user_logged_in as django_user_logged_in\n\n@receiver(allauth_user_logged_in)',
+              '\n@receiver(allauth_user_logged_in)',
+          )
+          replace_once(
+              'apps/diagnostic/service.py',
+              "' → '.join(f'h{l}' for l in levels[:8])",
+              "' → '.join(f'h{level}' for level in levels[:8])",
+          )
+          replace_once(
+              'apps/einvoicing/tests/test_conformity.py',
+              '        report = check_invoice(_cii_xml(tax="20.00", grand="120.00"), "test.xml")\n        # cohérent ici ; on vérifie le contraire avec une TVA décalée\n',
+              '        # Vérifie que le contrôle BR-CO-14 est bien présent dans le rapport.\n',
+          )
+          replace_once(
+              'apps/factures/models.py',
+              '        if total_ht < 0: total_ht = Decimal("0.00")\n        if total_tva < 0: total_tva = Decimal("0.00")\n',
+              '        if total_ht < 0:\n            total_ht = Decimal("0.00")\n        if total_tva < 0:\n            total_tva = Decimal("0.00")\n',
+          )
+          replace_once(
+              'apps/leads/models.py',
+              'from django.db import models\n',
+              'from django.db import models\nfrom django.db.models.signals import pre_save\nfrom django.dispatch import receiver\n',
+          )
+          replace_once(
+              'apps/leads/models.py',
+              '\n# Auto-compute lead score on save\nfrom django.db.models.signals import pre_save\nfrom django.dispatch import receiver\n\n\n@receiver(pre_save, sender=Lead)',
+              '\n# Auto-compute lead score on save\n@receiver(pre_save, sender=Lead)',
+          )
+          replace_once(
+              'apps/messaging/services.py',
+              "        # Render template context\n        context = {\n            'prospect': prospect,\n            'contact_name': prospect.contact_name,\n            'company_name': prospect.company_name,\n        }\n        \n",
+              '',
+          )
+          replace_once(
+              'apps/messaging/views.py',
+              '            entry = form.save()\n',
+              '            form.save()\n',
+          )
+          replace_once(
+              'config/settings/development.py',
+              'from .base import *  # noqa: F401,F403\nimport os\n',
+              'from .base import *  # noqa: F401,F403\nimport os\nimport socket\n',
+          )
+          replace_once(
+              'config/settings/development.py',
+              '# DATABASE - SQLite local (fallback si PostgreSQL non disponible)\n# ==============================================================================\nimport socket\n\ndef _is_postgres_available',
+              '# DATABASE - SQLite local (fallback si PostgreSQL non disponible)\n# ==============================================================================\n\ndef _is_postgres_available',
+          )
+          replace_once(
+              'config/settings/production.py',
+              'import dj_database_url\n',
+              'import dj_database_url\nimport re\nimport sys\n',
+          )
+          replace_once(
+              'config/settings/production.py',
+              "# 🛡️ SECURITY: Only hash-named files are immutable (not robots.txt, sitemap, etc.)\nimport re\n_HASHED_FILE_RE = re.compile(r'\\.[a-f0-9]{8,32}\\.')\nWHITENOISE_IMMUTABLE_FILE_TEST = lambda path, url: bool(_HASHED_FILE_RE.search(url))\n",
+              "# 🛡️ SECURITY: Only hash-named files are immutable (not robots.txt, sitemap, etc.)\n_HASHED_FILE_RE = re.compile(r'\\.[a-f0-9]{8,32}\\.')\n\ndef _is_whitenoise_immutable_file(path, url):\n    return bool(_HASHED_FILE_RE.search(url))\n\nWHITENOISE_IMMUTABLE_FILE_TEST = _is_whitenoise_immutable_file\n",
+          )
+          replace_once(
+              'config/settings/production.py',
+              "# Vérifier si on est en train de builder (collectstatic)\nimport sys\nIS_BUILDING = 'collectstatic' in sys.argv\n",
+              "# Vérifier si on est en train de builder (collectstatic)\nIS_BUILDING = 'collectstatic' in sys.argv\n",
+          )
+          replace_once(
+              'config/settings/test.py',
+              'from .base import *  # noqa: F401,F403\n\nimport os\n',
+              'from .base import *  # noqa: F401,F403\n\nimport os\nimport tempfile\n',
+          )
+          replace_once(
+              'config/settings/test.py',
+              '# MEDIA FILES (Temporary pour les tests)\n# ==============================================================================\nimport tempfile\nMEDIA_ROOT = tempfile.mkdtemp()\n',
+              '# MEDIA FILES (Temporary pour les tests)\n# ==============================================================================\nMEDIA_ROOT = tempfile.mkdtemp()\n',
+          )
+          replace_once(
+              'config/urls.py',
+              'from django.views.generic import TemplateView\n',
+              'from django.views.generic import TemplateView\nfrom django_otp.admin import OTPAdminSite\n\nfrom apps.pages.healthz import healthz\nfrom config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap\nfrom core.views_session import session_ping\nfrom core.views_totp import totp_qr_code\n',
+          )
+          replace_once(
+              'config/urls.py',
+              '# 🛡️ SECURITY: OTP-protected admin site (2FA required for all staff)\nfrom django_otp.admin import OTPAdminSite\n\n\nclass TUSOTPAdminSite',
+              '# 🛡️ SECURITY: OTP-protected admin site (2FA required for all staff)\nclass TUSOTPAdminSite',
+          )
+          replace_once(
+              'config/urls.py',
+              "admin.site.__class__ = TUSOTPAdminSite\n\nfrom config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap\nfrom apps.pages.healthz import healthz\nfrom core.views_totp import totp_qr_code\nfrom core.views_session import session_ping\n\n\n# Sitemap configuration",
+              "admin.site.__class__ = TUSOTPAdminSite\n\n\n# Sitemap configuration",
+          )
+          replace_once(
+              'core/services/image_processor.py',
+              '                from PIL import Image, features\n',
+              '                from PIL import features\n',
+          )
+          replace_once(
+              'tests/test_client_portal.py',
+              '    profile = ClientProfile.objects.create(\n',
+              '    ClientProfile.objects.create(\n',
+          )
+          replace_once(
+              'tests/test_middleware_tasks.py',
+              "        with patch('core.tasks.async_send_password_changed_email'):\n            result = mw.process_response(request, response)\n",
+              "        with patch('core.tasks.async_send_password_changed_email'):\n            mw.process_response(request, response)\n",
+          )
+          replace_once(
+              'tests/test_middleware_tasks.py',
+              "        response = HttpResponse(status=302)\n        result = mw.process_response(request, response)\n        assert 'must_change_password' in request.session  # Not cleared\n",
+              "        response = HttpResponse(status=302)\n        mw.process_response(request, response)\n        assert 'must_change_password' in request.session  # Not cleared\n",
+          )
+          PY
+
+          python -m pip install ruff==0.16.4
+          ruff check apps/ config/ core/ services/ tests/ manage.py --output-format=concise
+          git diff --check
+
+      - name: Commit reviewed fixes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add apps config core tests
+          git commit -m 'chore: resolve remaining Ruff findings'
+          git push origin HEAD:fix/p0-audit-2026-08-21
