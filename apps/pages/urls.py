@@ -1,7 +1,7 @@
 """URL configuration for the pages app."""
 from django.urls import path
 
-from .p0_views import HomeP0View, LegalP0View
+from .p0_views import HomeP0View
 from .views import (
     ServicesView, MethodView,
     FAQView, MentionsLegalesView, ConfidentialiteView, CGVView,
@@ -18,5 +18,6 @@ urlpatterns = [
     path('mentions-legales/', MentionsLegalesView.as_view(), name='mentions_legales'),
     path('confidentialite/', ConfidentialiteView.as_view(), name='confidentialite'),
     path('cgv/', CGVView.as_view(), name='cgv'),
-    path('legal/', LegalP0View.as_view(), name='legal'),
+    # Alias historique : même source légale afin d'éviter deux vérités publiques.
+    path('legal/', MentionsLegalesView.as_view(), name='legal'),
 ]
