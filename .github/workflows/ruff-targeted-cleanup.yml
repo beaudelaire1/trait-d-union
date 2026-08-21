@@ -1,9 +1,9 @@
 name: One-time targeted Ruff cleanup
 
 on:
-  push:
+  pull_request:
     branches:
-      - fix/p0-audit-2026-08-21
+      - deploy/coolify-ovh
 
 permissions:
   contents: write
@@ -12,7 +12,7 @@ jobs:
   targeted-fix:
     if: >-
       github.repository == 'beaudelaire1/trait-d-union' &&
-      github.ref == 'refs/heads/fix/p0-audit-2026-08-21' &&
+      github.event.pull_request.head.ref == 'fix/p0-audit-2026-08-21' &&
       github.actor != 'github-actions[bot]'
     runs-on: ubuntu-24.04
     steps:
