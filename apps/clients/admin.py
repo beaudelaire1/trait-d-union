@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from .models import (
     ClientProfile, Project, ProjectMilestone, ClientDocument,
     ProjectActivity, ProjectComment, ClientNotification,
-    WorkflowTemplate, MilestoneTemplate
 )
+from .models_workflow import WorkflowTemplate, MilestoneTemplate
 
 
 class ClientProfileCreationForm(forms.ModelForm):
