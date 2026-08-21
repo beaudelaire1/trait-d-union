@@ -2,7 +2,7 @@ name: CI — Trait d'Union Studio
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, deploy/coolify-ovh]
   pull_request:
     branches: [main, deploy/coolify-ovh]
 
@@ -21,12 +21,12 @@ jobs:
   # 1. Blocking quality + security gate
   # ──────────────────────────────────────────────────────────────
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -47,7 +47,7 @@ jobs:
   # 2. Tests with PostgreSQL + Coverage
   # ──────────────────────────────────────────────────────────────
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: lint
 
     services:
@@ -82,10 +82,10 @@ jobs:
       REDIS_URL: redis://localhost:6379/0
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -117,11 +117,12 @@ jobs:
           pytest --tb=short -q \
             --cov=apps --cov=core --cov=config \
             --cov-report=term-missing \
-            --cov-report=xml
+            --cov-report=xml \
+            --cov-fail-under=57.5
 
       - name: Upload coverage report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage.xml
