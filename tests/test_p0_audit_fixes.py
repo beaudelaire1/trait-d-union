@@ -38,15 +38,15 @@ def test_homepage_renders_delivery_metric_server_side():
 
 
 @pytest.mark.django_db
-def test_legal_page_matches_current_production_infrastructure():
+def test_legal_alias_uses_current_legal_source():
     response = Client().get('/legal/')
     assert response.status_code == 200
     html = response.content.decode('utf-8')
     assert 'OVH SAS (OVHcloud)' in html
-    assert 'Strasbourg' in html
-    assert 'Django-Q2' in html
-    assert 'Render Services, Inc.' not in html
-    assert 'Hostinger International Ltd.' not in html
+    assert 'Strasbourg, France' in html
+    assert '<strong>Render</strong>' not in html
+    assert 'San Francisco' not in html
+    assert 'Frankfurt' not in html
     assert 'Celery' not in html
 
 
