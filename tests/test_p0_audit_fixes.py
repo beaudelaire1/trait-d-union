@@ -51,6 +51,18 @@ def test_legal_page_matches_current_production_infrastructure():
 
 
 @pytest.mark.django_db
+def test_legal_notices_page_matches_current_production_infrastructure():
+    response = Client().get('/mentions-legales/')
+    assert response.status_code == 200
+    html = response.content.decode('utf-8')
+    assert 'OVH SAS (OVHcloud)' in html
+    assert 'Strasbourg, France' in html
+    assert '<strong>Render</strong>' not in html
+    assert 'San Francisco' not in html
+    assert 'Frankfurt' not in html
+
+
+@pytest.mark.django_db
 def test_privacy_page_matches_infrastructure_and_transactional_report_use():
     response = Client().get('/confidentialite/')
     assert response.status_code == 200
