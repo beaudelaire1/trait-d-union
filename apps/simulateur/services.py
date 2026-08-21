@@ -92,9 +92,8 @@ class SimulatorReportService:
             cls.send(report, pdf_bytes=pdf_bytes, charts=charts)
         except Exception as exc:
             logger.exception(
-                "Échec envoi rapport simulateur #%s : %s",
+                "Échec envoi rapport simulateur #%s",
                 report.pk,
-                exc,
             )
             SimulatorReport.objects.filter(pk=report.pk).update(
                 send_attempts=F('send_attempts') + 1,
@@ -154,10 +153,9 @@ class SimulatorReportService:
             msg.send(fail_silently=False)
         except Exception as exc:
             logger.exception(
-                "Échec envoi rapport simulateur %s à %s : %s",
+                "Échec envoi rapport simulateur %s à %s",
                 report.tool_slug,
                 report.email,
-                exc,
             )
             report.send_error = str(exc)[:500]
             report.save(update_fields=['send_error'])
