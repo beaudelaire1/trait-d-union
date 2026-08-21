@@ -84,8 +84,7 @@ class TestCIIConformity:
         assert not report.is_conformant
 
     def test_vat_total_mismatch_flagged(self):
-        report = check_invoice(_cii_xml(tax="20.00", grand="120.00"), "test.xml")
-        # cohérent ici ; on vérifie le contraire avec une TVA décalée
+        # Vérifie que le contrôle BR-CO-14 est bien présent dans le rapport.
         report2 = check_invoice(_cii_xml(tax="20.00", basis="100.00",
                                          grand="120.00", due="120.00", rate="20"), "test.xml")
         assert any(c.code == "BR-CO-14" for c in report2.checks)

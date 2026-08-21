@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 from apps.devis.models import Quote
 from apps.factures.models import Invoice
-from apps.clients.models import ClientNotification
+from apps.clients.models import ClientNotification, ProjectMilestone
 
 logger = logging.getLogger(__name__)
 
@@ -105,9 +105,6 @@ def notify_invoice_paid(sender, instance, created, **kwargs):
 # ==============================================================================
 # MILESTONE NOTIFICATIONS (in-app + email)
 # ==============================================================================
-
-from apps.clients.models import ProjectMilestone
-
 
 @receiver(post_save, sender=ProjectMilestone)
 def notify_milestone_completed(sender, instance, created, **kwargs):

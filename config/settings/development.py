@@ -5,6 +5,7 @@ sont présentes, sinon utilise le backend console (pas d'envoi réel).
 """
 from .base import *  # noqa: F401,F403
 import os
+import socket
 
 DEBUG = True
 # 🛡️ SECURITY: Restrict dev hosts — prevents accidental deployment with wrong settings module
@@ -17,7 +18,6 @@ INSTALLED_APPS += [
 # ==============================================================================
 # DATABASE - SQLite local (fallback si PostgreSQL non disponible)
 # ==============================================================================
-import socket
 
 def _is_postgres_available(port=5432):
     """Vérifie si PostgreSQL est accessible."""

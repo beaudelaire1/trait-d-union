@@ -515,7 +515,7 @@ def quick_request(request):
     }
     
     # Create the lead (will trigger admin notification)
-    lead = Lead.objects.create(
+    Lead.objects.create(
         name=f"[CLIENT] {request.user.get_full_name() or request.user.username}",
         email=request.user.email,
         project_type=project_type_map.get(request_type, 'vitrine'),

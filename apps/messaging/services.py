@@ -45,13 +45,6 @@ def send_prospection_template(prospect, template_slug='prospection-standard'):
         if not template:
             return {'success': False, 'error': f"Template {template_slug} not found"}
             
-        # Render template context
-        context = {
-            'prospect': prospect,
-            'contact_name': prospect.contact_name,
-            'company_name': prospect.company_name,
-        }
-        
         # If template is stored as database content
         # We might need to render the liquid/django tags inside the content
         # For simplicity, let's assume content is just HTML string

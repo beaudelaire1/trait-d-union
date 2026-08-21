@@ -120,7 +120,7 @@ def prospect_edit(request, pk):
     if request.method == 'POST':
         form = ProspectForm(request.POST, instance=prospect)
         if form.is_valid():
-            entry = form.save()
+            form.save()
             messages.success(request, "Prospect mis à jour.")
             return redirect('messaging:prospect_detail', pk=pk)
     else:

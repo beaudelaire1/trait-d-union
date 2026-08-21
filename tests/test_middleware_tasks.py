@@ -90,7 +90,7 @@ class TestForcePasswordChangeMiddleware:
 
         response = HttpResponse(status=302)
         with patch('core.tasks.async_send_password_changed_email'):
-            result = mw.process_response(request, response)
+            mw.process_response(request, response)
 
         assert 'must_change_password' not in request.session
         assert mock_profile.must_change_password is False
@@ -167,7 +167,7 @@ class TestForcePasswordChangeMiddleware:
         request.user = MagicMock(is_authenticated=True)
         request.session = {'must_change_password': True}
         response = HttpResponse(status=302)
-        result = mw.process_response(request, response)
+        mw.process_response(request, response)
         assert 'must_change_password' in request.session  # Not cleared
 
     def test_process_response_no_profile_no_crash(self):

@@ -225,7 +225,7 @@ class QuoteRequestForm(forms.ModelForm):
         f.seek(0)
         header = f.read(12)
         f.seek(0)
-        for magic, _ in self._IMAGE_MAGIC.items():
+        for magic in self._IMAGE_MAGIC:
             if header.startswith(magic):
                 return True
         # Special case for WEBP: RIFF + 4 bytes size + WEBP

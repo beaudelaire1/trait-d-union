@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from core.utils import raw_media_storage
 
 
@@ -169,10 +171,6 @@ class EmailSubscriber(models.Model):
 
 
 # Auto-compute lead score on save
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
-
-
 @receiver(pre_save, sender=Lead)
 def auto_score_lead(sender, instance, **kwargs):
     """Compute lead score before saving."""

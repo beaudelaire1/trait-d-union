@@ -45,7 +45,7 @@ class ImageProcessor:
         """Vérifie si Pillow est disponible avec le support WebP/AVIF."""
         if self._pillow_available is None:
             try:
-                from PIL import Image, features
+                from PIL import features
                 self._pillow_available = True
                 # Vérifier le support AVIF (optionnel)
                 self._avif_support = features.check('avif')
