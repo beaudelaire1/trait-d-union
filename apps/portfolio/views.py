@@ -1,10 +1,7 @@
 """View definitions for the portfolio app."""
 from __future__ import annotations
 
-from typing import Any
-
 from django.db.models import QuerySet
-from django.http import HttpRequest
 from django.views.generic import ListView, DetailView
 
 from .models import Project, ProjectType
