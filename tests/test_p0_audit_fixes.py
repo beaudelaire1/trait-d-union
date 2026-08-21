@@ -51,6 +51,18 @@ def test_legal_page_matches_current_production_infrastructure():
 
 
 @pytest.mark.django_db
+def test_privacy_page_matches_infrastructure_and_transactional_report_use():
+    response = Client().get('/confidentialite/')
+    assert response.status_code == 200
+    html = response.content.decode('utf-8')
+    assert 'OVHcloud, Strasbourg, France' in html
+    assert 'hébergement (Render)' not in html
+    assert 'données de simulation' in html
+    assert 'ne vous inscrit pas automatiquement à une newsletter' in html
+    assert 'consentement distinct' in html
+
+
+@pytest.mark.django_db
 def test_simulator_report_ui_has_transactional_consent_only():
     response = Client().get('/simulateur/point-mort/')
     assert response.status_code == 200
