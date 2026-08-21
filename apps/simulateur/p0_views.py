@@ -10,7 +10,6 @@ from typing import Any, Callable
 from django.http import HttpRequest, JsonResponse
 
 from .forms import SimulatorReportForm
-from .services import SimulatorReportService
 from .views import ReportSubmitView
 
 logger = logging.getLogger(__name__)
@@ -139,7 +138,7 @@ def stabilize_simulator_page(view: Callable) -> Callable:
             charset = getattr(rendered_response, 'charset', None) or 'utf-8'
             html = rendered_response.content.decode(charset, errors='replace')
 
-            # Django {# ... #} n'est pas prévu pour ce commentaire multiligne.
+            # Retire le commentaire multiligne qui apparaît dans le HTML public.
             html = re.sub(
                 r'\{#\s*Attributs HTML\s*:.*?slug envoyé au serveur serait invalide\.\s*#\}',
                 '',
@@ -153,6 +152,7 @@ def stabilize_simulator_page(view: Callable) -> Callable:
                 flags=re.DOTALL,
             )
 
+            # Le consentement ne porte plus que sur la livraison demandée.
             html = html.replace(
                 "J'accepte de recevoir ce rapport et, occasionnellement, "
                 "du contenu utile de Trait d'Union Studio. Désinscription en un clic.",
@@ -162,9 +162,11 @@ def stabilize_simulator_page(view: Callable) -> Callable:
                 'Aucune carte · Aucun spam · Désinscription en un clic',
                 'Aucune carte · Aucun abonnement marketing automatique',
             )
-            html = html.replace(
-                'Désinscription en un clic',
-                'Pas d’inscription automatique',
+            html = re.sub(
+                r'(<p class="report-cta-fineprint">.*?)(Désinscription en un clic)(.*?</p>)',
+                r'\1Pas d’inscription automatique\3',
+                html,
+                flags=re.DOTALL,
             )
 
             rendered_response.content = html.encode(charset)
