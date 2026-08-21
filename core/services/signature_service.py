@@ -113,8 +113,15 @@ class SignatureService:
             if img.mode != 'RGBA':
                 img = img.convert('RGBA')
 
-            # Compter les pixels non-blancs et non-transparents
-            pixels = list(img.getdata())
+            # Pillow 12.3 déprécie Image.getdata() au profit de
+            # get_flattened_data(). Garder un fallback uniquement pour les
+            # versions de Pillow antérieures qui ne disposent pas encore de
+            # la nouvelle API.
+            if hasattr(img, 'get_flattened_data'):
+                pixels = img.get_flattened_data()
+            else:
+                pixels = tuple(img.getdata())
+
             non_blank = 0
             for r, g, b, a in pixels:
                 # Pixel visible (non transparent) et non blanc
