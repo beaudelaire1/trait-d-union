@@ -14,7 +14,6 @@ from django.urls import path
 
 from . import public_views, views
 
-
 app_name = "factures"
 
 urlpatterns = [
@@ -22,7 +21,6 @@ urlpatterns = [
     path("download/<int:pk>/", views.download_invoice, name="download"),
     # Liste des factures avec leurs fichiers PDF (archive)
     path("archive/", views.archive, name="archive"),
-
     # ===========================================
     # PHASE 3 : Paiement en ligne
     # ===========================================
