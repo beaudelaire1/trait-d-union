@@ -42,7 +42,7 @@ from django.conf import settings
 if TYPE_CHECKING:  # pragma: no cover
     from apps.factures.models import Invoice
 
-from .cii import build_cii_xml, _profile_urn  # type: ignore
+from .cii import build_cii_xml  # type: ignore
 
 logger = logging.getLogger(__name__)
 

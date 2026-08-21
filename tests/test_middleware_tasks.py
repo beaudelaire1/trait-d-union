@@ -1,7 +1,7 @@
 """Tests for ForcePasswordChangeMiddleware and core.tasks dispatch logic."""
 import pytest
-from unittest.mock import patch, MagicMock, PropertyMock
-from django.test import Client, RequestFactory, override_settings
+from unittest.mock import patch, MagicMock
+from django.test import RequestFactory
 from django.contrib.auth.models import User, AnonymousUser
 from django.http import HttpResponse
 
@@ -218,7 +218,7 @@ class TestTaskDispatch:
 
     @patch('core.tasks._is_qcluster_running', return_value=False)
     def test_is_qcluster_running_handles_exception(self, mock_running):
-        from core.tasks import _is_qcluster_running
+        pass
         # The mock already returns False
 
 

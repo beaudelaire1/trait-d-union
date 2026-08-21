@@ -13,7 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
-from typing import Iterable, Optional, Union
+from typing import Iterable, Union
 
 from django.db import transaction
 

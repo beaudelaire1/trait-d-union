@@ -100,7 +100,6 @@ class BrevoEmailService:
 
         try:
             import sib_api_v3_sdk
-            from sib_api_v3_sdk.rest import ApiException as BrevoApiException
 
             # Construction du payload
             send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(

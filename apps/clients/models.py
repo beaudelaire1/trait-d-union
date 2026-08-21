@@ -16,7 +16,6 @@ from django.utils import timezone
 from core.utils import raw_media_storage
 
 # Import workflow models
-from .models_workflow import WorkflowTemplate, MilestoneTemplate
 
 # E-invoicing : codes & validators
 from apps.einvoicing.codelists import LegalForm
@@ -385,7 +384,6 @@ class Project(models.Model):
         Returns:
             Liste des ProjectMilestone créées
         """
-        from datetime import timedelta
         from django.utils import timezone
         
         if workflow_template is None:

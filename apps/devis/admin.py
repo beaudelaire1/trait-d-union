@@ -3,8 +3,7 @@ from django.urls import path, reverse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.html import format_html
 from django import forms
-from django.contrib.auth.models import User
-from apps.clients.models import ClientProfile, ClientDocument, ClientNotification
+from apps.clients.models import ClientDocument, ClientNotification
 from .models import Quote, QuoteItem
 
 

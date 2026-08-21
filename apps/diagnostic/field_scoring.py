@@ -32,7 +32,7 @@ déjà audités. Le moteur est pur (sans effet de bord) et déterministe.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Optional
 
 from .field_questions import DOMAINS, PROFILES

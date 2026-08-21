@@ -1,8 +1,7 @@
 """Tests for messaging views, leads email_views, chroniques, audit, dashboard, healthz."""
 import json
 import pytest
-from unittest.mock import patch, MagicMock
-from django.test import Client, RequestFactory
+from unittest.mock import patch
 from django.contrib.auth.models import User
 
 from apps.messaging.models import Prospect, EmailTemplate

@@ -9,7 +9,7 @@ from django.contrib.sitemaps.views import x_robots_tag, _get_latest_lastmod
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
-from django.urls import path, include, URLPattern, URLResolver
+from django.urls import path, include, URLPattern
 from django.utils.http import http_date
 from django.views.generic import TemplateView
 

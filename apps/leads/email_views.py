@@ -11,7 +11,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.template.loader import render_to_string
-from django.urls import reverse_lazy, reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, ListView, DetailView
@@ -207,7 +207,7 @@ class SendEmailView(View):
         
         # Use the same send logic as EmailComposeView
         try:
-            from core.services.email_backends import brevo_service, send_transactional_email
+            from core.services.email_backends import send_transactional_email
             
             branding = getattr(settings, 'INVOICE_BRANDING', {})
             site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.studio').rstrip('/')

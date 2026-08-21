@@ -19,10 +19,8 @@ from apps.diagnostic.field_scoring import analyze
 from apps.diagnostic.sector_recommendations import (
     SECTOR_METRICS,
     SECTOR_RULES,
-    SectorMetric,
     SectorRule,
     _evaluate_condition,
-    evaluate_sector_metrics,
     evaluate_sector_rules,
 )
 

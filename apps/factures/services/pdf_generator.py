@@ -19,8 +19,7 @@ celui‑ci est utilisé tel quel.
 from __future__ import annotations
 
 import io
-from datetime import date
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal
 from pathlib import Path
 from typing import Dict, List, Optional
 

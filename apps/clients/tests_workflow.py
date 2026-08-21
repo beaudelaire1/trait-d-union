@@ -8,7 +8,7 @@ Valide :
 """
 from django.test import TestCase
 from django.contrib.auth.models import User
-from datetime import date, timedelta
+from datetime import date
 from apps.clients.models import ClientProfile, Project
 from apps.clients.models_workflow import WorkflowTemplate, MilestoneTemplate
 

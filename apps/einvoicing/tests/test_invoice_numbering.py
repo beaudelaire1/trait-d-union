@@ -7,7 +7,6 @@ classique `FAC-AAAA-XXX` reste sacrée. Les avoirs ont une séquence dédiée
 
 from __future__ import annotations
 
-from decimal import Decimal
 
 import pytest
 

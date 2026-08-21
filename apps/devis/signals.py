@@ -97,7 +97,7 @@ def force_password_change_on_login(sender, request, user, **kwargs):
                 f"Première connexion client, changement de mot de passe requis : {user.email}",
                 extra={'user_pk': user.pk}
             )
-    except (AttributeError, Exception) as exc:
+    except (AttributeError, Exception):
         # Pas un profil client
         pass
 

@@ -8,7 +8,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
 from services.models import Service
-from .models import Quote, QuoteRequest, QuoteRequestPhoto, QuoteItem
+from .models import Quote, QuoteRequest, QuoteItem
 from apps.clients.models import ClientProfile
 
 

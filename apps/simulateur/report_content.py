@@ -272,7 +272,6 @@ def get_content_for(tool_slug: str) -> dict:
 # Interprétation conditionnelle : produire un diagnostic et des recos
 # basés sur les VRAIES valeurs saisies / calculées par l'utilisateur.
 # ──────────────────────────────────────────────────────────────────
-import re as _re
 
 
 def _to_number(raw: str) -> float | None:

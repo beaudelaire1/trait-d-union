@@ -370,7 +370,7 @@ class ProjectAdmin(admin.ModelAdmin):
             ProjectActivity.objects.create(
                 project=obj,
                 activity_type='milestone_created',
-                title=f"Jalons générés automatiquement",
+                title="Jalons générés automatiquement",
                 description=f"{len(milestones)} jalons créés depuis le workflow '{obj.workflow_template.name}'",
                 performed_by=request.user,
                 is_client_visible=False
@@ -428,7 +428,7 @@ class ProjectAdmin(admin.ModelAdmin):
             ProjectActivity.objects.create(
                 project=project,
                 activity_type='milestone_created',
-                title=f"Jalons générés par action admin",
+                title="Jalons générés par action admin",
                 description=f"{len(milestones)} jalons créés depuis '{project.workflow_template.name}'",
                 performed_by=request.user,
                 is_client_visible=False
@@ -469,7 +469,7 @@ class ProjectAdmin(admin.ModelAdmin):
             ProjectActivity.objects.create(
                 project=project,
                 activity_type='milestone_created',
-                title=f"Jalons régénérés",
+                title="Jalons régénérés",
                 description=f"{deleted_count} jalons supprimés, {len(milestones)} jalons créés depuis '{project.workflow_template.name}'",
                 performed_by=request.user,
                 is_client_visible=False

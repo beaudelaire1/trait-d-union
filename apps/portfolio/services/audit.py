@@ -25,7 +25,7 @@ import logging
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Optional
 from urllib.parse import urlparse
 
 from django.conf import settings

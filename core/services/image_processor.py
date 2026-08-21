@@ -22,7 +22,6 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from django.core.files.base import ContentFile
-from django.core.files.uploadedfile import InMemoryUploadedFile
 
 logger = logging.getLogger(__name__)
 

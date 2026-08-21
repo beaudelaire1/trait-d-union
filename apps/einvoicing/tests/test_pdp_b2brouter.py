@@ -5,12 +5,10 @@ On mocke `requests.Session.request` pour valider le contrat HTTP.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
 import pytest
-from django.test import override_settings
 
 from apps.clients.models import ClientProfile
 from apps.einvoicing.pdp.b2brouter import B2BrouterClient, STAGING_BASE

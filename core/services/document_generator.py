@@ -3,7 +3,6 @@ Document Generator Service
 Génère les PDFs pour les devis et factures avec la charte graphique TUS.
 """
 import logging
-from io import BytesIO
 from typing import TYPE_CHECKING, Optional
 
 from django.conf import settings
@@ -66,7 +65,7 @@ class DocumentGenerator:
         conforme à un sous-ensemble (ex. ``pdf/a-3b`` pour Factur-X).
         """
         try:
-            from weasyprint import HTML, CSS
+            from weasyprint import HTML
         except Exception as exc:
             raise ImportError(
                 "WeasyPrint n'est pas installé. "

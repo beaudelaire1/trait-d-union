@@ -6,7 +6,7 @@ from django.dispatch import receiver
 
 from apps.devis.models import Quote
 from apps.factures.models import Invoice
-from apps.clients.models import ClientNotification, ClientProfile
+from apps.clients.models import ClientNotification
 
 logger = logging.getLogger(__name__)
 

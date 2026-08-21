@@ -20,7 +20,7 @@ Aucune logique de calcul ne vit dans ce fichier : il ne décrit que la
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 

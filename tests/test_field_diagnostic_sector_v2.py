@@ -21,7 +21,6 @@ from apps.diagnostic.field_scoring import (
 from apps.diagnostic.sector_calibration import (
     SCORING_VERSION,
     DOMAIN_WEIGHTS_BY_SECTOR,
-    KPI_THRESHOLDS_BY_SECTOR,
     SectorContext,
     get_domain_weights,
     get_kpi_thresholds,

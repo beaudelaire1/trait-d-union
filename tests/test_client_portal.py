@@ -1,7 +1,6 @@
 """Tests for client portal views: dashboard, profile, projects, documents, quotes, invoices."""
 import pytest
 from unittest.mock import patch, MagicMock
-from django.test import Client, RequestFactory
 from django.contrib.auth.models import User
 
 from apps.clients.models import ClientProfile, Project
