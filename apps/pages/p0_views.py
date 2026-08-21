@@ -46,6 +46,62 @@ class HomeP0View(HomeView):
 
 
 class LegalP0View(LegalView):
-    """Page légale alignée sur l'infrastructure de production actuelle."""
+    """Mentions légales cohérentes avec l'infrastructure de production.
 
-    template_name = 'pages/legal_p0.html'
+    Le template historique contient encore des références à l'ancien
+    déploiement Render/Francfort/Hostinger/Celery. La correction est appliquée
+    sur la réponse rendue afin de remettre immédiatement l'information publique
+    en conformité sans modifier le reste de la page légale.
+    """
+
+    _REPLACEMENTS = (
+        (
+            b'<strong class="text-tus-white">Render Services, Inc.</strong>',
+            b'<strong class="text-tus-white">OVH SAS (OVHcloud)</strong>',
+        ),
+        (
+            b'525 Brannan Street, Suite 300, San Francisco, CA 94107, \xc3\x89tats-Unis',
+            b'2 rue Kellermann, 59100 Roubaix, France',
+        ),
+        (
+            b'<a href="https://render.com" class="text-tus-blue-a11y hover:underline">render.com</a>',
+            b'<a href="https://www.ovhcloud.com" class="text-tus-blue-a11y hover:underline">ovhcloud.com</a>',
+        ),
+        (
+            b'datacenter de Francfort (Allemagne, Union europ\xc3\xa9enne)',
+            b'datacenter de Strasbourg (France, Union europ\xc3\xa9enne)',
+        ),
+        (
+            b'La gestion du nom de domaine (DNS) est assur\xc3\xa9e par Hostinger International Ltd. (Larnaca, Chypre, UE).',
+            b'La gestion DNS du domaine est distincte de l\'h\xc3\xa9bergement applicatif OVHcloud.',
+        ),
+        (
+            b'Django (Python), PostgreSQL, Celery, Redis, Gunicorn, WhiteNoise',
+            b'Django (Python), PostgreSQL, Django-Q2, Redis, Gunicorn, WhiteNoise',
+        ),
+        (
+            b'Render (Francfort, UE), PostgreSQL manag\xc3\xa9, stockage objet compatible S3 (AWS S3 / Cloudflare R2), conteneurisation Docker',
+            b'OVHcloud (Strasbourg, France), PostgreSQL, stockage objet compatible S3, conteneurisation Docker',
+        ),
+    )
+
+    def render_to_response(self, context, **response_kwargs):
+        response = super().render_to_response(context, **response_kwargs)
+
+        def _fix_legal(rendered_response):
+            content = rendered_response.content
+            missing = []
+            for old, new in self._REPLACEMENTS:
+                if old not in content:
+                    missing.append(old[:80])
+                    continue
+                content = content.replace(old, new)
+            rendered_response.content = content
+            if missing:
+                logger.warning(
+                    "Certaines mentions d'infrastructure P0 n'ont pas \xc3\xa9t\xc3\xa9 trouv\xc3\xa9es dans legal.html."
+                )
+            return rendered_response
+
+        response.add_post_render_callback(_fix_legal)
+        return response
