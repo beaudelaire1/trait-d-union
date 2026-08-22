@@ -18,14 +18,14 @@ class HomeView(TemplateView):
     The context will be populated with featured services and testimonials from the database.
     """
 
-    template_name: str = 'pages/home.html'
+    template_name: str = 'pages/home_positioned.html'
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:  # type: ignore[override]
         context = super().get_context_data(**kwargs)
-        
+
         # ⚡ PERFORMANCE: Cache homepage data (services, testimonials, portfolio count)
         from django.core.cache import cache
-        
+
         # Charger les services depuis la base de données (cached 5 min)
         services_data = cache.get('homepage_services')
         if services_data is None:
@@ -41,7 +41,7 @@ class HomeView(TemplateView):
             ]
             cache.set('homepage_services', services_data, 300)
         context['services'] = services_data
-        
+
         # Charger les témoignages depuis la base de données (cached 5 min)
         # On affiche jusqu'à 6 témoignages mis en avant + le total publié
         # pour piloter le lien "Voir tous les avis".
@@ -56,7 +56,7 @@ class HomeView(TemplateView):
             cache.set('homepage_testimonials', cached, 300)
         context['testimonials'] = cached['items']
         context['testimonials_total'] = cached['total']
-        
+
         # Compteur dynamique de projets portfolio (cached 10 min)
         portfolio_count = cache.get('homepage_portfolio_count')
         if portfolio_count is None:
@@ -64,7 +64,7 @@ class HomeView(TemplateView):
             portfolio_count = Project.objects.filter(is_published=True).count()
             cache.set('homepage_portfolio_count', portfolio_count, 600)
         context['portfolio_count'] = portfolio_count
-        
+
         # Breadcrumbs SEO (page d'accueil = racine)
         context['breadcrumbs_list'] = [
             {'name': 'Accueil', 'url': '/'},
@@ -80,14 +80,14 @@ class HomeView(TemplateView):
                 'image_url': static('img/trusted/eebc-logo.png'),
             },
         ]
-        
+
         return context
 
 
 class ServicesView(TemplateView):
     """Services overview page."""
 
-    template_name: str = 'pages/services.html'
+    template_name: str = 'pages/services_positioned.html'
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -115,7 +115,7 @@ class MethodView(TemplateView):
 class FAQView(TemplateView):
     """FAQ page with breadcrumbs for SEO rich snippets."""
 
-    template_name: str = 'pages/faq.html'
+    template_name: str = 'pages/faq_positioned.html'
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)
@@ -221,7 +221,6 @@ class LegalView(TemplateView):
         # mais la TVA n'est pas facturée (cf. mention ci-dessus).
         context['vat_intracom'] = "FR 17 908264112"
         return context
-
 
 
 def page_not_found(request: HttpRequest, exception: Exception) -> HttpResponse:
