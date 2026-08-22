@@ -34,9 +34,11 @@ class TestPublicPages:
         assert b'<h1' in response.content
 
     def test_home_template(self, client):
-        """homepage uses correct template."""
+        """Homepage uses the positioned wrapper and the historical body template."""
         response = client.get(reverse('pages:home'))
-        assert 'pages/home.html' in [t.name for t in response.templates]
+        names = [t.name for t in response.templates]
+        assert 'pages/home_positioned.html' in names
+        assert 'pages/home.html' in names
 
     def test_home_contains_trust_logos_section(self, client):
         response = client.get(reverse('pages:home'))
@@ -47,7 +49,7 @@ class TestPublicPages:
 
     def test_services_template(self, client):
         response = client.get(reverse('pages:services'))
-        assert 'pages/services.html' in [t.name for t in response.templates]
+        assert 'pages/services_positioned.html' in [t.name for t in response.templates]
 
     def test_method_template(self, client):
         response = client.get(reverse('pages:method'))
