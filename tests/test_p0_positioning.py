@@ -29,7 +29,7 @@ class P0PositioningTests(TestCase):
         self.assertIn("mini-ERP", body)
         self.assertIn("automatis", body.lower())
         self.assertNotIn(
-            "Création Site Internet &amp; E-commerce Guyane, Martinique, Guadeloupe",
+            "Création Site Internet & E-commerce Guyane, Martinique, Guadeloupe",
             body,
         )
 
@@ -38,7 +38,7 @@ class P0PositioningTests(TestCase):
         self.assertEqual(response.status_code, 200)
         body = response.content.decode()
 
-        self.assertIn("Plateformes métier &amp; automatisation en Guyane", body)
+        self.assertIn("Plateformes métier & automatisation en Guyane", body)
         self.assertIn("CRM, mini-ERP, portails clients", body)
         self.assertIn("logiciel métier sur mesure guyane", body)
 
@@ -47,7 +47,7 @@ class P0PositioningTests(TestCase):
         self.assertEqual(response.status_code, 200)
         body = response.content.decode()
 
-        self.assertIn("Que construit Trait d&#x27;Union Studio ?", body)
+        self.assertIn("Que construit Trait d'Union Studio ?", body)
         self.assertIn("plateformes métier sur mesure", body)
         self.assertIn("Quelle différence avec un CRM ou un ERP standard ?", body)
         self.assertNotIn(
@@ -62,8 +62,8 @@ class P0PositioningTests(TestCase):
         body = response.content.decode()
 
         self.assertIn(
-            "Chroniques TUS — Entreprise, pilotage &amp; transformation numérique",
+            "Chroniques TUS — Entreprise, pilotage & transformation numérique",
             body,
         )
         self.assertIn("transformation numérique", body)
-        self.assertNotIn("Articles &amp; Réflexions sur le Web en Guyane", body)
+        self.assertNotIn("Articles & Réflexions sur le Web en Guyane", body)
