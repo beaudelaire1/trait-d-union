@@ -3,7 +3,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from apps.pages.views import FAQView, HomeView, ServicesView
+from apps.pages.views import FAQView, HomeView, MethodView, ServicesView
 
 
 class P0PositioningTests(TestCase):
@@ -12,6 +12,7 @@ class P0PositioningTests(TestCase):
     def test_positioned_templates_are_the_public_templates(self):
         self.assertEqual(HomeView.template_name, "pages/home_positioned.html")
         self.assertEqual(ServicesView.template_name, "pages/services_positioned.html")
+        self.assertEqual(MethodView.template_name, "pages/method_positioned.html")
         self.assertEqual(FAQView.template_name, "pages/faq_positioned.html")
 
     def test_services_page_leads_with_business_infrastructure(self):
@@ -56,6 +57,17 @@ class P0PositioningTests(TestCase):
         self.assertIn("Plateformes métier & automatisation en Guyane", body)
         self.assertIn("CRM, mini-ERP, portails clients", body)
         self.assertIn("logiciel métier sur mesure guyane", body)
+
+    def test_method_is_about_business_system_delivery(self):
+        response = self.client.get(reverse("pages:method"))
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode()
+
+        self.assertIn("Méthode projet — Plateformes métier & automatisation", body)
+        self.assertIn("Cartographie des flux", body)
+        self.assertIn("Règles métier", body)
+        self.assertIn("Tests automatisés", body)
+        self.assertNotIn("Création de Site Internet en Guyane", body)
 
     def test_faq_is_not_structured_as_a_web_agency_faq(self):
         response = self.client.get(reverse("pages:faq"))
