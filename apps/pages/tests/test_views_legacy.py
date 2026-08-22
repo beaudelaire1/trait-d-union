@@ -10,6 +10,7 @@ class HomeViewTest(TestCase):
         """Test that the home page loads successfully."""
         response = self.client.get(reverse('pages:home'))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'pages/home_positioned.html')
         self.assertTemplateUsed(response, 'pages/home.html')
 
     def test_home_page_contains_cta(self):
@@ -25,14 +26,16 @@ class ServicesViewTest(TestCase):
         """Test that the services page loads successfully."""
         response = self.client.get(reverse('pages:services'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pages/services.html')
+        self.assertTemplateUsed(response, 'pages/services_positioned.html')
 
     def test_services_page_contains_offerings(self):
-        """Test that services page contains service offerings."""
+        """The public hierarchy must lead with business infrastructure."""
         response = self.client.get(reverse('pages:services'))
-        self.assertContains(response, 'Site Vitrine')
-        self.assertContains(response, 'E-commerce')
-        self.assertContains(response, 'Plateforme')
+        self.assertContains(response, 'Infrastructure métier sur mesure')
+        self.assertContains(response, 'Système de vente en ligne')
+        self.assertContains(response, 'Présence web stratégique')
+        self.assertContains(response, 'CRM')
+        self.assertContains(response, 'mini-ERP')
 
 
 class MethodViewTest(TestCase):
@@ -56,7 +59,7 @@ class LegalViewTest(TestCase):
     """Test the legal page view."""
 
     def test_legal_page_loads(self):
-        """Test that the legal page loads successfully."""
+        """Test that legal page loads successfully."""
         response = self.client.get(reverse('pages:legal'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'pages/legal.html')
