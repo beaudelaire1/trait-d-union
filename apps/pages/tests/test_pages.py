@@ -53,7 +53,7 @@ class TestPublicPages:
 
     def test_method_template(self, client):
         response = client.get(reverse('pages:method'))
-        assert 'pages/method.html' in [t.name for t in response.templates]
+        assert 'pages/method_positioned.html' in [t.name for t in response.templates]
 
 
 @pytest.mark.django_db
