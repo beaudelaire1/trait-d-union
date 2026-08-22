@@ -33,6 +33,21 @@ class P0PositioningTests(TestCase):
             body,
         )
 
+    def test_global_structured_data_uses_same_offer_hierarchy(self):
+        response = self.client.get(reverse("pages:services"))
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode()
+
+        self.assertNotIn("Studio Web Cayenne", body)
+        self.assertIn("Infrastructure métier Guyane", body)
+        self.assertIn("Solutions métier et architecture digitale", body)
+
+        primary = body.index('"name": "Infrastructure métier sur mesure"')
+        ecommerce = body.index('"name": "Système de vente en ligne"')
+        web = body.index('"name": "Présence web stratégique"')
+        self.assertLess(primary, ecommerce)
+        self.assertLess(primary, web)
+
     def test_homepage_metadata_targets_business_software(self):
         response = self.client.get(reverse("pages:home"))
         self.assertEqual(response.status_code, 200)
