@@ -1,24 +1,22 @@
 {% comment %}
 Schema.org JSON-LD structured data for SEO
-Include in base.html within
+Include in base.html within <head>.
+{% endcomment %}
 
-<head> tag
-    {% endcomment %}
+{% load static %}
 
-    {% load static %}
-
-    {# Organization Schema - Site-wide #}
-    <script type="application/ld+json">
+{# Organization Schema - Site-wide #}
+<script type="application/ld+json">
 {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     "@id": "{{ request.scheme }}://{{ request.get_host }}/#organization",
     "name": "Trait d'Union Studio",
-    "alternateName": ["TUS", "Trait d'Union Studio Guyane", "Studio Web Cayenne"],
+    "alternateName": ["TUS", "Trait d'Union Studio Guyane", "Infrastructure métier Guyane"],
     "url": "{{ request.scheme }}://{{ request.get_host }}",
     "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/tus-logo.svg' %}",
     "image": "{{ request.scheme }}://{{ request.get_host }}{% static 'img/tus-logo.svg' %}",
-    "description": "Studio d'architecture digitale en Guyane et Outre-mer. Création de sites internet, e-commerce et plateformes métier sur mesure à Cayenne, Kourou, Saint-Laurent, Martinique et Guadeloupe.",
+    "description": "Studio d'architecture digitale spécialisé dans les plateformes métier sur mesure, l'automatisation et le pilotage des activités en Guyane et aux Antilles : CRM, mini-ERP, portails clients, outils internes, e-commerce et présence web.",
     "telephone": "+594 695 35 80 41",
     "email": "contact@traitdunion.studio",
     "foundingDate": "2024",
@@ -82,38 +80,38 @@ Include in base.html within
     "priceRange": "€€€",
     "openingHours": "Mo-Fr 09:00-18:00",
     "knowsAbout": [
-        "Création de sites internet",
-        "Développement web",
+        "Logiciels métier sur mesure",
+        "Plateformes métier",
+        "CRM sur mesure",
+        "Mini-ERP",
+        "Portails clients",
+        "Automatisation des processus",
+        "Pilotage d'activité",
+        "Applications web sur mesure",
         "Architecture digitale",
         "E-commerce",
-        "Applications web sur mesure",
-        "Design UI/UX",
-        "Référencement SEO",
-        "Plateformes métier",
-        "Refonte de site web",
-        "Projet web en Guyane",
-        "Projet web en Martinique",
-        "Projet web en Guadeloupe"
+        "Création de sites internet",
+        "Référencement SEO"
     ],
     "hasOfferCatalog": {
         "@type": "OfferCatalog",
-        "name": "Services d'architecture digitale",
+        "name": "Solutions métier et architecture digitale",
         "itemListElement": [
             {
                 "@type": "Offer",
                 "itemOffered": {
                     "@type": "Service",
-                    "name": "Création de site internet vitrine",
-                    "description": "Conception et développement de sites vitrines sur mesure, référencés et performants",
-                    "serviceType": "Création de site internet"
+                    "name": "Infrastructure métier sur mesure",
+                    "description": "CRM, mini-ERP, portails clients, devis-factures, planning, tableaux de bord, automatisations et intégrations adaptés aux flux de l'entreprise.",
+                    "serviceType": "Développement de logiciel métier sur mesure"
                 }
             },
             {
                 "@type": "Offer",
                 "itemOffered": {
                     "@type": "Service",
-                    "name": "Création de site e-commerce",
-                    "description": "Boutiques en ligne sécurisées avec tunnel de conversion optimisé",
+                    "name": "Système de vente en ligne",
+                    "description": "E-commerce sécurisé pouvant être relié aux flux commerciaux, au stock et à la facturation.",
                     "serviceType": "Développement e-commerce"
                 }
             },
@@ -121,31 +119,22 @@ Include in base.html within
                 "@type": "Offer",
                 "itemOffered": {
                     "@type": "Service",
-                    "name": "Plateforme métier et application web",
-                    "description": "Applications métier sur mesure : CRM, ERP, portails clients, API",
-                    "serviceType": "Développement d'application web"
-                }
-            },
-            {
-                "@type": "Offer",
-                "itemOffered": {
-                    "@type": "Service",
-                    "name": "Refonte de site internet",
-                    "description": "Modernisation complète de sites existants avec migration SEO",
-                    "serviceType": "Refonte de site web"
+                    "name": "Présence web stratégique",
+                    "description": "Présence web sur mesure autonome ou intégrée à une infrastructure métier plus large.",
+                    "serviceType": "Création de site internet"
                 }
             }
         ]
     },
     "additionalType": [
-        "https://schema.org/WebDesign",
-        "https://schema.org/SoftwareApplication"
+        "https://schema.org/SoftwareApplication",
+        "https://schema.org/WebDesign"
     ]
 }
 </script>
 
-    {# WebSite Schema — Sitelinks Search Box #}
-    <script type="application/ld+json">
+{# WebSite Schema #}
+<script type="application/ld+json">
 {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -159,8 +148,8 @@ Include in base.html within
 }
 </script>
 
-    {# BreadcrumbList Schema #}
-    {% block schema_breadcrumb %}{% endblock %}
+{# BreadcrumbList Schema #}
+{% block schema_breadcrumb %}{% endblock %}
 
-    {# Page-specific Schema #}
-    {% block schema_page %}{% endblock %}
+{# Page-specific Schema #}
+{% block schema_page %}{% endblock %}
