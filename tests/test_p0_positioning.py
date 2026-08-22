@@ -1,0 +1,69 @@
+"""Non-regression tests for the commercial positioning and SEO P0."""
+
+from django.test import TestCase
+from django.urls import reverse
+
+from apps.pages.views import FAQView, HomeView, ServicesView
+
+
+class P0PositioningTests(TestCase):
+    """Keep business infrastructure as TUS's primary public category."""
+
+    def test_positioned_templates_are_the_public_templates(self):
+        self.assertEqual(HomeView.template_name, "pages/home_positioned.html")
+        self.assertEqual(ServicesView.template_name, "pages/services_positioned.html")
+        self.assertEqual(FAQView.template_name, "pages/faq_positioned.html")
+
+    def test_services_page_leads_with_business_infrastructure(self):
+        response = self.client.get(reverse("pages:services"))
+        self.assertEqual(response.status_code, 200)
+
+        body = response.content.decode()
+        primary = body.index("Infrastructure métier sur mesure")
+        ecommerce = body.index("Système de vente en ligne")
+        web = body.index("Présence web stratégique")
+
+        self.assertLess(primary, ecommerce)
+        self.assertLess(primary, web)
+        self.assertIn("CRM", body)
+        self.assertIn("mini-ERP", body)
+        self.assertIn("automatis", body.lower())
+        self.assertNotIn(
+            "Création Site Internet &amp; E-commerce Guyane, Martinique, Guadeloupe",
+            body,
+        )
+
+    def test_homepage_metadata_targets_business_software(self):
+        response = self.client.get(reverse("pages:home"))
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode()
+
+        self.assertIn("Plateformes métier &amp; automatisation en Guyane", body)
+        self.assertIn("CRM, mini-ERP, portails clients", body)
+        self.assertIn("logiciel métier sur mesure guyane", body)
+
+    def test_faq_is_not_structured_as_a_web_agency_faq(self):
+        response = self.client.get(reverse("pages:faq"))
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode()
+
+        self.assertIn("Que construit Trait d&#x27;Union Studio ?", body)
+        self.assertIn("plateformes métier sur mesure", body)
+        self.assertIn("Quelle différence avec un CRM ou un ERP standard ?", body)
+        self.assertNotIn(
+            "Tout ce que vous devez savoir sur la création de sites web",
+            body,
+        )
+        self.assertNotIn("Render (Francfort", body)
+
+    def test_chroniques_index_metadata_matches_broader_editorial_scope(self):
+        response = self.client.get(reverse("chroniques:list"))
+        self.assertEqual(response.status_code, 200)
+        body = response.content.decode()
+
+        self.assertIn(
+            "Chroniques TUS — Entreprise, pilotage &amp; transformation numérique",
+            body,
+        )
+        self.assertIn("transformation numérique", body)
+        self.assertNotIn("Articles &amp; Réflexions sur le Web en Guyane", body)
