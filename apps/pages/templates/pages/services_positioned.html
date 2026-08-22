@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Plateformes métier, CRM & automatisation en Guyane — Trait d'Union Studio{% endblock %}
+{% block meta_description %}Plateformes métier sur mesure en Guyane et aux Antilles : CRM, mini-ERP, portails clients, devis-factures, planning, tableaux de bord et automatisation des flux. Présence web et e-commerce intégrables selon le besoin.{% endblock %}
+{% block meta_keywords %}plateforme métier guyane, crm sur mesure guyane, mini erp guyane, logiciel gestion cayenne, automatisation pme guyane, portail client guyane, outil gestion sur mesure, digitalisation entreprise guyane, e-commerce guyane, création site internet guyane{% endblock %}
+{% block og_title %}Plateformes métier & automatisation | Trait d'Union Studio{% endblock %}
+{% block og_description %}Nous construisons le système logiciel qui centralise, automatise et structure votre activité : CRM, mini-ERP, portails, pilotage et modules web.{% endblock %}
+{% block twitter_title %}Plateformes métier & automatisation | Trait d'Union Studio{% endblock %}
+{% block twitter_description %}CRM, mini-ERP, portails clients et outils internes sur mesure en Guyane et aux Antilles.{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Solutions métier — Trait d'Union Studio",
+  "description": "Plateformes métier sur mesure pour structurer, digitaliser et automatiser les activités des TPE-PME en Guyane et aux Antilles.",
+  "url": "{{ request.scheme }}://{{ canonical_host }}{% url 'pages:services' %}",
+  "numberOfItems": 3,
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "item": {
+        "@type": "Service",
+        "name": "Infrastructure métier sur mesure",
+        "description": "CRM, mini-ERP, portails clients, devis-factures, planning, tableaux de bord, automatisations et intégrations adaptés aux flux réels de l'entreprise.",
+        "provider": { "@id": "{{ request.scheme }}://{{ canonical_host }}/#organization" },
+        "areaServed": ["Guyane française", "Martinique", "Guadeloupe"],
+        "serviceType": "Développement de logiciel métier sur mesure"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "item": {
+        "@type": "Service",
+        "name": "Système de vente en ligne",
+        "description": "E-commerce sécurisé connecté aux flux commerciaux et administratifs lorsque le besoin métier l'exige.",
+        "provider": { "@id": "{{ request.scheme }}://{{ canonical_host }}/#organization" },
+        "areaServed": ["Guyane française", "Martinique", "Guadeloupe"],
+        "serviceType": "Développement e-commerce"
+      }
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "item": {
+        "@type": "Service",
+        "name": "Présence web stratégique",
+        "description": "Présence web sur mesure pouvant fonctionner seule ou comme façade publique d'une infrastructure métier plus large.",
+        "provider": { "@id": "{{ request.scheme }}://{{ canonical_host }}/#organization" },
+        "areaServed": ["Guyane française", "Martinique", "Guadeloupe"],
+        "serviceType": "Création de site internet"
+      }
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-[600px] h-[600px] bg-gradient-to-bl from-tus-blue/15 to-tus-green/10 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-tus-green/10 to-tus-blue/15 rounded-full blur-[120px]"></div>
+    </div>
+
+    <section class="py-20 px-6 relative z-10">
+        <div class="max-w-5xl mx-auto text-center">
+            <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue-a11y text-sm font-medium mb-6 reveal">Structurer · Digitaliser · Automatiser</span>
+            <h1 class="text-4xl md:text-6xl font-display font-bold mb-6 reveal-clip">
+                Une infrastructure métier<br>
+                <span class="text-tus-blue-a11y">conçue autour de votre activité</span>
+            </h1>
+            <p class="text-tus-white/70 text-lg md:text-xl max-w-3xl mx-auto reveal">
+                Nous ne partons pas d'un catalogue de logiciels à empiler. Nous partons de vos flux réels — commercial,
+                opérationnel, administratif et client — pour construire le système qui les relie.
+            </p>
+            <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4 reveal">
+                <a href="{% url 'leads:contact' %}" class="btn-primary btn-magnetic bg-tus-blue px-7 py-3.5 rounded-full font-semibold">Parler de votre organisation</a>
+                <a href="{% url 'simulateur:acse' %}" class="px-7 py-3.5 rounded-full border border-white/15 text-tus-white/80 hover:border-tus-blue/50 hover:text-white transition-colors">Diagnostiquer le maillon faible</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 px-6 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="rounded-3xl border border-tus-blue/25 bg-tus-blue/[0.06] p-8 md:p-10 mb-8 reveal">
+                <div class="grid lg:grid-cols-[1.1fr_1.9fr] gap-10 items-start">
+                    <div>
+                        <span class="text-xs uppercase tracking-[0.25em] text-tus-blue-a11y font-semibold">Offre principale</span>
+                        <h2 class="text-3xl md:text-4xl font-display font-bold mt-4 mb-4">Infrastructure métier sur mesure</h2>
+                        <p class="text-tus-white/65 leading-relaxed">
+                            Un socle propriétaire qui centralise ce qui est aujourd'hui dispersé et automatise ce qui ne devrait plus dépendre de relances ou de ressaisies manuelles.
+                        </p>
+                        <p class="text-tus-blue-a11y font-semibold mt-5">Périmètre et investissement : sur devis</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <h3 class="font-display font-bold text-lg mb-2">Commercial</h3>
+                            <p class="text-sm text-tus-white/60">Prospects, CRM, devis, relances, suivi des opportunités et transformation en facturation.</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <h3 class="font-display font-bold text-lg mb-2">Opérations</h3>
+                            <p class="text-sm text-tus-white/60">Planning, tâches, jalons, affectations, documents, interventions et suivi d'exécution.</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <h3 class="font-display font-bold text-lg mb-2">Relation client</h3>
+                            <p class="text-sm text-tus-white/60">Portail client, validations, documents, factures, historique et avancement en temps réel.</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                            <h3 class="font-display font-bold text-lg mb-2">Pilotage</h3>
+                            <p class="text-sm text-tus-white/60">Tableaux de bord, indicateurs, alertes, contrôle des écarts et données fiables pour décider.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 reveal">
+                <div class="rounded-2xl border border-white/10 bg-white/[0.025] p-6">
+                    <p class="text-sm text-tus-blue-a11y font-semibold mb-3">1. Centraliser</p>
+                    <h3 class="text-xl font-display font-bold mb-3">Une source de vérité</h3>
+                    <p class="text-tus-white/60">Les données utiles à l'activité ne sont plus réparties entre fichiers, messageries et outils sans continuité.</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.025] p-6">
+                    <p class="text-sm text-tus-blue-a11y font-semibold mb-3">2. Automatiser</p>
+                    <h3 class="text-xl font-display font-bold mb-3">Moins de tâches mécaniques</h3>
+                    <p class="text-tus-white/60">Notifications, changements d'état, documents et transmissions suivent des règles métier plutôt que la mémoire des équipes.</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/[0.025] p-6">
+                    <p class="text-sm text-tus-blue-a11y font-semibold mb-3">3. Piloter</p>
+                    <h3 class="text-xl font-display font-bold mb-3">Des décisions sur des faits</h3>
+                    <p class="text-tus-white/60">Les indicateurs sont produits par le système d'exploitation de l'activité, pas reconstitués en fin de mois.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <span class="text-sm uppercase tracking-[0.22em] text-tus-white/45">Modules complémentaires</span>
+                <h2 class="text-3xl md:text-4xl font-display font-bold mt-3">Le web devient une composante du système</h2>
+                <p class="text-tus-white/60 max-w-3xl mx-auto mt-4">
+                    Une vitrine ou un e-commerce reste pertinent lorsqu'il répond au besoin. Il n'impose pas l'architecture du projet : il s'intègre au système métier lorsqu'une continuité de données est nécessaire.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                <div class="rounded-3xl border border-white/10 bg-white/[0.025] p-8 reveal">
+                    <span class="text-xs uppercase tracking-wider text-tus-white/40">Présence & acquisition</span>
+                    <h3 class="text-2xl font-display font-bold mt-3 mb-3">Présence web stratégique</h3>
+                    <p class="text-tus-white/60 mb-5">Une façade publique rapide, administrable et reliée aux bons parcours de contact, d'inscription ou de demande de devis.</p>
+                    <p class="text-sm text-tus-white/50">Repère actuel : one page à partir de 1 000 € ; vitrine multi-pages de 1 500 € à 2 000 €.</p>
+                </div>
+                <div class="rounded-3xl border border-white/10 bg-white/[0.025] p-8 reveal">
+                    <span class="text-xs uppercase tracking-wider text-tus-white/40">Vente & encaissement</span>
+                    <h3 class="text-2xl font-display font-bold mt-3 mb-3">Système de vente en ligne</h3>
+                    <p class="text-tus-white/60 mb-5">Catalogue, paiement, commandes et suivi peuvent rester autonomes ou être reliés à la gestion commerciale, au stock et à la facturation.</p>
+                    <p class="text-sm text-tus-white/50">Repère actuel : 5 000 € à 8 500 € selon le périmètre.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 relative z-10 bg-white/[0.015] border-y border-white/5">
+        <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <span class="text-tus-blue-a11y text-sm font-semibold uppercase tracking-wider">Standard TUS</span>
+                <h2 class="text-3xl md:text-4xl font-display font-bold mt-3 mb-5">Le même niveau d'exigence, quel que soit le périmètre</h2>
+                <p class="text-tus-white/65 leading-relaxed">
+                    Architecture documentée, code transmissible, sécurité, performance, suivi de projet et autonomie d'administration font partie du socle. Le périmètre varie ; la méthode ne devient pas un assemblage opportuniste.
+                </p>
+                <div class="mt-7">{% include 'partials/badge_standard_tus.html' %}</div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-4">
+                <div class="p-5 rounded-2xl border border-white/10 bg-white/[0.025]"><strong class="block mb-1">Code propriétaire auditable</strong><span class="text-sm text-tus-white/55">Transmissible et maintenable.</span></div>
+                <div class="p-5 rounded-2xl border border-white/10 bg-white/[0.025]"><strong class="block mb-1">Portail de pilotage</strong><span class="text-sm text-tus-white/55">Devis, factures, avancement et documents.</span></div>
+                <div class="p-5 rounded-2xl border border-white/10 bg-white/[0.025]"><strong class="block mb-1">SEO natif</strong><span class="text-sm text-tus-white/55">Intégré aux surfaces publiques utiles.</span></div>
+                <div class="p-5 rounded-2xl border border-white/10 bg-white/[0.025]"><strong class="block mb-1">Support post-livraison</strong><span class="text-sm text-tus-white/55">Ajustements terrain et accompagnement.</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-6 relative z-10">
+        <div class="max-w-4xl mx-auto text-center rounded-3xl border border-tus-blue/20 bg-tus-blue/[0.06] p-10 md:p-14">
+            <h2 class="text-3xl md:text-4xl font-display font-bold mb-4">Votre problème n'est peut-être pas un manque d'outils.</h2>
+            <p class="text-tus-white/65 text-lg mb-8">Il peut venir de la façon dont ils s'enchaînent, de ce qui reste manuel ou de ce qui n'est jamais mesuré.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{% url 'simulateur:acse' %}" class="bg-tus-blue px-7 py-3.5 rounded-full font-semibold">Faire le diagnostic A.C.S.E</a>
+                <a href="{% url 'leads:contact' %}" class="px-7 py-3.5 rounded-full border border-white/15 hover:border-tus-blue/50 transition-colors">Discuter du cas d'usage</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
