@@ -1,8 +1,7 @@
 """Tests for messaging views, leads email_views, chroniques, audit, dashboard, healthz."""
 import json
 import pytest
-from unittest.mock import patch, MagicMock
-from django.test import Client, RequestFactory
+from unittest.mock import patch
 from django.contrib.auth.models import User
 
 from apps.messaging.models import Prospect, EmailTemplate
@@ -145,14 +144,15 @@ class TestMessagingQuickAdd:
 
 @pytest.mark.django_db
 class TestMessagingSendEmail:
-    @patch('apps.messaging.views.send_prospect_email', return_value=True)
+    @patch('apps.messaging.views.send_prospection_template', return_value={'success': True})
     def test_send_email_to_prospect(self, mock_send, client, staff_user, prospect):
         client.force_login(staff_user)
-        response = client.post(f'/tus-gestion-secure/messaging/prospects/{prospect.pk}/send/', {
-            'subject': 'Test Email',
-            'body_html': 'Hello!',
-        })
-        assert response.status_code in (200, 302)
+        response = client.post(
+            f'/tus-gestion-secure/messaging/prospects/{prospect.pk}/send/',
+            {'template': 'prospection-standard'},
+        )
+        assert response.status_code == 302
+        mock_send.assert_called_once_with(prospect, 'prospection-standard')
 
 
 @pytest.mark.django_db
@@ -161,19 +161,28 @@ class TestSendEmailAPI:
         response = client.post('/tus-gestion-secure/messaging/api/send/')
         assert response.status_code == 302
 
-    @patch('apps.messaging.views.send_prospect_email', return_value=True)
+    @patch(
+        'apps.messaging.services.send_email_brevo',
+        return_value={'success': True, 'message_id': 'test-message-id'},
+    )
     def test_send_email_api_post(self, mock_send, client, staff_user):
         client.force_login(staff_user)
         response = client.post(
             '/tus-gestion-secure/messaging/api/send/',
             json.dumps({
-                'to': 'test@example.com',
+                'recipients': ['test@example.com'],
                 'subject': 'Test',
-                'body': '<p>Hello</p>',
+                'content': '<p>Hello</p>',
             }),
             content_type='application/json',
         )
-        assert response.status_code in (200, 400)
+        assert response.status_code == 200
+        assert response.json()['sent'] == 1
+        mock_send.assert_called_once_with(
+            to_email='test@example.com',
+            subject='Test',
+            html_content='<p>Hello</p>',
+        )
 
 
 # ==============================================================================

@@ -8,9 +8,7 @@ principaux (numéro, devis associé, montant, date).
 
 from django.contrib import admin, messages
 from django.utils.html import format_html
-from django.core.files.base import ContentFile
 from django import forms
-import os
 from django.urls import reverse
 
 from .models import Invoice, InvoiceItem

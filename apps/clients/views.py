@@ -2,16 +2,15 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import TemplateView, ListView, DetailView, UpdateView, CreateView
+from django.views.generic import TemplateView, ListView, DetailView, UpdateView
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.http import HttpResponse, JsonResponse, FileResponse
-from django.core.files.storage import default_storage
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
-from .models import ClientProfile, Project, ProjectMilestone, ClientDocument, ClientNotification
-from .forms import ClientProfileForm, DocumentUploadForm, ClientRequestForm
+from .models import ClientProfile, Project, ClientDocument, ClientNotification
+from .forms import ClientProfileForm, DocumentUploadForm
 
 
 @login_required
@@ -485,14 +484,14 @@ def quick_request(request):
     
     # Build the full message with context
     full_message = f"[CLIENT EXISTANT - {request_label}]\n"
-    full_message += f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+    full_message += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
     full_message += f"Client : {request.user.get_full_name() or request.user.username}\n"
     full_message += f"Email : {request.user.email}\n"
     if profile.phone:
         full_message += f"Téléphone : {profile.phone}\n"
     if profile.company_name:
         full_message += f"Entreprise : {profile.company_name}\n"
-    full_message += f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+    full_message += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
     
     if project_id:
         try:
@@ -516,7 +515,7 @@ def quick_request(request):
     }
     
     # Create the lead (will trigger admin notification)
-    lead = Lead.objects.create(
+    Lead.objects.create(
         name=f"[CLIENT] {request.user.get_full_name() or request.user.username}",
         email=request.user.email,
         project_type=project_type_map.get(request_type, 'vitrine'),
@@ -528,7 +527,7 @@ def quick_request(request):
         client=profile,
         notification_type='message',
         title=f"Demande envoyée : {request_label}",
-        message=f"Votre demande a été transmise à l'équipe. Réponse sous 24h.",
+        message="Votre demande a été transmise à l'équipe. Réponse sous 24h.",
         related_url='',
     )
     
@@ -575,7 +574,7 @@ def quote_pdf_download(request, pk):
         response = HttpResponse(pdf_bytes, content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="devis_{quote.number}.pdf"'
         return response
-    except Exception as e:
+    except Exception:
         messages.error(request, "Erreur lors de la génération du PDF.")
         return redirect('clients:quotes')
 
@@ -597,7 +596,7 @@ def quote_pdf_view(request, pk):
         resp = HttpResponse(pdf_bytes, content_type='application/pdf')
         resp['Content-Disposition'] = f'inline; filename="devis_{quote.number}.pdf"'
         return resp
-    except Exception as e:
+    except Exception:
         # Retourner une page d'erreur simple au lieu d'un redirect (pour l'iframe)
         quote_detail_url = reverse_lazy('clients:quote_detail', kwargs={'pk': pk})
         return HttpResponse(
@@ -660,6 +659,6 @@ def invoice_pdf_download(request, pk):
             filename=f"facture_{invoice.number}.pdf",
             content_type='application/pdf'
         )
-    except Exception as e:
+    except Exception:
         messages.error(request, "Erreur lors de la génération du PDF.")
         return redirect('clients:invoices')

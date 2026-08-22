@@ -22,7 +22,6 @@ dépendances à Unsplash ont été supprimées pour garantir un rendu fiable.
 from decimal import Decimal, ROUND_HALF_UP
 from datetime import date
 from django.db import models
-from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from core.utils import raw_media_storage
 from services.models import Service
@@ -390,7 +389,6 @@ class Quote(models.Model):
             # ne bloque pas la génération si un item est mal formé
             pass
 
-        from django.core.files.base import ContentFile
         from core.services.document_generator import DocumentGenerator
 
         return DocumentGenerator.generate_quote_pdf(self, attach=attach)

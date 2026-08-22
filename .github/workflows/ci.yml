@@ -2,42 +2,52 @@ name: CI — Trait d'Union Studio
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, deploy/coolify-ovh]
   pull_request:
-    branches: [main]
+    branches: [main, deploy/coolify-ovh]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   PYTHON_VERSION: "3.12"
 
 jobs:
   # ──────────────────────────────────────────────────────────────
-  # 1. Lint + Security Scan
+  # 1. Blocking quality + security gate
   # ──────────────────────────────────────────────────────────────
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
 
-      - name: Install lint tools
-        run: pip install ruff bandit
+      - name: Install quality tools
+        run: python -m pip install ruff==0.16.4 bandit==1.9.4
 
-      - name: Ruff lint
-        run: ruff check apps/ config/ core/ services/ --output-format=github || true
+      - name: Ruff correctness gate
+        run: >-
+          ruff check
+          apps/ config/ core/ services/ tests/ manage.py
+          --output-format=github
 
-      - name: Bandit security scan
-        run: bandit -r apps/ core/ config/ -ll --skip B101 || true
+      - name: Bandit security gate
+        run: bandit -q -r apps/ core/ config/ -ll -c bandit.yaml
 
   # ──────────────────────────────────────────────────────────────
   # 2. Tests with PostgreSQL + Coverage
   # ──────────────────────────────────────────────────────────────
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: lint
 
     services:
@@ -50,7 +60,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U tus_test -d tus_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -72,10 +82,10 @@ jobs:
       REDIS_URL: redis://localhost:6379/0
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: pip
@@ -90,12 +100,14 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
       - name: Django system checks
         run: python manage.py check
+
+      - name: Check migration drift
+        run: python manage.py makemigrations --check --dry-run
 
       - name: Run migrations
         run: python manage.py migrate --noinput
@@ -105,11 +117,12 @@ jobs:
           pytest --tb=short -q \
             --cov=apps --cov=core --cov=config \
             --cov-report=term-missing \
-            --cov-report=xml
+            --cov-report=xml \
+            --cov-fail-under=57.5
 
       - name: Upload coverage report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: coverage.xml

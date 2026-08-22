@@ -17,7 +17,7 @@ This middleware NEVER blocks or modifies the request — it observes only.
 import logging
 
 from django.conf import settings
-from django.contrib.auth import HASH_SESSION_KEY, BACKEND_SESSION_KEY
+from django.contrib.auth import HASH_SESSION_KEY
 from django.utils.deprecation import MiddlewareMixin
 
 logger = logging.getLogger('tus.session_guard')

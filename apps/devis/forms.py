@@ -8,7 +8,7 @@ from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
 from services.models import Service
-from .models import Quote, QuoteRequest, QuoteRequestPhoto, QuoteItem
+from .models import Quote, QuoteRequest, QuoteItem
 from apps.clients.models import ClientProfile
 
 
@@ -225,7 +225,7 @@ class QuoteRequestForm(forms.ModelForm):
         f.seek(0)
         header = f.read(12)
         f.seek(0)
-        for magic, _ in self._IMAGE_MAGIC.items():
+        for magic in self._IMAGE_MAGIC:
             if header.startswith(magic):
                 return True
         # Special case for WEBP: RIFF + 4 bytes size + WEBP

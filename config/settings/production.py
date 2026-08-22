@@ -11,6 +11,8 @@ Configuration optimale pour :
 from .base import *  # noqa: F401,F403
 
 import dj_database_url
+import re
+import sys
 
 # TOUJOURS False en production - ne jamais utiliser de variable d'env pour DEBUG
 DEBUG = False
@@ -118,9 +120,12 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 # Cache-Control: public, max-age=31536000, immutable
 WHITENOISE_MAX_AGE = 31536000  # 365 jours
 # 🛡️ SECURITY: Only hash-named files are immutable (not robots.txt, sitemap, etc.)
-import re
 _HASHED_FILE_RE = re.compile(r'\.[a-f0-9]{8,32}\.')
-WHITENOISE_IMMUTABLE_FILE_TEST = lambda path, url: bool(_HASHED_FILE_RE.search(url))
+
+def _is_whitenoise_immutable_file(path, url):
+    return bool(_HASHED_FILE_RE.search(url))
+
+WHITENOISE_IMMUTABLE_FILE_TEST = _is_whitenoise_immutable_file
 
 # ==============================================================================
 # MEDIA FILES (Cloudinary - recommandé pour simplicité)
@@ -131,7 +136,6 @@ CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
 CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
 
 # Vérifier si on est en train de builder (collectstatic)
-import sys
 IS_BUILDING = 'collectstatic' in sys.argv
 
 if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY):

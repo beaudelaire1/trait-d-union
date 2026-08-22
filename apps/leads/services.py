@@ -102,7 +102,7 @@ class EmailService:
                 'brand': branding.get('name', "Trait d'Union Studio"),
                 'headline': '🔔 Nouveau contact reçu',
                 'title': 'Notification Admin',
-                'intro': f"Un nouveau prospect vient de vous contacter via le formulaire du site.",
+                'intro': "Un nouveau prospect vient de vous contacter via le formulaire du site.",
                 'rows': [
                     {'label': 'Nom', 'value': lead.name},
                     {'label': 'Email', 'value': lead.email},

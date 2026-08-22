@@ -370,7 +370,7 @@ def _check_accessibility(soup):
     items.append({
         "name": "Hiérarchie des titres",
         "passed": has_hierarchy and not skips,
-        "detail": f"Niveaux : {' → '.join(f'h{l}' for l in levels[:8])}" + (" ⚠ saut" if skips else ""),
+        "detail": f"Niveaux : {' → '.join(f'h{level}' for level in levels[:8])}" + (" ⚠ saut" if skips else ""),
     })
     return _score(items, "Accessibilité")
 

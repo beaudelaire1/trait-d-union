@@ -6,8 +6,6 @@ are correctly configured at the Django settings level.
 import pytest
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import Client
-from django.urls import reverse
 
 User = get_user_model()
 

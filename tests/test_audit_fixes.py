@@ -9,8 +9,7 @@ This file covers the critical changes made during the audit repair:
 - Lead attachment validators
 """
 import json
-from decimal import Decimal
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import pytest
 from django.test import TestCase, RequestFactory, override_settings

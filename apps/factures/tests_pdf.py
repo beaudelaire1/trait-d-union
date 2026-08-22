@@ -7,7 +7,6 @@ from decimal import Decimal
 from datetime import date
 
 from django.test import TestCase
-from django.contrib.auth.models import User
 
 from apps.devis.models import Quote, QuoteItem
 from apps.factures.models import Invoice, InvoiceItem

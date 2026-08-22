@@ -37,7 +37,8 @@ def safe_html_filter(value: str) -> str:
         tags=ALLOWED_TAGS,
         attributes=ALLOWED_ATTRIBUTES,
     )
-    return mark_safe(clean)
+    # The value is trusted only after nh3 has applied the explicit allow-list.
+    return mark_safe(clean)  # nosec B308, B703
 
 
 @register.filter(name="plain_text")

@@ -1,7 +1,6 @@
 """Tests for client portal views: dashboard, profile, projects, documents, quotes, invoices."""
 import pytest
 from unittest.mock import patch, MagicMock
-from django.test import Client, RequestFactory
 from django.contrib.auth.models import User
 
 from apps.clients.models import ClientProfile, Project
@@ -18,7 +17,7 @@ def client_user(db):
         'client', 'client@test.com', 'pass123',
         first_name='Jean', last_name='Dupont'
     )
-    profile = ClientProfile.objects.create(
+    ClientProfile.objects.create(
         user=user, company_name='Dupont SARL', phone='+594600000000',
     )
     return user

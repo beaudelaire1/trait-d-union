@@ -1,14 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
-from django.utils import timezone
 from django.db.models import Count, Q
 import json
 
-from .models import Prospect, ProspectMessage, EmailTemplate, EmailCampaign, CampaignRecipient, ProspectActivity
-from .services import send_prospect_email, send_prospection_template
+from .models import Prospect, ProspectMessage, EmailTemplate, EmailCampaign, ProspectActivity
+from .services import send_prospection_template
 from .forms import ProspectForm, CampaignForm
 
 def staff_member_required(view_func):
@@ -121,7 +120,7 @@ def prospect_edit(request, pk):
     if request.method == 'POST':
         form = ProspectForm(request.POST, instance=prospect)
         if form.is_valid():
-            entry = form.save()
+            form.save()
             messages.success(request, "Prospect mis à jour.")
             return redirect('messaging:prospect_detail', pk=pk)
     else:

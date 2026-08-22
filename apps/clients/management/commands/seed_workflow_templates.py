@@ -225,12 +225,12 @@ class Command(BaseCommand):
         total_workflows = WorkflowTemplate.objects.count()
         total_milestones = MilestoneTemplate.objects.count()
         
-        self.stdout.write(f"\n📊 Statistiques:")
+        self.stdout.write("\n📊 Statistiques:")
         self.stdout.write(f"   - {total_workflows} workflows disponibles")
         self.stdout.write(f"   - {total_milestones} templates de jalons au total")
         
-        self.stdout.write(f"\n📝 Prochaines étapes:")
-        self.stdout.write(f"   1. Vérifier dans l'admin : /admin/clients/workflowtemplate/")
-        self.stdout.write(f"   2. Créer un projet et lui assigner un workflow")
-        self.stdout.write(f"   3. Appeler project.generate_milestones_from_template()")
-        self.stdout.write(f"\n✨ Fini ! Vos workflows sont prêts.\n")
+        self.stdout.write("\n📝 Prochaines étapes:")
+        self.stdout.write("   1. Vérifier dans l'admin : /admin/clients/workflowtemplate/")
+        self.stdout.write("   2. Créer un projet et lui assigner un workflow")
+        self.stdout.write("   3. Appeler project.generate_milestones_from_template()")
+        self.stdout.write("\n✨ Fini ! Vos workflows sont prêts.\n")

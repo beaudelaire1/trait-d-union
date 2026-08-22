@@ -181,7 +181,7 @@ class Command(BaseCommand):
         try:
             result = client.lookup_directory(probe)
         except PDPNotFoundError:
-            self._warn(f"  [WARN] Endpoint /directory introuvable (404). "
+            self._warn("  [WARN] Endpoint /directory introuvable (404). "
                        "IOPOLE n'expose peut-être pas cet alias — non bloquant.")
             return
         except PDPValidationError as exc:

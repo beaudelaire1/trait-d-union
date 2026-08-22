@@ -1,5 +1,4 @@
 """Tests for the leads app."""
-import pytest
 import requests
 from unittest.mock import patch, MagicMock
 from django.contrib.auth import get_user_model

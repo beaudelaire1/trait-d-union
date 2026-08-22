@@ -1,7 +1,6 @@
 """Custom middleware for TUS website."""
 import logging
 import time
-from typing import Any, Callable
 
 from django.core.cache import cache
 from django.http import HttpRequest, HttpResponse

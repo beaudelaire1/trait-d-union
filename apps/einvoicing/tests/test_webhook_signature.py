@@ -6,7 +6,6 @@ import hashlib
 import hmac
 import time
 
-import pytest
 
 from apps.einvoicing.webhooks import (
     DEFAULT_TOLERANCE_SECONDS,

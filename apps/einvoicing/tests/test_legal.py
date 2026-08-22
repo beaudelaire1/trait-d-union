@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
 from django.test import override_settings
 
 from apps.einvoicing.legal import (

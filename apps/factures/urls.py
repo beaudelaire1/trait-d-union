@@ -11,8 +11,8 @@ Routes publiques (Phase 3 - Paiement en ligne):
 """
 
 from django.urls import path
-from . import views
 
+from . import public_views, views
 
 app_name = "factures"
 
@@ -21,7 +21,6 @@ urlpatterns = [
     path("download/<int:pk>/", views.download_invoice, name="download"),
     # Liste des factures avec leurs fichiers PDF (archive)
     path("archive/", views.archive, name="archive"),
-    
     # ===========================================
     # PHASE 3 : Paiement en ligne
     # ===========================================
@@ -30,6 +29,6 @@ urlpatterns = [
     path("paiement/succes/", views.invoice_payment_success, name="payment_success"),
     path("paiement/annule/", views.invoice_payment_cancel, name="payment_cancel"),
     path("paiement/erreur/", views.invoice_payment_error, name="payment_error"),
-    path("pdf/<str:token>/", views.invoice_public_pdf, name="public_pdf"),
+    path("pdf/<str:token>/", public_views.invoice_public_pdf, name="public_pdf"),
     path("webhook/stripe/", views.stripe_invoice_webhook, name="stripe_webhook"),
 ]

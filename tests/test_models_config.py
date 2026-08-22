@@ -2,9 +2,6 @@
 document_generator, config.urls error handlers."""
 import pytest
 from decimal import Decimal
-from unittest.mock import patch, MagicMock
-from django.test import Client, RequestFactory
-from django.core.cache import cache
 
 
 # ==============================================================================

@@ -6,7 +6,6 @@ Architecture scalable :
 - Project.generate_milestones_from_template() : auto-génération
 """
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 
 class WorkflowTemplate(models.Model):
@@ -191,7 +190,6 @@ class ProjectWithWorkflowMixin:
         Returns:
             Liste des ProjectMilestone créées
         """
-        from datetime import timedelta
         from django.utils import timezone
         
         if start_date is None:

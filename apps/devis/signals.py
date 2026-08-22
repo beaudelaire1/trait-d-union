@@ -2,6 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 from allauth.account.signals import user_logged_in as allauth_user_logged_in
+from django.contrib.auth.signals import user_logged_in as django_user_logged_in
 import logging
 
 from .models import Quote
@@ -75,8 +76,6 @@ def auto_provision_client_on_quote_accepted_or_validated(
 # Cela permet à l'admin de vérifier le devis avant envoi au client.
 
 
-from django.contrib.auth.signals import user_logged_in as django_user_logged_in
-
 @receiver(allauth_user_logged_in)
 @receiver(django_user_logged_in)
 def force_password_change_on_login(sender, request, user, **kwargs):
@@ -97,7 +96,7 @@ def force_password_change_on_login(sender, request, user, **kwargs):
                 f"Première connexion client, changement de mot de passe requis : {user.email}",
                 extra={'user_pk': user.pk}
             )
-    except (AttributeError, Exception) as exc:
+    except (AttributeError, Exception):
         # Pas un profil client
         pass
 
