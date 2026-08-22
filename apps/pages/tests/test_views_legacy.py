@@ -45,14 +45,17 @@ class MethodViewTest(TestCase):
         """Test that the method page loads successfully."""
         response = self.client.get(reverse('pages:method'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pages/method.html')
+        self.assertTemplateUsed(response, 'pages/method_positioned.html')
 
     def test_method_page_contains_steps(self):
-        """Test that method page contains process steps."""
+        """Test that method page contains the full delivery process."""
         response = self.client.get(reverse('pages:method'))
         self.assertContains(response, 'Découverte')
         self.assertContains(response, 'Stratégie')
         self.assertContains(response, 'Design')
+        self.assertContains(response, 'Développement')
+        self.assertContains(response, 'Lancement')
+        self.assertContains(response, 'Cartographie des flux')
 
 
 class LegalViewTest(TestCase):
