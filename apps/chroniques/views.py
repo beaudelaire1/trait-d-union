@@ -89,7 +89,7 @@ def article_list(request):
         current_sort = DEFAULT_SORT
         query_string = ""
 
-    return render(request, "chroniques/list.html", {
+    return render(request, "chroniques/list_positioned.html", {
         "page_obj": page_obj,
         "categories": categories,
         "active_category": active_category,
