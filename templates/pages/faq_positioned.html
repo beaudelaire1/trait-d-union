@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ — Plateformes métier & automatisation | Trait d'Union Studio{% endblock %}
+{% block meta_description %}Questions fréquentes sur les plateformes métier sur mesure, CRM, mini-ERP, portails clients, automatisation, e-commerce et présence web en Guyane et aux Antilles.{% endblock %}
+{% block meta_keywords %}faq logiciel métier guyane, crm sur mesure cayenne, mini erp guyane, automatisation pme guyane, plateforme métier antilles, portail client, e-commerce guyane, création site internet guyane{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Que construit Trait d'Union Studio ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Trait d'Union Studio conçoit des plateformes métier sur mesure qui centralisent les flux commerciaux, opérationnels, administratifs et clients : CRM, mini-ERP, portails, devis-factures, planning, tableaux de bord et automatisations."}
+    },
+    {
+      "@type": "Question",
+      "name": "Quelle différence avec un CRM ou un ERP standard ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Un logiciel standard impose son périmètre et ses processus. Une plateforme métier sur mesure part des flux réellement utilisés et ne conserve que les fonctions utiles, avec un code transmissible et une architecture adaptée à l'activité."}
+    },
+    {
+      "@type": "Question",
+      "name": "Un site internet ou un e-commerce peut-il faire partie du projet ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Oui. Une présence web ou un e-commerce peut être livré comme besoin autonome ou devenir la façade publique d'un système plus large, reliée au CRM, aux demandes de devis, aux commandes, à la facturation ou au portail client."}
+    },
+    {
+      "@type": "Question",
+      "name": "Quels flux peut-on automatiser ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Selon l'activité : qualification de prospects, relances, changements d'état, génération de documents, notifications, validations, facturation, suivi de tâches, transmission de données et alimentation de tableaux de bord."}
+    },
+    {
+      "@type": "Question",
+      "name": "Combien coûte une solution Trait d'Union Studio ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Une infrastructure métier est chiffrée sur devis selon le périmètre. Pour les modules web, les repères actuels sont : one page à partir de 1 000 €, vitrine multi-pages de 1 500 € à 2 000 €, e-commerce de 5 000 € à 8 500 €."}
+    },
+    {
+      "@type": "Question",
+      "name": "Quels sont les délais ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Une plateforme métier nécessite généralement 3 à 6 mois selon son périmètre. Un site vitrine demande environ 3 à 6 semaines et un e-commerce 6 à 12 semaines. Les délais couvrent conception, développement, tests et mise en production."}
+    },
+    {
+      "@type": "Question",
+      "name": "À qui appartient le code ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Le code source est livré au client, documenté et transmissible. Il peut être hébergé ailleurs ou repris par une autre équipe sans verrou technique imposé par Trait d'Union Studio."}
+    },
+    {
+      "@type": "Question",
+      "name": "Les solutions peuvent-elles intégrer la facturation électronique ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Oui. Les flux de devis et de facturation peuvent intégrer Factur-X, la norme EN 16931, la transmission via une plateforme agréée et le suivi du cycle de vie de la facture."}
+    },
+    {
+      "@type": "Question",
+      "name": "Travaillez-vous uniquement en Guyane ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Trait d'Union Studio est basé en Guyane et intervient également en Martinique, Guadeloupe et plus largement dans les Outre-mer."}
+    },
+    {
+      "@type": "Question",
+      "name": "Comment démarrer un projet ?",
+      "acceptedAnswer": {"@type": "Answer", "text": "Le point de départ est le problème opérationnel à résoudre : flux mal reliés, tâches répétitives, manque de visibilité ou limite de capacité. Un diagnostic permet ensuite de définir le périmètre utile avant chiffrage."}
+    }
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<section class="relative pt-32 pb-16 px-6 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-tus-blue/5 to-transparent"></div>
+    <div class="max-w-4xl mx-auto relative z-10">
+        <span class="text-tus-blue-a11y text-sm font-semibold uppercase tracking-[0.2em]">Questions fréquentes</span>
+        <h1 class="font-display text-4xl md:text-6xl font-bold text-tus-white mt-4 mb-6">Comprendre ce que nous construisons</h1>
+        <p class="text-xl text-tus-white/70 max-w-3xl">
+            Une plateforme métier n'est pas un catalogue de fonctions. Voici les réponses utiles pour comprendre le périmètre, les délais, la propriété du code et la place du web dans l'ensemble.
+        </p>
+        <div class="flex flex-wrap gap-4 mt-8">
+            <a href="{% url 'leads:contact' %}" class="inline-flex items-center px-6 py-3 bg-tus-blue-a11y text-white font-semibold rounded-full">Parler de votre besoin</a>
+            <a href="{% url 'simulateur:acse' %}" class="inline-flex items-center px-6 py-3 border border-white/15 text-tus-white/80 font-semibold rounded-full hover:border-tus-blue/50 transition-colors">Faire le diagnostic A.C.S.E</a>
+        </div>
+    </div>
+</section>
+
+<section class="py-12 pb-24 px-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="space-y-4" x-data="faqAccordion">
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(1)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">Que construit Trait d'Union Studio ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(1)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    Nous concevons des plateformes métier sur mesure qui centralisent les flux commerciaux, opérationnels, administratifs et clients. Selon le besoin, cela peut inclure CRM, mini-ERP, portails clients, devis-factures, planning, tableaux de bord, documents, automatisations et intégrations.
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(2)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">Quelle différence avec un CRM ou un ERP standard ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(2)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    Un logiciel standard impose son périmètre et son vocabulaire. Une plateforme métier sur mesure part des flux réellement utilisés : ce qui doit être centralisé, automatisé, validé ou mesuré. Le système est donc plus proche d'un sous-ERP adapté à l'activité que d'un assemblage de modules génériques.
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(3)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">Un site internet ou un e-commerce peut-il faire partie du projet ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(3)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    Oui. Une présence web ou un e-commerce peut être le besoin principal lorsqu'il est réellement suffisant. Il peut aussi devenir la façade publique d'un système plus large : formulaire relié au CRM, commande transmise à la gestion, espace client, devis en ligne ou facturation sans ressaisie.
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(4)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">Quels flux peut-on automatiser ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(4)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    Cela dépend du métier. Les cas fréquents sont la qualification de prospects, les relances, les changements d'état, la génération de documents, les notifications, les validations, la facturation, le suivi de tâches, la transmission de données et l'alimentation des indicateurs de pilotage.
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(5)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">Combien coûte une solution Trait d'Union Studio ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(5)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    <p>Une infrastructure métier est chiffrée sur devis, car le coût dépend des flux, des rôles utilisateurs, des automatisations et des intégrations à couvrir.</p>
+                    <p class="mt-3">Pour les modules web, les repères actuels restent : one page à partir de 1 000 €, vitrine multi-pages de 1 500 € à 2 000 €, e-commerce de 5 000 € à 8 500 €.</p>
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(6)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">Quels sont les délais ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(6)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    Une plateforme métier nécessite généralement 3 à 6 mois selon son périmètre. Un site vitrine demande environ 3 à 6 semaines et un e-commerce 6 à 12 semaines. Ces délais comprennent conception, développement, tests et mise en production.
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(7)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">À qui appartient le code une fois le projet livré ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(7)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    Le code source est livré au client, documenté et transmissible. Il peut être hébergé ailleurs ou repris par une autre équipe. Le sur-mesure ne doit pas créer un verrou technique vis-à-vis du studio.
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(8)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">Les solutions peuvent-elles intégrer la facturation électronique ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(8)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    Oui. Les flux de devis et de facturation peuvent intégrer Factur-X, la norme EN 16931, la transmission via une plateforme agréée et le suivi du cycle de vie de la facture, afin d'éviter les doubles saisies entre commercial et administratif.
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(9)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">Travaillez-vous uniquement en Guyane ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(9)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    Non. Trait d'Union Studio est basé en Guyane et intervient également en Martinique, Guadeloupe et plus largement dans les Outre-mer. Le suivi du projet et les validations peuvent être réalisés à distance.
+                </div>
+            </div>
+
+            <div class="bg-surface-dark rounded-2xl border border-stroke-dark overflow-hidden">
+                <button @click="toggle(10)" class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-tus-white/5 transition">
+                    <h2 class="font-display text-lg font-semibold text-tus-white pr-4">Comment démarrer un projet ?</h2>
+                    <span class="text-tus-blue-a11y text-xl" aria-hidden="true">+</span>
+                </button>
+                <div x-show="isOpen(10)" x-collapse class="px-6 pb-6 text-tus-white/70 leading-relaxed">
+                    Le point de départ n'est pas une liste de fonctionnalités. Il faut identifier le problème opérationnel : flux mal reliés, tâches répétitives, manque de visibilité, retards de traitement ou limite de capacité. Le périmètre utile est ensuite défini avant chiffrage.
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

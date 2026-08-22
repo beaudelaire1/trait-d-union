@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Méthode projet — Plateformes métier & automatisation | Trait d'Union Studio{% endblock %}
+{% block meta_description %}La méthode Trait d'Union Studio pour concevoir une plateforme métier sur mesure : diagnostic des flux, architecture, expérience utilisateur, développement, tests, déploiement et ajustements terrain.{% endblock %}
+{% block meta_keywords %}méthode logiciel métier guyane, conception crm sur mesure, développement mini erp guyane, automatisation processus pme, architecture plateforme métier, gestion projet digital guyane{% endblock %}
+{% block og_title %}Notre méthode de conception métier — Trait d'Union Studio{% endblock %}
+{% block og_description %}Du problème opérationnel au système déployé : cadrage des flux, architecture, design, développement, validation et mise en production.{% endblock %}
+{% block twitter_title %}Notre méthode de conception métier — Trait d'Union Studio{% endblock %}
+{% block twitter_description %}Une méthode en cinq étapes pour transformer des flux métier réels en système logiciel fiable et exploitable.{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Méthode Trait d'Union Studio pour concevoir une plateforme métier",
+  "description": "Cinq étapes allant du diagnostic des flux à la mise en production et aux ajustements terrain.",
+  "step": [
+    {"@type": "HowToStep", "position": 1, "name": "Découverte", "text": "Comprendre l'activité, les flux, les irritants, les rôles et les objectifs mesurables."},
+    {"@type": "HowToStep", "position": 2, "name": "Stratégie", "text": "Définir le périmètre, les règles métier, les données, les intégrations et les priorités."},
+    {"@type": "HowToStep", "position": 3, "name": "Design", "text": "Prototyper les parcours utilisateurs et les interfaces avant de figer l'implémentation."},
+    {"@type": "HowToStep", "position": 4, "name": "Développement", "text": "Construire, tester et documenter le système par incréments vérifiables."},
+    {"@type": "HowToStep", "position": 5, "name": "Lancement", "text": "Déployer, former, observer l'usage réel et corriger les écarts constatés sur le terrain."}
+  ]
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen relative overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-tus-blue/15 to-tus-green/10 rounded-full blur-[150px]"></div>
+        <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-gradient-to-tl from-tus-green/10 to-tus-blue/15 rounded-full blur-[120px]"></div>
+    </div>
+
+    <section class="pt-28 pb-20 px-6 relative z-10">
+        <div class="max-w-5xl mx-auto text-center">
+            <span class="inline-block px-4 py-2 rounded-full bg-tus-blue/10 text-tus-blue-a11y text-sm font-medium mb-6 reveal">Du flux réel au système exploitable</span>
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-display font-bold mb-6 reveal-clip">Une méthode conçue pour <span class="text-tus-blue-a11y">réduire l'incertitude</span></h1>
+            <p class="text-tus-white/70 text-lg md:text-xl max-w-3xl mx-auto reveal">
+                Nous ne commençons pas par dessiner des écrans. Nous commençons par comprendre ce qui entre, ce qui sort, qui décide, où l'information se perd et ce qui doit être mesuré.
+            </p>
+        </div>
+    </section>
+
+    <section class="pb-24 px-6 relative z-10">
+        <div class="max-w-5xl mx-auto space-y-6">
+            <article class="grid md:grid-cols-[120px_1fr] gap-6 rounded-3xl border border-white/10 bg-white/[0.025] p-7 md:p-9 reveal">
+                <div><span class="text-5xl font-display font-bold text-tus-blue-a11y/80">01</span></div>
+                <div>
+                    <h2 class="text-3xl font-display font-bold mb-3">Découverte</h2>
+                    <p class="text-tus-white/65 leading-relaxed mb-5">Comprendre l'activité avant de définir la solution : flux actuels, rôles, contraintes, données, outils en place, points de friction et décisions qui manquent d'information.</p>
+                    <div class="flex flex-wrap gap-2 text-sm text-tus-white/60"><span class="px-3 py-2 border border-white/10 rounded-lg">Entretiens métier</span><span class="px-3 py-2 border border-white/10 rounded-lg">Cartographie des flux</span><span class="px-3 py-2 border border-white/10 rounded-lg">Irritants & risques</span><span class="px-3 py-2 border border-white/10 rounded-lg">Objectifs mesurables</span></div>
+                </div>
+            </article>
+
+            <article class="grid md:grid-cols-[120px_1fr] gap-6 rounded-3xl border border-white/10 bg-white/[0.025] p-7 md:p-9 reveal">
+                <div><span class="text-5xl font-display font-bold text-tus-blue-a11y/80">02</span></div>
+                <div>
+                    <h2 class="text-3xl font-display font-bold mb-3">Stratégie</h2>
+                    <p class="text-tus-white/65 leading-relaxed mb-5">Définir le système utile, pas le système maximal : périmètre fonctionnel, règles métier, modèle de données, rôles et permissions, automatisations, intégrations et indicateurs.</p>
+                    <div class="flex flex-wrap gap-2 text-sm text-tus-white/60"><span class="px-3 py-2 border border-white/10 rounded-lg">Architecture fonctionnelle</span><span class="px-3 py-2 border border-white/10 rounded-lg">Priorisation</span><span class="px-3 py-2 border border-white/10 rounded-lg">Règles métier</span><span class="px-3 py-2 border border-white/10 rounded-lg">Plan de données</span></div>
+                </div>
+            </article>
+
+            <article class="grid md:grid-cols-[120px_1fr] gap-6 rounded-3xl border border-white/10 bg-white/[0.025] p-7 md:p-9 reveal">
+                <div><span class="text-5xl font-display font-bold text-tus-blue-a11y/80">03</span></div>
+                <div>
+                    <h2 class="text-3xl font-display font-bold mb-3">Design</h2>
+                    <p class="text-tus-white/65 leading-relaxed mb-5">Prototyper les parcours de travail avant d'investir dans leur implémentation. L'interface doit rendre le bon geste évident et ne pas ajouter une nouvelle couche de complexité.</p>
+                    <div class="flex flex-wrap gap-2 text-sm text-tus-white/60"><span class="px-3 py-2 border border-white/10 rounded-lg">Parcours utilisateurs</span><span class="px-3 py-2 border border-white/10 rounded-lg">Prototypes</span><span class="px-3 py-2 border border-white/10 rounded-lg">Validation métier</span><span class="px-3 py-2 border border-white/10 rounded-lg">Accessibilité</span></div>
+                </div>
+            </article>
+
+            <article class="grid md:grid-cols-[120px_1fr] gap-6 rounded-3xl border border-white/10 bg-white/[0.025] p-7 md:p-9 reveal">
+                <div><span class="text-5xl font-display font-bold text-tus-blue-a11y/80">04</span></div>
+                <div>
+                    <h2 class="text-3xl font-display font-bold mb-3">Développement</h2>
+                    <p class="text-tus-white/65 leading-relaxed mb-5">Construire par incréments vérifiables : logique métier, sécurité, automatisations, interfaces, tests et documentation évoluent ensemble. Les arbitrages restent traçables.</p>
+                    <div class="flex flex-wrap gap-2 text-sm text-tus-white/60"><span class="px-3 py-2 border border-white/10 rounded-lg">Code sur mesure</span><span class="px-3 py-2 border border-white/10 rounded-lg">Tests automatisés</span><span class="px-3 py-2 border border-white/10 rounded-lg">Sécurité</span><span class="px-3 py-2 border border-white/10 rounded-lg">Documentation</span></div>
+                </div>
+            </article>
+
+            <article class="grid md:grid-cols-[120px_1fr] gap-6 rounded-3xl border border-tus-blue/25 bg-tus-blue/[0.05] p-7 md:p-9 reveal">
+                <div><span class="text-5xl font-display font-bold text-tus-blue-a11y">05</span></div>
+                <div>
+                    <h2 class="text-3xl font-display font-bold mb-3">Lancement</h2>
+                    <p class="text-tus-white/65 leading-relaxed mb-5">Mettre en production ne clôt pas l'observation. Nous vérifions les données, les parcours réels, la prise en main et les écarts entre le processus prévu et le terrain afin d'apporter les ajustements nécessaires.</p>
+                    <div class="flex flex-wrap gap-2 text-sm text-tus-white/60"><span class="px-3 py-2 border border-white/10 rounded-lg">Mise en production</span><span class="px-3 py-2 border border-white/10 rounded-lg">Formation</span><span class="px-3 py-2 border border-white/10 rounded-lg">Suivi d'usage</span><span class="px-3 py-2 border border-white/10 rounded-lg">Ajustements terrain</span></div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 relative z-10 border-y border-white/5 bg-white/[0.015]">
+        <div class="max-w-5xl mx-auto grid lg:grid-cols-2 gap-10">
+            <div>
+                <span class="text-sm uppercase tracking-[0.22em] text-tus-blue-a11y font-semibold">Principe de cadrage</span>
+                <h2 class="text-3xl md:text-4xl font-display font-bold mt-3 mb-4">Chaque fonction doit justifier sa place</h2>
+                <p class="text-tus-white/65 leading-relaxed">Une fonction est retenue si elle supprime une friction, sécurise une opération, accélère un flux, améliore une décision ou crée une capacité utile. Le sur-mesure n'est pas une accumulation de fonctionnalités.</p>
+            </div>
+            <div class="rounded-3xl border border-white/10 bg-white/[0.025] p-7">
+                <h3 class="font-display font-bold text-xl mb-4">Ce qui doit être clair avant développement</h3>
+                <ul class="space-y-3 text-tus-white/65">
+                    <li>• le problème opérationnel à résoudre ;</li>
+                    <li>• les utilisateurs et leurs responsabilités ;</li>
+                    <li>• les données nécessaires à chaque décision ;</li>
+                    <li>• les règles qui déclenchent une action ou une alerte ;</li>
+                    <li>• les critères permettant de juger le système utile.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-6 relative z-10">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl md:text-4xl font-display font-bold mb-5">Commencer par le problème, pas par le logiciel</h2>
+            <p class="text-tus-white/65 text-lg mb-8">Le diagnostic A.C.S.E permet d'identifier le maillon qui limite actuellement l'activité avant de décider ce qui mérite d'être construit.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{% url 'simulateur:acse' %}" class="bg-tus-blue px-7 py-3.5 rounded-full font-semibold">Faire le diagnostic A.C.S.E</a>
+                <a href="{% url 'leads:contact' %}" class="px-7 py-3.5 rounded-full border border-white/15 hover:border-tus-blue/50 transition-colors">Nous exposer le contexte</a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
