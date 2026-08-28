@@ -15,7 +15,7 @@ def user(db):
     """Standard user without admin privileges."""
     return User.objects.create_user(
         username="testuser",
-        email="test@traitdunion.it",
+        email="test@traitdunion.studio",
         password="T3stP@ssw0rd!",
     )
 
@@ -25,6 +25,6 @@ def admin_user(db):
     """Super-user for admin views."""
     return User.objects.create_superuser(
         username="admin",
-        email="admin@traitdunion.it",
+        email="contact@traitdunion.studio",
         password="Adm1nP@ssw0rd!",
     )

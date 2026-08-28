@@ -3,7 +3,6 @@ Document Generator Service
 Génère les PDFs pour les devis et factures avec la charte graphique TUS.
 """
 import logging
-from io import BytesIO
 from typing import TYPE_CHECKING, Optional
 
 from django.conf import settings
@@ -26,8 +25,8 @@ DEFAULT_BRANDING = {
     'region': 'Guyane française',
     'country': 'Guyane française',
     'phone': '+594 695 35 80 41',
-    'email': 'contact@traitdunion.it',
-    'website': 'https://traitdunion.it',
+    'email': 'contact@traitdunion.studio',
+    'website': 'https://traitdunion.studio',
     'siret': '908 264 112 00016',
     'tva_intra': '',
     'iban': '',  # 🛡️ Loaded from settings.INVOICE_BRANDING (env vars)
@@ -66,7 +65,7 @@ class DocumentGenerator:
         conforme à un sous-ensemble (ex. ``pdf/a-3b`` pour Factur-X).
         """
         try:
-            from weasyprint import HTML, CSS
+            from weasyprint import HTML
         except Exception as exc:
             raise ImportError(
                 "WeasyPrint n'est pas installé. "

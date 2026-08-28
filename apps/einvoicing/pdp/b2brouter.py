@@ -103,7 +103,7 @@ class B2BrouterClient(PDPClient):
             "Content-Type": "application/json",
             "X-B2B-API-Key": self.api_key,
             "X-B2B-API-Version": self.api_version,
-            "User-Agent": "TUS-eInvoicing/1.0 (+https://traitdunion.it)",
+            "User-Agent": "TUS-eInvoicing/1.0 (+https://traitdunion.studio)",
         })
         self._session = session
         return session

@@ -14,7 +14,7 @@ import pytest
 from apps.clients.models import ClientProfile
 from apps.einvoicing.codelists import LifecycleState
 from apps.einvoicing.models import InvoiceLifecycleEvent
-from apps.einvoicing.pdp.base import PDPClient, PDPLifecycleEvent, PDPSubmission
+from apps.einvoicing.pdp.base import PDPClient, PDPSubmission
 from apps.einvoicing.pdp.exceptions import PDPValidationError
 from apps.einvoicing.services import ingest_lifecycle_event, submit_invoice_to_pdp
 from apps.factures.models import Invoice, InvoiceItem

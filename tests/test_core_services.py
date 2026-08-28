@@ -1,9 +1,8 @@
 """Tests for core services: captcha, email_obfuscator, utils, context_processors, forms."""
 import base64
 from decimal import Decimal
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
-import pytest
 import requests
 from django.test import RequestFactory, override_settings
 

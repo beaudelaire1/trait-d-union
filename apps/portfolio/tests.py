@@ -2,7 +2,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 
-from apps.portfolio.models import Project, ProjectType, ProjectImage
+from apps.portfolio.models import Project, ProjectType
 
 
 class ProjectModelTest(TestCase):

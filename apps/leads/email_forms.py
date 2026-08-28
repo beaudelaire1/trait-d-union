@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from django import forms
-from .email_models import EmailComposition, EmailTemplate
+from .email_models import EmailComposition
 
 
 class EmailCompositionForm(forms.ModelForm):

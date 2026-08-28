@@ -30,8 +30,7 @@ from typing import TYPE_CHECKING, Optional
 from django.conf import settings
 from lxml import etree
 
-from ..codelists import LegalForm, TransactionType, VATPaymentBasis
-from ..taxation import InvoiceTotals, compute_vat_breakdown
+from ..taxation import compute_vat_breakdown
 
 if TYPE_CHECKING:  # pragma: no cover
     from apps.factures.models import Invoice

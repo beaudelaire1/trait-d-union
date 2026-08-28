@@ -18,8 +18,7 @@ Configuration (.env):
 import os
 import logging
 from datetime import datetime
-from typing import Optional, Dict, Any, List
-from django.conf import settings
+from typing import Optional, Dict, Any
 
 import requests
 

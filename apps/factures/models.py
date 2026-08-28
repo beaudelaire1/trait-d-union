@@ -26,9 +26,7 @@ from apps.einvoicing.codelists import (
     InvoiceTypeCode,
     LifecycleState,
     TransactionType,
-    UN_UNIT_CODES,
     VATCategory,
-    VATEX_REASON_CODES,
     VATPaymentBasis,
     unit_code_choices,
     vatex_choices,
@@ -359,8 +357,10 @@ class Invoice(models.Model):
             total_ht -= discount
             total_tva -= (total_tva * ratio)
 
-        if total_ht < 0: total_ht = Decimal("0.00")
-        if total_tva < 0: total_tva = Decimal("0.00")
+        if total_ht < 0:
+            total_ht = Decimal("0.00")
+        if total_tva < 0:
+            total_tva = Decimal("0.00")
         
         self.total_ht = total_ht.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         self.tva = total_tva.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)

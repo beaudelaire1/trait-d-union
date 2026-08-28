@@ -25,7 +25,7 @@ import logging
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Optional
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -104,7 +104,7 @@ class _Session:
                 import requests
                 cls._instance = requests.Session()
                 cls._instance.headers["User-Agent"] = (
-                    "TUS-Portfolio-Audit/1.0 (+https://www.traitdunion.it)"
+                    "TUS-Portfolio-Audit/1.0 (+https://traitdunion.studio)"
                 )
             except ImportError:  # pragma: no cover
                 cls._instance = None

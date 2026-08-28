@@ -1,5 +1,5 @@
 """Tests for the pages app."""
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
 
 
@@ -10,6 +10,7 @@ class HomeViewTest(TestCase):
         """Test that the home page loads successfully."""
         response = self.client.get(reverse('pages:home'))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'pages/home_positioned.html')
         self.assertTemplateUsed(response, 'pages/home.html')
 
     def test_home_page_contains_cta(self):
@@ -25,14 +26,16 @@ class ServicesViewTest(TestCase):
         """Test that the services page loads successfully."""
         response = self.client.get(reverse('pages:services'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pages/services.html')
+        self.assertTemplateUsed(response, 'pages/services_positioned.html')
 
     def test_services_page_contains_offerings(self):
-        """Test that services page contains service offerings."""
+        """The public hierarchy must lead with business infrastructure."""
         response = self.client.get(reverse('pages:services'))
-        self.assertContains(response, 'Site Vitrine')
-        self.assertContains(response, 'E-commerce')
-        self.assertContains(response, 'Plateforme')
+        self.assertContains(response, 'Infrastructure métier sur mesure')
+        self.assertContains(response, 'Système de vente en ligne')
+        self.assertContains(response, 'Présence web stratégique')
+        self.assertContains(response, 'CRM')
+        self.assertContains(response, 'mini-ERP')
 
 
 class MethodViewTest(TestCase):
@@ -42,21 +45,24 @@ class MethodViewTest(TestCase):
         """Test that the method page loads successfully."""
         response = self.client.get(reverse('pages:method'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pages/method.html')
+        self.assertTemplateUsed(response, 'pages/method_positioned.html')
 
     def test_method_page_contains_steps(self):
-        """Test that method page contains process steps."""
+        """Test that method page contains the full delivery process."""
         response = self.client.get(reverse('pages:method'))
         self.assertContains(response, 'Découverte')
         self.assertContains(response, 'Stratégie')
         self.assertContains(response, 'Design')
+        self.assertContains(response, 'Développement')
+        self.assertContains(response, 'Lancement')
+        self.assertContains(response, 'Cartographie des flux')
 
 
 class LegalViewTest(TestCase):
     """Test the legal page view."""
 
     def test_legal_page_loads(self):
-        """Test that the legal page loads successfully."""
+        """Test that legal page loads successfully."""
         response = self.client.get(reverse('pages:legal'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'pages/legal.html')

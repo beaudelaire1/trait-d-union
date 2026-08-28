@@ -44,13 +44,13 @@ services:
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DJANGO_ALLOWED_HOSTS
-        value: traitdunion.it,www.traitdunion.it,.onrender.com
+        value: traitdunion.studio,www.traitdunion.studio,.onrender.com
       - key: CANONICAL_DOMAIN
-        value: www.traitdunion.it
+        value: traitdunion.studio
       - key: SITE_URL
-        value: https://www.traitdunion.it
+        value: https://traitdunion.studio
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://traitdunion.it,https://www.traitdunion.it,https://*.onrender.com
+        value: https://traitdunion.studio,https://www.traitdunion.studio,https://*.onrender.com
       
       # Base de données (lien automatique)
       - key: DATABASE_URL
@@ -64,13 +64,13 @@ services:
       
       # Email
       - key: DEFAULT_FROM_EMAIL
-        value: contact@traitdunion.it
+        value: contact@traitdunion.studio
       - key: DEFAULT_FROM_NAME
         value: "Trait d'Union Studio"
       - key: ADMIN_EMAIL
-        value: admin@traitdunion.it
+        value: contact@traitdunion.studio
       - key: TASK_NOTIFICATION_EMAIL
-        value: info@traitdunion.it
+        value: contact@traitdunion.studio
       
       # Stripe (à configurer manuellement - SECRETS)
       - key: STRIPE_SECRET_KEY
@@ -98,7 +98,7 @@ services:
       - key: DJANGO_SUPERUSER_USERNAME
         value: admin
       - key: DJANGO_SUPERUSER_EMAIL
-        value: admin@traitdunion.it
+        value: contact@traitdunion.studio
       - key: DJANGO_SUPERUSER_PASSWORD
         sync: false
 
@@ -184,9 +184,9 @@ services:
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: SITE_URL
-        value: https://www.traitdunion.it
+        value: https://traitdunion.studio
       - key: DEFAULT_FROM_EMAIL
-        value: contact@traitdunion.it
+        value: contact@traitdunion.studio
       - key: DEFAULT_FROM_NAME
         value: "Trait d'Union Studio"
       - key: BREVO_API_KEY

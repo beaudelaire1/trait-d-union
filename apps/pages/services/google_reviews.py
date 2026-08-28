@@ -22,7 +22,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Iterable, Optional
+from typing import Any, Optional
 
 from django.conf import settings
 from django.utils.dateparse import parse_datetime

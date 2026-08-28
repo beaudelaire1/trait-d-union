@@ -98,13 +98,13 @@
             gtag('config', window._tusGA4ID, {
                 'anonymize_ip': true,
                 'cookie_flags': 'SameSite=None;Secure',
-                'cookie_domain': 'traitdunion.it',
+                'cookie_domain': 'traitdunion.studio',
                 'cookie_expires': 63072000
             });
             window._tusGALoaded = true;
 
             // Tracking conversion contact (post-load)
-            if (window.location.pathname === '/contact/' && document.referrer.includes('traitdunion.it')) {
+            if (window.location.pathname === '/contact/' && document.referrer.includes('traitdunion.studio')) {
                 gtag('event', 'page_view_contact_form');
             }
         };

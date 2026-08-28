@@ -1,17 +1,17 @@
 """Dashboard views for the admin cockpit (Phase 5)."""
 from decimal import Decimal
-from datetime import date, timedelta
+from datetime import timedelta
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.cache import cache
 from django.shortcuts import render
 from django.utils import timezone
-from django.db.models import Sum, Count, Avg, Q, F
-from django.db.models.functions import TruncMonth, TruncWeek
+from django.db.models import Sum, Count
+from django.db.models.functions import TruncMonth
 
 from apps.devis.models import Quote
 from apps.factures.models import Invoice
 from apps.leads.models import Lead
-from apps.clients.models import ClientProfile, Project
+from apps.clients.models import Project
 
 DASHBOARD_CACHE_TTL = 300  # 5 minutes
 

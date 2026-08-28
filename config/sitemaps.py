@@ -16,14 +16,14 @@ logger = logging.getLogger(__name__)
 
 # Date de dernière mise à jour significative du site (à mettre à jour manuellement lors de changements majeurs)
 # Utilise datetime.timezone.utc (stdlib) — compatible Django 5.x ET 6.x
-_SITE_LAST_MODIFIED = datetime(2026, 2, 25, tzinfo=dt_tz.utc)
+_SITE_LAST_MODIFIED = datetime(2026, 8, 22, tzinfo=dt_tz.utc)
 
 
 class StaticViewSitemap(Sitemap):
     """Sitemap for static pages."""
-    
+
     changefreq = 'monthly'
-    
+
     def items(self):
         return [
             'pages:home',
@@ -39,14 +39,14 @@ class StaticViewSitemap(Sitemap):
             'chroniques:list',
             'portfolio:list',
         ]
-    
+
     def location(self, item):
         return reverse(item)
-    
+
     def lastmod(self, item):
         """Return the last modification date for static pages."""
         return _SITE_LAST_MODIFIED
-    
+
     def priority(self, item):
         # Priorité maximale pour pages stratégiques SEO Guyane/Outre-Mer
         priorities = {
@@ -68,33 +68,33 @@ class StaticViewSitemap(Sitemap):
 
 class PortfolioSitemap(Sitemap):
     """Sitemap for portfolio projects."""
-    
+
     changefreq = 'weekly'
     priority = 0.8
-    
+
     def items(self):
         try:
             return Project.objects.filter(is_published=True)
         except Exception:
             logger.exception("Sitemap portfolio generation failed; returning empty list")
             return []
-    
+
     def lastmod(self, obj):
         return obj.updated_at
 
 
 class ChroniquesSitemap(Sitemap):
     """Sitemap for blog articles (Chroniques TUS)."""
-    
+
     changefreq = 'weekly'
     priority = 0.7
-    
+
     def items(self):
         try:
             return Article.objects.filter(is_published=True)
         except Exception:
             logger.exception("Sitemap chroniques generation failed; returning empty list")
             return []
-    
+
     def lastmod(self, obj):
         return obj.updated_at

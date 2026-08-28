@@ -1,0 +1,21 @@
+target-version = "py312"
+line-length = 100
+extend-exclude = ["**/migrations/*.py"]
+
+[lint]
+# Blocking repository baseline: Python syntax/runtime hazards, Pyflakes
+# correctness checks, and core pycodestyle errors. Style-only normalization
+# remains separate from correctness and must not weaken this gate.
+select = ["E4", "E7", "E9", "F"]
+
+[lint.per-file-ignores]
+# The generator deliberately keeps Invoice as a forward reference to avoid a
+# model/service import cycle; postponed annotations make it runtime-safe.
+"apps/factures/services/pdf_generator.py" = ["F821"]
+# Django settings modules intentionally inherit an environment-specific base
+# through star imports. The imported settings are consumed by Django at module
+# level, so Pyflakes cannot statically resolve their use.
+"config/settings/development.py" = ["F403", "F405"]
+"config/settings/production.py" = ["F403", "F405"]
+"config/settings/test.py" = ["F403", "F405"]
+"config/settings/coolify.py" = ["F403", "F405"]

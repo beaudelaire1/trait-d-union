@@ -9,9 +9,15 @@ from django.contrib.sitemaps.views import x_robots_tag, _get_latest_lastmod
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
-from django.urls import path, include, URLPattern, URLResolver
+from django.urls import path, include, URLPattern
 from django.utils.http import http_date
 from django.views.generic import TemplateView
+from django_otp.admin import OTPAdminSite
+
+from apps.pages.healthz import healthz
+from config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap
+from core.views_session import session_ping
+from core.views_totp import totp_qr_code
 
 
 def _staff_protected_include(module):
@@ -32,9 +38,6 @@ def _staff_protected_include(module):
     return url_patterns, app_ns, inst_ns
 
 # 🛡️ SECURITY: OTP-protected admin site (2FA required for all staff)
-from django_otp.admin import OTPAdminSite
-
-
 class TUSOTPAdminSite(OTPAdminSite):
     """OTPAdminSite with TOTP QR code URL injected into login context."""
 
@@ -46,11 +49,6 @@ class TUSOTPAdminSite(OTPAdminSite):
 
 
 admin.site.__class__ = TUSOTPAdminSite
-
-from config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap
-from apps.pages.healthz import healthz
-from core.views_totp import totp_qr_code
-from core.views_session import session_ping
 
 
 # Sitemap configuration

@@ -335,11 +335,11 @@ def send_field_report(diag, actor=None):
     filename, pdf_bytes = _render_field_pdf(diag)
     context = {
         "diag": diag,
-        "site_url": getattr(settings, "SITE_URL", "https://traitdunion.it"),
+        "site_url": getattr(settings, "SITE_URL", "https://traitdunion.studio"),
     }
     html_body = render_to_string("emails/field_diagnostic_report.html", context)
     text_body = render_to_string("emails/field_diagnostic_report.txt", context)
-    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "contact@traitdunion.it")
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "contact@traitdunion.studio")
 
     msg = EmailMultiAlternatives(
         subject=f"Votre diagnostic d'entreprise — {diag.company_name}",

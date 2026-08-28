@@ -41,11 +41,11 @@ def _base_url(request=None) -> str:
     Toujours utiliser SITE_URL pour éviter les liens localhost
     derrière un reverse-proxy (Render, Nginx, etc.).
     """
-    url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.it')).rstrip('/')
+    url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
     # Sécurité : ne jamais envoyer un lien localhost/127.0.0.1 par email
     if 'localhost' in url or '127.0.0.1' in url or '0.0.0.0' in url:
-        logger.warning(f"SITE_URL contient localhost ({url!r}), fallback sur https://traitdunion.it")
-        url = 'https://traitdunion.it'
+        logger.warning(f"SITE_URL contient localhost ({url!r}), fallback sur https://traitdunion.studio")
+        url = 'https://traitdunion.studio'
     return url
 
 
@@ -92,7 +92,7 @@ def _send_via_django(
     email = EmailMessage(
         subject=subject,
         body=html_body,
-        from_email=from_email or getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it'),
+        from_email=from_email or getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio'),
         to=[recipient]
     )
     email.content_subtype = 'html'
@@ -173,14 +173,14 @@ def send_quote_email(quote, request=None, *, to_email: Optional[str] = None) -> 
         },
     )
 
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or 'contact@traitdunion.it'
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or 'contact@traitdunion.studio'
     from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
     
     # Email admin pour copie (TASK_NOTIFICATION_EMAIL ou ADMIN_EMAIL)
     admin_email = (
         getattr(settings, 'TASK_NOTIFICATION_EMAIL', None) or 
         getattr(settings, 'ADMIN_EMAIL', None) or 
-        'contact@traitdunion.it'
+        'contact@traitdunion.studio'
     )
     
     # Générer le PDF pour la pièce jointe
@@ -271,7 +271,7 @@ def send_quote_validation_code(quote, validation, request=None, *, to_email: Opt
     code_url = f"{base}{reverse('devis:quote_validate_code', kwargs={'token': validation.token})}"
 
     subject = f"Code de confirmation pour valider le devis {quote.number}"
-    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or 'contact@traitdunion.it'
+    from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None) or 'contact@traitdunion.studio'
     from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
     client_name = getattr(client, 'full_name', '') if client else ''
 

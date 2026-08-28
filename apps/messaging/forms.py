@@ -5,7 +5,17 @@ from .models import Prospect, EmailCampaign, EmailTemplate
 
 class ProspectForm(forms.ModelForm):
     """Form for creating/editing prospects."""
-    
+
+    website = forms.URLField(
+        required=False,
+        max_length=200,
+        assume_scheme='https',
+        widget=forms.URLInput(attrs={
+            'class': 'form-input',
+            'placeholder': 'https://www.exemple.com'
+        }),
+    )
+
     class Meta:
         model = Prospect
         fields = [
@@ -40,10 +50,6 @@ class ProspectForm(forms.ModelForm):
             'phone': forms.TextInput(attrs={
                 'class': 'form-input',
                 'placeholder': '+594 694 XX XX XX'
-            }),
-            'website': forms.URLInput(attrs={
-                'class': 'form-input',
-                'placeholder': 'https://www.exemple.com'
             }),
             'sector': forms.Select(attrs={'class': 'form-select'}),
             'activity_description': forms.Textarea(attrs={
@@ -81,14 +87,14 @@ class ProspectForm(forms.ModelForm):
 
 class ProspectQuickEmailForm(forms.Form):
     """Quick email form for prospect detail page."""
-    
+
     template = forms.ModelChoiceField(
         queryset=EmailTemplate.objects.filter(is_active=True),
         required=False,
         empty_label="Template par défaut",
         widget=forms.Select(attrs={'class': 'form-select'})
     )
-    
+
     custom_message = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={
@@ -101,7 +107,7 @@ class ProspectQuickEmailForm(forms.Form):
 
 class CampaignForm(forms.ModelForm):
     """Form for creating email campaigns."""
-    
+
     class Meta:
         model = EmailCampaign
         fields = ['name', 'template', 'scheduled_at']
@@ -120,7 +126,7 @@ class CampaignForm(forms.ModelForm):
 
 class ProspectImportForm(forms.Form):
     """Form for importing prospects from CSV."""
-    
+
     csv_file = forms.FileField(
         label='Fichier CSV',
         help_text='Format: email, contact_name, company_name, phone, sector, source',

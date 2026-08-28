@@ -34,7 +34,6 @@ def healthz(request):
 
     # Redis check (if configured separately from cache)
     try:
-        from django.conf import settings
         redis_url = getattr(settings, 'REDIS_URL', None)
         if redis_url:
             import redis

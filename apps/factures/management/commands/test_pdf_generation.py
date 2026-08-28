@@ -3,7 +3,6 @@ Commande pour tester la génération de PDF en local.
 Usage: python manage.py test_pdf_generation
 """
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
 
 from decimal import Decimal
 from datetime import date
@@ -67,7 +66,7 @@ class Command(BaseCommand):
     def _create_test_client(self):
         """Crée un client de test."""
         client, created = ClientProfile.objects.get_or_create(
-            email="test@traitdunion.it",
+            email="test@traitdunion.studio",
             defaults={
                 "full_name": "Test Client",
                 "phone": "+594695358041",

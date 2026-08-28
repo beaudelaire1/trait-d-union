@@ -5,7 +5,6 @@ Génère le rapport PDF d'un simulateur et l'envoie par email au lead.
 from __future__ import annotations
 
 import logging
-from typing import Any
 
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -14,7 +13,8 @@ from django.utils import timezone
 from core.services.document_generator import DocumentGenerator
 
 from .models import SimulatorReport
-from .report_content import get_content_for, interpret
+from .report_content import interpret
+from .report_content_overrides import get_content_for
 
 logger = logging.getLogger(__name__)
 
@@ -90,10 +90,10 @@ class SimulatorReportService:
 
         try:
             cls.send(report, pdf_bytes=pdf_bytes, charts=charts)
-        except Exception as exc:  # noqa: BLE001
-            logger.error(
-                "Échec envoi rapport simulateur #%s : %s",
-                report.pk, exc, exc_info=True,
+        except Exception as exc:
+            logger.exception(
+                "Échec envoi rapport simulateur #%s",
+                report.pk,
             )
             SimulatorReport.objects.filter(pk=report.pk).update(
                 send_attempts=F('send_attempts') + 1,
@@ -129,14 +129,14 @@ class SimulatorReportService:
         context = {
             'report': report,
             'tool_name': report.tool_name,
-            'site_url': getattr(settings, 'SITE_URL', 'https://traitdunion.it'),
+            'site_url': getattr(settings, 'SITE_URL', 'https://traitdunion.studio'),
         }
         html_body = render_to_string('emails/simulateur_report.html', context)
         text_body = render_to_string('emails/simulateur_report.txt', context)
 
         subject = f"Votre rapport : {report.tool_name}"
         from_email = getattr(
-            settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.it'
+            settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio'
         )
 
         msg = EmailMultiAlternatives(
@@ -151,10 +151,11 @@ class SimulatorReportService:
 
         try:
             msg.send(fail_silently=False)
-        except Exception as exc:  # noqa: BLE001
-            logger.error(
-                "Échec envoi rapport simulateur %s à %s : %s",
-                report.tool_slug, report.email, exc, exc_info=True,
+        except Exception as exc:
+            logger.exception(
+                "Échec envoi rapport simulateur %s à %s",
+                report.tool_slug,
+                report.email,
             )
             report.send_error = str(exc)[:500]
             report.save(update_fields=['send_error'])
@@ -168,6 +169,7 @@ class SimulatorReportService:
             admin_email = getattr(settings, 'ADMIN_EMAIL', None)
             if admin_email:
                 from django.core.mail import send_mail
+
                 send_mail(
                     subject=f"[Lead simulateur] {report.tool_name} – {report.email}",
                     message=(
@@ -182,5 +184,5 @@ class SimulatorReportService:
                     recipient_list=[admin_email],
                     fail_silently=True,
                 )
-        except Exception:  # noqa: BLE001
+        except Exception:
             logger.exception("Échec notification admin lead simulateur")

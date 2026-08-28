@@ -32,7 +32,7 @@ services:
       - DEBUG=False
       # Brevo (optionnel en local)
       - BREVO_API_KEY=${BREVO_API_KEY:-}
-      - DEFAULT_FROM_EMAIL=contact@traitdunion.it
+      - DEFAULT_FROM_EMAIL=contact@traitdunion.studio
     volumes:
       # Monter le code source pour le développement
       - .:/app:cached

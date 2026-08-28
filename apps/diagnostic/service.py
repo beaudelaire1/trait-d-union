@@ -28,7 +28,7 @@ _LINK_CHECK_WORKERS = 5   # parallélisme pour les HEAD requests
 _CATEGORY_WORKERS = 7     # une catégorie par thread
 USER_AGENT = (
     "Mozilla/5.0 (compatible; TUS-Diagnostic/1.0; "
-    "+https://www.traitdunion.it)"
+    "+https://traitdunion.studio)"
 )
 
 
@@ -370,7 +370,7 @@ def _check_accessibility(soup):
     items.append({
         "name": "Hiérarchie des titres",
         "passed": has_hierarchy and not skips,
-        "detail": f"Niveaux : {' → '.join(f'h{l}' for l in levels[:8])}" + (" ⚠ saut" if skips else ""),
+        "detail": f"Niveaux : {' → '.join(f'h{level}' for level in levels[:8])}" + (" ⚠ saut" if skips else ""),
     })
     return _score(items, "Accessibilité")
 

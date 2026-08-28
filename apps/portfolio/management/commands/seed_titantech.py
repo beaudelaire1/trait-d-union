@@ -4,7 +4,7 @@ Usage :
     python manage.py seed_titantech            # créé / met à jour
     python manage.py seed_titantech --clear    # supprime le projet de démo
 
-Le projet pointe sur https://www.traitdunion.it pour pouvoir tester le Ch.05
+Le projet pointe sur https://traitdunion.studio pour pouvoir tester le Ch.05
 (audit performance) sur un vrai site en ligne.
 
 Idempotent : la commande s'appuie sur le slug ``titantech``. Relancée, elle
@@ -20,7 +20,7 @@ from django.core.management.base import BaseCommand
 
 
 SLUG = "titantech"
-PROJECT_URL = "https://www.traitdunion.it"
+PROJECT_URL = "https://traitdunion.studio"
 
 
 class Command(BaseCommand):

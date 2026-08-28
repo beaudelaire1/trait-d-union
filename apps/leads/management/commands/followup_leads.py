@@ -84,7 +84,7 @@ class Command(BaseCommand):
         """Email de relance J+2 pour un lead NEW."""
         from core.tasks import async_send_generic_email
 
-        site_url = str(getattr(settings, 'SITE_URL', 'https://www.traitdunion.it')).rstrip('/')
+        site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
         first_name = lead.name.split()[0] if lead.name else 'Bonjour'
 
         subject = f"{first_name}, avez-vous des questions sur votre projet ?"
@@ -112,7 +112,7 @@ class Command(BaseCommand):
   <tr><td style="padding:24px 40px;border-top:1px solid rgba(246,247,251,0.08);text-align:center;">
     <p style="margin:0;font-size:0.78rem;color:rgba(246,247,251,0.35);">
       Trait d'Union Studio · Cayenne, Guyane<br>
-      <a href="mailto:contact@traitdunion.it" style="color:#4D6FFF;text-decoration:none;">contact@traitdunion.it</a>
+      <a href="mailto:contact@traitdunion.studio" style="color:#4D6FFF;text-decoration:none;">contact@traitdunion.studio</a>
     </p>
   </td></tr>
 </table>
@@ -125,7 +125,7 @@ class Command(BaseCommand):
         """Email de relance J+7 pour un lead CONTACTED."""
         from core.tasks import async_send_generic_email
 
-        site_url = str(getattr(settings, 'SITE_URL', 'https://www.traitdunion.it')).rstrip('/')
+        site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
         first_name = lead.name.split()[0] if lead.name else 'Bonjour'
 
         subject = f"Dernière relance — votre projet web, {first_name}"

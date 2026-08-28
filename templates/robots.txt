@@ -32,4 +32,4 @@ Disallow: /factures/webhook/
 Disallow: /tinymce/
 
 # Sitemap
-Sitemap: https://www.traitdunion.it/sitemap.xml
+Sitemap: https://traitdunion.studio/sitemap.xml

@@ -5,6 +5,7 @@ Used by pytest and GitHub Actions CI/CD pipeline.
 from .base import *  # noqa: F401,F403
 
 import os
+import tempfile
 
 # ==============================================================================
 # CORE SETTINGS
@@ -74,7 +75,6 @@ PASSWORD_HASHERS = [
 # ==============================================================================
 # MEDIA FILES (Temporary pour les tests)
 # ==============================================================================
-import tempfile
 MEDIA_ROOT = tempfile.mkdtemp()
 
 # ==============================================================================

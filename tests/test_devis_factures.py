@@ -1,9 +1,7 @@
 """Tests for devis views, factures views, email backends, payment email service."""
-import json
 import pytest
-from decimal import Decimal
-from unittest.mock import patch, MagicMock
-from django.test import Client, RequestFactory, override_settings
+from unittest.mock import patch
+from django.test import override_settings
 from django.contrib.auth.models import User
 
 from apps.devis.models import Quote

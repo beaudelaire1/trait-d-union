@@ -11,10 +11,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Dict, Any
 
-from django.db import transaction, IntegrityError
+from django.db import transaction
 from django.contrib.auth.models import User
 from django.utils import timezone
-from django.core.exceptions import ValidationError
 
 from apps.devis.models import Quote
 from apps.clients.models import ClientProfile

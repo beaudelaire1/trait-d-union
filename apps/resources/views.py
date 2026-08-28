@@ -4,7 +4,6 @@ from __future__ import annotations
 from django.http import FileResponse, HttpRequest, HttpResponse, Http404
 from django.views.generic import TemplateView, View
 from django.conf import settings
-from django.utils.encoding import smart_str
 
 
 class ResourcesView(TemplateView):

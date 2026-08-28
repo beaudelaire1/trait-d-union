@@ -11,6 +11,8 @@ Configuration optimale pour :
 from .base import *  # noqa: F401,F403
 
 import dj_database_url
+import re
+import sys
 
 # TOUJOURS False en production - ne jamais utiliser de variable d'env pour DEBUG
 DEBUG = False
@@ -21,15 +23,15 @@ DEBUG = False
 # 🛡️ ZERO TRUST: Strict domain whitelist - NO wildcards
 ALLOWED_HOSTS = [
     'trait-d-union.onrender.com',  # Render exact subdomain
-    'traitdunion.it',
-    'www.traitdunion.it',
+    'traitdunion.studio',
+    'www.traitdunion.studio',
 ]
 
 # CSRF trusted origins - DOIT inclure le scheme https://
 CSRF_TRUSTED_ORIGINS = [
     'https://trait-d-union.onrender.com',
-    'https://traitdunion.it',
-    'https://www.traitdunion.it',
+    'https://traitdunion.studio',
+    'https://www.traitdunion.studio',
 ]
 
 # Sécurité HTTPS
@@ -49,9 +51,8 @@ SECURE_CONTENT_TYPE_NOSNIFF = True  # X-Content-Type-Options: nosniff
 X_FRAME_OPTIONS = 'DENY'  # Protection clickjacking
 SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
-# 🔍 SEO: Canonical domain (www ↔ apex). Default aligns with Cloudflare redirect
-# to www to avoid redirect loops. Override via env if you want apex.
-CANONICAL_DOMAIN = os.environ.get('CANONICAL_DOMAIN', 'www.traitdunion.it')
+# 🔍 SEO: the apex .studio domain is canonical; www is redirected to it.
+CANONICAL_DOMAIN = os.environ.get('CANONICAL_DOMAIN', 'traitdunion.studio')
 
 # Permissions Policy (anciennement Feature-Policy)
 # 🛡️ BANK-GRADE: Exhaustive permissions lockdown
@@ -78,7 +79,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin'
 # 🛡️ BANK-GRADE: Restrict session cookie to production domain
 # Ne PAS fixer SESSION_COOKIE_DOMAIN : Django utilise automatiquement le
 # domaine de la requête, ce qui évite les problèmes de cookies rejetés
-# pendant les redirections (ex: .onrender.com → traitdunion.it).
+# pendant les redirections (ex: .onrender.com → traitdunion.studio).
 # Avec la valeur par défaut (None), le cookie s'applique uniquement à l'hôte
 # qui sert la page, ce qui est le comportement correct derrière un reverse proxy.
 
@@ -119,9 +120,12 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 # Cache-Control: public, max-age=31536000, immutable
 WHITENOISE_MAX_AGE = 31536000  # 365 jours
 # 🛡️ SECURITY: Only hash-named files are immutable (not robots.txt, sitemap, etc.)
-import re
 _HASHED_FILE_RE = re.compile(r'\.[a-f0-9]{8,32}\.')
-WHITENOISE_IMMUTABLE_FILE_TEST = lambda path, url: bool(_HASHED_FILE_RE.search(url))
+
+def _is_whitenoise_immutable_file(path, url):
+    return bool(_HASHED_FILE_RE.search(url))
+
+WHITENOISE_IMMUTABLE_FILE_TEST = _is_whitenoise_immutable_file
 
 # ==============================================================================
 # MEDIA FILES (Cloudinary - recommandé pour simplicité)
@@ -132,7 +136,6 @@ CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET')
 CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
 
 # Vérifier si on est en train de builder (collectstatic)
-import sys
 IS_BUILDING = 'collectstatic' in sys.argv
 
 if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY):

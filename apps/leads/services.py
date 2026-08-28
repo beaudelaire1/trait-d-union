@@ -71,7 +71,7 @@ class EmailService:
                     {'label': 'Type de projet', 'value': lead.get_project_type_display()},
                     {'label': 'Budget estimé', 'value': lead.get_budget_display() or 'Non spécifié'},
                 ],
-                'action_url': getattr(settings, 'SITE_URL', 'https://traitdunion.it'),
+                'action_url': getattr(settings, 'SITE_URL', 'https://traitdunion.studio'),
                 'action_label': 'Visiter notre site',
             },
         )
@@ -94,7 +94,7 @@ class EmailService:
         
         # Template HTML premium TUS pour l'admin
         branding = getattr(settings, 'INVOICE_BRANDING', {})
-        site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.it').rstrip('/')
+        site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.studio').rstrip('/')
         
         html_body = render_to_string(
             'emails/notification_generic.html',
@@ -102,7 +102,7 @@ class EmailService:
                 'brand': branding.get('name', "Trait d'Union Studio"),
                 'headline': '🔔 Nouveau contact reçu',
                 'title': 'Notification Admin',
-                'intro': f"Un nouveau prospect vient de vous contacter via le formulaire du site.",
+                'intro': "Un nouveau prospect vient de vous contacter via le formulaire du site.",
                 'rows': [
                     {'label': 'Nom', 'value': lead.name},
                     {'label': 'Email', 'value': lead.email},
@@ -122,7 +122,7 @@ class EmailService:
         admin_email = (
             os.environ.get('TASK_NOTIFICATION_EMAIL') or
             os.environ.get('ADMIN_EMAIL') or 
-            getattr(settings, 'ADMIN_EMAIL', 'contact@traitdunion.it')
+            getattr(settings, 'ADMIN_EMAIL', 'contact@traitdunion.studio')
         )
         
         return _send_email(admin_email, subject, message, html_body)

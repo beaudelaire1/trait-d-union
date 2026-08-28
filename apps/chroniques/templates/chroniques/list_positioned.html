@@ -1,0 +1,6 @@
+{% extends 'chroniques/list.html' %}
+
+{% block title %}Chroniques TUS — Entreprise, pilotage & transformation numérique{% endblock %}
+{% block meta_description %}Analyses de Trait d'Union Studio sur l'organisation, le pilotage, la transformation numérique, les outils métier, l'automatisation et les réalités économiques de la Guyane et des Outre-mer.{% endblock %}
+{% block meta_keywords %}transformation numérique guyane, pilotage entreprise guyane, automatisation pme guyane, logiciel métier guyane, organisation entreprise outre-mer, outils gestion pme, chroniques business guyane{% endblock %}
+{% block canonical_url %}{{ request.scheme }}://{{ canonical_host }}{% url 'chroniques:list' %}{% endblock %}

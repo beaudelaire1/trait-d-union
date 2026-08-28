@@ -14,7 +14,7 @@ from apps.diagnostic.field_scoring import (
     detect_signals, urgency_level,
 )
 from apps.diagnostic.field_questions import (
-    questions_for_profile, PROFILES, SECTORS, QUESTIONS,
+    questions_for_profile, PROFILES, QUESTIONS,
 )
 
 

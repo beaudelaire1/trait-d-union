@@ -11,8 +11,8 @@ Cette configuration expose les routes suivantes :
 """
 
 from django.urls import path
-from . import views
 
+from . import public_views, views
 
 app_name = "devis"
 
@@ -26,14 +26,15 @@ urlpatterns = [
     path("admin/<int:pk>/", views.admin_quote_edit, name="admin_quote_edit"),
     # Endpoint JSON pour récupérer les infos d'un service
     path("service/<int:pk>/", views.service_info, name="service_info"),
-    path("admin/quote/<int:pk>/generate-pdf/",views.admin_generate_quote_pdf, name="quote-generate-pdf",
+    path(
+        "admin/quote/<int:pk>/generate-pdf/",
+        views.admin_generate_quote_pdf,
+        name="quote-generate-pdf",
     ),
-
     # Validation client (2 facteurs) + accès PDF sécurisé
     path("valider/<str:token>/", views.quote_validate_start, name="quote_validate_start"),
     path("valider/<str:token>/code/", views.quote_validate_code, name="quote_validate_code"),
-    path("pdf/<str:token>/", views.quote_public_pdf, name="quote_public_pdf"),
-    
+    path("pdf/<str:token>/", public_views.quote_public_pdf, name="quote_public_pdf"),
     # ===========================================
     # PHASE 3 : Signature électronique & Paiement
     # ===========================================

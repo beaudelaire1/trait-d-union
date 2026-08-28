@@ -15,7 +15,6 @@ Aucune écriture en base : crée des objets en transaction qui est rollback
 
 from __future__ import annotations
 
-import os
 from decimal import Decimal
 from io import BytesIO
 from pathlib import Path
@@ -36,9 +35,7 @@ class Command(BaseCommand):
         from apps.einvoicing.builders.cii import build_cii_xml
         from apps.einvoicing.builders.facturx import (
             FACTURX_FILENAME,
-            build_facturx_pdf,
         )
-        from apps.factures.models import Invoice, InvoiceItem
 
         out_dir = Path(options["out"]).resolve()
         out_dir.mkdir(parents=True, exist_ok=True)

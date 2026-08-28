@@ -1,12 +1,9 @@
 import logging
 from django.conf import settings
 from django.core.mail import send_mail
-from django.template.loader import render_to_string
 from django.utils import timezone
-import requests
-import json
 
-from .models import Prospect, ProspectMessage, EmailTemplate
+from .models import EmailTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -48,13 +45,6 @@ def send_prospection_template(prospect, template_slug='prospection-standard'):
         if not template:
             return {'success': False, 'error': f"Template {template_slug} not found"}
             
-        # Render template context
-        context = {
-            'prospect': prospect,
-            'contact_name': prospect.contact_name,
-            'company_name': prospect.company_name,
-        }
-        
         # If template is stored as database content
         # We might need to render the liquid/django tags inside the content
         # For simplicity, let's assume content is just HTML string

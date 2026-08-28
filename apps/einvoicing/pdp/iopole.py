@@ -128,7 +128,7 @@ class IopoleClient(PDPClient):
         session.headers.update({
             "Accept": "application/json",
             "Content-Type": "application/json",
-            "User-Agent": "TUS-eInvoicing/1.0 (+https://traitdunion.it)",
+            "User-Agent": "TUS-eInvoicing/1.0 (+https://traitdunion.studio)",
         })
         self._session = session
         return session

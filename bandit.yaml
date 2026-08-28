@@ -1,0 +1,9 @@
+# Bandit policy for the Django application.
+#
+# B101: assertions are present in test/support code and are not a production
+# security boundary.
+# B104: this repository does not bind application sockets in Python; the
+# reported occurrences are comparisons used to reject localhost/0.0.0.0 URLs.
+skips:
+  - B101
+  - B104

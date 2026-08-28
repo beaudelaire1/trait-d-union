@@ -4,15 +4,20 @@ from __future__ import annotations
 from django import forms
 from django.core.exceptions import ValidationError
 from phonenumber_field.formfields import SplitPhoneNumberField
-from phonenumber_field.widgets import PhoneNumberPrefixWidget
 
-from .models import Lead, ProjectTypeChoice, BudgetRange
+from .models import Lead, ProjectTypeChoice
 
 
 class ContactForm(forms.ModelForm):
     """Main contact form with dynamic fields based on project type."""
 
     phone = SplitPhoneNumberField(label="Téléphone", required=False)
+    existing_url = forms.URLField(
+        label="Site existant",
+        required=False,
+        max_length=500,
+        assume_scheme='https',
+    )
 
     # Magic bytes signatures for file type validation
     _MAGIC_SIGNATURES = {
