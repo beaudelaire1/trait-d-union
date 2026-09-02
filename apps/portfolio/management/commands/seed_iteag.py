@@ -2,6 +2,7 @@
 
 Usage :
     python manage.py seed_iteag              # créé / met à jour
+    python manage.py seed_iteag --si-absent  # ne crée que si la fiche manque
     python manage.py seed_iteag --clear      # supprime le projet
     python manage.py seed_iteag --sans-images  # ne réattache pas les captures
 
@@ -24,6 +25,7 @@ from pathlib import Path
 
 from django.core.files import File
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 
 SLUG = "iteag"
@@ -48,10 +50,23 @@ class Command(BaseCommand):
             help="Supprime le projet (et ses phases / images).",
         )
         parser.add_argument(
+            "--si-absent", action="store_true",
+            help=(
+                "Ne fait rien si la fiche existe déjà. Mode du post-déploiement : "
+                "le premier déploiement publie l'étude de cas, les suivants "
+                "laissent intactes les retouches faites depuis l'admin."
+            ),
+        )
+        parser.add_argument(
             "--sans-images", action="store_true",
             help="Ne réattache pas les captures (contenu textuel seulement).",
         )
 
+    # La fiche, ses captures et ses phases arrivent ensemble ou pas du tout.
+    # Sans cela, un envoi de capture qui échoue — le stockage est distant en
+    # production — laisse une fiche créée mais vide, que « --si-absent »
+    # figerait à chaque déploiement suivant.
+    @transaction.atomic
     def handle(self, *args, **options):
         from apps.portfolio.models import (
             Project,
@@ -68,6 +83,22 @@ class Command(BaseCommand):
                 f"[OK] {count} projet(s) supprimé(s) (slug={SLUG!r})."
             ))
             return
+
+        if options["si_absent"]:
+            existante = Project.objects.filter(slug=SLUG).first()
+            # Une fiche sans phase n'est pas une fiche : c'est le résidu d'un
+            # passage interrompu. La sauter la figerait dans cet état. On ne
+            # s'abstient que devant une étude de cas effectivement montée.
+            if existante is not None and StrategyPhase.objects.filter(project=existante).exists():
+                self.stdout.write(
+                    f"[--] Fiche « {SLUG} » déjà présente : rien à faire (--si-absent)."
+                )
+                return
+            if existante is not None:
+                self.stdout.write(self.style.WARNING(
+                    f"[!!] Fiche « {SLUG} » présente mais sans phase — passage "
+                    "précédent interrompu. Réécriture."
+                ))
 
         # ── Identité projet ──────────────────────────────────────────
         defaults = dict(
@@ -149,9 +180,12 @@ class Command(BaseCommand):
                 "<li><strong>13 applications métier</strong> aux dépendances "
                 "déclarées — le graphe est vérifié à chaque exécution de la suite, "
                 "une dépendance non déclarée fait échouer les tests.</li>"
-                "<li><strong>1 459 tests</strong> répartis sur 127 modules, "
-                "exécutés sur PostgreSQL comme en intégration continue.</li>"
-                "<li><strong>≈ 54 000 lignes de Python</strong> et plus de 200 "
+                "<li><strong>1 459 fonctions de test sur 127 modules</strong>, "
+                "soit 3 092 cas exécutés, sur PostgreSQL comme en intégration "
+                "continue. <strong>93 % de couverture</strong> — et 100 % sur "
+                "le point de contrôle d'accès, celui dont dépend la valeur des "
+                "cours filmés.</li>"
+                "<li><strong>≈ 55 000 lignes de Python</strong> et plus de 200 "
                 "gabarits, sans dépendance à un plugin propriétaire.</li>"
                 "<li><strong>Un jeu de démonstration idempotent</strong> qui peuple "
                 "toute la plateforme : chaque écran y montre au moins un cas de "
