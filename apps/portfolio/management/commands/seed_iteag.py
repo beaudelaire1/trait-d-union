@@ -25,6 +25,7 @@ from pathlib import Path
 
 from django.core.files import File
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 
 SLUG = "iteag"
@@ -61,6 +62,11 @@ class Command(BaseCommand):
             help="Ne réattache pas les captures (contenu textuel seulement).",
         )
 
+    # La fiche, ses captures et ses phases arrivent ensemble ou pas du tout.
+    # Sans cela, un envoi de capture qui échoue — le stockage est distant en
+    # production — laisse une fiche créée mais vide, que « --si-absent »
+    # figerait à chaque déploiement suivant.
+    @transaction.atomic
     def handle(self, *args, **options):
         from apps.portfolio.models import (
             Project,
@@ -78,11 +84,21 @@ class Command(BaseCommand):
             ))
             return
 
-        if options["si_absent"] and Project.objects.filter(slug=SLUG).exists():
-            self.stdout.write(
-                f"[--] Fiche « {SLUG} » déjà présente : rien à faire (--si-absent)."
-            )
-            return
+        if options["si_absent"]:
+            existante = Project.objects.filter(slug=SLUG).first()
+            # Une fiche sans phase n'est pas une fiche : c'est le résidu d'un
+            # passage interrompu. La sauter la figerait dans cet état. On ne
+            # s'abstient que devant une étude de cas effectivement montée.
+            if existante is not None and StrategyPhase.objects.filter(project=existante).exists():
+                self.stdout.write(
+                    f"[--] Fiche « {SLUG} » déjà présente : rien à faire (--si-absent)."
+                )
+                return
+            if existante is not None:
+                self.stdout.write(self.style.WARNING(
+                    f"[!!] Fiche « {SLUG} » présente mais sans phase — passage "
+                    "précédent interrompu. Réécriture."
+                ))
 
         # ── Identité projet ──────────────────────────────────────────
         defaults = dict(
