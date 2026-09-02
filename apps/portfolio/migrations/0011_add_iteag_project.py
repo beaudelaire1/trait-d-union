@@ -190,6 +190,11 @@ PHASES = [
 
 
 def forwards(apps, schema_editor):
+    """Écrit la fiche et ses phases, sans toucher aux images.
+
+    Les champs d'image ne figurent pas dans ``defaults`` : une capture
+    téléversée depuis l'admin survit donc à une réexécution.
+    """
     Project = apps.get_model("portfolio", "Project")
     StrategyPhase = apps.get_model("portfolio", "StrategyPhase")
 
@@ -225,8 +230,33 @@ def forwards(apps, schema_editor):
 
 
 def backwards(apps, schema_editor):
+    """Retire la fiche — sauf si quelqu'un l'a reprise depuis.
+
+    Annuler une migration doit rendre la base à son état d'avant, pas
+    détruire ce qui est arrivé après. Tant que la fiche porte exactement le
+    texte semé ici et aucune image, elle n'existe que par cette migration :
+    on la supprime, ses phases avec elle. Dès qu'elle a été rédigée dans
+    l'admin ou qu'une capture y a été téléversée — ou qu'un projet du même
+    slug préexistait — le travail n'est pas le nôtre : on la laisse.
+    """
     Project = apps.get_model("portfolio", "Project")
-    Project.objects.filter(slug=SLUG).delete()
+
+    project = Project.objects.filter(slug=SLUG).first()
+    if project is None:
+        return
+
+    inchangee = (
+        project.objective == OBJECTIF
+        and project.solution == DEFI
+        and project.strategy == STRATEGIE
+        and project.result == RESULTAT
+        and not project.image_ch02
+        and not project.image_ch03
+        and not project.image_ch04
+        and not project.thumbnail
+    )
+    if inchangee:
+        project.delete()
 
 
 class Migration(migrations.Migration):

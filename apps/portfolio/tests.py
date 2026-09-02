@@ -177,3 +177,43 @@ class SeededCaseStudyTest(TestCase):
         """Elle apparaît dans « Nos signatures »."""
         response = self.client.get(reverse('portfolio:list'))
         self.assertContains(response, 'ITEAG')
+
+
+class SeedMigrationReverseTest(TestCase):
+    """Le retour arrière de la migration ITEAG ne doit rien détruire d'autre."""
+
+    @staticmethod
+    def _migration():
+        import importlib
+        return importlib.import_module(
+            'apps.portfolio.migrations.0011_add_iteag_project'
+        )
+
+    def test_reverse_removes_untouched_seed(self):
+        """Une fiche restée telle que semée disparaît avec la migration."""
+        from django.apps import apps as global_apps
+        self._migration().backwards(global_apps, None)
+        self.assertFalse(Project.objects.filter(slug='iteag').exists())
+
+    def test_reverse_keeps_edited_project(self):
+        """Une fiche reprise dans l'admin survit au retour arrière."""
+        from django.apps import apps as global_apps
+        project = Project.objects.get(slug='iteag')
+        project.objective = '<p>Texte réécrit par le secrétariat.</p>'
+        project.save(update_fields=['objective'])
+
+        self._migration().backwards(global_apps, None)
+
+        project.refresh_from_db()
+        self.assertEqual(project.objective, '<p>Texte réécrit par le secrétariat.</p>')
+
+    def test_reverse_keeps_project_with_uploaded_image(self):
+        """Une capture téléversée suffit à retenir la fiche."""
+        from django.apps import apps as global_apps
+        Project.objects.filter(slug='iteag').update(
+            image_ch04='portfolio/chapters/iteag-resultat.png'
+        )
+
+        self._migration().backwards(global_apps, None)
+
+        self.assertTrue(Project.objects.filter(slug='iteag').exists())
