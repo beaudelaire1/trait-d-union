@@ -2,6 +2,7 @@
 
 Usage :
     python manage.py seed_iteag              # créé / met à jour
+    python manage.py seed_iteag --si-absent  # ne crée que si la fiche manque
     python manage.py seed_iteag --clear      # supprime le projet
     python manage.py seed_iteag --sans-images  # ne réattache pas les captures
 
@@ -48,6 +49,14 @@ class Command(BaseCommand):
             help="Supprime le projet (et ses phases / images).",
         )
         parser.add_argument(
+            "--si-absent", action="store_true",
+            help=(
+                "Ne fait rien si la fiche existe déjà. Mode du post-déploiement : "
+                "le premier déploiement publie l'étude de cas, les suivants "
+                "laissent intactes les retouches faites depuis l'admin."
+            ),
+        )
+        parser.add_argument(
             "--sans-images", action="store_true",
             help="Ne réattache pas les captures (contenu textuel seulement).",
         )
@@ -67,6 +76,12 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(
                 f"[OK] {count} projet(s) supprimé(s) (slug={SLUG!r})."
             ))
+            return
+
+        if options["si_absent"] and Project.objects.filter(slug=SLUG).exists():
+            self.stdout.write(
+                f"[--] Fiche « {SLUG} » déjà présente : rien à faire (--si-absent)."
+            )
             return
 
         # ── Identité projet ──────────────────────────────────────────
@@ -149,9 +164,12 @@ class Command(BaseCommand):
                 "<li><strong>13 applications métier</strong> aux dépendances "
                 "déclarées — le graphe est vérifié à chaque exécution de la suite, "
                 "une dépendance non déclarée fait échouer les tests.</li>"
-                "<li><strong>1 459 tests</strong> répartis sur 127 modules, "
-                "exécutés sur PostgreSQL comme en intégration continue.</li>"
-                "<li><strong>≈ 54 000 lignes de Python</strong> et plus de 200 "
+                "<li><strong>1 459 fonctions de test sur 127 modules</strong>, "
+                "soit 3 092 cas exécutés, sur PostgreSQL comme en intégration "
+                "continue. <strong>93 % de couverture</strong> — et 100 % sur "
+                "le point de contrôle d'accès, celui dont dépend la valeur des "
+                "cours filmés.</li>"
+                "<li><strong>≈ 55 000 lignes de Python</strong> et plus de 200 "
                 "gabarits, sans dépendance à un plugin propriétaire.</li>"
                 "<li><strong>Un jeu de démonstration idempotent</strong> qui peuple "
                 "toute la plateforme : chaque écran y montre au moins un cas de "
