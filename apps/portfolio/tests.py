@@ -93,15 +93,18 @@ class ProjectListViewTest(TestCase):
         """Test that only published projects are displayed."""
         response = self.client.get(self.url)
         projects = response.context['projects']
-        self.assertEqual(projects.count(), 2)
+        # Le portfolio contient aussi les études de cas insérées par migration
+        # de données : on vérifie l'appartenance, pas un décompte absolu.
+        self.assertIn(self.project1, projects)
+        self.assertIn(self.project2, projects)
         self.assertNotIn(self.unpublished, projects)
 
     def test_filter_by_type(self):
         """Test filtering projects by type."""
         response = self.client.get(self.url, {'type': 'site'})
         projects = response.context['projects']
-        self.assertEqual(projects.count(), 1)
-        self.assertEqual(projects[0], self.project1)
+        self.assertIn(self.project1, projects)
+        self.assertNotIn(self.project2, projects)
 
     def test_htmx_returns_partial(self):
         """Test that HTMX requests return the partial template."""
@@ -145,3 +148,32 @@ class ProjectDetailViewTest(TestCase):
         url = reverse('portfolio:detail', kwargs={'slug': 'nonexistent'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+
+class SeededCaseStudyTest(TestCase):
+    """Les études de cas insérées par migration doivent rester affichables."""
+
+    def setUp(self):
+        self.client = Client()
+
+    def test_iteag_project_is_published(self):
+        """La signature ITEAG existe et est publiée."""
+        project = Project.objects.get(slug='iteag')
+        self.assertTrue(project.is_published)
+        self.assertEqual(project.project_type, ProjectType.OUTILS)
+        self.assertEqual(project.strategy_phases.count(), 6)
+
+    def test_iteag_detail_page_renders(self):
+        """Sa page de détail rend les quatre chapitres rédigés."""
+        response = self.client.get(
+            reverse('portfolio:detail', kwargs={'slug': 'iteag'})
+        )
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        for chapter in ('2 635 notices', 'Quatre portails', 'Phase 1 · Cadrage'):
+            self.assertIn(chapter, content)
+
+    def test_iteag_listed_on_portfolio(self):
+        """Elle apparaît dans « Nos signatures »."""
+        response = self.client.get(reverse('portfolio:list'))
+        self.assertContains(response, 'ITEAG')
