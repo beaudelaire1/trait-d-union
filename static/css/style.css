@@ -113,6 +113,14 @@ h4, h5, h6 {
     letter-spacing: -0.015em;
 }
 
+/* Les titres de « Nos signatures » sont des h2 pour que la séquence des
+   titres de la page reste valide (h1 → h2). Ils gardent en revanche
+   l'approche des h3, à laquelle leur taille a été dessinée : sans cela, le
+   passage de -0.02em à -0.03em resserrerait le texte. */
+.titre-signature {
+    letter-spacing: -0.02em;
+}
+
 /* ============================================
    Links & Buttons
    ============================================ */
