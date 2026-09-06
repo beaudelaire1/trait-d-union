@@ -2340,3 +2340,26 @@ footer,
 input, textarea, select {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
+
+/* ============================================
+   UTILITAIRES MANQUANTS AU TAILWIND COMPILÉ
+   ============================================
+   « static/css/tailwind.css » est un fichier construit puis versionné, et
+   le déploiement ne le reconstruit pas : une classe absente de cette
+   version n'existe nulle part, sans que rien ne le signale. Ces deux-là
+   manquaient. Elles sont définies ici, dans la feuille écrite à la main,
+   qui part telle quelle. Les déclarations reprennent exactement celles de
+   Tailwind : le jour où le CSS sera reconstruit, elles feront doublon sans
+   rien changer.
+
+   Sans « break-words », un mot plus large que sa colonne — « COMMUNICATION »
+   dans un libellé d'étape, en majuscules et interlettré — dépasse le cadre
+   au lieu de se couper, et le texte se retrouve rogné sur un téléphone
+   étroit. */
+.break-words {
+    overflow-wrap: break-word;
+}
+
+.max-w-full {
+    max-width: 100%;
+}
