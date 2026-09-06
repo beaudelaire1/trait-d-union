@@ -2,12 +2,28 @@
 from __future__ import annotations
 
 import html as html_module
+import re
 
 import nh3
 from django import template
 from django.utils.safestring import mark_safe
 
 register = template.Library()
+
+_NBSP_ENTITY_RE = re.compile(r"&(?:nbsp|#0*160|#x0*a0);", re.IGNORECASE)
+
+
+def _normalize_breakable_spaces(value: str) -> str:
+    """Turn editor-inserted non-breaking spaces into regular spaces.
+
+    TinyMCE can persist pasted paragraphs with ``&nbsp;`` between every word.
+    Once rendered inside the portfolio's clipped layout, the whole paragraph
+    becomes effectively unbreakable and disappears beyond the viewport.
+    Named, decimal, hexadecimal and literal NBSP variants are all handled
+    without decoding unrelated entities before sanitization.
+    """
+    return _NBSP_ENTITY_RE.sub(" ", value).replace("\u00a0", " ")
+
 
 # Tags HTML autorisés en sortie (whitelist stricte)
 ALLOWED_TAGS = {
@@ -33,7 +49,7 @@ def safe_html_filter(value: str) -> str:
     if not value:
         return ""
     clean = nh3.clean(
-        value,
+        _normalize_breakable_spaces(value),
         tags=ALLOWED_TAGS,
         attributes=ALLOWED_ATTRIBUTES,
     )
@@ -51,7 +67,7 @@ def plain_text_filter(value: str) -> str:
     if not value:
         return ""
     # 1. Strip all tags (nh3 with empty tag set)
-    stripped = nh3.clean(value, tags=set())
+    stripped = nh3.clean(_normalize_breakable_spaces(value), tags=set())
     # 2. Decode HTML entities (&eacute; → é, &amp; → &, etc.)
     return html_module.unescape(stripped)
 
