@@ -1,9 +1,9 @@
 """Tests for the portfolio app."""
-from django.test import TestCase, Client
+from django.test import TestCase, Client, SimpleTestCase
 from django.urls import reverse
 
 from apps.portfolio.models import Project, ProjectType
-from apps.portfolio.templatetags.portfolio_tags import safe_html_filter
+from apps.portfolio.templatetags.portfolio_tags import plain_text_filter, safe_html_filter
 
 
 class ProjectModelTest(TestCase):
@@ -148,7 +148,7 @@ class ProjectDetailViewTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class SafeHtmlFilterTest(TestCase):
+class SafeHtmlFilterTest(SimpleTestCase):
     """Le filtre qui met en forme les textes des fiches.
 
     Une fiche saisie à la main dans l'admin arrive souvent en texte brut :
@@ -184,3 +184,22 @@ class SafeHtmlFilterTest(TestCase):
         """Une valeur vide ne produit pas un paragraphe fantôme."""
         self.assertEqual(safe_html_filter(""), "")
         self.assertEqual(safe_html_filter(None), "")
+
+    def test_pasted_paragraphs_have_breakable_word_spaces(self):
+        for space in ("&nbsp;", "&#160;", "&#0160;", "&#xA0;", "\u00a0"):
+            with self.subTest(space=space):
+                source = f"<p>Les{space}responsables{space}tiennent leurs listes.</p>"
+                self.assertEqual(
+                    safe_html_filter(source),
+                    "<p>Les responsables tiennent leurs listes.</p>",
+                )
+
+    def test_spaces_preserve_rich_text_and_escaped_markup(self):
+        source = '<p onclick="alert(1)">Du&nbsp;<strong>texte</strong> &amp; &lt;code&gt;.</p>'
+        self.assertEqual(
+            safe_html_filter(source),
+            "<p>Du <strong>texte</strong> &amp; &lt;code&gt;.</p>",
+        )
+
+    def test_plain_text_spaces_remain_breakable(self):
+        self.assertEqual(plain_text_filter("<p>Un&nbsp;texte&#xA0;lisible</p>"), "Un texte lisible")

@@ -32,6 +32,17 @@ _BLOC_RE = re.compile(
     re.IGNORECASE,
 )
 
+_NBSP_ENTITY_RE = re.compile(r"&(?:nbsp|#0*160|#x0*a0);", re.IGNORECASE)
+
+
+def _normalize_breakable_spaces(value: str) -> str:
+    """Restore word wrapping in copy pasted with NBSP between every word.
+
+    Replace only non-breaking spaces, without decoding escaped HTML before
+    sanitization or altering the saved editorial content.
+    """
+    return _NBSP_ENTITY_RE.sub(" ", value).replace("\u00a0", " ")
+
 
 @register.filter(name="safe_html")
 def safe_html_filter(value: str) -> str:
@@ -41,6 +52,7 @@ def safe_html_filter(value: str) -> str:
     """
     if not value:
         return ""
+    value = _normalize_breakable_spaces(value)
     # Une fiche saisie au kilomètre dans l'admin arrive sans balise de bloc :
     # ses paragraphes n'y sont que des lignes vides, et le HTML les avale. Le
     # texte s'affiche alors d'un seul tenant, sans le moindre retour à la
@@ -69,7 +81,7 @@ def plain_text_filter(value: str) -> str:
     # 1. Strip all tags (nh3 with empty tag set)
     stripped = nh3.clean(value, tags=set())
     # 2. Decode HTML entities (&eacute; → é, &amp; → &, etc.)
-    return html_module.unescape(stripped)
+    return html_module.unescape(stripped).replace("\u00a0", " ")
 
 
 # Keep backward-compat alias for any template still using |md
