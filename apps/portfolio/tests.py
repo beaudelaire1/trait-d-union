@@ -3,6 +3,30 @@ from django.test import TestCase, Client
 from django.urls import reverse
 
 from apps.portfolio.models import Project, ProjectType
+from apps.portfolio.templatetags.portfolio_tags import plain_text_filter, safe_html_filter
+
+
+class PortfolioTemplateFilterTest(TestCase):
+    """Regression tests for rich portfolio copy rendered from TinyMCE."""
+
+    def test_safe_html_makes_editor_nbsp_breakable(self):
+        rendered = safe_html_filter(
+            "<p>Texte&nbsp;qui&#160;doit\u00a0rester <strong>lisible</strong>.</p>"
+        )
+
+        self.assertEqual(rendered, "<p>Texte qui doit rester <strong>lisible</strong>.</p>")
+        self.assertNotIn("&nbsp;", rendered)
+        self.assertNotIn("\u00a0", rendered)
+
+    def test_safe_html_still_sanitizes_unsafe_markup(self):
+        rendered = safe_html_filter(
+            '<p onclick="alert(1)">Texte&nbsp;visible<script>alert(1)</script></p>'
+        )
+
+        self.assertEqual(rendered, "<p>Texte visible</p>")
+
+    def test_plain_text_normalizes_nbsp(self):
+        self.assertEqual(plain_text_filter("<p>Texte&nbsp;visible</p>"), "Texte visible")
 
 
 class ProjectModelTest(TestCase):
