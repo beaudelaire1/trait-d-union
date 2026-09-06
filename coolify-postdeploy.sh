@@ -11,11 +11,14 @@ python manage.py migrate --noinput
 echo "[TUS] Normalizing django-allauth email records..."
 python manage.py fix_email_addresses --apply
 
-# Le portfolio n'est pas alimenté par les migrations : sans cet appel, l'étude
-# de cas ITEAG n'apparaît jamais en ligne. « --si-absent » ne publie qu'une
-# fois : les déploiements suivants ne réécrivent pas ce que l'admin a retouché.
-echo "[TUS] Publishing the ITEAG case study if missing..."
+# Le portfolio n'est pas alimenté par les migrations : sans ces appels, les
+# études de cas n'apparaissent jamais en ligne. « --si-absent » ne publie
+# qu'une fois : les déploiements suivants ne réécrivent pas ce que l'admin a
+# retouché.
+echo "[TUS] Publishing the case studies if missing..."
 python manage.py seed_iteag --si-absent
+python manage.py seed_eebc --si-absent
+python manage.py seed_netexpress --si-absent
 
 # Initial admin creation is opt-in. Define all three variables in Coolify only
 # for the first deployment, then remove DJANGO_SUPERUSER_PASSWORD afterwards.
