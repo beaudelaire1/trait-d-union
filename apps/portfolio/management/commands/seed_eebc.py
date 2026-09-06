@@ -12,6 +12,9 @@ de test sur 35 modules.
 Idempotent : la commande s'appuie sur le slug ``eebc``. Relancée, elle met à
 jour les contenus sans créer de doublon ; ``--clear`` supprime proprement
 (et avec lui les phases de stratégie en cascade).
+
+Les captures téléversées depuis l'admin sont conservées : les champs d'image
+ne figurent pas dans ``defaults``, donc ``update_or_create`` n'y touche pas.
 """
 
 from __future__ import annotations

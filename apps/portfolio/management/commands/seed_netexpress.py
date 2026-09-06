@@ -12,6 +12,18 @@ lignes de Python hors migrations, 156 gabarits, 526 fonctions de test sur
 
 Idempotent : la commande s'appuie sur le slug ``netexpress``, celui de la
 fiche déjà publiée — elle la réécrit plutôt que d'en créer une seconde.
+
+Les captures déjà téléversées sont conservées : les champs d'image ne
+figurent pas dans ``defaults``, donc ``update_or_create`` n'y touche pas.
+Seuls le texte, les technologies et les phases sont réécrits.
+
+.. warning::
+
+   Le post-déploiement appelle ``--si-absent``, qui ne fait rien devant une
+   fiche déjà présente et pourvue de ses phases. La réécriture d'une fiche
+   existante est donc une opération **ponctuelle et volontaire** : lancer
+   ``python manage.py seed_netexpress`` une fois sur l'environnement, sans
+   l'option. Sans ce passage, la fiche en ligne reste celle d'avant.
 """
 
 from __future__ import annotations
