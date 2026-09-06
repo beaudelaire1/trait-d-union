@@ -6,7 +6,9 @@ un thread d'arrière-plan côté web (réponse non bloquante). Si ce thread est 
 rapport reste avec ``pdf_sent_at = NULL``. Ce cron le détecte et le renvoie,
 garantissant la livraison.
 
-Planifié via render.yaml (toutes les 15 min environ).
+À planifier toutes les 15 minutes environ. Le planning vivait dans
+render.yaml, supprimé avec l'outillage Render ; sous Coolify, il n'a
+pas de remplaçant automatique — voir coolify-postdeploy.sh.
 """
 from __future__ import annotations
 
