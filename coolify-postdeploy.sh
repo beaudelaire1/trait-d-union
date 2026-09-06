@@ -20,6 +20,14 @@ python manage.py seed_iteag --si-absent
 python manage.py seed_eebc --si-absent
 python manage.py seed_netexpress --si-absent
 
+# La commande EEBC a longtemps visé le slug « eebc » alors que la fiche
+# d'origine porte « eebc-gestion » : chaque déploiement publiait donc une
+# seconde fiche à côté de la vraie. Cet appel retire ce résidu. Il ne touche
+# qu'au slug « eebc » et ne fait rien s'il a déjà disparu ; il pourra être
+# supprimé d'ici quelques déploiements.
+echo "[TUS] Removing the stray duplicate EEBC entry, if any..."
+python manage.py seed_eebc --nettoyer-doublon
+
 # Initial admin creation is opt-in. Define all three variables in Coolify only
 # for the first deployment, then remove DJANGO_SUPERUSER_PASSWORD afterwards.
 if [ -n "${DJANGO_SUPERUSER_PASSWORD:-}" ]; then
