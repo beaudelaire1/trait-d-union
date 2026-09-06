@@ -246,7 +246,7 @@
         <div class="max-w-6xl mx-auto px-6 relative z-10">
             <div class="grid lg:grid-cols-2 gap-20 items-center">
                 <!-- Visual — Code placeholder LEFT -->
- <div class="order-2 lg:order-1 reveal-left td-100" >
+ <div class="min-w-0 order-2 lg:order-1 reveal-left td-100" >
                     <!-- Capture Ch.02 -->
                     <div class="relative group image-luminance">
                         <div class="absolute -inset-3 bg-gradient-to-br from-tus-blue/15 to-cyan-500/10 rounded-3xl blur-2xl opacity-50 group-hover:opacity-80 transition-opacity duration-700"></div>
@@ -265,7 +265,7 @@
                             {% if project.image_ch02 %}
                             <img src="{{ project.image_ch02.url }}" alt="Défi technique — {{ project.title }}" class="w-full h-auto" loading="lazy">
                             {% else %}
-                            <div class="aspect-[16/10] flex items-center justify-center p-8 min-h-[400px]">
+                            <div class="w-full aspect-[16/10] flex items-center justify-center p-8 min-h-[400px]">
                                 <div class="text-center">
                                     <svg class="w-20 h-20 text-tus-white/[0.06] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
                                     <p class="text-tus-white/15 text-sm font-mono">Capture du code ici</p>
@@ -277,12 +277,12 @@
                     </div>
                 </div>
                 <!-- Narration RIGHT -->
-                <div class="order-1 lg:order-2">
+                <div class="min-w-0 order-1 lg:order-2">
                     <div class="flex items-center gap-6 mb-8 reveal-right">
-                        <div class="relative">
+                        <div class="relative shrink-0">
                             <span class="text-8xl lg:text-9xl font-display font-bold text-tus-blue-a11y/8 select-none leading-none number-display text-shimmer">02</span>
                         </div>
-                        <div>
+                        <div class="min-w-0 break-words">
                             <span class="text-tus-blue-a11y text-sm font-semibold uppercase tracking-[0.15em] block">Chapitre</span>
                             <h2 class="text-3xl md:text-4xl font-display font-bold">Défi technique</h2>
                         </div>
@@ -351,11 +351,11 @@
 
             <!-- Header — aligné à gauche comme Ch.01 pour plus d'impact -->
             <div class="flex items-center gap-6 mb-16 reveal-left">
-                <div class="relative">
+                <div class="relative shrink-0">
                     <span class="text-8xl lg:text-9xl font-display font-bold text-tus-blue-a11y/8 select-none leading-none parallax-num number-display text-shimmer" data-speed="0.05">03</span>
                     <div class="chapter-accent absolute -left-4 top-2 chapter-accent-blue"></div>
                 </div>
-                <div>
+                <div class="min-w-0 break-words">
                     <span class="text-tus-blue-a11y text-sm font-semibold uppercase tracking-[0.2em] block mb-1">Chapitre</span>
                     <h2 class="text-4xl md:text-5xl font-display font-bold">Notre approche</h2>
                 </div>
@@ -420,7 +420,7 @@
                                 <svg class="w-6 h-6 {% if forloop.last %}text-tus-green{% else %}text-tus-blue-a11y{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                 {% endif %}
                             </div>
-                            <div>
+                            <div class="min-w-0 break-words">
                                 <span class="{% if forloop.last %}text-tus-green/60{% else %}text-tus-blue-a11y/60{% endif %} text-xs font-semibold uppercase tracking-wider">{{ phase.phase_label }}</span>
                                 <h3 class="text-xl font-display font-bold mt-1 mb-3">{{ phase.title }}</h3>
                                 <p class="text-tus-white/60 leading-relaxed">{{ phase.description }}</p>
@@ -456,7 +456,7 @@
                             <div class="w-12 h-12 rounded-xl bg-tus-blue/10 flex items-center justify-center flex-shrink-0 group-hover:bg-tus-blue/20 transition-colors duration-300">
                                 <svg class="w-6 h-6 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             </div>
-                            <div>
+                            <div class="min-w-0 break-words">
                                 <span class="text-tus-blue-a11y/60 text-xs font-semibold uppercase tracking-wider">Phase d'audit</span>
                                 <h3 class="text-xl font-display font-bold mt-1 mb-3">Analyse & Exploration</h3>
                                 <p class="text-tus-white/60 leading-relaxed">Compréhension approfondie du contexte métier, étude des flux existants, identification des points de friction et définition des objectifs de performance.</p>
@@ -475,7 +475,7 @@
                             <div class="w-12 h-12 rounded-xl bg-tus-blue/10 flex items-center justify-center flex-shrink-0 group-hover:bg-tus-blue/20 transition-colors duration-300">
                                 <svg class="w-6 h-6 text-tus-blue-a11y" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                             </div>
-                            <div>
+                            <div class="min-w-0 break-words">
                                 <span class="text-tus-blue-a11y/60 text-xs font-semibold uppercase tracking-wider">Phase de conception</span>
                                 <h3 class="text-xl font-display font-bold mt-1 mb-3">Architecture & Prototypage</h3>
                                 <p class="text-tus-white/60 leading-relaxed">Conception de l'infrastructure technique sur-mesure, sans dépendance à des outils génériques. Prototypage fonctionnel et validation avec le client.</p>
@@ -494,7 +494,7 @@
                             <div class="w-12 h-12 rounded-xl bg-tus-green/10 flex items-center justify-center flex-shrink-0 group-hover:bg-tus-green/20 transition-colors duration-300">
                                 <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
                             </div>
-                            <div>
+                            <div class="min-w-0 break-words">
                                 <span class="text-tus-green/60 text-xs font-semibold uppercase tracking-wider">Phase de livraison</span>
                                 <h3 class="text-xl font-display font-bold mt-1 mb-3">Déploiement & Formation</h3>
                                 <p class="text-tus-white/60 leading-relaxed">Mise en production itérative, tests de charge, optimisation des performances et transfert de compétences à l'équipe client.</p>
@@ -550,7 +550,7 @@
                         {% if project.image_ch03 %}
                         <img src="{{ project.image_ch03.url }}" alt="Stratégie — {{ project.title }}" class="w-full h-auto" loading="lazy">
                         {% else %}
-                        <div class="aspect-[21/9] flex items-center justify-center p-12 min-h-[350px]">
+                        <div class="w-full aspect-[21/9] flex items-center justify-center p-12 min-h-[350px]">
                             <div class="text-center">
                                 <svg class="w-24 h-24 text-tus-white/[0.04] mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.75" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
                                 <p class="text-tus-white/10 font-mono text-sm">Capture panoramique du code</p>
@@ -627,8 +627,8 @@
                                 <div class="w-3 h-3 rounded-full bg-yellow-500/60"></div>
                                 <div class="w-3 h-3 rounded-full bg-green-500/60"></div>
                             </div>
-                            <div class="flex-1 ml-4">
-                                <div class="max-w-md mx-auto px-4 py-1.5 rounded-lg bg-tus-white/5 text-xs text-tus-white/40 text-center font-mono">
+                            <div class="min-w-0 flex-1 ml-4">
+                                <div class="max-w-md mx-auto px-4 py-1.5 rounded-lg bg-tus-white/5 text-xs text-tus-white/40 text-center font-mono truncate">
                                     {% if project.url %}{{ project.url }}{% else %}https://{{ project.title|slugify }}.traitdunion.studio{% endif %}
                                 </div>
                             </div>
@@ -637,7 +637,7 @@
                         <img src="{{ project.image_ch04.url }}" alt="Résultat — {{ project.title }}" class="w-full h-auto" loading="lazy">
                         {% else %}
                         <!-- PLACEHOLDER CAPTURE RÉSULTAT -->
-                        <div class="aspect-[16/9] flex items-center justify-center p-12 min-h-[500px]">
+                        <div class="w-full aspect-[16/9] flex items-center justify-center p-12 min-h-[500px]">
                             <div class="text-center">
                                 <svg class="w-28 h-28 text-tus-white/[0.04] mx-auto mb-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.75" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                                 <p class="text-tus-white/10 text-lg">Capture du résultat final</p>
@@ -654,16 +654,16 @@
  <div class="mt-16 reveal td-200" >
                 <a href="{{ project.url }}" target="_blank" rel="noopener" 
                    class="group flex items-center justify-between p-6 rounded-2xl border border-tus-green/20 bg-tus-green/[0.03] hover:bg-tus-green/[0.08] hover:border-tus-green/40 transition-all duration-500">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-xl bg-tus-green/15 flex items-center justify-center">
+                    <div class="min-w-0 flex items-center gap-4">
+                        <div class="w-12 h-12 shrink-0 rounded-xl bg-tus-green/15 flex items-center justify-center">
                             <svg class="w-6 h-6 text-tus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
                         </div>
-                        <div>
+                        <div class="min-w-0 break-words">
                             <p class="text-tus-white font-semibold">Voir le projet en ligne</p>
-                            <p class="text-tus-white/50 text-sm">{{ project.url }}</p>
+                            <p class="text-tus-white/50 text-sm truncate">{{ project.url }}</p>
                         </div>
                     </div>
-                    <svg class="w-6 h-6 text-tus-green group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    <svg class="w-6 h-6 shrink-0 ml-4 text-tus-green group-hover:translate-x-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
             </div>
             {% endif %}
@@ -689,11 +689,11 @@
 
         <div class="max-w-6xl mx-auto px-6 relative z-10">
             <div class="text-center mb-16 lg:mb-20">
-                <div class="inline-flex items-center gap-4 mb-6">
-                    <div class="relative">
+                <div class="inline-flex items-center gap-4 mb-6 max-w-full">
+                    <div class="relative shrink-0">
                         <span class="text-7xl lg:text-8xl font-display font-bold text-tus-green/10 select-none leading-none number-display">05</span>
                     </div>
-                    <div class="text-left">
+                    <div class="min-w-0 break-words text-left">
                         <span class="text-tus-green text-sm font-semibold uppercase tracking-[0.15em] block">Chapitre</span>
                         <h2 class="text-3xl md:text-4xl font-display font-bold">Performance &amp; conformité</h2>
                     </div>
