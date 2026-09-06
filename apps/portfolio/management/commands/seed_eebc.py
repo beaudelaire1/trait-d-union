@@ -10,6 +10,12 @@ Contenu relevé dans le dépôt beaudelaire1/gestion-eebc : 19 applications
 métier, 67 342 lignes de Python hors migrations, 362 gabarits, 645 fonctions
 de test sur 35 modules.
 
+L'application mobile constitue la deuxième phase de développement : elle est
+prévue dans l'architecture (API REST, jetons JWT, modèle de données unique)
+mais elle n'est pas livrée. La fiche doit décrire un socle prêt, jamais une
+application en service — ne pas réintroduire Flutter dans les technologies
+tant que l'application n'est pas en production.
+
 Idempotent : la commande s'appuie par défaut sur le slug ``eebc``. Relancée,
 elle met à jour les contenus sans créer de doublon ; ``--clear`` supprime
 proprement (et avec lui les phases de stratégie en cascade).
@@ -153,9 +159,23 @@ class Command(BaseCommand):
                 "groupes de maison, club biblique des enfants, jeunesse, "
                 "culte et planning, transport, inventaire, départements, "
                 "budgets, campagnes de collecte, import de données.</li>"
-                "<li><strong>Une application mobile Flutter</strong> pour "
-                "iOS et Android, adossée à la même API REST que le site — un "
-                "seul modèle de données, pas deux vérités.</li>"
+                "<li><strong>Les données restent en France.</strong> "
+                "L'appartenance religieuse est une donnée sensible au sens du "
+                "RGPD, au même titre que la santé : elle ne se traite pas "
+                "comme un fichier client. La plateforme est hébergée sur "
+                "OVHcloud, dans les centres de données de Roubaix. Les noms "
+                "des membres, l'historique des dons et les reçus fiscaux ne "
+                "quittent pas le territoire français.</li>"
+                "<li><strong>Le mobile prévu dès la conception, pas ajouté "
+                "après.</strong> Toute la plateforme expose ses données par "
+                "une API REST authentifiée par jetons, écrite et testée en "
+                "même temps que les écrans web. L'application mobile, prévue "
+                "en deuxième phase de développement, s'y branchera sans "
+                "qu'on touche au serveur. Une API greffée après coup sur une "
+                "application web finit toujours par raconter une histoire "
+                "légèrement différente de celle du site : celle-ci a été "
+                "posée d'abord, précisément pour que cette divergence n'ait "
+                "pas lieu d'être.</li>"
                 "</ul>"
             ),
             strategy=(
@@ -186,8 +206,17 @@ class Command(BaseCommand):
                 "réglementation française des associations cultuelles, "
                 "numérotés et traçables, annulables mais jamais "
                 "effaçables.</li>"
-                "<li><strong>Une application mobile iOS et Android</strong> "
-                "sur la même API que le site.</li>"
+                "<li><strong>Hébergement OVHcloud, à Roubaix</strong>, "
+                "sauvegardes comprises. Les données d'une association "
+                "cultuelle française restent sur le territoire "
+                "français.</li>"
+                "<li><strong>Un socle prêt pour le mobile.</strong> "
+                "L'application iOS et Android est la deuxième phase de "
+                "développement — elle n'est pas encore livrée. Ce qu'elle "
+                "demande existe déjà et tourne : l'API REST, "
+                "l'authentification par jetons, le modèle de données unique. "
+                "Le jour où l'église la lancera, il n'y aura pas de "
+                "plateforme à refaire pour l'accueillir.</li>"
                 "<li><strong>Un site public</strong> avec sa page de don, "
                 "administrable par le secrétariat depuis le même outil.</li>"
                 "</ul>"
@@ -209,8 +238,7 @@ class Command(BaseCommand):
                 "WeasyPrint",
                 "Stripe",
                 "WhatsApp Cloud API",
-                "Flutter (iOS & Android)",
-                "Render",
+                "OVHcloud (Roubaix, France)",
             ],
             is_featured=True,
             is_published=True,
@@ -267,9 +295,10 @@ class Command(BaseCommand):
                 "icon": StrategyPhaseIcon.CODE,
                 "description": (
                     "Courriel, SMS et WhatsApp Cloud API depuis un même "
-                    "écran, avec journal des envois. L'application mobile "
-                    "Flutter est arrivée ici : elle consomme la même API que "
-                    "le site, donc elle ne peut pas diverger."
+                    "écran, avec journal des envois. C'est ici qu'a été "
+                    "arrêtée l'API REST : elle sert la communication "
+                    "aujourd'hui, et elle servira l'application mobile de la "
+                    "deuxième phase sans qu'il faille rouvrir le serveur."
                 ),
                 "order": 4,
             },
@@ -279,7 +308,8 @@ class Command(BaseCommand):
                 "icon": StrategyPhaseIcon.DEPLOY,
                 "description": (
                     "Import des membres et de l'historique financier, "
-                    "déploiement sur Render avec sauvegardes, puis prise en "
+                    "mise en ligne sur OVHcloud à Roubaix avec "
+                    "sauvegardes, puis prise en "
                     "main par les responsables. Le critère de sortie n'était "
                     "pas « le site est en ligne » mais « le secrétariat a "
                     "fait une semaine complète sans nous »."

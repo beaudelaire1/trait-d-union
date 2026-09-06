@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import html as html_module
+import re
 
 import nh3
 from django import template
+from django.utils.html import linebreaks
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -23,6 +25,13 @@ ALLOWED_ATTRIBUTES = {
     "a": {"href", "title", "target"},
 }
 
+# Une balise de bloc suffit à prouver que le texte est structuré. Sans aucune
+# d'elles, les paragraphes ne sont que des lignes vides — invisibles en HTML.
+_BLOC_RE = re.compile(
+    r"<\s*(?:p|div|ul|ol|li|h[1-6]|blockquote|pre|table|br|hr)\b",
+    re.IGNORECASE,
+)
+
 
 @register.filter(name="safe_html")
 def safe_html_filter(value: str) -> str:
@@ -32,6 +41,13 @@ def safe_html_filter(value: str) -> str:
     """
     if not value:
         return ""
+    # Une fiche saisie au kilomètre dans l'admin arrive sans balise de bloc :
+    # ses paragraphes n'y sont que des lignes vides, et le HTML les avale. Le
+    # texte s'affiche alors d'un seul tenant, sans le moindre retour à la
+    # ligne. On rétablit les paragraphes avant l'assainissement — nh3 passe
+    # ensuite et reste seul juge de ce qui sort.
+    if not _BLOC_RE.search(value):
+        value = linebreaks(value)
     clean = nh3.clean(
         value,
         tags=ALLOWED_TAGS,

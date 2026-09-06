@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 
 from apps.portfolio.models import Project, ProjectType
+from apps.portfolio.templatetags.portfolio_tags import safe_html_filter
 
 
 class ProjectModelTest(TestCase):
@@ -145,3 +146,41 @@ class ProjectDetailViewTest(TestCase):
         url = reverse('portfolio:detail', kwargs={'slug': 'nonexistent'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+
+class SafeHtmlFilterTest(TestCase):
+    """Le filtre qui met en forme les textes des fiches.
+
+    Une fiche saisie à la main dans l'admin arrive souvent en texte brut :
+    ses paragraphes ne sont que des lignes vides. Sans mise en forme, la
+    page les affiche d'un seul tenant, sans le moindre retour à la ligne.
+    """
+
+    def test_texte_brut_devient_des_paragraphes(self):
+        """Les lignes vides d'un texte brut deviennent des paragraphes."""
+        rendu = safe_html_filter("Premier bloc.\n\nDeuxième bloc.\n\nTroisième.")
+        self.assertEqual(rendu.count("<p>"), 3)
+
+    def test_html_deja_structure_reste_intact(self):
+        """Un texte déjà balisé n'est pas remis en forme une seconde fois."""
+        for source in ("<p>Un</p><p>Deux</p>", "<ul><li>Un</li></ul>", "Un<br>Deux"):
+            with self.subTest(source=source):
+                self.assertEqual(safe_html_filter(source), source)
+
+    def test_le_gras_survit_a_la_mise_en_forme(self):
+        """Les balises en ligne d'un texte brut sont conservées."""
+        rendu = safe_html_filter("Du <strong>gras</strong>.\n\nUn second bloc.")
+        self.assertIn("<strong>gras</strong>", rendu)
+        self.assertEqual(rendu.count("<p>"), 2)
+
+    def test_le_texte_brut_reste_assaini(self):
+        """La mise en forme ne court-circuite pas l'assainissement."""
+        rendu = safe_html_filter("Bonjour\n\n<script>alert(1)</script>\n\nAu revoir")
+        self.assertNotIn("script", rendu)
+        self.assertIn("Bonjour", rendu)
+        self.assertIn("Au revoir", rendu)
+
+    def test_valeur_vide(self):
+        """Une valeur vide ne produit pas un paragraphe fantôme."""
+        self.assertEqual(safe_html_filter(""), "")
+        self.assertEqual(safe_html_filter(None), "")
