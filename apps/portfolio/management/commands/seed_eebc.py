@@ -1,17 +1,23 @@
 """Insère le projet portfolio « EEBC » — plateforme de gestion d'église.
 
 Usage :
-    python manage.py seed_eebc              # créé / met à jour
-    python manage.py seed_eebc --si-absent  # ne crée que si la fiche manque
-    python manage.py seed_eebc --clear      # supprime le projet
+    python manage.py seed_eebc                      # créé / met à jour
+    python manage.py seed_eebc --slug <autre-slug>  # met à jour une fiche existante
+    python manage.py seed_eebc --si-absent          # ne crée que si la fiche manque
+    python manage.py seed_eebc --clear              # supprime le projet
 
 Contenu relevé dans le dépôt beaudelaire1/gestion-eebc : 19 applications
 métier, 67 342 lignes de Python hors migrations, 362 gabarits, 645 fonctions
 de test sur 35 modules.
 
-Idempotent : la commande s'appuie sur le slug ``eebc``. Relancée, elle met à
-jour les contenus sans créer de doublon ; ``--clear`` supprime proprement
-(et avec lui les phases de stratégie en cascade).
+Idempotent : la commande s'appuie par défaut sur le slug ``eebc``. Relancée,
+elle met à jour les contenus sans créer de doublon ; ``--clear`` supprime
+proprement (et avec lui les phases de stratégie en cascade).
+
+Une fiche EEBC créée à la main dans l'admin ne porte pas forcément ce slug.
+Dans ce cas, ``--slug`` vise la fiche d'origine : la commande la met à jour
+au lieu d'en publier une seconde. Le slug se lit dans l'adresse de la page,
+``/nos-signatures/<slug>/``.
 
 Les captures téléversées depuis l'admin sont conservées : les champs d'image
 ne figurent pas dans ``defaults``, donc ``update_or_create`` n'y touche pas.
@@ -30,6 +36,15 @@ class Command(BaseCommand):
     help = "Crée (ou met à jour) le projet portfolio « EEBC »."
 
     def add_arguments(self, parser):
+        parser.add_argument(
+            "--slug", default=SLUG,
+            help=(
+                "Slug de la fiche à écrire. Par défaut « %(default)s ». "
+                "Si l'étude de cas a été créée à la main sous un autre slug, "
+                "le passer ici : la commande met alors à jour la fiche "
+                "d'origine au lieu d'en créer une seconde."
+            ),
+        )
         parser.add_argument(
             "--clear", action="store_true",
             help="Supprime le projet (et ses phases).",
@@ -54,27 +69,29 @@ class Command(BaseCommand):
             StrategyPhaseIcon,
         )
 
+        slug = options["slug"]
+
         if options["clear"]:
-            qs = Project.objects.filter(slug=SLUG)
+            qs = Project.objects.filter(slug=slug)
             count = qs.count()
             qs.delete()
             self.stdout.write(self.style.SUCCESS(
-                f"[OK] {count} projet(s) supprimé(s) (slug={SLUG!r})."
+                f"[OK] {count} projet(s) supprimé(s) (slug={slug!r})."
             ))
             return
 
         if options["si_absent"]:
-            existante = Project.objects.filter(slug=SLUG).first()
+            existante = Project.objects.filter(slug=slug).first()
             # Une fiche sans phase est le résidu d'un passage interrompu, pas
             # une étude de cas : la sauter la figerait dans cet état.
             if existante is not None and StrategyPhase.objects.filter(project=existante).exists():
                 self.stdout.write(
-                    f"[--] Fiche « {SLUG} » déjà présente : rien à faire (--si-absent)."
+                    f"[--] Fiche « {slug} » déjà présente : rien à faire (--si-absent)."
                 )
                 return
             if existante is not None:
                 self.stdout.write(self.style.WARNING(
-                    f"[!!] Fiche « {SLUG} » présente mais sans phase — passage "
+                    f"[!!] Fiche « {slug} » présente mais sans phase — passage "
                     "précédent interrompu. Réécriture."
                 ))
 
@@ -98,10 +115,10 @@ class Command(BaseCommand):
                 "qui savait où en était une visite était celle qui l'avait "
                 "faite.</p>"
                 "<p><strong>La commande :</strong> une plateforme unique, "
-                "tenue par des bénévoles et non par des informaticiens, qui "
-                "absorbe la comptabilité, les membres, les groupes, le culte "
-                "et la communication — sans transformer la vie de l'église "
-                "en saisie de formulaires.</p>"
+                "tenue par les membres de l'église eux-mêmes et non par des "
+                "informaticiens, qui absorbe la comptabilité, les membres, "
+                "les groupes, le culte et la communication — sans transformer "
+                "la vie de l'église en saisie de formulaires.</p>"
             ),
             solution=(
                 "<p>La difficulté n'était pas technique au départ, elle était "
@@ -199,7 +216,7 @@ class Command(BaseCommand):
             is_published=True,
         )
 
-        project, created = Project.objects.update_or_create(slug=SLUG, defaults=defaults)
+        project, created = Project.objects.update_or_create(slug=slug, defaults=defaults)
         self.stdout.write(self.style.SUCCESS(
             f"[OK] Projet « {project.title} » {'créé' if created else 'mis à jour'} "
             f"(slug={project.slug})."
@@ -258,14 +275,14 @@ class Command(BaseCommand):
             },
             {
                 "phase_label": "Phase 5 · Mise en service",
-                "title": "Reprise des données et formation des bénévoles",
+                "title": "Reprise des données et prise en main par l'équipe",
                 "icon": StrategyPhaseIcon.DEPLOY,
                 "description": (
                     "Import des membres et de l'historique financier, "
-                    "déploiement sur Render avec sauvegardes, puis formation "
-                    "des responsables. Le critère de sortie n'était pas « le "
-                    "site est en ligne » mais « le secrétariat a fait une "
-                    "semaine complète sans nous »."
+                    "déploiement sur Render avec sauvegardes, puis prise en "
+                    "main par les responsables. Le critère de sortie n'était "
+                    "pas « le site est en ligne » mais « le secrétariat a "
+                    "fait une semaine complète sans nous »."
                 ),
                 "order": 5,
             },
