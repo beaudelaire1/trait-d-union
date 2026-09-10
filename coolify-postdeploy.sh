@@ -20,13 +20,22 @@ python manage.py seed_iteag --si-absent
 python manage.py seed_eebc --si-absent
 python manage.py seed_netexpress --si-absent
 
-# La commande EEBC a longtemps visé le slug « eebc » alors que la fiche
-# d'origine porte « eebc-gestion » : chaque déploiement publiait donc une
-# seconde fiche à côté de la vraie. Cet appel retire ce résidu. Il ne touche
-# qu'au slug « eebc » et ne fait rien s'il a déjà disparu ; il pourra être
-# supprimé d'ici quelques déploiements.
-echo "[TUS] Removing the stray duplicate EEBC entry, if any..."
-python manage.py seed_eebc --nettoyer-doublon
+# Remplissage initial des audits portfolio (chapitre 05), pour les fiches sans
+# mesure. Repris de « build.sh », le pré-déploiement Render supprimé avec le
+# reste de cet outillage. Non bloquant à dessein : une panne réseau ou un
+# dépassement de délai chez SSL Labs ne doit jamais casser un déploiement.
+echo "[TUS] Filling in missing portfolio audits..."
+python manage.py audit_portfolio_projects --only-missing || \
+    echo "[TUS] Portfolio audit skipped (non-blocking)."
+
+# Ce qui n'a pas de remplaçant sous Coolify. « render.yaml » planifiait trois
+# tâches récurrentes, consignées ici pour que leur suppression n'efface pas
+# leur existence. Un post-déploiement ne les remplace pas : il faut un
+# planificateur, côté Coolify ou en cron sur la machine.
+#
+#   sync_google_reviews               toutes les 6 heures   0 */6 * * *
+#   audit_portfolio_projects          lundi à 04h00         0 4 * * 1
+#   resend_unsent_simulator_reports   tous les quarts d'h.  */15 * * * *
 
 # Initial admin creation is opt-in. Define all three variables in Coolify only
 # for the first deployment, then remove DJANGO_SUPERUSER_PASSWORD afterwards.
