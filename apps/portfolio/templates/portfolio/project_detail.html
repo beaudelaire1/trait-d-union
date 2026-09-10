@@ -714,7 +714,7 @@
 
             {% with audit=project.audit_results encoded=project.url|urlencode host=project.url|cut:'https://'|cut:'http://'|cut:'/' %}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger-children">
-                {% include 'portfolio/partials/_audit_card.html' with key='performance' label='Performance' icon='⚡' subtitle='Lighthouse · Core Web Vitals' tool='Google PageSpeed' display='grade' score=audit.performance.score detail_url=audit.performance.detail_url fallback_url='https://pagespeed.web.dev/analysis?url='|add:encoded color='blue' %}
+                {% include 'portfolio/partials/_audit_card.html' with key='performance' label='Meilleure performance mesurée' icon='⚡' subtitle='Lighthouse · Core Web Vitals' tool='Google PageSpeed' display='grade' score=audit.performance.score detail_url=audit.performance.detail_url fallback_url='https://pagespeed.web.dev/analysis?url='|add:encoded color='blue' %}
                 {% include 'portfolio/partials/_audit_card.html' with key='seo' label='SEO' icon='🔍' subtitle='Référencement & métadonnées' tool='Google PageSpeed' display='score' score=audit.seo.score detail_url=audit.seo.detail_url fallback_url='https://pagespeed.web.dev/analysis?url='|add:encoded color='blue' %}
                 {% include 'portfolio/partials/_audit_card.html' with key='ui_ux' label='UI / UX' icon='🎨' subtitle='Hiérarchie, lisibilité, parcours' tool='Évaluation TUS' display='score' score=audit.ui_ux.score detail_url='' fallback_url='' is_manual=True color='blue' %}
                 {% include 'portfolio/partials/_audit_card.html' with key='accessibility' label='Accessibilité' icon='♿' subtitle='WCAG 2.1 · lecteurs d’écran' tool='WAVE WebAIM' display='score' score=audit.accessibility.score detail_url=audit.accessibility.detail_url fallback_url='https://wave.webaim.org/report#/'|add:project.url color='green' %}
@@ -730,7 +730,8 @@
                     <a href="https://wave.webaim.org" class="text-tus-blue-a11y/70 hover:text-tus-blue-a11y" rel="noopener" target="_blank">WAVE</a> (accessibilité),
                     <a href="https://developer.mozilla.org/en-US/observatory" class="text-tus-blue-a11y/70 hover:text-tus-blue-a11y" rel="noopener" target="_blank">Mozilla&nbsp;Observatory</a> (sécurité),
                     <a href="https://www.ssllabs.com" class="text-tus-blue-a11y/70 hover:text-tus-blue-a11y" rel="noopener" target="_blank">SSL&nbsp;Labs</a> (chiffrement).
-                    La note UI/UX est attribuée par l'équipe TUS. Toutes les mesures sont vérifiables via le bouton « Tester ».
+                    La performance affichée est la meilleure mesure enregistrée ; un nouveau test peut donner un résultat différent.
+                    La note UI/UX est attribuée par l'équipe TUS. Les boutons « Tester » permettent de relancer une vérification.
                 </p>
             </div>
         </div>

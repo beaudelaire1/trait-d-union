@@ -101,6 +101,14 @@ class Command(BaseCommand):
                 continue
 
             new_results = audit.to_json()
+            # Conserver le record de performance et les métadonnées de sa mesure.
+            previous_performance = (project.audit_results or {}).get("performance") or {}
+            previous_score = previous_performance.get("score")
+            current_score = new_results["performance"].get("score")
+            if isinstance(previous_score, (int, float)) and (
+                current_score is None or previous_score > current_score
+            ):
+                new_results["performance"] = previous_performance
             # Préserve la note UI/UX manuelle (saisie via l'admin) — la pipeline
             # automatisée ne mesure pas l'esthétique / qualité de parcours.
             existing_ui_ux = (project.audit_results or {}).get("ui_ux") or {}

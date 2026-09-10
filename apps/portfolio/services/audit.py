@@ -119,16 +119,12 @@ def _audit_pagespeed(url: str, *, strategy: str = "mobile", runs: int = 3) -> di
     """Renvoie 3 scores Lighthouse : performance, seo, accessibility.
 
     Outil de référence : Google PageSpeed Insights.
-    Stratégie de fiabilisation (Lighthouse a une variance ±5-15 points par run) :
-
-    1. **CrUX d'abord** : si Google publie des Field Data (utilisateurs réels)
-       pour la URL, on prend la performance CrUX (28 derniers jours, stable).
-    2. **Sinon, médiane sur N runs Lighthouse** (3 par défaut) : on lance
-       plusieurs audits et on prend la médiane, ce qui réduit drastiquement
-       la variance liée à la charge serveur Google et à la latence réseau.
+    La performance retient le maximum des runs Lighthouse réussis.
+    SEO et accessibilité conservent leur médiane. Les catégories CrUX ne
+    sont pas converties en score Lighthouse.
 
     ``strategy`` : ``mobile`` (Google priorise la mobile) ou ``desktop``.
-    ``runs``     : nombre de runs Lighthouse pour la médiane (3 = bon compromis).
+    ``runs``     : nombre de runs Lighthouse (3 par défaut).
     """
     api_key = getattr(settings, "PAGESPEED_API_KEY", "") or ""
     session = _Session()
@@ -145,7 +141,7 @@ def _audit_pagespeed(url: str, *, strategy: str = "mobile", runs: int = 3) -> di
 
     report_url = f"https://pagespeed.web.dev/analysis?url={requests_quote(url)}&form_factor={strategy}"
 
-    # ── Run 1 : on regarde si CrUX (Field Data) est disponible ───────
+    # ── Premier run Lighthouse ─────────────────────────────────────
     try:
         resp = session.get(PSI_URL, params=params, timeout=90)
     except Exception as exc:  # noqa: BLE001
@@ -156,14 +152,13 @@ def _audit_pagespeed(url: str, *, strategy: str = "mobile", runs: int = 3) -> di
         return {}
 
     first_payload = resp.json() or {}
-    crux_perf = _extract_crux_performance(first_payload)
 
     # Lighthouse scores du run 1
     runs_scores: dict[str, list[int]] = {"performance": [], "seo": [], "accessibility": []}
     _accumulate_lh_scores(first_payload, runs_scores)
 
-    # ── Runs 2..N (uniquement si pas de CrUX et runs > 1) ────────────
-    if crux_perf is None and runs > 1:
+    # ── Runs 2..N, même si des données CrUX sont disponibles ────────
+    if runs > 1:
         for _ in range(runs - 1):
             try:
                 r = session.get(PSI_URL, params=params, timeout=90)
@@ -179,12 +174,7 @@ def _audit_pagespeed(url: str, *, strategy: str = "mobile", runs: int = 3) -> di
         s = sorted(values)
         return s[len(s) // 2]
 
-    perf_score: Optional[int]
-    if crux_perf is not None:
-        # Field Data = priorité absolue, ultra-stable.
-        perf_score = crux_perf
-    else:
-        perf_score = median(runs_scores["performance"])
+    perf_score = max(runs_scores["performance"], default=None)
     seo_score = median(runs_scores["seo"])
     a11y_score = median(runs_scores["accessibility"])
 
@@ -216,28 +206,6 @@ def _accumulate_lh_scores(payload: dict, target: dict[str, list[int]]) -> None:
         score = node.get("score")
         if isinstance(score, (int, float)):
             target[target_key].append(round(float(score) * 100))
-
-
-def _extract_crux_performance(payload: dict) -> Optional[int]:
-    """Lit le score Performance issu du Chrome User Experience Report (CrUX).
-
-    CrUX agrège les vraies métriques utilisateurs sur 28 jours. C'est ce que
-    PSI affiche comme « Field Data » en haut du rapport. Bien plus stable que
-    le score Lighthouse en mode lab.
-
-    Renvoie None si Google n'a pas assez de trafic réel sur l'URL pour
-    publier un score CrUX (cas fréquent pour les sites à faible audience).
-    """
-    metrics = (payload.get("loadingExperience") or {}).get("metrics") or {}
-    overall = (payload.get("loadingExperience") or {}).get("overall_category")
-    if not metrics:
-        return None
-    # CrUX classe en FAST/AVERAGE/SLOW. On mappe vers un score indicatif
-    # uniquement si on a au moins 3 Web Vitals collectés (sinon données trop minces).
-    if len(metrics) < 3:
-        return None
-    mapping = {"FAST": 95, "AVERAGE": 75, "SLOW": 50}
-    return mapping.get(overall or "")
 
 
 def _audit_mozilla_observatory(url: str) -> CategoryScore:
@@ -422,8 +390,9 @@ def audit_project(
        SSL calculés directement depuis l'URL. Aucun quota, toujours dispo.
     2. **Grades officiels** — Mozilla Observatory (sécurité A+) et SSL Labs
        (chiffrement A+) écrasent/enrichissent le socle s'ils répondent.
-    3. **PageSpeed** (bonus) — si ``PAGESPEED_API_KEY`` configurée, la médiane
-       Lighthouse remplace le socle pour perf/SEO/accessibilité (plus précis).
+    3. **PageSpeed** (bonus) — si ``PAGESPEED_API_KEY`` configurée, le maximum
+       Lighthouse remplace la performance du socle ; SEO/accessibilité
+       utilisent la médiane.
 
     Résultat : toutes les cartes ont un score ET un lien « Tester », même
     sans aucune clé API configurée.
