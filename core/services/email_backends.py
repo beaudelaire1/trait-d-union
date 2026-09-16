@@ -19,6 +19,19 @@ from django.core.mail import EmailMessage
 logger = logging.getLogger(__name__)
 
 
+def _clean_display_name(value: Optional[str]) -> str:
+    """Nettoie les échappements accidentels dans les noms affichés des emails."""
+    cleaned = str(value or '').strip()
+    cleaned = cleaned.replace("\\'", "'").replace('\\’', '’').replace('\\‘', '‘')
+
+    # Le nom de marque doit toujours être affiché sans caractère d'échappement.
+    normalized_brand = cleaned.replace('’', "'").replace('‘', "'")
+    if normalized_brand == "Trait d'Union Studio":
+        return "Trait d'Union Studio"
+
+    return cleaned
+
+
 def _transactional_preheader(subject: str, tags: Optional[list[str]] = None) -> str:
     """Retourne un aperçu court et non sensible selon le type d'email.
 
@@ -73,7 +86,9 @@ class BrevoEmailService:
     def __init__(self):
         self.api_key = getattr(settings, 'BREVO_API_KEY', None)
         self.default_from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', 'contact@traitdunion.studio')
-        self.default_from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
+        self.default_from_name = _clean_display_name(
+            getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
+        )
         self._api_instance = None
 
     @property
@@ -123,6 +138,7 @@ class BrevoEmailService:
             import sib_api_v3_sdk
 
             html_content = _inject_preheader(html_content, subject, tags)
+            sender_name = _clean_display_name(from_name or self.default_from_name)
 
             send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
                 to=[sib_api_v3_sdk.SendSmtpEmailTo(
@@ -131,7 +147,7 @@ class BrevoEmailService:
                 )],
                 sender=sib_api_v3_sdk.SendSmtpEmailSender(
                     email=from_email or self.default_from_email,
-                    name=from_name or self.default_from_name
+                    name=sender_name
                 ),
                 subject=subject,
                 html_content=html_content,
