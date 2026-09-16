@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def _send_email(to_email: str, subject: str, message: str, html_body: str = None) -> bool:
     """
     Envoie un email via Brevo ou fallback Django.
-    
+
     Args:
         to_email: Destinataire
         subject: Sujet de l'email
@@ -24,11 +24,11 @@ def _send_email(to_email: str, subject: str, message: str, html_body: str = None
     """
     try:
         from core.services.email_backends import send_simple_email, brevo_service
-        
+
         if html_body and brevo_service.is_configured():
             # Utiliser l'API Brevo avec HTML
             from core.services.email_backends import send_transactional_email
-            
+
             result = send_transactional_email(
                 to_email=to_email,
                 subject=subject,
@@ -36,7 +36,7 @@ def _send_email(to_email: str, subject: str, message: str, html_body: str = None
                 tags=['lead', 'contact']
             )
             return result.get('success', False)
-        
+
         # Fallback sur send_simple_email
         return send_simple_email(to_email=to_email, subject=subject, text_body=message, html_body=html_body)
     except ImportError:
@@ -50,79 +50,116 @@ class EmailService:
 
     @staticmethod
     def send_confirmation_email(lead: Lead) -> bool:
-        """Send a confirmation email to the prospect with a summary of their request."""
-        subject = "Merci de votre demande – Trait d'Union Studio"
+        """Envoie au prospect un accusé de réception réellement exploitable."""
+        reference = f"LEAD-{lead.pk}"
+        project_type = lead.get_project_type_display()
+        budget = lead.get_budget_display() or 'Non spécifié'
+        site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
+
+        subject = f"Demande reçue — {project_type} | Réf. {reference}"
         message = (
             f"Bonjour {lead.name},\n\n"
-            "Nous avons bien reçu votre demande concernant un projet de type "
-            f"{lead.get_project_type_display()}. Nous reviendrons vers vous rapidement pour discuter des détails.\n\n"
-            "Résumé de votre message :\n"
+            f"Votre demande concernant « {project_type} » a bien été reçue. "
+            "Nous reviendrons vers vous sous 24 à 48 heures ouvrées.\n\n"
+            f"Référence : {reference}\n"
+            f"Type de projet : {project_type}\n"
+            f"Budget indiqué : {budget}\n"
+            f"Téléphone : {lead.phone or 'Non renseigné'}\n"
+            f"Site existant : {lead.existing_url or 'Non renseigné'}\n\n"
+            "Votre message :\n"
             f"{lead.message}\n\n"
-            "L'équipe Trait d'Union Studio"
+            "Si vous souhaitez ajouter une précision avant notre retour, vous pouvez répondre directement à cet email.\n\n"
+            "Trait d'Union Studio"
         )
-        
-        # Template HTML premium TUS
+
+        details = [
+            {'label': 'Référence', 'value': reference},
+            {'label': 'Type de projet', 'value': project_type},
+            {'label': 'Budget estimé', 'value': budget},
+        ]
+        if lead.phone:
+            details.append({'label': 'Téléphone', 'value': str(lead.phone)})
+        if lead.existing_url:
+            details.append({'label': 'Plateforme existante', 'value': lead.existing_url})
+        details.append({'label': 'Votre message', 'value': lead.message})
+
         html_body = render_to_string(
             'emails/notification_generic.html',
             {
-                'headline': 'Confirmation de votre demande',
-                'intro': f"Bonjour {lead.name},\n\nNous avons bien reçu votre demande concernant un projet de type {lead.get_project_type_display()}. Notre équipe reviendra vers vous dans les plus brefs délais.",
-                'rows': [
-                    {'label': 'Type de projet', 'value': lead.get_project_type_display()},
-                    {'label': 'Budget estimé', 'value': lead.get_budget_display() or 'Non spécifié'},
-                ],
-                'action_url': getattr(settings, 'SITE_URL', 'https://traitdunion.studio'),
-                'action_label': 'Visiter notre site',
+                'headline': 'Votre demande a bien été reçue',
+                'preheader': (
+                    f"Réf. {reference} — {project_type}. "
+                    "Récapitulatif de votre demande et délai de réponse : 24 à 48 h ouvrées."
+                ),
+                'message': (
+                    f"Bonjour <strong>{lead.name}</strong>,<br><br>"
+                    "Nous avons bien reçu votre demande. Nous reviendrons vers vous "
+                    "sous <strong>24 à 48 heures ouvrées</strong>.<br><br>"
+                    "Vous trouverez ci-dessous les informations enregistrées. "
+                    "Si une précision manque, répondez simplement à cet email."
+                ),
+                'details': details,
+                'reference': reference,
+                'cta_url': site_url,
+                'cta_text': "Accéder à Trait d'Union Studio",
             },
         )
-        
+
         return _send_email(lead.email, subject, message, html_body)
 
     @staticmethod
     def send_admin_notification(lead: Lead) -> bool:
         """Notify the site administrator of a new lead."""
-        subject = f'🔔 Nouveau lead : {lead.name}'
+        reference = f"LEAD-{lead.pk}"
+        project_type = lead.get_project_type_display()
+        subject = f"[TUS] Nouveau contact {reference} — {project_type} — {lead.name}"
         message = (
+            f"Référence : {reference}\n"
             f"Nom : {lead.name}\n"
             f"Email : {lead.email}\n"
-            f"Type de projet : {lead.get_project_type_display()}\n"
+            f"Téléphone : {lead.phone or '—'}\n"
+            f"Type de projet : {project_type}\n"
             f"Budget : {lead.get_budget_display() or 'Non spécifié'}\n"
             f"Message :\n{lead.message}\n"
             f"URL existante : {lead.existing_url or '—'}\n"
+            f"Pièce jointe : {lead.attachment.name if lead.attachment else '—'}\n"
             f"IP : {lead.ip_address or '—'}\n"
         )
-        
-        # Template HTML premium TUS pour l'admin
+
         branding = getattr(settings, 'INVOICE_BRANDING', {})
         site_url = getattr(settings, 'SITE_URL', 'https://traitdunion.studio').rstrip('/')
-        
+
+        rows = [
+            {'label': 'Nom', 'value': lead.name},
+            {'label': 'Email', 'value': lead.email},
+            {'label': 'Téléphone', 'value': str(lead.phone) if lead.phone else '—'},
+            {'label': 'Type de projet', 'value': project_type},
+            {'label': 'Budget', 'value': lead.get_budget_display() or 'Non spécifié'},
+            {'label': 'Message', 'value': lead.message},
+            {'label': 'Plateforme existante', 'value': lead.existing_url or '—'},
+            {'label': 'Pièce jointe', 'value': lead.attachment.name if lead.attachment else '—'},
+            {'label': 'IP', 'value': lead.ip_address or '—'},
+        ]
+
         html_body = render_to_string(
             'emails/notification_generic.html',
             {
                 'brand': branding.get('name', "Trait d'Union Studio"),
-                'headline': '🔔 Nouveau contact reçu',
-                'title': 'Notification Admin',
-                'intro': "Un nouveau prospect vient de vous contacter via le formulaire du site.",
-                'rows': [
-                    {'label': 'Nom', 'value': lead.name},
-                    {'label': 'Email', 'value': lead.email},
-                    {'label': 'Type de projet', 'value': lead.get_project_type_display()},
-                    {'label': 'Budget', 'value': lead.get_budget_display() or 'Non spécifié'},
-                    {'label': 'Message', 'value': lead.message[:200] + '...' if len(lead.message) > 200 else lead.message},
-                    {'label': 'URL existante', 'value': lead.existing_url or '—'},
-                    {'label': 'IP', 'value': lead.ip_address or '—'},
-                ],
+                'headline': 'Nouveau contact reçu',
+                'title': f'{reference} — {lead.name}',
+                'preheader': f"{reference} — {lead.name} — {project_type} — {lead.email}",
+                'intro': "Un nouveau prospect vient de soumettre le formulaire de contact.",
+                'rows': rows,
                 'action_url': f"{site_url}/tus-gestion-secure/leads/lead/{lead.pk}/change/",
-                'action_label': 'Voir dans l\'admin',
-                'reference': f"LEAD-{lead.pk}",
+                'action_label': "Ouvrir la fiche dans l'admin",
+                'reference': reference,
             },
         )
-        
-        # Utiliser ADMIN_EMAIL ou TASK_NOTIFICATION_EMAIL
+
         admin_email = (
             os.environ.get('TASK_NOTIFICATION_EMAIL') or
-            os.environ.get('ADMIN_EMAIL') or 
+            os.environ.get('ADMIN_EMAIL') or
             getattr(settings, 'ADMIN_EMAIL', 'contact@traitdunion.studio')
         )
-        
+
         return _send_email(admin_email, subject, message, html_body)
