@@ -122,7 +122,7 @@
 </head>
 <body>
     <!-- Pré-en-tête : visible dans l'aperçu Gmail/Outlook, invisible dans le message. -->
-    <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent; mso-hide:all;">
+    <div data-tus-preheader="1" style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent; mso-hide:all;">
         {% if preheader %}{{ preheader|striptags }}{% elif reference %}{{ headline }} — Réf. {{ reference }}{% else %}{{ headline }} — Trait d'Union Studio{% endif %}
     </div>
 
