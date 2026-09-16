@@ -56,7 +56,7 @@ class EmailService:
         budget = lead.get_budget_display() or 'Non spécifié'
         site_url = str(getattr(settings, 'SITE_URL', 'https://traitdunion.studio')).rstrip('/')
 
-        subject = f"Demande reçue — {project_type} | Réf. {reference}"
+        subject = f"Merci de votre demande — {project_type} | Réf. {reference}"
         message = (
             f"Bonjour {lead.name},\n\n"
             f"Votre demande concernant « {project_type} » a bien été reçue. "
