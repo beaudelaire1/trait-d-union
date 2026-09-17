@@ -40,7 +40,7 @@ def get_client_ip(request) -> str:
         ip = forwarded_for.split(',')[0].strip()
     else:
         ip = request.META.get('REMOTE_ADDR', '')
-    # Sanitize: max 45 chars (IPv6), strip whitespace, no special chars
+    # Sanitize: max 45 chars (IPv6 max length), strip whitespace, no special chars
     ip = ip.strip()[:45]
     # Remove any characters that shouldn't be in an IP address
     if ip and not all(c in '0123456789abcdefABCDEF.:' for c in ip):
@@ -51,11 +51,33 @@ def get_client_ip(request) -> str:
 def num2words_fr(value: Decimal) -> str:
     """Convertit un montant décimal en toutes lettres (français).
 
+    La partie décimale d'un montant est traitée comme un nombre à deux
+    chiffres. Par exemple, ``24.48`` devient ``vingt-quatre virgule
+    quarante-huit`` et non ``vingt-quatre virgule quatre huit``.
+
     Utilise ``num2words`` si disponible, sinon retourne la valeur
     formatée en français (virgule comme séparateur décimal).
     """
     try:
         from num2words import num2words
-        return num2words(value, lang='fr')
+
+        amount = Decimal(str(value)).quantize(Decimal("0.01"))
+        sign = "moins " if amount < 0 else ""
+        amount = abs(amount)
+
+        integer_part = int(amount)
+        decimal_part = int((amount - Decimal(integer_part)) * 100)
+
+        integer_words = num2words(integer_part, lang='fr')
+        if decimal_part == 0:
+            return f"{sign}{integer_words}"
+
+        # Préserver le zéro initial pour 0,01 à 0,09.
+        if decimal_part < 10:
+            decimal_words = f"zéro {num2words(decimal_part, lang='fr')}"
+        else:
+            decimal_words = num2words(decimal_part, lang='fr')
+
+        return f"{sign}{integer_words} virgule {decimal_words}"
     except ImportError:
         return str(value).replace(".", ",")
