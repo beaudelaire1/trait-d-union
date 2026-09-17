@@ -20,4 +20,15 @@ class FacturesConfig(AppConfig):
 
     def ready(self) -> None:
         # Signaux de notification gérés dans apps/clients/signals.py
-        pass
+        #
+        # Les anciens modèles ajoutent littéralement « euros » après une
+        # conversion générique du nombre. Pour les documents financiers,
+        # on remplace cette représentation par une vraie écriture monétaire
+        # (« 24,48 € » -> « vingt-quatre euros et quarante-huit centimes »).
+        from core.utils import amount_to_words_fr
+        from .models import Invoice
+
+        def amount_letter(invoice):
+            return amount_to_words_fr(invoice.total_ttc).title()
+
+        Invoice.amount_letter = amount_letter
