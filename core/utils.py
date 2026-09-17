@@ -1,7 +1,7 @@
 """Utilitaires partagés pour le projet Trait d'Union Studio."""
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 
 def raw_media_storage():
@@ -49,19 +49,16 @@ def get_client_ip(request) -> str:
 
 
 def num2words_fr(value: Decimal) -> str:
-    """Convertit un montant décimal en toutes lettres (français).
+    """Convertit un nombre décimal en toutes lettres (français).
 
-    La partie décimale d'un montant est traitée comme un nombre à deux
-    chiffres. Par exemple, ``24.48`` devient ``vingt-quatre virgule
-    quarante-huit`` et non ``vingt-quatre virgule quatre huit``.
-
-    Utilise ``num2words`` si disponible, sinon retourne la valeur
-    formatée en français (virgule comme séparateur décimal).
+    La partie décimale est traitée comme un nombre à deux chiffres. Cette
+    fonction reste générique ; pour un montant monétaire, utiliser
+    ``amount_to_words_fr``.
     """
     try:
         from num2words import num2words
 
-        amount = Decimal(str(value)).quantize(Decimal("0.01"))
+        amount = Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
         sign = "moins " if amount < 0 else ""
         amount = abs(amount)
 
@@ -72,7 +69,6 @@ def num2words_fr(value: Decimal) -> str:
         if decimal_part == 0:
             return f"{sign}{integer_words}"
 
-        # Préserver le zéro initial pour 0,01 à 0,09.
         if decimal_part < 10:
             decimal_words = f"zéro {num2words(decimal_part, lang='fr')}"
         else:
@@ -81,3 +77,34 @@ def num2words_fr(value: Decimal) -> str:
         return f"{sign}{integer_words} virgule {decimal_words}"
     except ImportError:
         return str(value).replace(".", ",")
+
+
+def amount_to_words_fr(value: Decimal) -> str:
+    """Convertit un montant en euros et centimes, sans notation « virgule ».
+
+    Exemples :
+    - 24.48 -> « vingt-quatre euros et quarante-huit centimes »
+    - 1.01  -> « un euro et un centime »
+    - 50.00 -> « cinquante euros »
+    """
+    amount = Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    negative = amount < 0
+    amount = abs(amount)
+
+    euros = int(amount)
+    centimes = int((amount - Decimal(euros)) * 100)
+
+    try:
+        from num2words import num2words
+
+        euro_words = num2words(euros, lang='fr')
+        result = f"{euro_words} euro{'s' if euros != 1 else ''}"
+
+        if centimes:
+            centime_words = num2words(centimes, lang='fr')
+            result += f" et {centime_words} centime{'s' if centimes != 1 else ''}"
+
+        return f"moins {result}" if negative else result
+    except ImportError:
+        formatted = f"{amount:.2f}".replace('.', ',')
+        return f"moins {formatted} euros" if negative else f"{formatted} euros"
