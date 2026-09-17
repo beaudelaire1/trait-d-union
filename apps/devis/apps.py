@@ -20,3 +20,10 @@ class DevisConfig(AppConfig):
 
     def ready(self) -> None:
         from . import signals  # noqa: F401
+        from core.utils import amount_to_words_fr
+        from .models import Quote
+
+        def amount_letter(quote):
+            return amount_to_words_fr(quote.total_ttc).title()
+
+        Quote.amount_letter = amount_letter
