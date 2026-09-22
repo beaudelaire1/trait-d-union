@@ -21,10 +21,8 @@ elle met à jour les contenus sans créer de doublon ; ``--clear`` supprime
 proprement (et avec lui les phases de stratégie en cascade).
 
 La fiche d'origine, créée à la main dans l'admin, porte le slug
-``eebc-gestion`` : c'est celui que vise la commande par défaut. Elle a
-longtemps visé ``eebc``, ce qui publiait une seconde fiche à côté de la
-vraie ; ``--nettoyer-doublon`` supprime ce résidu. ``--slug`` reste là pour
-viser une autre fiche au besoin — le slug se lit dans l'adresse de la page,
+``eebc-gestion`` : c'est celui que vise la commande par défaut. ``--slug`` reste là pour viser une autre fiche au
+besoin — le slug se lit dans l'adresse de la page,
 ``/nos-signatures/<slug>/``.
 
 Les captures téléversées depuis l'admin sont conservées : les champs d'image
@@ -37,7 +35,6 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 
 SLUG = "eebc-gestion"
-SLUG_DOUBLON = "eebc"
 PROJECT_URL = "https://eglise-ebc.org"
 
 
@@ -52,14 +49,6 @@ class Command(BaseCommand):
                 "Si l'étude de cas a été créée à la main sous un autre slug, "
                 "le passer ici : la commande met alors à jour la fiche "
                 "d'origine au lieu d'en créer une seconde."
-            ),
-        )
-        parser.add_argument(
-            "--nettoyer-doublon", action="store_true",
-            help=(
-                f"Supprime la fiche « {SLUG_DOUBLON} », publiée par erreur à "
-                f"côté de la fiche d'origine « {SLUG} », quand la commande "
-                "visait encore le mauvais slug. Sans effet si elle n'existe pas."
             ),
         )
         parser.add_argument(
@@ -87,16 +76,6 @@ class Command(BaseCommand):
         )
 
         slug = options["slug"]
-
-        if options["nettoyer_doublon"]:
-            supprimees, _ = Project.objects.filter(slug=SLUG_DOUBLON).delete()
-            if supprimees:
-                self.stdout.write(self.style.SUCCESS(
-                    f"[OK] Fiche en double « {SLUG_DOUBLON} » supprimée."
-                ))
-            else:
-                self.stdout.write(f"[--] Aucune fiche « {SLUG_DOUBLON} » : rien à supprimer.")
-            return
 
         if options["clear"]:
             qs = Project.objects.filter(slug=slug)
