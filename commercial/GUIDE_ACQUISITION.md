@@ -3,6 +3,8 @@
 
 **Base partenaires** : voir [partenaires_antilles_guyane.csv](./partenaires_antilles_guyane.csv)
 
+**Prospection tous secteurs et tous profils (septembre 2026)** : voir [prospection/](./prospection/README.md)
+
 ---
 
 ## 1. Personas cibles (ordre de rentabilité décroissante)
