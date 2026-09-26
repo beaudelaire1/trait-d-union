@@ -10,7 +10,6 @@ qui montrent un signal d'achat vérifiable.
 | [ANALYSE_MARCHE_2026.md](./ANALYSE_MARCHE_2026.md) | Étude de marché sourcée : facture électronique par territoire, aides à la digitalisation et leurs échéances, signaux sectoriels, segments prioritaires |
 | [PLAYBOOK_TOUS_SECTEURS.md](./PLAYBOOK_TOUS_SECTEURS.md) | Méthode : profils → offre d'entrée, 12 signaux d'achat, scoring sur 100, rituel hebdomadaire, messages prêts à l'emploi, RGPD, objectifs et plan à 90 jours |
 | [prospects_2026-09.csv](./prospects_2026-09.csv) | 18 prospects nominatifs trouvés sur le web (3 A, 9 B, 6 C ; 8 secteurs, 5 profils ; Guyane, Guadeloupe, Martinique), chacun avec son signal, son accroche, sa prochaine action et son URL source |
-| [EMAILS_PREMIER_CONTACT.md](./EMAILS_PREMIER_CONTACT.md) | Emails de premier contact prêts à envoyer pour les 3 prospects A, avec angle, destinataire à trouver et relances |
 | [matrice_secteurs.csv](./matrice_secteurs.csv) | Les 21 secteurs du diagnostic terrain : douleur, signal, offre d'entrée, simulateurs d'accroche, où trouver les prospects, ticket |
 | [../partenaires_antilles_guyane.csv](../partenaires_antilles_guyane.csv) | Prescripteurs (10 ajoutés : MPI Guyane, AMPI Martinique, UEBS, ARAPL, etc.) |
 
