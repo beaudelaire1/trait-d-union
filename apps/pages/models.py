@@ -12,7 +12,7 @@ class TrustedLogo(models.Model):
         upload_to="trusted_logos/",
         blank=True,
         null=True,
-        help_text="PNG, WebP ou SVG recommandé avec fond transparent.",
+        help_text="PNG, WebP ou JPG recommandé avec fond transparent.",
     )
     legacy_static_path = models.CharField(
         max_length=255,
