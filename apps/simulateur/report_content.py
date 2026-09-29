@@ -34,10 +34,12 @@ _DEFAULT = {
         "Si le diagnostic révèle un angle mort, provoquez une conversation "
         "structurée (coach, mentor, pair, expert) avant de décider.",
     ],
+    'limits': [
+        "Le résultat dépend directement des hypothèses saisies et doit être confronté aux données réelles.",
+        "Ce simulateur éclaire une décision précise ; il ne remplace pas une analyse complète du contexte de l'entreprise.",
+    ],
     'framework': (
-        "Un bon diagnostic n'est pas celui qui donne toutes les réponses, "
-        "mais celui qui pose les bonnes questions au bon moment. "
-        "Le vôtre vient de démarrer."
+        "Un bon diagnostic rend ses hypothèses visibles et permet de vérifier le résultat dans le réel."
     ),
 }
 
@@ -261,11 +263,456 @@ TOOL_CONTENT = {
 }
 
 
+
+# Couche éditoriale du rapport : elle est volontairement alignée sur les
+# calculs réellement présents dans chaque simulateur. Elle corrige les anciens
+# textes trop génériques ou sémantiquement décalés et ajoute les limites du
+# modèle afin de ne pas présenter une simulation comme une certitude.
+REPORT_OVERRIDES = {
+    'point-mort': {
+        'category': 'Rentabilité',
+        'measures': "Ce calcul détermine le nombre de ventes et le chiffre d'affaires nécessaires pour couvrir les charges fixes à partir du prix de vente et du coût variable unitaire.",
+        'limits': [
+            "Le calcul suppose un prix, un coût variable unitaire et des charges fixes stables sur la période.",
+            "Il ne modélise ni les décalages de trésorerie, ni les impôts, ni les coûts qui changent par paliers de volume.",
+        ],
+        'next_steps': [
+            "Vérifiez que toutes les charges fixes et variables réellement supportées sont incluses.",
+            "Comparez les ventes prévues au point mort et calculez votre marge de sécurité en unités et en euros.",
+            "Testez séparément une hausse de prix, une baisse de coût variable et une baisse de charges fixes.",
+            "Mettez à jour le seuil dès qu'un coût structurel ou un tarif change.",
+        ],
+        'framework': "Le point mort est un seuil de couverture des coûts, pas un objectif commercial suffisant.",
+    },
+    'cac': {
+        'category': 'Acquisition',
+        'measures': "Le simulateur relie budget marketing, trafic et taux de conversion pour estimer le nombre de clients acquis et le CAC, puis le rapproche de la valeur vie client saisie.",
+        'limits': [
+            "Le CAC moyen masque les écarts entre canaux, campagnes, segments et délais de conversion.",
+            "La LTV est une hypothèse saisie : elle doit être validée sur les données de facturation et de rétention réelles.",
+        ],
+        'next_steps': [
+            "Recalculez le CAC par canal au lieu de vous arrêter à la moyenne globale.",
+            "Vérifiez la LTV observée sur une cohorte de clients suffisamment ancienne.",
+            "Identifiez l'étape du tunnel qui dégrade le plus le coût d'acquisition et testez une seule correction à la fois.",
+            "Suivez CAC, taux de conversion et délai d'amortissement dans la même revue mensuelle.",
+        ],
+        'framework': "Un CAC n'est interprétable qu'avec la valeur créée par le client et le temps nécessaire pour récupérer l'investissement.",
+    },
+    'friction': {
+        'category': 'Opérations',
+        'measures': "Le calcul chiffre le coût du temps consacré aux tâches répétitives, estime la part automatisable et compare le gain potentiel au coût de l'automatisation.",
+        'limits': [
+            "Les heures perdues et la part automatisable reposent sur vos estimations : chronométrez avant de décider.",
+            "Le ROI ne mesure pas automatiquement les coûts de migration, de formation, d'adoption ou de maintenance non saisis.",
+        ],
+        'next_steps': [
+            "Mesurez pendant deux semaines les tâches répétitives réellement effectuées et leur durée.",
+            "Séparez les tâches à supprimer, standardiser, automatiser et déléguer.",
+            "Chiffrez un scénario prudent avec un gain de temps inférieur à l'hypothèse initiale.",
+            "Automatisez un flux prioritaire, puis comparez le temps réellement économisé au scénario.",
+        ],
+        'framework': "Une automatisation rentable supprime une friction mesurée ; elle ne doit pas automatiser un processus inutile.",
+    },
+    'fragmentation': {
+        'category': 'Systèmes & TCO',
+        'measures': "Le simulateur compare le coût cumulé de plusieurs abonnements SaaS au coût total de possession d'un écosystème unifié sur l'horizon choisi.",
+        'limits': [
+            "Le TCO financier ne mesure pas l'adéquation fonctionnelle, la qualité des intégrations ou le risque de verrouillage fournisseur.",
+            "Les coûts de migration, reprise de données, formation et conduite du changement ne sont pris en compte que s'ils sont inclus dans vos hypothèses.",
+        ],
+        'next_steps': [
+            "Inventoriez chaque outil, son coût, son propriétaire, ses utilisateurs et les données qu'il contient.",
+            "Identifiez les doublons fonctionnels et les ressaisies entre outils avant de parler de remplacement.",
+            "Comparez trois scénarios : statu quo optimisé, consolidation partielle et écosystème unifié.",
+            "Décidez sur le TCO et le fonctionnement réel, puis planifiez la migration par flux critique.",
+        ],
+        'framework': "Moins d'outils n'est pas automatiquement mieux : l'objectif est de réduire les doublons et les ruptures de flux sans perdre de fonctions utiles.",
+    },
+    'acse': {
+        'category': 'Flux A.C.S.E',
+        'measures': "A.C.S.E évalue quatre maillons — Attirer, Convertir, Structurer et Exécuter — puis priorise la zone dont l'écart au niveau cible produit l'impact le plus élevé.",
+        'limits': [
+            "Les scores sont auto-évalués : ils servent à prioriser, pas à certifier la maturité réelle de l'organisation.",
+            "Des scores proches doivent être départagés avec des données opérationnelles : volume de leads, conversion, délais, erreurs et satisfaction.",
+        ],
+        'next_steps': [
+            "Prenez le pilier prioritaire indiqué et associez-lui une métrique observable.",
+            "Vérifiez le diagnostic avec un exemple concret des 30 derniers jours.",
+            "Lancez une action courte sur ce pilier sans modifier simultanément les trois autres.",
+            "Refaites le score après 30 jours et comparez le résultat à la métrique réelle.",
+        ],
+        'framework': "Le score sert à choisir où regarder en premier ; la preuve vient ensuite des données du terrain.",
+    },
+    'plafond': {
+        'category': 'Capacité & automatisation',
+        'measures': "Le calcul estime la capacité de projets libérée par une réduction du temps administratif, puis traduit cette capacité en chiffre d'affaires et profit potentiels face au coût de l'automatisation.",
+        'limits': [
+            "La capacité libérée ne devient du chiffre d'affaires que si la demande existe et si l'équipe peut absorber la livraison.",
+            "Le scénario suppose que le gain de temps annoncé par l'automatisation est réellement atteint après mise en place.",
+        ],
+        'next_steps': [
+            "Mesurez le temps administratif par projet sur un échantillon réel.",
+            "Vérifiez que la demande commerciale permettrait d'utiliser la capacité libérée.",
+            "Testez un scénario prudent, médian et haut sur le pourcentage de temps gagné.",
+            "Décidez avec le délai d'amortissement observé et non avec le seul CA potentiel.",
+        ],
+        'framework': "Du temps libéré est une capacité ; il ne devient une valeur économique que lorsqu'il est réaffecté.",
+    },
+    'elasticite': {
+        'category': 'Pricing',
+        'measures': "Le simulateur calcule le changement de volume compatible avec une variation de prix pour préserver la marge. Il mesure une marge de manœuvre arithmétique, pas l'élasticité observée du marché.",
+        'limits': [
+            "Le calcul ne prédit pas la réaction réelle des clients : aucune élasticité n'est estimée à partir de données historiques ou d'une expérimentation.",
+            "Il suppose que le coût unitaire et la structure de marge restent comparables après le changement de prix.",
+        ],
+        'next_steps': [
+            "Utilisez le seuil calculé comme limite économique, pas comme prévision de ventes.",
+            "Testez le nouveau prix sur un segment ou sur les nouveaux clients avant généralisation.",
+            "Mesurez simultanément conversion, marge totale et motifs de refus.",
+            "Conservez un groupe ou une période de référence pour distinguer l'effet prix des autres variations commerciales.",
+        ],
+        'framework': "Le simulateur dit combien de volume vous pouvez perdre ou devez gagner ; seul le marché dira combien vous perdrez ou gagnerez réellement.",
+    },
+    'vallee-mort': {
+        'category': 'Trésorerie & BFR',
+        'measures': "Le modèle projette la trésorerie pendant la croissance en intégrant marge brute, charges fixes et décalage entre paiements clients et fournisseurs afin d'identifier le creux de financement.",
+        'limits': [
+            "La projection simplifie les flux : elle ne remplace pas un plan de trésorerie détaillé par date et par encaissement/décaissement.",
+            "Elle suppose que croissance, délais de paiement, marge et charges suivent les hypothèses saisies pendant la période.",
+        ],
+        'next_steps': [
+            "Comparez le creux projeté à votre trésorerie réellement disponible et à vos lignes de financement confirmées.",
+            "Refaites le scénario avec des encaissements plus tardifs et une croissance plus lente.",
+            "Travaillez en priorité acomptes, délais clients, délais fournisseurs et charges engagées avant le mois critique.",
+            "Transformez ensuite le scénario en prévision de trésorerie glissante, mise à jour chaque semaine.",
+        ],
+        'framework': "Une croissance rentable peut consommer du cash avant d'en produire : le calendrier des flux compte autant que la marge.",
+    },
+    'retention': {
+        'category': 'Fidélisation',
+        'measures': "Le simulateur compare sur cinq ans deux trajectoires de clientèle — rétention actuelle et rétention améliorée — puis rapproche la marge additionnelle du coût du programme de fidélisation.",
+        'limits': [
+            "Les taux de rétention, nouveaux clients, revenu moyen et marge sont maintenus constants dans la projection.",
+            "Le modèle ne distingue pas les cohortes, les segments, les hausses de prix ni l'actualisation des flux futurs.",
+        ],
+        'next_steps': [
+            "Calculez la rétention réelle par cohorte avant de fixer l'amélioration visée.",
+            "Identifiez le moment principal de perte client et l'action qui peut le modifier.",
+            "Testez le programme sur une cohorte limitée et mesurez son coût complet.",
+            "Comparez après plusieurs cycles la rétention observée, la marge additionnelle et le coût du programme.",
+        ],
+        'framework': "La valeur de la rétention se mesure sur des cohortes réelles, pas seulement sur une projection composée.",
+    },
+    'mix-produits': {
+        'category': 'Optimisation du mix',
+        'measures': "Le solveur recherche la combinaison entière d'offres qui maximise la marge brute sous les contraintes d'heures disponibles et de demande maximale saisies.",
+        'limits': [
+            "Le modèle suppose des marges unitaires, temps par unité et plafonds de demande stables.",
+            "Il n'intègre pas automatiquement d'autres contraintes : compétences, dépendances entre offres, minimums commerciaux, délais ou capacité par personne.",
+        ],
+        'next_steps': [
+            "Vérifiez les coûts directs et les heures réellement consommées par chaque offre.",
+            "Ajoutez mentalement les contraintes opérationnelles absentes avant d'adopter le mix calculé.",
+            "Comparez la solution entière à la relaxation LP et examinez le gap affiché.",
+            "Testez le mix sur un cycle court puis mettez à jour coûts, temps et demande avec le réalisé.",
+        ],
+        'framework': "Le solveur optimise ce que vous lui donnez ; une contrainte oubliée peut rendre une solution mathématiquement optimale mais opérationnellement impossible.",
+    },
+    'atterrissage': {
+        'category': 'Pilotage financier',
+        'measures': "L'atterrissage projette le chiffre d'affaires annuel par service à partir du réalisé, du temps restant et du pipeline pondéré, puis estime marge, RFA et PPTG selon les paramètres saisis.",
+        'limits': [
+            "Le pipeline est pondéré par un taux de conversion hypothétique : ce n'est pas du chiffre d'affaires acquis.",
+            "RFA et PPTG sont des simulations basées sur les seuils et taux saisis ; vérifiez toujours les règles contractuelles et comptables applicables.",
+        ],
+        'next_steps': [
+            "Vérifiez service par service le réalisé, le pipeline, la probabilité de conversion et le taux de marge.",
+            "Isolez le service qui explique le plus grand écart à l'objectif au lieu de piloter uniquement le total.",
+            "Construisez un scénario prudent, central et haut sur le pipeline restant.",
+            "Actualisez l'atterrissage à chaque clôture mensuelle et documentez l'écart entre projection précédente et réalisé.",
+        ],
+        'framework': "Un atterrissage utile n'est pas une prévision figée : c'est une estimation révisée à mesure que le réalisé remplace les hypothèses.",
+    },
+    'tresorerie': {
+        'category': 'Trésorerie mensuelle',
+        'measures': "Le simulateur projette le solde du mois jour par jour à partir du solde initial, des encaissements certains, des charges fixes et des dépenses variables afin d'identifier le point bas.",
+        'limits': [
+            "Le modèle mensuel agrège les flux autour de quelques dates et ne remplace pas une prévision bancaire transaction par transaction.",
+            "Les encaissements dits certains restent exposés aux retards de paiement et aux événements non saisis.",
+        ],
+        'next_steps': [
+            "Vérifiez chaque entrée et sortie importante avec une date réaliste, pas seulement un total mensuel.",
+            "Si un jour critique apparaît, identifiez les paiements déplaçables et les encaissements accélérables avant cette date.",
+            "Ajoutez un scénario de retard sur les encaissements les plus importants.",
+            "Passez à une trésorerie glissante de 13 semaines si la marge de sécurité est faible.",
+        ],
+        'framework': "Le solde de fin de mois peut être positif alors qu'un creux intermédiaire rend le mois impossible à financer.",
+    },
+    'jumeaux-clients': {
+        'category': 'Segmentation',
+        'measures': "Le simulateur compare plusieurs profils clients à partir du panier, de la fréquence, du CAC, du réachat et de la facilité de service pour produire un classement relatif.",
+        'limits': [
+            "Le score est un indice interne de comparaison, pas une mesure universelle de la valeur d'un segment.",
+            "Les données moyennes peuvent masquer la dispersion des comportements et la marge réelle par client.",
+        ],
+        'next_steps': [
+            "Remplacez les hypothèses par les données de vos derniers clients pour chaque segment.",
+            "Comparez le classement avec la marge réelle et la charge de service observée.",
+            "Choisissez un segment prioritaire et adaptez un canal, un message et une offre pendant 90 jours.",
+            "Mesurez ensuite CAC, conversion, réachat et temps de service pour valider ou invalider le choix.",
+        ],
+        'framework': "Un segment attractif combine économie favorable et capacité à bien le servir ; le chiffre d'affaires seul ne suffit pas.",
+    },
+    'correlation': {
+        'category': 'Cross-sell & bundles',
+        'measures': "La matrice compare les taux de co-achat saisis entre offres afin de faire ressortir les paires les plus connectées et les offres isolées.",
+        'limits': [
+            "Il s'agit d'une matrice de co-occurrence saisie par l'utilisateur, pas d'un coefficient statistique de corrélation calculé sur des transactions brutes.",
+            "Une forte co-occurrence ne prouve pas qu'un bundle augmentera la conversion ou la marge.",
+        ],
+        'next_steps': [
+            "Construisez la matrice à partir de transactions réelles et d'une période définie.",
+            "Sélectionnez une paire fortement associée et vérifiez sa marge combinée.",
+            "Testez un bundle ou une recommandation croisée sur une fraction des clients.",
+            "Comparez panier moyen, taux d'adoption et marge avant et après le test.",
+        ],
+        'framework': "Le co-achat révèle une association à tester ; il ne démontre pas à lui seul une causalité commerciale.",
+    },
+    'delegation': {
+        'category': 'Organisation & coûts',
+        'measures': "Le modèle compare sur l'horizon choisi le coût total d'une embauche et celui d'une sous-traitance, tout en estimant le chiffre d'affaires que le temps libéré pourrait permettre de récupérer.",
+        'limits': [
+            "La comparaison financière ne mesure pas la disponibilité des compétences, le risque social, la continuité, la confidentialité ou la qualité du travail.",
+            "Le chiffre d'affaires récupéré est une hypothèse : libérer du temps ne garantit pas qu'il sera transformé en ventes.",
+        ],
+        'next_steps': [
+            "Validez le volume d'heures réellement délégables et le niveau de compétence requis.",
+            "Calculez les coûts complets des deux options avec vos devis et données sociales réelles.",
+            "Testez la sous-traitance ou une délégation limitée avant un engagement structurel si l'incertitude est forte.",
+            "Décidez en croisant coût total, flexibilité, qualité, continuité et valeur du temps libéré.",
+        ],
+        'framework': "Le choix embauche/sous-traitance est un arbitrage de capacité et de risque, pas uniquement un comparatif de prix.",
+    },
+    'prix-psychologique': {
+        'category': 'Pricing exploratoire',
+        'measures': "Le simulateur construit une zone de prix indicative à partir du prix actuel, du prix marché et de scores déclaratifs de complexité, unicité et durée de relation.",
+        'limits': [
+            "Ce calcul n'est pas une étude de prix psychologique au sens d'une enquête clients ; il s'agit d'un scénario interne à tester.",
+            "Les scores de valeur sont subjectifs et la référence marché saisie peut être peu comparable à votre offre.",
+        ],
+        'next_steps': [
+            "Vérifiez que la référence de prix marché porte sur une offre réellement comparable.",
+            "Utilisez la zone calculée pour définir deux ou trois prix de test, pas pour imposer un tarif final.",
+            "Testez sur de nouveaux devis et consignez conversion, objections et marge.",
+            "Révisez les scores de valeur à partir des retours clients plutôt qu'à partir de votre seule perception.",
+        ],
+        'framework': "Une zone de prix devient crédible lorsqu'elle est confrontée à des comportements d'achat réels.",
+    },
+    'dependance': {
+        'category': 'Concentration client',
+        'measures': "Le radar mesure la concentration du chiffre d'affaires entre clients, estime la perte liée au premier compte et le nombre ainsi que le délai de nouveaux clients nécessaires pour la compenser.",
+        'limits': [
+            "La vitesse de compensation suppose que le rythme d'acquisition et le panier moyen futurs ressemblent aux valeurs saisies.",
+            "La concentration en chiffre d'affaires ne mesure pas à elle seule la marge, la solvabilité ou le caractère stratégique de chaque compte.",
+        ],
+        'next_steps': [
+            "Vérifiez que la répartition client totalise 100 % du chiffre d'affaires analysé.",
+            "Mesurez aussi la contribution à la marge des principaux clients.",
+            "Construisez un scénario de perte du premier compte avec un rythme d'acquisition prudent.",
+            "Fixez une trajectoire de diversification et suivez trimestriellement concentration, marge et pipeline.",
+        ],
+        'framework': "La dépendance se pilote avec une trajectoire de diversification ; la supprimer brutalement peut être aussi risqué que l'ignorer.",
+    },
+    'capacite': {
+        'category': 'Capacité facturable',
+        'measures': "Le calcul répartit le temps travaillé entre production facturable et activités non facturables, puis estime le chiffre d'affaires actuel, le potentiel au taux cible et le coût de l'écart.",
+        'limits': [
+            "Le potentiel suppose qu'il existe suffisamment de demande pour facturer les heures libérées au tarif saisi.",
+            "Une hausse du taux facturable peut dégrader prospection, management ou qualité si elle est obtenue en supprimant des activités nécessaires.",
+        ],
+        'next_steps': [
+            "Mesurez votre répartition du temps pendant plusieurs semaines au lieu de l'estimer de mémoire.",
+            "Identifiez la catégorie non facturable la plus lourde et distinguez ce qui est nécessaire de ce qui est friction.",
+            "Chiffrez le gain par point de taux facturable avant de choisir l'action.",
+            "Augmentez progressivement la capacité facturable et surveillez qualité, délais et pipeline.",
+        ],
+        'framework': "Le bon taux facturable maximise la valeur produite sans affaiblir les fonctions nécessaires à la prochaine vente et à la qualité.",
+    },
+    'saisonnalite': {
+        'category': 'Saisonnalité',
+        'measures': "Le simulateur part des douze mois de chiffre d'affaires, identifie les mois sous le seuil choisi et estime l'effet économique d'une action de lissage financée pendant les périodes creuses.",
+        'limits': [
+            "L'effet du budget de lissage est une hypothèse ; il ne constitue pas une prévision causale du chiffre d'affaires futur.",
+            "Une seule année de données peut confondre saisonnalité et événements exceptionnels.",
+        ],
+        'next_steps': [
+            "Comparez au moins deux années de chiffre d'affaires mensuel si vous les avez.",
+            "Distinguez les creux saisonniers récurrents des anomalies ponctuelles.",
+            "Testez l'action de lissage sur un ou deux mois creux avec un budget plafonné.",
+            "Mesurez la marge additionnelle réellement obtenue avant de reconduire l'investissement.",
+        ],
+        'framework': "Une saisonnalité observée devient exploitable lorsqu'elle se répète et qu'une action mesurée permet réellement d'en atténuer le creux.",
+    },
+    'cout-promotion': {
+        'category': 'Pricing & promotion',
+        'measures': "Le calcul détermine la marge unitaire après remise et le volume additionnel nécessaire pour retrouver la marge totale obtenue sans promotion.",
+        'limits': [
+            "Le modèle suppose que le coût unitaire ne change pas avec le volume et que toutes les ventes promotionnelles auraient sinon été réalisées au prix normal.",
+            "Il ne mesure pas la cannibalisation future, l'acquisition de nouveaux clients ni la valeur vie de ces clients.",
+        ],
+        'next_steps': [
+            "Calculez le point mort en unités avant de lancer la remise.",
+            "Comparez le volume additionnel requis à vos capacités de production et à l'historique de demande.",
+            "Définissez la population, la durée et l'objectif de la promotion avant le lancement.",
+            "Après l'opération, mesurez marge totale, nouveaux clients, cannibalisation et réachat.",
+        ],
+        'framework': "Une promotion doit être jugée sur la marge incrémentale et le comportement créé, pas sur le chiffre d'affaires affiché.",
+    },
+    'valeur-sortie': {
+        'category': 'Valorisation indicative',
+        'measures': "Le simulateur applique des multiples indicatifs de chiffre d'affaires et d'EBITDA au secteur sélectionné, avec une variante liée à la croissance, afin de construire une fourchette exploratoire.",
+        'limits': [
+            "Les multiples embarqués sont des hypothèses de simulation et ne remplacent pas des comparables récents et documentés.",
+            "La valeur d'entreprise réelle dépend aussi de la dette, de la trésorerie, du BFR, de la récurrence, des risques, des actifs et des conditions de marché.",
+        ],
+        'next_steps': [
+            "Vérifiez l'EBITDA normalisé et retirez les éléments exceptionnels.",
+            "Recherchez des comparables récents réellement proches en taille, secteur et modèle économique.",
+            "Construisez plusieurs méthodes de valorisation au lieu de retenir un seul multiple.",
+            "Faites valider le scénario par un professionnel si une cession, levée ou opération juridique est envisagée.",
+        ],
+        'framework': "Une fourchette par multiples est un point de comparaison, pas une expertise de valorisation.",
+    },
+    'effort-impact': {
+        'category': 'Priorisation',
+        'measures': "La matrice classe les projets à partir de notes d'effort et d'impact saisies afin de distinguer gains rapides, projets stratégiques, tâches secondaires et initiatives à reporter.",
+        'limits': [
+            "Les notes sont subjectives et ne représentent ni un ROI financier ni une probabilité de succès.",
+            "Les dépendances entre projets et les contraintes de calendrier ne sont pas automatiquement modélisées.",
+        ],
+        'next_steps': [
+            "Définissez la même échelle d'effort et d'impact pour tous les projets avant de noter.",
+            "Justifiez chaque note par une donnée, une contrainte ou une hypothèse explicite.",
+            "Lancez les gains rapides qui ne bloquent pas un projet plus structurant.",
+            "Reclassez la matrice après chaque trimestre ou changement majeur de contrainte.",
+        ],
+        'framework': "La matrice sert à rendre les arbitrages visibles ; elle ne remplace pas la gestion des dépendances et des ressources.",
+    },
+    'cout-inaction': {
+        'category': 'Décision d'investissement',
+        'measures': "Le modèle cumule la perte mensuelle attribuée au statu quo, éventuellement aggravée dans le temps, puis la compare au coût et au délai d'une solution ainsi qu'à la réduction attendue du problème.",
+        'limits': [
+            "La perte mensuelle et son aggravation sont des hypothèses : évitez de présenter le coût d'inaction comme un manque à gagner certain.",
+            "Le modèle ne tient pas compte de la probabilité de succès, de la valeur temps de l'argent ou des coûts indirects de mise en œuvre.",
+        ],
+        'next_steps': [
+            "Documentez la perte actuelle à partir de données observables avant de la projeter.",
+            "Testez un scénario bas, central et haut sur l'aggravation et l'efficacité de la solution.",
+            "Comparez le point de bascule à votre horizon réel de décision et de financement.",
+            "Décidez avec un plan de mesure permettant de vérifier après mise en œuvre si la perte a réellement diminué.",
+        ],
+        'framework': "Le coût d'inaction est utile lorsqu'il est explicite et testable ; une hypothèse non vérifiée ne doit pas devenir une certitude comptable.",
+    },
+    'scenario-pivot': {
+        'category': 'Stratégie',
+        'measures': "Le simulateur compare sur douze mois la trajectoire actuelle à un modèle alternatif en intégrant croissance, marge, investissement initial et montée en charge du pivot.",
+        'limits': [
+            "La montée en charge est simplifiée et les réactions du marché ne sont pas observées : le scénario n'est pas une prévision.",
+            "Le modèle ne valorise pas automatiquement les coûts d'arrêt de l'ancien modèle, les risques d'exécution ou les effets de cannibalisation.",
+        ],
+        'next_steps': [
+            "Vérifiez séparément les hypothèses de CA cible, marge et durée de montée en charge.",
+            "Mesurez la trésorerie nécessaire pour absorber le creux de transition.",
+            "Testez le pivot sous une forme limitée avant de déplacer l'ensemble des ressources.",
+            "Définissez à l'avance les indicateurs qui déclencheront poursuite, ajustement ou arrêt.",
+        ],
+        'framework': "Un pivot se teste par étapes : la comparaison financière aide à cadrer l'expérience, elle ne remplace pas la preuve de marché.",
+    },
+    'roi-marketing': {
+        'category': 'Marketing',
+        'measures': "Le calcul transforme budget, trafic et conversions en leads, clients, CPL, CAC, chiffre d'affaires, ROAS et marge nette marketing.",
+        'limits': [
+            "L'attribution est simplifiée : un client peut être influencé par plusieurs canaux et sur une période plus longue que le mois simulé.",
+            "Le panier moyen ne représente pas la valeur vie client sauf si vous l'avez construit pour cela.",
+        ],
+        'next_steps': [
+            "Calculez les mêmes indicateurs par canal et par campagne.",
+            "Vérifiez les conversions dans votre CRM ou vos données de vente, pas uniquement dans les plateformes publicitaires.",
+            "Comparez ROAS et marge nette : un ROAS élevé peut rester insuffisant avec une faible marge.",
+            "Réallouez progressivement le budget et mesurez si le CAC reste stable lorsque le volume augmente.",
+        ],
+        'framework': "Le marketing est rentable lorsque la marge générée couvre durablement l'acquisition, pas simplement lorsque le chiffre d'affaires dépasse la dépense publicitaire.",
+    },
+    'pricing-paliers': {
+        'category': 'Pricing',
+        'measures': "Le simulateur construit trois niveaux de prix à partir d'une offre Pro, de ratios d'ancrage, des coûts de revient et d'un mix de ventes hypothétique afin d'estimer chiffre d'affaires et marge.",
+        'limits': [
+            "La répartition Basic/Pro/Premium est une hypothèse de demande ; le simulateur ne prédit pas quel mix vos prospects choisiront.",
+            "Les coûts de revient doivent inclure les coûts variables réellement associés à chaque niveau pour que la marge soit interprétable.",
+        ],
+        'next_steps': [
+            "Définissez clairement la promesse et le périmètre de chaque palier avant de modifier les prix.",
+            "Vérifiez la marge unitaire de chaque offre et sa contribution au mix simulé.",
+            "Testez la grille sur de nouveaux prospects en conservant la trace des choix et motifs de refus.",
+            "Réestimez le mix et les coûts après un volume suffisant de ventes réelles.",
+        ],
+        'framework': "Une grille à trois paliers est une hypothèse de packaging ; sa qualité se juge sur la marge et les choix réellement observés.",
+    },
+    'taille-marche': {
+        'category': 'Marché',
+        'measures': "Le calcul estime TAM, SAM et SOM à partir de la population cible, de la dépense annuelle moyenne, de la part réellement servable et de la part de marché visée.",
+        'limits': [
+            "Il s'agit d'une approche top-down fondée sur les hypothèses saisies ; elle ne prouve ni l'existence de la demande ni votre capacité à la capter.",
+            "Le SOM résulte directement du pourcentage de part de marché visée et ne constitue pas une prévision de ventes.",
+        ],
+        'next_steps': [
+            "Documentez la population cible et la dépense moyenne avec des sources identifiables.",
+            "Justifiez le passage du TAM au SAM par des contraintes réelles de géographie, capacité, réglementation ou offre.",
+            "Confrontez le SOM à une approche bottom-up : nombre de prospects atteignables × conversion × panier.",
+            "Révisez le marché accessible lorsque l'offre, la zone ou la capacité change.",
+        ],
+        'framework': "TAM, SAM et SOM structurent une hypothèse de marché ; la validation commerciale vient des prospects accessibles et des conversions réelles.",
+    },
+    'vulnerabilite-fournisseur': {
+        'category': 'Risque fournisseur',
+        'measures': "Le simulateur combine part des achats, remplaçabilité et fiabilité déclarées pour construire un indice de vulnérabilité et identifier les fournisseurs les plus critiques.",
+        'limits': [
+            "Les notes de remplaçabilité et de fiabilité sont subjectives tant qu'elles ne sont pas reliées à des délais, incidents ou alternatives vérifiées.",
+            "Le score n'intègre pas automatiquement stocks de sécurité, clauses contractuelles, criticité technique ou dépendances de second rang.",
+        ],
+        'next_steps': [
+            "Vérifiez la part réelle de chaque fournisseur dans les achats critiques.",
+            "Pour les fournisseurs à risque, documentez au moins une alternative avec délai et conditions de bascule.",
+            "Ajoutez les protections opérationnelles pertinentes : stock, double sourcing, portabilité ou clause de sortie.",
+            "Testez périodiquement le plan de remplacement au lieu d'attendre une rupture.",
+        ],
+        'framework': "Un risque fournisseur est maîtrisé quand l'alternative est documentée et testable, pas quand elle est simplement connue.",
+    },
+    'cout-non-qualite': {
+        'category': 'Qualité',
+        'measures': "Le calcul agrège les coûts visibles et cachés de non-qualité, puis estime les économies, le délai d'amortissement et le ROI d'un programme correctif selon la réduction attendue.",
+        'limits': [
+            "Les impacts de réputation et de clients perdus sont difficiles à attribuer : traitez-les comme des estimations explicites.",
+            "La réduction attendue du problème n'est pas garantie et doit être vérifiée après mise en œuvre.",
+        ],
+        'next_steps': [
+            "Séparez les coûts mesurés des estimations et documentez leur source.",
+            "Classez les causes de non-qualité par fréquence et coût avant de choisir le correctif.",
+            "Lancez une action ciblée sur la cause principale et mesurez son effet réel.",
+            "Recalculez le ROI avec les coûts et économies observés plutôt qu'avec l'hypothèse initiale.",
+        ],
+        'framework': "Le coût de non-qualité devient pilotable lorsque chaque poste est relié à une cause, une action et une mesure après correction.",
+    },
+}
+
 def get_content_for(tool_slug: str) -> dict:
-    """Retourne le contenu stratégique pour un outil, ou un défaut générique."""
+    """Retourne le profil éditorial aligné sur le calcul réel de l'outil."""
     if not tool_slug:
-        return _DEFAULT
-    return TOOL_CONTENT.get(tool_slug, _DEFAULT)
+        return dict(_DEFAULT)
+    base = dict(TOOL_CONTENT.get(tool_slug, _DEFAULT))
+    base.update(REPORT_OVERRIDES.get(tool_slug, {}))
+    return base
 
 
 # ──────────────────────────────────────────────────────────────────
