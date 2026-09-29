@@ -212,7 +212,6 @@
                 const tauxMarge = (prix, marge) => prix > 0 ? (marge / prix * 100) : 0;
 
                 return {
-                    verdict: this.insight(),
                     user_inputs: [
                         { label: "Prix de l'offre Pro", value: this.fmt(this.prixPro) + ' €' },
                         { label: "Coût de revient Pro", value: this.fmt(this.coutPro) + ' €' },
@@ -239,7 +238,7 @@
                     sections: [
                         {
                             title: 'Mix simulé et rentabilité unitaire',
-                            summary: 'Lecture du scénario avec les volumes et taux de marge issus de vos hypothèses.',
+                            summary: this.insight(),
                             items: [
                                 { label: 'Basic', value: volumeBasic + ' ventes · ' + tauxMarge(prixBasic, margeBasic).toFixed(1) + '% de marge unitaire' },
                                 { label: 'Pro', value: volumePro + ' ventes · ' + tauxMarge(this.prixPro, margePro).toFixed(1) + '% de marge unitaire' },
