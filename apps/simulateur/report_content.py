@@ -404,6 +404,153 @@ def _interpret_point_mort(inputs: list, results: list) -> dict:
     return {'headline': headline, 'verdict': verdict, 'recommendations': recos}
 
 
+
+def _interpret_pricing_paliers(inputs: list, results: list) -> dict:
+    """Lecture décisionnelle du simulateur de pricing par paliers.
+
+    Les conclusions restent attachées aux hypothèses saisies : on décrit
+    l'économie de la grille simulée et sa sensibilité, sans présenter un ratio
+    de prix comme une vérité universelle.
+    """
+    _, prix_pro = _find(inputs, "prix de l'offre pro", "prix pro")
+    _, cout_pro = _find(inputs, "coût de revient pro", "cout de revient pro")
+    _, cout_basic = _find(inputs, "coût de revient basic", "cout de revient basic")
+    _, cout_premium = _find(inputs, "coût de revient premium", "cout de revient premium")
+    _, ratio_basic = _find(inputs, "ratio basic", "basic / pro")
+    _, ratio_premium = _find(inputs, "ratio premium", "premium / pro")
+    _, pct_basic = _find(inputs, "répartition basic", "% basic")
+    _, pct_pro = _find(inputs, "répartition pro", "% pro")
+    _, pct_premium = _find(inputs, "répartition premium", "% premium")
+    _, volume = _find(inputs, "volume total", "volume / mois")
+
+    _, prix_basic_result = _find(results, "prix basic", "basic — prix")
+    _, prix_premium_result = _find(results, "prix premium", "premium — prix")
+    _, ca_moyen = _find(results, "ca moyen pondéré", "ca moyen pondere")
+    _, ca_total = _find(results, "ca mensuel total", "ca mensuel")
+    _, marge_total = _find(results, "marge mensuelle")
+
+    if not prix_pro:
+        return _interpret_generic(inputs, results)
+
+    prix_basic = prix_basic_result or (
+        prix_pro * ratio_basic if ratio_basic is not None else None
+    )
+    prix_premium = prix_premium_result or (
+        prix_pro * ratio_premium if ratio_premium is not None else None
+    )
+
+    # Si le front n'a pas envoyé explicitement la part Pro, elle est le solde.
+    if pct_pro is None and pct_basic is not None and pct_premium is not None:
+        pct_pro = max(0.0, 100.0 - pct_basic - pct_premium)
+
+    def margin(price: float | None, cost: float | None) -> float | None:
+        if price is None or cost is None:
+            return None
+        return price - cost
+
+    def margin_rate(price: float | None, cost: float | None) -> float | None:
+        if not price or cost is None:
+            return None
+        return (price - cost) / price * 100
+
+    marge_basic = margin(prix_basic, cout_basic)
+    marge_pro = margin(prix_pro, cout_pro)
+    marge_premium = margin(prix_premium, cout_premium)
+    taux_basic = margin_rate(prix_basic, cout_basic)
+    taux_pro = margin_rate(prix_pro, cout_pro)
+    taux_premium = margin_rate(prix_premium, cout_premium)
+
+    headline_parts: list[str] = []
+    if ca_moyen is not None:
+        headline_parts.append(f"panier moyen pondéré {_fmt_money(ca_moyen)}")
+    if ca_total is not None:
+        headline_parts.append(f"CA mensuel simulé {_fmt_money(ca_total)}")
+    if marge_total is not None:
+        headline_parts.append(f"marge mensuelle simulée {_fmt_money(marge_total)}")
+    headline = (
+        "Avec vos hypothèses : " + " · ".join(headline_parts) + "."
+        if headline_parts else ""
+    )
+
+    verdict_parts: list[str] = []
+    if ratio_basic is not None:
+        verdict_parts.append(f"Basic à {ratio_basic:.2f}x le Pro")
+    if ratio_premium is not None:
+        verdict_parts.append(f"Premium à {ratio_premium:.2f}x le Pro")
+    if pct_pro is not None:
+        verdict_parts.append(f"{pct_pro:.0f}% du volume sur Pro")
+    verdict = (
+        "La grille simulée est structurée autour du Pro : "
+        + ", ".join(verdict_parts)
+        + ". La bonne décision dépend maintenant de la conversion réelle de chaque palier, pas du ratio seul."
+        if verdict_parts else
+        "La simulation donne une photographie économique de vos trois paliers. "
+        "La validation doit ensuite se faire sur les conversions et les coûts réels."
+    )
+
+    analysis: list[str] = []
+    if all(v is not None for v in (prix_basic, marge_basic, taux_basic)):
+        analysis.append(
+            f"Basic : {_fmt_money(prix_basic)} de prix pour {_fmt_money(marge_basic)} "
+            f"de marge unitaire, soit environ {taux_basic:.1f}% avant frais non inclus."
+        )
+    if all(v is not None for v in (prix_pro, marge_pro, taux_pro)):
+        analysis.append(
+            f"Pro : {_fmt_money(prix_pro)} de prix pour {_fmt_money(marge_pro)} "
+            f"de marge unitaire, soit environ {taux_pro:.1f}% avant frais non inclus."
+        )
+    if all(v is not None for v in (prix_premium, marge_premium, taux_premium)):
+        analysis.append(
+            f"Premium : {_fmt_money(prix_premium)} de prix pour {_fmt_money(marge_premium)} "
+            f"de marge unitaire, soit environ {taux_premium:.1f}% avant frais non inclus."
+        )
+
+    if (
+        volume is not None and pct_basic is not None and pct_pro is not None
+        and pct_premium is not None and marge_basic is not None
+        and marge_pro is not None and marge_premium is not None
+    ):
+        contrib_basic = volume * pct_basic / 100 * marge_basic
+        contrib_pro = volume * pct_pro / 100 * marge_pro
+        contrib_premium = volume * pct_premium / 100 * marge_premium
+        contrib_total = contrib_basic + contrib_pro + contrib_premium
+        if contrib_total:
+            analysis.append(
+                "Contribution à la marge : "
+                f"Basic {_fmt_money(contrib_basic)} ({contrib_basic / contrib_total * 100:.0f}%), "
+                f"Pro {_fmt_money(contrib_pro)} ({contrib_pro / contrib_total * 100:.0f}%), "
+                f"Premium {_fmt_money(contrib_premium)} ({contrib_premium / contrib_total * 100:.0f}%)."
+            )
+
+        # Sensibilité simple et lisible : 5 points de volume déplacés de Pro
+        # vers Premium, sans prétendre prédire le comportement du marché.
+        if prix_premium is not None:
+            delta_units = volume * 0.05
+            delta_margin = delta_units * (marge_premium - marge_pro)
+            delta_ca = delta_units * (prix_premium - prix_pro)
+            sign_margin = "+" if delta_margin >= 0 else "−"
+            sign_ca = "+" if delta_ca >= 0 else "−"
+            analysis.append(
+                "Test de sensibilité : déplacer 5 points de volume de Pro vers Premium "
+                f"changerait, à coûts constants, le CA d'environ {sign_ca}{_fmt_money(abs(delta_ca))} "
+                f"et la marge d'environ {sign_margin}{_fmt_money(abs(delta_margin))} par mois."
+            )
+
+    recommendations = [
+        "Mesurez le taux de conversion et le taux de refus par palier pendant 30 jours : la répartition simulée doit être confrontée aux ventes réelles.",
+        "Décrivez noir sur blanc ce qui change entre Basic, Pro et Premium : périmètre, délai, niveau d'accompagnement et résultat attendu.",
+        "Suivez la marge unitaire réelle par palier, en intégrant le temps de livraison et les coûts variables qui ne figurent pas dans cette simulation.",
+        "Testez une seule modification de grille à la fois (prix, contenu ou ancrage) pour pouvoir attribuer l'effet observé.",
+    ]
+
+    return {
+        'headline': headline,
+        'verdict': verdict,
+        'analysis': analysis,
+        'recommendations': recommendations,
+    }
+
+
 def _interpret_generic(inputs: list, results: list) -> dict:
     """Fallback : extrait les 3 KPI les plus parlants pour en faire un headline."""
     if not results:
@@ -420,6 +567,7 @@ def _interpret_generic(inputs: list, results: list) -> dict:
 _INTERPRETERS = {
     'cac': _interpret_cac,
     'point-mort': _interpret_point_mort,
+    'pricing-paliers': _interpret_pricing_paliers,
 }
 
 
