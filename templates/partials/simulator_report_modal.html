@@ -367,9 +367,13 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
             s = window.__buildReportSnapshot() || {};
           }
         } catch (e) { /* ignore */ }
-        // Toujours enrichir avec saisies + KPI affichés + graphiques
+        // Toujours enrichir avec les éléments effectivement visibles dans
+        // le simulateur. Le PDF doit être une restitution fidèle du calcul,
+        // pas une brochure générique.
         if (!s.user_inputs || !s.user_inputs.length) s.user_inputs = this.scrapeUserInputs();
         if (!s.results || !s.results.length) s.results = this.scrapeResults();
+        if (!s.verdict) s.verdict = this.scrapeNarrativeInsight();
+        if (!s.tables || !s.tables.length) s.tables = this.scrapeTables();
         if (!s.charts || !s.charts.length) s.charts = this.captureCharts();
         return s;
       },
@@ -389,20 +393,38 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
           seen.add(key);
           results.push({ label, value });
         };
-        // Pattern 1 : blocs .result-block avec .result-label + .result-big
+        // Pattern 1 : blocs .result-block. Certains outils utilisent
+        // .result-big, d'autres un simple texte gras dynamique.
         document.querySelectorAll('.result-block').forEach(block => {
           if (!block.offsetParent) return;
-          const labels = block.querySelectorAll('.result-label');
-          const bigs = block.querySelectorAll('.result-big');
-          const n = Math.min(labels.length, bigs.length);
-          for (let i = 0; i < n; i++) {
-            push(labels[i].textContent, bigs[i].textContent);
-          }
-          // Pattern 1b : titre h3 + gros nombre affiché à côté
-          if (!n) {
-            const h = block.querySelector('h3');
-            const big = block.querySelector('[x-text]');
-            if (h && big) push(h.textContent, big.textContent);
+          const labels = Array.from(block.querySelectorAll('.result-label'));
+          labels.forEach(labelEl => {
+            let valueEl = null;
+            const parent = labelEl.parentElement || block;
+            valueEl = parent.querySelector('.result-big');
+            if (!valueEl) {
+              const candidates = Array.from(parent.querySelectorAll('[x-text], .font-bold, .font-semibold'))
+                .filter(el => el !== labelEl)
+                .filter(el => el.getAttribute('x-text') !== 'insight()')
+                .filter(el => !el.classList.contains('result-label'));
+              valueEl = candidates.find(el => {
+                const txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+                return txt && txt.length <= 100;
+              }) || null;
+            }
+            if (valueEl) push(labelEl.textContent, valueEl.textContent);
+          });
+
+          // Pattern 1b : bloc sans .result-label mais avec titre + valeur.
+          if (!labels.length) {
+            const h = block.querySelector('h2, h3');
+            const candidates = Array.from(block.querySelectorAll('.result-big, [x-text], .font-bold'))
+              .filter(el => el.getAttribute('x-text') !== 'insight()');
+            const valueEl = candidates.find(el => {
+              const txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+              return txt && txt.length <= 100;
+            });
+            if (h && valueEl) push(h.textContent, valueEl.textContent);
           }
         });
         // Pattern 2 : rangées "label : valeur" (flex justify-between)
@@ -415,6 +437,62 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
           }
         });
         return results.slice(0, 30);
+      },
+      scrapeNarrativeInsight() {
+        // Les simulateurs qui calculent déjà une lecture métier via insight()
+        // doivent retrouver exactement cette lecture dans le PDF.
+        const direct = document.querySelector('[x-text="insight()"]');
+        if (direct && direct.offsetParent) {
+          const txt = (direct.textContent || '').replace(/\s+/g, ' ').trim();
+          if (txt.length >= 20) return txt.substring(0, 1400);
+        }
+
+        // Repli prudent pour les blocs de diagnostic/verdict qui n'utilisent
+        // pas le nom insight(). On exclut les simples KPI.
+        const candidates = Array.from(document.querySelectorAll('.result-block p, .result-block [x-text]'))
+          .filter(el => el.offsetParent)
+          .filter(el => !el.classList.contains('result-label'))
+          .filter(el => !el.classList.contains('result-big'))
+          .filter(el => !el.closest('.srm-dialog, .srm-backdrop'));
+        for (const el of candidates) {
+          const txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+          if (txt.length >= 60 && txt.length <= 1400) return txt;
+        }
+        return '';
+      },
+      scrapeTables() {
+        const tables = [];
+        document.querySelectorAll('table').forEach((table, tableIndex) => {
+          if (!table.offsetParent) return;
+          if (table.closest('.srm-dialog, .srm-backdrop')) return;
+
+          const headers = Array.from(table.querySelectorAll('thead th'))
+            .map(th => (th.textContent || '').replace(/\s+/g, ' ').trim())
+            .filter((h, i, arr) => h || arr.some(Boolean))
+            .slice(0, 10);
+
+          const rows = Array.from(table.querySelectorAll('tbody tr'))
+            .map(tr => Array.from(tr.querySelectorAll('td, th'))
+              .map(cell => (cell.textContent || '').replace(/\s+/g, ' ').trim())
+              .slice(0, 10))
+            .filter(row => row.some(Boolean))
+            .slice(0, 20);
+
+          if (!rows.length) return;
+
+          let title = '';
+          const container = table.closest('.result-block, .tool-card');
+          const heading = container && container.querySelector('h2, h3, .result-label');
+          if (heading) title = (heading.textContent || '').replace(/\s+/g, ' ').trim();
+          if (!title) title = 'Détail du calcul ' + (tableIndex + 1);
+
+          tables.push({
+            title: title.substring(0, 100),
+            headers,
+            rows,
+          });
+        });
+        return tables.slice(0, 4);
       },
       normalizeChartText(value) {
         if (value === null || value === undefined) return '';
