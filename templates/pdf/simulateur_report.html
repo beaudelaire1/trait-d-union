@@ -16,9 +16,9 @@
   }
   @page {
     size: A4;
-    margin: 16mm 14mm 20mm 14mm;
+    margin: 11mm 11mm 15mm 11mm;
     @bottom-center {
-      content: "{{ branding.name|default:'Trait d\'Union Studio' }}  ·  Rapport confidentiel  ·  page " counter(page) " / " counter(pages);
+      content: "Trait d’Union Studio  ·  Rapport confidentiel  ·  page " counter(page) " / " counter(pages);
       font-family: 'Inter', Arial, sans-serif;
       font-size: 7.5pt;
       color: #9ca3af;
@@ -28,8 +28,8 @@
   body {
     font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     color: #1f2937;
-    font-size: 10.5pt;
-    line-height: 1.6;
+    font-size: 9.4pt;
+    line-height: 1.45;
     margin: 0;
   }
   h1, h2, h3, h4 {
@@ -219,17 +219,18 @@
     font-weight: 600;
     line-height: 1.4;
   }
-  .section { margin-bottom: 10mm; page-break-inside: avoid; }
+  .section { margin-bottom: 5mm; page-break-inside: auto; }
+  .section-tight { margin-bottom: 4mm; }
   .section h2 {
-    font-size: 15pt; font-weight: 600; color: #0f172a;
-    padding-bottom: 3mm; border-bottom: 2px solid #0f172a;
-    margin-bottom: 4mm;
+    font-size: 13.2pt; font-weight: 600; color: #0f172a;
+    padding-bottom: 2mm; border-bottom: 1.5px solid #0f172a;
+    margin-bottom: 2.5mm;
   }
   .section h3 {
-    font-size: 11.5pt; font-weight: 600; color: #1e293b;
-    margin-top: 5mm; margin-bottom: 2mm;
+    font-size: 10.5pt; font-weight: 600; color: #1e293b;
+    margin-top: 3mm; margin-bottom: 1.5mm;
   }
-  .section p { margin: 0 0 3mm 0; }
+  .section p { margin: 0 0 2mm 0; }
   .eyebrow {
     display: inline-block; font-size: 7.5pt; font-weight: 700;
     letter-spacing: 0.2em; text-transform: uppercase;
@@ -254,12 +255,12 @@
     margin: 3mm 0 5mm 0;
   }
   .kpi-grid {
-    display: flex; flex-wrap: wrap; gap: 3mm;
-    margin: 3mm 0 5mm 0;
+    display: flex; flex-wrap: wrap; gap: 2mm;
+    margin: 2mm 0 3mm 0;
   }
   .kpi-card {
-    flex: 1 1 48mm; min-width: 48mm;
-    padding: 4mm 5mm;
+    flex: 1 1 38mm; min-width: 38mm;
+    padding: 2.8mm 3.2mm;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border: 1px solid #e2e8f0;
     border-radius: 5px;
@@ -271,14 +272,14 @@
   }
   .kpi-card .kpi-value {
     font-family: 'Space Grotesk', 'Helvetica Neue', sans-serif;
-    font-size: 15pt; font-weight: 700; color: #0f172a; line-height: 1.1;
+    font-size: 12.8pt; font-weight: 700; color: #0f172a; line-height: 1.1;
   }
   .chart-block {
-    margin: 4mm 0 7mm 0;
+    margin: 2mm 0 4mm 0;
     page-break-inside: avoid;
   }
   .chart-card {
-    padding: 5mm;
+    padding: 3mm;
     background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
     border: 1px solid #e2e8f0;
     border-radius: 6px;
@@ -337,14 +338,15 @@
     line-height: 1.5;
   }
   .chart-block img {
-    max-width: 100%; height: auto; display: block;
+    width: 100%; max-width: 100%; max-height: 82mm; height: auto; display: block;
+    object-fit: contain;
     border-radius: 3px;
     background: #fff;
   }
   table.kv { width: 100%; border-collapse: collapse; margin-top: 2mm; }
   table.kv td {
-    padding: 2.2mm 3mm; border-bottom: 1px solid #f1f5f9;
-    vertical-align: top; font-size: 10pt;
+    padding: 1.5mm 2.2mm; border-bottom: 1px solid #f1f5f9;
+    vertical-align: top; font-size: 9.2pt;
   }
   table.kv td:first-child { color: #64748b; width: 60%; }
   table.kv td:last-child { font-weight: 600; text-align: right; color: #0f172a; }
@@ -358,14 +360,14 @@
   .questions { counter-reset: qc; margin: 3mm 0; padding: 0; list-style: none; }
   .questions li {
     counter-increment: qc; position: relative;
-    padding: 3mm 4mm 3mm 12mm; margin-bottom: 2mm;
-    background: #f8fafc; border-left: 3px solid #0f766e;
-    border-radius: 2px; font-size: 10pt; line-height: 1.55;
+    padding: 2mm 3mm 2mm 10mm; margin-bottom: 1mm;
+    background: #f8fafc; border-left: 2px solid #0f766e;
+    border-radius: 2px; font-size: 9.2pt; line-height: 1.4;
   }
   .questions li::before {
     content: counter(qc);
-    position: absolute; left: 3mm; top: 3mm;
-    width: 6mm; height: 6mm;
+    position: absolute; left: 2.3mm; top: 2.1mm;
+    width: 5mm; height: 5mm;
     background: #0f766e; color: #fff;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
@@ -412,7 +414,7 @@
     border-top: 1px solid var(--tus-line);
   }
   .journey-step {
-    padding: 4mm 0 4.5mm 0;
+    padding: 2.2mm 0 2.5mm 0;
     border-bottom: 1px solid var(--tus-line);
     page-break-inside: avoid;
   }
@@ -427,13 +429,56 @@
   .journey-step-text {
     font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
     color: var(--tus-slate);
-    font-size: 11pt;
+    font-size: 9.5pt;
     font-weight: 500;
-    line-height: 1.48;
+    line-height: 1.38;
     letter-spacing: -0.01em;
   }
+  .analysis-list {
+    margin: 1.5mm 0 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2mm;
+  }
+  .analysis-list li {
+    flex: 1 1 78mm;
+    padding: 2.4mm 3mm;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 3px solid #0f766e;
+    border-radius: 4px;
+    font-size: 9.1pt;
+    line-height: 1.42;
+    page-break-inside: avoid;
+  }
+  .report-grid {
+    display: flex;
+    gap: 5mm;
+    align-items: flex-start;
+    margin-bottom: 4mm;
+  }
+  .report-grid > .section {
+    flex: 1 1 0;
+    margin-bottom: 0;
+    min-width: 0;
+  }
+  .report-grid .section h2 { font-size: 12pt; }
+  .report-grid .muted-note { font-size: 8.6pt; }
+  .report-grid .journey-step-label { margin-bottom: 0.8mm; }
+  .report-grid .steps li {
+    padding: 2mm 2mm 2mm 10mm;
+    margin-bottom: 1mm;
+    font-size: 9.1pt;
+    line-height: 1.4;
+  }
+  .report-grid .steps li::before {
+    top: 2.2mm;
+    font-size: 6.8pt;
+  }
   .cta {
-    margin-top: 10mm;
+    margin-top: 5mm;
     background: linear-gradient(145deg, var(--tus-ink) 0%, #10172e 100%);
     color: #fff;
     border-radius: 8px;
@@ -451,16 +496,16 @@
   }
   .cta-main {
     flex: 1 1 116mm;
-    padding: 8mm 8mm 7mm 8mm;
+    padding: 5mm 5.5mm 4.5mm 5.5mm;
   }
   .cta-panel {
     width: 58mm;
-    padding: 8mm 7mm;
+    padding: 5mm;
     background: linear-gradient(145deg, rgba(11, 45, 255, 0.18) 0%, rgba(246, 247, 251, 0.05) 100%);
     border-left: 1px solid rgba(246, 247, 251, 0.08);
   }
-  .cta h3 { color: #fff; font-size: 16pt; margin-bottom: 3mm; }
-  .cta p { color: #cbd5e1; margin-bottom: 4mm; font-size: 10.5pt; line-height: 1.62; }
+  .cta h3 { color: #fff; font-size: 13.5pt; margin-bottom: 2mm; }
+  .cta p { color: #cbd5e1; margin-bottom: 2.5mm; font-size: 9.2pt; line-height: 1.45; }
   .cta-chips {
     display: flex;
     flex-wrap: wrap;
@@ -519,7 +564,7 @@
     font-size: 9pt;
   }
   .footer-legal {
-    margin-top: 15mm; padding-top: 5mm;
+    margin-top: 6mm; padding-top: 3mm;
     border-top: 1px solid #e5e7eb;
     font-size: 8pt; color: #9ca3af; text-align: center; line-height: 1.6;
   }
@@ -549,13 +594,13 @@
       </div>
       <div class="cover-pills">
         <span class="cover-pill cover-pill--accent">Rapport personnalisé</span>
-        <span class="cover-pill">Livret d'aide à la décision</span>
+        <span class="cover-pill">Synthèse d'aide à la décision</span>
       </div>
       <h1>{{ tool_name }}</h1>
       <p class="subtitle">{{ strategic.measures }}</p>
       <div class="cover-highlight">
         <div class="cover-highlight-label">Ce que vous allez lire</div>
-        <p class="cover-highlight-text">Un diagnostic lisible, des chiffres immédiatement partageables, et un plan d'action en 5 temps pour passer de l'intuition à la décision.</p>
+        <p class="cover-highlight-text">Vos chiffres, leur lecture, les hypothèses utilisées et les décisions à tester — réunis dans un document court et exploitable.</p>
       </div>
     </div>
     <div class="cover-aside">
@@ -586,7 +631,7 @@
     </div>
     <div class="cover-footer-card">
       <div class="cover-footer-label">Format</div>
-      <div class="cover-footer-value">Livret premium PDF</div>
+      <div class="cover-footer-value">Rapport d'aide à la décision</div>
     </div>
     <div class="cover-footer-card">
       <div class="cover-footer-label">Statut</div>
@@ -622,6 +667,14 @@
 </div>
 {% endif %}
 
+{% if analysis %}
+<div class="section section-tight">
+  <span class="eyebrow">Lecture de la simulation</span>
+  <h2>Ce que disent réellement vos chiffres</h2>
+  <ul class="analysis-list">{% for item in analysis %}<li>{{ item }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
 {% if charts %}
 <div class="section">
   <span class="eyebrow">Visualisation</span>
@@ -646,7 +699,7 @@
       <div class="chart-frame">
         <img src="{{ chart.data_url }}" alt="{{ chart.title|default:'Graphique' }}">
       </div>
-      <div class="chart-caption">Version export haute lisibilité, avec axes, graduations et légende conservés pour l'impression client.</div>
+      <div class="chart-caption">Lecture : comparez le poids de chaque palier dans le chiffre d'affaires et la marge, puis confrontez cette hypothèse au mix réellement vendu.</div>
     </div>
   </div>
   {% endfor %}
@@ -674,44 +727,46 @@
 {% endfor %}
 {% endif %}
 
-{% if user_inputs %}
-<div class="section">
-  <span class="eyebrow">Vos hypothèses</span>
-  <h2>Les données que vous avez saisies</h2>
-  <p class="muted-note">Gardez-les pour refaire la simulation avec des chiffres ajustés dans 30 jours.</p>
-  <table class="kv">
-    {% for item in user_inputs %}
-    <tr><td>{{ item.label }}</td><td>{{ item.value }}</td></tr>
-    {% endfor %}
-  </table>
-</div>
-{% endif %}
+<div class="report-grid">
+  {% if user_inputs %}
+  <div class="section">
+    <span class="eyebrow">Vos hypothèses</span>
+    <h2>Données utilisées</h2>
+    <p class="muted-note">Conservez-les : sans hypothèses explicites, un résultat chiffré n'est pas reproductible.</p>
+    <table class="kv">
+      {% for item in user_inputs %}
+      <tr><td>{{ item.label }}</td><td>{{ item.value }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
 
-{% if recommendations %}
-<div class="section">
-  <span class="eyebrow">Priorités</span>
-  <h2>Pistes d'action prioritaires</h2>
-  <ul class="steps">{% for reco in recommendations %}<li>{{ reco }}</li>{% endfor %}</ul>
+  {% if strategic.questions %}
+  <div class="section">
+    <span class="eyebrow">Points de contrôle</span>
+    <h2>3 questions avant de décider</h2>
+    <ul class="questions">{% for q in strategic.questions %}<li>{{ q }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
 </div>
-{% endif %}
 
-{% if strategic.questions %}
-<div class="section">
-  <span class="eyebrow">Pour aller plus loin</span>
-  <h2>3 questions à vous poser cette semaine</h2>
-  <p class="muted-note">Les meilleurs diagnostics déclenchent les bonnes questions. Prenez 15&nbsp;minutes pour celles-ci — seul·e, ou avec un pair.</p>
-  <ul class="questions">{% for q in strategic.questions %}<li>{{ q }}</li>{% endfor %}</ul>
-</div>
-{% endif %}
+<div class="report-grid">
+  {% if recommendations %}
+  <div class="section">
+    <span class="eyebrow">Priorités issues du scénario</span>
+    <h2>Actions à tester</h2>
+    <ul class="steps">{% for reco in recommendations %}<li>{{ reco }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
 
-{% if strategic.next_steps %}
-<div class="section">
-  <span class="eyebrow">Plan d'action</span>
-  <h2>5 étapes concrètes pour transformer ce diagnostic</h2>
-  <p class="journey-intro">Voici la séquence recommandée pour traduire ce rapport en décisions visibles, dans le bon ordre et sans dispersion.</p>
-  <ul class="journey-steps">{% for s in strategic.next_steps %}<li class="journey-step"><div class="journey-step-label">Étape {{ forloop.counter }}</div><div class="journey-step-text">{{ s }}</div></li>{% endfor %}</ul>
+  {% if strategic.next_steps %}
+  <div class="section">
+    <span class="eyebrow">Plan de suivi</span>
+    <h2>5 étapes de mise à l'épreuve</h2>
+    <ul class="journey-steps">{% for s in strategic.next_steps %}<li class="journey-step"><div class="journey-step-label">Étape {{ forloop.counter }}</div><div class="journey-step-text">{{ s }}</div></li>{% endfor %}</ul>
+  </div>
+  {% endif %}
 </div>
-{% endif %}
 
 {% if strategic.framework %}
 <div class="section">
@@ -749,7 +804,7 @@
   {% if branding.address %} · {{ branding.address }}{% endif %}{% if branding.city %}, {{ branding.zip_code|default:"" }} {{ branding.city }}{% endif %}
   {% if branding.siret %} · SIRET {{ branding.siret }}{% endif %}
   <br>
-  Ce rapport est personnel et confidentiel. Les recommandations sont génériques et ne constituent pas un conseil professionnel individualisé.
+  Ce rapport est personnel et confidentiel. Les calculs dépendent des hypothèses saisies ; les pistes proposées doivent être confrontées aux données réelles avant décision.
 </div>
 
 </body>
