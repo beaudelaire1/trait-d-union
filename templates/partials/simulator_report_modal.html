@@ -740,7 +740,7 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
       },
       scrapeUserInputs() {
         const results = [];
-        const selector = 'input[type=number], input[type=text], input:not([type]), select, textarea';
+        const selector = 'input[type=number], input[type=range], input[type=text], input:not([type]), select, textarea';
         const seen = new Set();
         document.querySelectorAll(selector).forEach(el => {
           // Visible + avec valeur + pas honeypot
@@ -758,6 +758,14 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
           if (!label) {
             const parentLabel = el.closest('label');
             if (parentLabel) label = parentLabel.textContent.replace(raw, '').trim();
+          }
+          // La majorité des simulateurs utilisent un <label> frère dans le
+          // même bloc de champ, sans attribut for/id. Ne jamais exporter
+          // "Champ" si le libellé visible existe déjà à l'écran.
+          if (!label) {
+            const field = el.closest('div');
+            const nearbyLabel = field && field.querySelector('label');
+            if (nearbyLabel) label = nearbyLabel.textContent.trim();
           }
           if (!label) label = el.getAttribute('aria-label') || el.name || '';
           label = (label || 'Champ').replace(/\s+/g, ' ').substring(0, 80);
