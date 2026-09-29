@@ -842,11 +842,36 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
           // "Champ" si le libellé visible existe déjà à l'écran.
           if (!label) {
             const field = el.closest('div');
-            const nearbyLabel = field && field.querySelector('label');
+            const nearbyLabel = field && field.querySelector('label, .tool-label, .tool-sublabel');
             if (nearbyLabel) label = nearbyLabel.textContent.trim();
           }
           if (!label) label = el.getAttribute('aria-label') || el.name || '';
-          label = (label || 'Champ').replace(/\s+/g, ' ').substring(0, 80);
+          if (!label) label = (el.getAttribute('placeholder') || el.placeholder || '').trim();
+
+          // Pour les listes répétables (projets, fournisseurs, profils,
+          // prestations...), rattacher Effort/Impact/Part/etc. au nom de la
+          // ligne. Sans cela le PDF produisait plusieurs lignes "Champ".
+          let groupName = '';
+          const localGroup = el.closest('.p-4, .tool-card');
+          if (localGroup) {
+            const groupHeading = localGroup.querySelector('h2, h3');
+            if (groupHeading) groupName = (groupHeading.textContent || '').trim();
+            const nameInput = localGroup.querySelector('input[type="text"]');
+            if ((!groupName || /^vos |^fournisseurs$|^paramètres/i.test(groupName)) && nameInput) {
+              groupName = (nameInput.value || nameInput.placeholder || '').trim();
+            }
+          }
+          if (!groupName) {
+            const row = el.closest('.flex');
+            const rowName = row && row.querySelector('input[type="text"]');
+            if (rowName && rowName !== el) groupName = (rowName.value || rowName.placeholder || '').trim();
+          }
+
+          label = (label || 'Valeur saisie').replace(/\s+/g, ' ').trim();
+          if (groupName && !label.toLowerCase().includes(groupName.toLowerCase())) {
+            label = groupName + ' — ' + label;
+          }
+          label = label.substring(0, 100);
           const key = label + '::' + raw;
           if (seen.has(key)) return;
           seen.add(key);
