@@ -1,5 +1,46 @@
 """Models for the pages app."""
 from django.db import models
+from django.templatetags.static import static
+
+
+class TrustedLogo(models.Model):
+    """Logo affiché dans la section « Ils nous font confiance » de l'accueil."""
+
+    name = models.CharField("Nom", max_length=200)
+    logo = models.ImageField(
+        "Logo",
+        upload_to="trusted_logos/",
+        blank=True,
+        null=True,
+        help_text="PNG, WebP ou JPG recommandé avec fond transparent.",
+    )
+    legacy_static_path = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        editable=False,
+        help_text="Chemin statique conservé pour les logos historiques.",
+    )
+    is_active = models.BooleanField("Actif", default=True)
+    order = models.PositiveIntegerField("Ordre d'affichage", default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["order", "name"]
+        verbose_name = "Logo de confiance"
+        verbose_name_plural = "Logos — Ils nous font confiance"
+
+    def __str__(self) -> str:
+        return self.name
+
+    @property
+    def image_url(self) -> str:
+        """URL à afficher : upload admin prioritaire, sinon logo historique."""
+        if self.logo:
+            return self.logo.url
+        if self.legacy_static_path:
+            return static(self.legacy_static_path)
+        return ""
 
 
 class TestimonialSource(models.TextChoices):
@@ -72,7 +113,6 @@ class Testimonial(models.Model):
         verbose_name = "Témoignage"
         verbose_name_plural = "Témoignages"
         constraints = [
-            # Unicité forte sur l'ID Google (évite les doublons à la synchro)
             models.UniqueConstraint(
                 fields=["google_review_id"],
                 condition=models.Q(google_review_id__gt=""),
