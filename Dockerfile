@@ -77,4 +77,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
 # les workers. Garantit que SECRET_KEY, settings et connexions DB sont
 # identiques dans tous les workers (élimine le risque de clé aléatoire
 # différente par worker si DJANGO_SECRET_KEY est absent/faible).
-CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.production gunicorn config.wsgi:application --preload --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]
+CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.coolify python manage.py migrate --noinput && DJANGO_SETTINGS_MODULE=config.settings.coolify gunicorn config.wsgi:application --preload --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]
