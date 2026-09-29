@@ -199,7 +199,58 @@
                 if (tips.length === 0) return `Grille cohérente avec ces hypothèses. Le Pro à ${this.fmt(this.prixPro)} € concentre ${this.pctPro()}% des ventes, et le Premium sert d'ancrage de comparaison.`;
                 return tips.join(' ');
             },
+            buildReportSnapshot() {
+                const prixBasic = this.prixBasic();
+                const prixPremium = this.prixPremium();
+                const margeBasic = this.margeBasic();
+                const margePro = this.margePro();
+                const margePremium = this.margePremium();
+                const pctPro = this.pctPro();
+                const volumeBasic = Math.round(this.volumeTotal * this.pctBasic / 100);
+                const volumePro = Math.round(this.volumeTotal * pctPro / 100);
+                const volumePremium = Math.round(this.volumeTotal * this.pctPremium / 100);
+                const tauxMarge = (prix, marge) => prix > 0 ? (marge / prix * 100) : 0;
+
+                return {
+                    verdict: this.insight(),
+                    user_inputs: [
+                        { label: "Prix de l'offre Pro", value: this.fmt(this.prixPro) + ' €' },
+                        { label: "Coût de revient Pro", value: this.fmt(this.coutPro) + ' €' },
+                        { label: "Coût de revient Basic", value: this.fmt(this.coutBasicVal) + ' €' },
+                        { label: "Coût de revient Premium", value: this.fmt(this.coutPremiumVal) + ' €' },
+                        { label: "Ratio Basic / Pro", value: Number(this.ratioBasic).toFixed(2) + 'x' },
+                        { label: "Ratio Premium / Pro", value: Number(this.ratioPremium).toFixed(2) + 'x' },
+                        { label: "Répartition Basic", value: this.pctBasic + '%' },
+                        { label: "Répartition Pro", value: pctPro + '%' },
+                        { label: "Répartition Premium", value: this.pctPremium + '%' },
+                        { label: "Volume total / mois", value: this.fmt(this.volumeTotal) },
+                    ],
+                    results: [
+                        { label: 'Basic — prix', value: this.fmt(prixBasic) + ' €' },
+                        { label: 'Basic — marge unitaire', value: this.fmt(margeBasic) + ' €' },
+                        { label: 'Pro — prix', value: this.fmt(this.prixPro) + ' €' },
+                        { label: 'Pro — marge unitaire', value: this.fmt(margePro) + ' €' },
+                        { label: 'Premium — prix', value: this.fmt(prixPremium) + ' €' },
+                        { label: 'Premium — marge unitaire', value: this.fmt(margePremium) + ' €' },
+                        { label: 'CA moyen pondéré', value: this.fmt(this.caMoyenPondere()) + ' €' },
+                        { label: 'CA mensuel total', value: this.fmt(this.caMensuel()) + ' €' },
+                        { label: 'Marge mensuelle', value: this.fmt(this.margeMensuelle()) + ' €' },
+                    ],
+                    sections: [
+                        {
+                            title: 'Mix simulé et rentabilité unitaire',
+                            summary: 'Lecture du scénario avec les volumes et taux de marge issus de vos hypothèses.',
+                            items: [
+                                { label: 'Basic', value: volumeBasic + ' ventes · ' + tauxMarge(prixBasic, margeBasic).toFixed(1) + '% de marge unitaire' },
+                                { label: 'Pro', value: volumePro + ' ventes · ' + tauxMarge(this.prixPro, margePro).toFixed(1) + '% de marge unitaire' },
+                                { label: 'Premium', value: volumePremium + ' ventes · ' + tauxMarge(prixPremium, margePremium).toFixed(1) + '% de marge unitaire' },
+                            ],
+                        },
+                    ],
+                };
+            },
             init() {
+                window.__buildReportSnapshot = () => this.buildReportSnapshot();
                 ['prixPro','coutPro','coutBasicVal','coutPremiumVal','ratioBasic','ratioPremium','pctBasic','pctPremium','volumeTotal'].forEach(k => {
                     this.$watch(k, () => this.updateChart());
                 });
