@@ -44,6 +44,24 @@ REPORT_TOOL_SLUGS = (
 )
 
 
+def test_profile_list_matches_public_simulator_routes():
+    from apps.simulateur import urls as simulator_urls
+
+    excluded = {
+        "hub",
+        "devis",
+        "report_submit",
+        "conformite-facture",
+        "conformite-facture-check",
+    }
+    routed = {
+        pattern.name
+        for pattern in simulator_urls.urlpatterns
+        if pattern.name and pattern.name not in excluded
+    }
+    assert routed == set(REPORT_TOOL_SLUGS)
+
+
 def test_every_reportable_tool_has_an_explicit_profile():
     assert len(REPORT_TOOL_SLUGS) == 29
     missing = [slug for slug in REPORT_TOOL_SLUGS if slug not in REPORT_OVERRIDES]
