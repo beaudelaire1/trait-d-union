@@ -2,7 +2,37 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Testimonial
+from .models import Testimonial, TrustedLogo
+
+
+@admin.register(TrustedLogo)
+class TrustedLogoAdmin(admin.ModelAdmin):
+    """Gestion des logos de la section « Ils nous font confiance »."""
+
+    list_display = ("preview", "name", "is_active", "order")
+    list_editable = ("is_active", "order")
+    list_filter = ("is_active",)
+    search_fields = ("name",)
+    readonly_fields = ("preview_large", "created_at")
+    fields = ("name", "logo", "preview_large", "is_active", "order", "created_at")
+
+    @admin.display(description="Aperçu")
+    def preview(self, obj: TrustedLogo) -> str:
+        if not obj.image_url:
+            return "—"
+        return format_html(
+            '<img src="{}" alt="" style="max-height:36px;max-width:120px;object-fit:contain;">',
+            obj.image_url,
+        )
+
+    @admin.display(description="Aperçu du logo")
+    def preview_large(self, obj: TrustedLogo) -> str:
+        if not obj.pk or not obj.image_url:
+            return "Aucun logo"
+        return format_html(
+            '<img src="{}" alt="" style="max-height:100px;max-width:280px;object-fit:contain;">',
+            obj.image_url,
+        )
 
 
 @admin.register(Testimonial)

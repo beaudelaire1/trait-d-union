@@ -5,7 +5,6 @@ from typing import Any
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.templatetags.static import static
 from django.views.generic import TemplateView
 
 from services.models import Service
@@ -70,16 +69,10 @@ class HomeView(TemplateView):
             {'name': 'Accueil', 'url': '/'},
         ]
 
-        context['trusted_logos'] = [
-            {
-                'name': 'Nettoyage Express',
-                'image_url': static('img/trusted/nettoyage-express-logo.png'),
-            },
-            {
-                'name': 'EEBC',
-                'image_url': static('img/trusted/eebc-logo.png'),
-            },
-        ]
+        # Logos de confiance gérés depuis l'admin Django.
+        # Pas de cache ici : un ajout, retrait ou changement d'ordre est visible immédiatement.
+        from apps.pages.models import TrustedLogo
+        context['trusted_logos'] = TrustedLogo.objects.filter(is_active=True)
 
         return context
 
