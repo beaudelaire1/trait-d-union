@@ -279,7 +279,7 @@ def _to_number(raw: str) -> float | None:
     if not raw:
         return None
     s = str(raw).strip()
-    s = s.replace('\xa0', ' ').replace(' ', '')
+    s = s.replace('\xa0', ' ').replace('\u202f', ' ').replace(' ', '')
     s = s.replace('€', '').replace('%', '').replace('x', '').strip()
     # Virgule décimale fr → point
     if ',' in s and '.' not in s:
