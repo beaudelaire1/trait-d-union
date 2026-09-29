@@ -47,6 +47,31 @@ class TestPublicPages:
         assert b'Nettoyage Express' in content
         assert b'EEBC' in content
 
+    def test_home_displays_admin_managed_trusted_logo(self, client):
+        from apps.pages.models import TrustedLogo
+
+        TrustedLogo.objects.create(
+            name="Partenaire test",
+            legacy_static_path="img/trusted/eebc-logo.png",
+            order=30,
+            is_active=True,
+        )
+
+        response = client.get(reverse('pages:home'))
+        assert b'Partenaire test' in response.content
+
+    def test_home_hides_inactive_trusted_logo(self, client):
+        from apps.pages.models import TrustedLogo
+
+        TrustedLogo.objects.create(
+            name="Logo inactif",
+            legacy_static_path="img/trusted/eebc-logo.png",
+            is_active=False,
+        )
+
+        response = client.get(reverse('pages:home'))
+        assert b'Logo inactif' not in response.content
+
     def test_services_template(self, client):
         response = client.get(reverse('pages:services'))
         assert 'pages/services_positioned.html' in [t.name for t in response.templates]
