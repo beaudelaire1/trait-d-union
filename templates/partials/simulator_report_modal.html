@@ -374,6 +374,9 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
         if (!s.results || !s.results.length) s.results = this.scrapeResults();
         if (!s.verdict) s.verdict = this.scrapeNarrativeInsight();
         if (!s.tables || !s.tables.length) s.tables = this.scrapeTables();
+        if ((!s.sections || !s.sections.length) && (!s.details || !s.details.length)) {
+          s.details = this.scrapeResultDetails();
+        }
         if (!s.charts || !s.charts.length) s.charts = this.captureCharts();
         return s;
       },
@@ -459,6 +462,45 @@ Snapshot des données : l'Alpine component du simulateur doit exposer
           if (txt.length >= 60 && txt.length <= 1400) return txt;
         }
         return '';
+      },
+      scrapeResultDetails() {
+        const details = [];
+        document.querySelectorAll('.result-block').forEach(block => {
+          if (!block.offsetParent) return;
+          if (block.closest('.srm-dialog, .srm-backdrop')) return;
+          if (block.querySelector('table')) return;
+
+          const heading = block.querySelector('h2, h3');
+          if (!heading) return;
+          const title = (heading.textContent || '').replace(/\s+/g, ' ').trim();
+          if (!title) return;
+
+          // innerText préserve les lignes rendues par x-for. C'est utile pour
+          // les classements de projets, fournisseurs et mixes optimisés.
+          let lines = (block.innerText || '')
+            .split(/\n+/)
+            .map(v => v.replace(/\s+/g, ' ').trim())
+            .filter(Boolean)
+            .filter(v => v !== title)
+            .filter(v => v.length <= 180);
+
+          const seen = new Set();
+          lines = lines.filter(v => {
+            if (seen.has(v)) return false;
+            seen.add(v);
+            return true;
+          }).slice(0, 18);
+
+          // Un bloc qui ne contient que le titre d'un graphique n'apporte
+          // aucune information textuelle supplémentaire.
+          if (!lines.length) return;
+
+          details.push({
+            title: title.substring(0, 100),
+            lines,
+          });
+        });
+        return details.slice(0, 6);
       },
       scrapeTables() {
         const tables = [];
