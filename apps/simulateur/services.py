@@ -61,6 +61,7 @@ class SimulatorReportService:
             'results': results,
             'charts': charts or [],
             'headline': interpretation.get('headline'),
+            'analysis': interpretation.get('analysis', []),
             'strategic': get_content_for(report.tool_slug),
             'generated_at': timezone.now(),
         }
