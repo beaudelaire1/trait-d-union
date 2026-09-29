@@ -350,6 +350,49 @@
   }
   table.kv td:first-child { color: #64748b; width: 60%; }
   table.kv td:last-child { font-weight: 600; text-align: right; color: #0f172a; }
+  .detail-table-wrap {
+    margin: 2mm 0 4mm 0;
+    page-break-inside: avoid;
+  }
+  .detail-table-title {
+    font-family: 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+    font-size: 9.8pt;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 1.5mm;
+  }
+  table.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  table.detail-table th {
+    padding: 1.4mm 1.6mm;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 7.6pt;
+    font-weight: 700;
+    text-align: left;
+  }
+  table.detail-table td {
+    padding: 1.35mm 1.6mm;
+    border: 1px solid #e2e8f0;
+    color: #1f2937;
+    font-size: 7.8pt;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .limits-list {
+    margin: 1.5mm 0 0 0;
+    padding-left: 4.5mm;
+  }
+  .limits-list li {
+    margin-bottom: 1.2mm;
+    color: #475569;
+    font-size: 8.8pt;
+    line-height: 1.4;
+  }
   .pillar {
     display: flex; justify-content: space-between;
     padding: 2.5mm 0; border-bottom: 1px dashed #e2e8f0;
@@ -642,8 +685,8 @@
 
 {% if verdict or score %}
 <div class="section">
-  <span class="eyebrow">Votre diagnostic</span>
-  <h2>Résultat clé</h2>
+  <span class="eyebrow">Synthèse exécutive</span>
+  <h2>Ce qu'il en est</h2>
   <div class="verdict">
     {% if score %}<div class="score">{{ score }}</div>{% endif %}
     {% if verdict %}<div class="verdict-text">{{ verdict }}</div>{% endif %}
@@ -699,7 +742,7 @@
       <div class="chart-frame">
         <img src="{{ chart.data_url }}" alt="{{ chart.title|default:'Graphique' }}">
       </div>
-      <div class="chart-caption">Lecture : comparez le poids de chaque palier dans le chiffre d'affaires et la marge, puis confrontez cette hypothèse au mix réellement vendu.</div>
+      <div class="chart-caption">Lecture : ce graphique représente le scénario saisi. Interprétez-le avec les hypothèses, les indicateurs et les limites du calcul présentés dans ce rapport.</div>
     </div>
   </div>
   {% endfor %}
@@ -727,6 +770,28 @@
 {% endfor %}
 {% endif %}
 
+{% if tables %}
+<div class="section section-tight">
+  <span class="eyebrow">Détail du calcul</span>
+  <h2>Données et résultats structurés</h2>
+  {% for table in tables %}
+  <div class="detail-table-wrap">
+    <div class="detail-table-title">{{ table.title }}</div>
+    <table class="detail-table">
+      {% if table.headers %}
+      <thead><tr>{% for header in table.headers %}<th>{{ header|default:"—" }}</th>{% endfor %}</tr></thead>
+      {% endif %}
+      <tbody>
+        {% for row in table.rows %}
+        <tr>{% for cell in row %}<td>{{ cell|default:"—" }}</td>{% endfor %}</tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
 <div class="report-grid">
   {% if user_inputs %}
   <div class="section">
@@ -741,11 +806,11 @@
   </div>
   {% endif %}
 
-  {% if strategic.questions %}
+  {% if strategic.limits %}
   <div class="section">
-    <span class="eyebrow">Points de contrôle</span>
-    <h2>3 questions avant de décider</h2>
-    <ul class="questions">{% for q in strategic.questions %}<li>{{ q }}</li>{% endfor %}</ul>
+    <span class="eyebrow">Périmètre du calcul</span>
+    <h2>Ce que ce résultat ne dit pas</h2>
+    <ul class="limits-list">{% for item in strategic.limits %}<li>{{ item }}</li>{% endfor %}</ul>
   </div>
   {% endif %}
 </div>
@@ -761,8 +826,8 @@
 
   {% if strategic.next_steps %}
   <div class="section">
-    <span class="eyebrow">Plan de suivi</span>
-    <h2>5 étapes de mise à l'épreuve</h2>
+    <span class="eyebrow">Marche à suivre</span>
+    <h2>Étapes concrètes</h2>
     <ul class="journey-steps">{% for s in strategic.next_steps %}<li class="journey-step"><div class="journey-step-label">Étape {{ forloop.counter }}</div><div class="journey-step-text">{{ s }}</div></li>{% endfor %}</ul>
   </div>
   {% endif %}
@@ -778,18 +843,18 @@
   <div class="cta-grid">
     <div class="cta-main">
       <div class="cta-eyebrow">Et maintenant&nbsp;?</div>
-      <h3>Passez du diagnostic au système</h3>
-      <p>Ce rapport éclaire une zone. Pour en faire un plan d'action ajusté à votre réalité — votre équipe, votre marché, votre capacité d'exécution — un échange de 30&nbsp;minutes suffit souvent pour poser les 3 bonnes priorités.</p>
+      <h3>Transformer ce scénario en décision opérationnelle</h3>
+      <p>Le calcul donne un point de départ. Trait d’Union Studio peut vous aider à vérifier les hypothèses, traduire le diagnostic en indicateurs de pilotage et structurer l’outil ou le processus nécessaire pour suivre l’action dans le temps.</p>
       <div class="cta-chips">
         <span class="cta-chip">30 min</span>
-        <span class="cta-chip">Vision claire</span>
-        <span class="cta-chip">Priorités activables</span>
+        <span class="cta-chip">Hypothèses vérifiées</span>
+        <span class="cta-chip">Priorité claire</span>
         <span class="cta-chip">Feuille de route</span>
       </div>
     </div>
     <div class="cta-panel">
-      <div class="cta-panel-title">Ce que vous obtenez à l'issue de l'échange</div>
-      <ul class="cta-list"><li>Le levier à travailler en premier, pas le plus bruyant.</li><li>Un arbitrage concret entre croissance, marge et charge mentale.</li><li>Une prochaine action réaliste à enclencher sous 7 jours.</li></ul>
+      <div class="cta-panel-title">À l'issue de l'échange</div>
+      <ul class="cta-list"><li>Les hypothèses à confirmer ou corriger.</li><li>Le levier à traiter en premier et l'indicateur à suivre.</li><li>Une prochaine action cadrée, avec responsable et échéance.</li></ul>
       <div class="cta-contact">
         <strong>Parlons-en</strong> &nbsp;·&nbsp;
         {{ branding.email|default:"contact@traitdunion.studio" }}{% if branding.phone %} &nbsp;·&nbsp; {{ branding.phone }}{% endif %}<br>
