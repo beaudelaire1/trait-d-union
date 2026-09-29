@@ -87,6 +87,11 @@ class BrevoEmailBackend(BaseEmailBackend):
         # Expéditeur
         from_email = message.from_email or getattr(settings, 'DEFAULT_FROM_EMAIL', '')
         from_name = getattr(settings, 'DEFAULT_FROM_NAME', "Trait d'Union Studio")
+        # Une valeur d'environnement saisie comme Trait d\'Union Studio peut
+        # conserver le backslash littéral selon le parseur de déploiement.
+        # On normalise uniquement ces séquences d'échappement d'apostrophe
+        # avant de les envoyer à Brevo.
+        from_name = str(from_name).replace("\\'", "'").replace("'\\", "'").strip()
 
         # Construire le payload
         smtp_email = sib_api_v3_sdk.SendSmtpEmail(
