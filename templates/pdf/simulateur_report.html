@@ -41,14 +41,15 @@
   .cover {
     position: relative;
     overflow: hidden;
-    min-height: 244mm;
-    padding: 16mm 12mm 12mm 12mm;
+    min-height: 0;
+    padding: 7mm 8mm 6mm 8mm;
     background: linear-gradient(140deg, var(--tus-ink) 0%, #0c1323 48%, #162a55 100%);
     color: #fff;
     border-radius: 8px;
     border: 1px solid rgba(246, 247, 251, 0.08);
-    margin-bottom: 14mm;
-    page-break-after: always;
+    margin-bottom: 5mm;
+    page-break-after: auto;
+    page-break-inside: avoid;
   }
   .cover-orb {
     position: absolute;
@@ -72,17 +73,17 @@
     position: relative;
     z-index: 1;
     display: flex;
-    gap: 10mm;
+    gap: 6mm;
     align-items: stretch;
   }
   .cover-main {
     flex: 1 1 122mm;
   }
   .cover-aside {
-    width: 58mm;
+    width: 52mm;
     display: flex;
     flex-direction: column;
-    gap: 4mm;
+    gap: 2mm;
   }
   .cover-edition {
     font-size: 7.2pt;
@@ -90,11 +91,11 @@
     letter-spacing: 0.24em;
     text-transform: uppercase;
     color: rgba(246, 247, 251, 0.62);
-    margin-bottom: 8mm;
+    margin-bottom: 3mm;
   }
   .cover-logo {
-    width: 88mm;
-    margin-bottom: 8mm;
+    width: 66mm;
+    margin-bottom: 3mm;
   }
   .cover-logo svg {
     display: block;
@@ -104,17 +105,17 @@
   .cover-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: 2mm;
-    margin-bottom: 6mm;
+    gap: 1.5mm;
+    margin-bottom: 3mm;
   }
   .cover-pill {
     display: inline-block;
-    padding: 1.8mm 3.2mm;
+    padding: 1.2mm 2.2mm;
     border-radius: 999px;
     background: rgba(246, 247, 251, 0.08);
     border: 1px solid rgba(246, 247, 251, 0.14);
     color: var(--tus-paper);
-    font-size: 7.6pt;
+    font-size: 6.8pt;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -126,22 +127,22 @@
   }
   .cover h1 {
     color: #fff;
-    font-size: 30pt;
-    line-height: 1.04;
+    font-size: 20pt;
+    line-height: 1.08;
     font-weight: 700;
-    margin-bottom: 6mm;
+    margin-bottom: 2.5mm;
     max-width: 122mm;
   }
   .cover .subtitle {
-    font-size: 12pt;
+    font-size: 9.3pt;
     color: #d9e1ef;
-    line-height: 1.62;
-    margin-bottom: 8mm;
+    line-height: 1.45;
+    margin-bottom: 3mm;
     max-width: 122mm;
   }
   .cover-highlight {
     max-width: 118mm;
-    padding: 5mm 5.5mm;
+    padding: 3mm 3.5mm;
     border-radius: 6px;
     background: rgba(246, 247, 251, 0.06);
     border: 1px solid rgba(246, 247, 251, 0.12);
@@ -157,11 +158,11 @@
   .cover-highlight-text {
     margin: 0;
     color: #edf2fb;
-    font-size: 10.2pt;
-    line-height: 1.65;
+    font-size: 8.7pt;
+    line-height: 1.42;
   }
   .cover-panel {
-    padding: 4.5mm;
+    padding: 2.5mm;
     border-radius: 5px;
     background: rgba(246, 247, 251, 0.05);
     border: 1px solid rgba(246, 247, 251, 0.12);
@@ -178,29 +179,29 @@
     margin-bottom: 1.6mm;
   }
   .cover-panel-value {
-    font-size: 10.3pt;
+    font-size: 8.8pt;
     font-weight: 600;
     color: #fff;
-    line-height: 1.45;
+    line-height: 1.35;
   }
   .cover-panel-value-soft {
-    margin-top: 1mm;
-    font-size: 9pt;
+    margin-top: 0.5mm;
+    font-size: 7.8pt;
     color: rgba(246, 247, 251, 0.74);
   }
   .cover-panel-copy {
     margin: 0;
     color: #dde6f5;
-    font-size: 9.3pt;
-    line-height: 1.62;
+    font-size: 8pt;
+    line-height: 1.4;
   }
   .cover-footer {
     position: relative;
     z-index: 1;
     display: flex;
-    gap: 5mm;
-    margin-top: 12mm;
-    padding-top: 5mm;
+    gap: 4mm;
+    margin-top: 4mm;
+    padding-top: 3mm;
     border-top: 1px solid rgba(246, 247, 251, 0.14);
   }
   .cover-footer-card {
@@ -215,7 +216,7 @@
   }
   .cover-footer-value {
     color: #fff;
-    font-size: 9.8pt;
+    font-size: 8.5pt;
     font-weight: 600;
     line-height: 1.4;
   }
@@ -691,8 +692,8 @@
         <div class="cover-panel-value">TUS-{{ report.pk|default:"—" }}-{{ generated_at|date:"Y" }}</div>
       </div>
       <div class="cover-panel">
-        <div class="cover-panel-label">Promesse du livret</div>
-        <p class="cover-panel-copy">Faire émerger le bon levier, le bon rythme d'action et les arbitrages à poser maintenant.</p>
+        <div class="cover-panel-label">Objet du rapport</div>
+        <p class="cover-panel-copy">Restituer le scénario calculé, ses hypothèses, ses limites et les actions à vérifier avant décision.</p>
       </div>
     </div>
   </div>
@@ -876,12 +877,6 @@
   </div>
   {% endif %}
 </div>
-
-{% if strategic.framework %}
-<div class="section">
-  <div class="framework">« {{ strategic.framework }} »</div>
-</div>
-{% endif %}
 
 <div class="cta">
   <div class="cta-grid">
