@@ -53,6 +53,7 @@ class SimulatorReportService:
             'verdict': snapshot.get('verdict') or interpretation.get('verdict'),
             'score': snapshot.get('score'),
             'sections': snapshot.get('sections', []),
+            'tables': snapshot.get('tables', []),
             'recommendations': (
                 snapshot.get('recommendations')
                 or interpretation.get('recommendations', [])
