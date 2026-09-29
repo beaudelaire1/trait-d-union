@@ -496,6 +496,35 @@
     line-height: 1.42;
     page-break-inside: avoid;
   }
+  .detail-blocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5mm;
+    margin-top: 1.5mm;
+  }
+  .detail-block {
+    flex: 1 1 78mm;
+    padding: 2.8mm 3mm;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    page-break-inside: avoid;
+  }
+  .detail-block h3 {
+    margin: 0 0 1.5mm 0;
+    font-size: 9.6pt;
+    color: #0f172a;
+  }
+  .detail-block ul {
+    margin: 0;
+    padding-left: 4mm;
+  }
+  .detail-block li {
+    margin-bottom: 0.8mm;
+    color: #475569;
+    font-size: 8.4pt;
+    line-height: 1.35;
+  }
   .report-grid {
     display: flex;
     gap: 5mm;
@@ -768,6 +797,21 @@
   {% endif %}
 </div>
 {% endfor %}
+{% endif %}
+
+{% if details %}
+<div class="section section-tight">
+  <span class="eyebrow">Détail opérationnel</span>
+  <h2>Éléments à retenir du calcul</h2>
+  <div class="detail-blocks">
+    {% for detail in details %}
+    <div class="detail-block">
+      <h3>{{ detail.title }}</h3>
+      <ul>{% for line in detail.lines %}<li>{{ line }}</li>{% endfor %}</ul>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 {% endif %}
 
 {% if tables %}
