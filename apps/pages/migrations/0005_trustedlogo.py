@@ -27,7 +27,7 @@ def remove_seeded_trusted_logos(apps, schema_editor):
     TrustedLogo = apps.get_model("pages", "TrustedLogo")
     TrustedLogo.objects.filter(
         name__in=["Nettoyage Express", "EEBC"],
-        logo="",
+        logo__isnull=True,
     ).delete()
 
 
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
             fields=[
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("name", models.CharField(max_length=200, verbose_name="Nom")),
-                ("logo", models.ImageField(blank=True, null=True, help_text="PNG, WebP ou SVG recommandé avec fond transparent.", upload_to="trusted_logos/", verbose_name="Logo")),
+                ("logo", models.ImageField(blank=True, null=True, help_text="PNG, WebP ou JPG recommandé avec fond transparent.", upload_to="trusted_logos/", verbose_name="Logo")),
                 ("legacy_static_path", models.CharField(blank=True, default="", editable=False, help_text="Chemin statique conservé pour les logos historiques.", max_length=255)),
                 ("is_active", models.BooleanField(default=True, verbose_name="Actif")),
                 ("order", models.PositiveIntegerField(default=0, verbose_name="Ordre d'affichage")),
