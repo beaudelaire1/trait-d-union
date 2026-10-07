@@ -77,4 +77,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
 # les workers. Garantit que SECRET_KEY, settings et connexions DB sont
 # identiques dans tous les workers (élimine le risque de clé aléatoire
 # différente par worker si DJANGO_SECRET_KEY est absent/faible).
-CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.coolify python manage.py migrate --noinput && DJANGO_SETTINGS_MODULE=config.settings.coolify gunicorn config.wsgi:application --preload --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]
+CMD ["sh", "-c", "DJANGO_SETTINGS_MODULE=config.settings.coolify python manage.py migrate --noinput && DJANGO_SETTINGS_MODULE=config.settings.coolify python manage.py shell -c \"from django_otp.plugins.otp_totp.models import TOTPDevice; TOTPDevice.objects.filter(tolerance__lt=3).update(tolerance=3); TOTPDevice.objects.filter(throttling_failure_count__gt=0).update(throttling_failure_count=0, throttling_failure_timestamp=None)\" && DJANGO_SETTINGS_MODULE=config.settings.coolify gunicorn config.wsgi:application --preload --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]
