@@ -4,6 +4,8 @@ from django import forms
 from django.conf import settings
 
 from allauth.account.forms import LoginForm
+from django_otp.admin import OTPAdminAuthenticationForm
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from core.services.captcha import verify_recaptcha, verify_turnstile
 
@@ -50,3 +52,29 @@ class CaptchaLoginForm(LoginForm):
             )
 
         return cleaned_data
+
+
+class TUSOTPAdminAuthenticationForm(OTPAdminAuthenticationForm):
+    """Admin OTP form compatible with django-otp's explicit device selection.
+
+    Recent django-otp versions require an explicit OTP device. On the first
+    login submission our template cannot render that selector yet because the
+    user has not been authenticated by password. If the user has exactly one
+    confirmed TOTP device, select it directly instead of rejecting a perfectly
+    valid authenticator code and forcing a second submission.
+
+    If several TOTP devices exist, keep django-otp's secure default and require
+    an explicit device choice.
+    """
+
+    def _chosen_device(self, user):
+        device = super()._chosen_device(user)
+        if device is not None:
+            return device
+
+        devices = list(
+            TOTPDevice.objects.filter(user=user, confirmed=True)
+            .select_for_update()
+            .order_by("pk")[:2]
+        )
+        return devices[0] if len(devices) == 1 else None
