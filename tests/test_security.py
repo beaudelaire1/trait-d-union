@@ -6,6 +6,11 @@ are correctly configured at the Django settings level.
 import pytest
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.test import RequestFactory
+from django_otp.oath import TOTP
+from django_otp.plugins.otp_totp.models import TOTPDevice
+
+from core.forms import TUSOTPAdminAuthenticationForm
 
 User = get_user_model()
 
@@ -138,3 +143,80 @@ class TestSessionPing:
         client.force_login(user)
         response = client.get('/tus-gestion-secure/session-ping/')
         assert 'no-store' in response.get('Cache-Control', '')
+
+
+@pytest.mark.django_db
+class TestAdminTOTPLogin:
+    """Regression tests for admin TOTP login with django-otp 1.7.x."""
+
+    def test_single_totp_device_accepts_valid_code_on_first_submission(self):
+        user = User.objects.create_user(
+            username="totp-admin",
+            password="StrongPass123!",
+            email="totp@example.com",
+            is_staff=True,
+        )
+        device = TOTPDevice.objects.create(
+            user=user,
+            name="Microsoft Authenticator",
+            confirmed=True,
+            tolerance=3,
+        )
+        generator = TOTP(
+            device.bin_key,
+            device.step,
+            device.t0,
+            device.digits,
+            device.drift,
+        )
+        token = str(generator.token()).zfill(device.digits)
+        request = RequestFactory().post("/tus-gestion-secure/login/")
+
+        form = TUSOTPAdminAuthenticationForm(
+            request=request,
+            data={
+                "username": user.username,
+                "password": "StrongPass123!",
+                "otp_token": token,
+            },
+        )
+
+        assert form.is_valid(), form.errors.as_json()
+        assert form.get_user() == user
+        assert form.get_user().otp_device.pk == device.pk
+
+    def test_multiple_totp_devices_still_require_explicit_choice(self):
+        user = User.objects.create_user(
+            username="totp-admin-multi",
+            password="StrongPass123!",
+            email="totp-multi@example.com",
+            is_staff=True,
+        )
+        first = TOTPDevice.objects.create(
+            user=user,
+            name="Authenticator 1",
+            confirmed=True,
+            tolerance=3,
+        )
+        TOTPDevice.objects.create(
+            user=user,
+            name="Authenticator 2",
+            confirmed=True,
+            tolerance=3,
+        )
+        token = str(
+            TOTP(first.bin_key, first.step, first.t0, first.digits, first.drift).token()
+        ).zfill(first.digits)
+        request = RequestFactory().post("/tus-gestion-secure/login/")
+
+        form = TUSOTPAdminAuthenticationForm(
+            request=request,
+            data={
+                "username": user.username,
+                "password": "StrongPass123!",
+                "otp_token": token,
+            },
+        )
+
+        assert not form.is_valid()
+        assert "otp_device" in form.errors.as_text().lower() or "device" in form.errors.as_text().lower()
