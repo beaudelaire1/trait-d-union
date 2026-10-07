@@ -8,6 +8,18 @@ export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.coolify
 echo "[TUS] Applying database migrations..."
 python manage.py migrate --noinput
 
+echo "[TUS] Normalizing TOTP devices..."
+python manage.py shell <<'PY'
+from django_otp.plugins.otp_totp.models import TOTPDevice
+
+updated = TOTPDevice.objects.filter(tolerance__lt=3).update(tolerance=3)
+unlocked = TOTPDevice.objects.filter(throttling_failure_count__gt=0).update(
+    throttling_failure_count=0,
+    throttling_failure_timestamp=None,
+)
+print(f"[TUS] TOTP tolerance updated: {updated}; throttling reset: {unlocked}")
+PY
+
 echo "[TUS] Normalizing django-allauth email records..."
 python manage.py fix_email_addresses --apply
 
