@@ -18,6 +18,7 @@ from apps.pages.healthz import healthz
 from config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap
 from core.views_session import session_ping
 from core.views_totp import totp_qr_code
+from core.forms import TUSOTPAdminAuthenticationForm
 
 
 def _staff_protected_include(module):
@@ -40,6 +41,8 @@ def _staff_protected_include(module):
 # 🛡️ SECURITY: OTP-protected admin site (2FA required for all staff)
 class TUSOTPAdminSite(OTPAdminSite):
     """OTPAdminSite with TOTP QR code URL injected into login context."""
+
+    login_form = TUSOTPAdminAuthenticationForm
 
     def login(self, request, extra_context=None):
         from django.urls import reverse
