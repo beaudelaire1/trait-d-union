@@ -70,6 +70,13 @@ commands = [
     [sys.executable, "manage.py", "qcluster"],
 ]
 
+# TOTP maintenance (lockout reset, optional one-shot re-enrolment). Never block
+# the web server from starting if it fails.
+try:
+    subprocess.run([sys.executable, "manage.py", "totp_startup"], check=True, timeout=120)
+except (subprocess.SubprocessError, OSError) as exc:
+    print(f"[TUS] totp_startup failed: {exc}", file=sys.stderr, flush=True)
+
 try:
     for command in commands:
         processes.append(subprocess.Popen(command))
