@@ -44,23 +44,8 @@ echo ""
 echo "📧 Vérification des EmailAddress allauth..."
 python manage.py fix_email_addresses --apply
 
-# 4. Fix: augmenter la tolérance TOTP (±90s) pour compenser le drift d'horloge cloud
-echo ""
-echo "🔐 Mise à jour tolérance TOTP..."
-python manage.py shell << 'EOFTOTP'
-from django_otp.plugins.otp_totp.models import TOTPDevice
-updated = TOTPDevice.objects.filter(tolerance__lt=3).update(tolerance=3)
-if updated:
-    print(f"✅ {updated} device(s) TOTP mis à jour (tolerance=3)")
-else:
-    print("ℹ️  Tous les devices TOTP ont déjà tolerance≥3")
-# Reset throttling au déploiement pour débloquer après échecs
-reset = TOTPDevice.objects.filter(throttling_failure_count__gt=0).update(
-    throttling_failure_count=0, throttling_failure_timestamp=None
-)
-if reset:
-    print(f"🔓 {reset} device(s) TOTP débloqué(s) (throttling reset)")
-EOFTOTP
+# Les compteurs d'échecs et la tolérance OTP ne doivent pas être modifiés
+# par un déploiement : ils protègent contre la répétition de jetons.
 
 # 5. Remplissage initial des audits portfolio (Ch.05) — projets sans mesure.
 #    Inclut SSL Labs pour obtenir le grade officiel A+/A (scan mis en cache

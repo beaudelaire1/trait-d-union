@@ -393,7 +393,7 @@
             <line x1="21" y1="21" x2="21" y2="21.01"></line>
             <line x1="14" y1="21" x2="14" y2="21.01"></line>
         </svg>
-        Afficher mon QR Code TOTP
+        Configurer Microsoft Authenticator
     </button>
 </div>
 
@@ -418,7 +418,9 @@
     const modal = document.getElementById('totp-qr-modal');
     const closeBtn = document.getElementById('totp-qr-close');
     const content = document.getElementById('totp-qr-content');
-    const QR_URL = '{{ totp_qr_url }}';
+    const QR_URL = '{{ totp_qr_url|escapejs }}';
+    const VERIFY_URL = '{{ totp_verify_url|escapejs }}';
+    let qrObjectUrl = null;
 
     function showModal() {
         const username = document.getElementById('id_username').value.trim();
@@ -448,12 +450,42 @@
         .then(function(response) {
             if (response.ok) {
                 return response.blob().then(function(blob) {
-                    const url = URL.createObjectURL(blob);
+                    if (qrObjectUrl) URL.revokeObjectURL(qrObjectUrl);
+                    qrObjectUrl = URL.createObjectURL(blob);
                     content.innerHTML =
-                        '<h3>📱 Scannez ce QR Code</h3>' +
-                        '<p>Ouvrez votre app d\'authentification<br>(Google Authenticator, Authy, etc.)</p>' +
-                        '<div class="totp-qr-img-wrap"><img src="' + url + '" alt="QR Code TOTP" /></div>' +
-                        '<p class="totp-qr-hint">Entrez le code à 6 chiffres affiché dans l\'app ci-dessus</p>';
+                        '<h3>Associer votre application</h3>' +
+                        '<p>Scannez le QR code dans Microsoft Authenticator, puis confirmez le code affiché.</p>' +
+                        '<div class="totp-qr-img-wrap"><img src="' + qrObjectUrl + '" alt="QR code de configuration TOTP" /></div>' +
+                        '<form id="totp-setup-form">' +
+                        '<label for="totp-setup-code" style="display:block;color:var(--tus-text);margin-bottom:8px">Code à 6 chiffres</label>' +
+                        '<input id="totp-setup-code" type="text" inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" maxlength="6" required style="box-sizing:border-box;width:100%;padding:12px;border-radius:8px;background:var(--tus-bg);color:var(--tus-text);border:1px solid var(--tus-border)" />' +
+                        '<div id="totp-setup-feedback" role="alert" class="totp-qr-error" style="display:none"></div>' +
+                        '<button type="submit" class="totp-qr-btn" style="margin-top:14px">Vérifier et activer</button></form>' +
+                        '<p class="totp-qr-hint" style="margin-top:12px">L’appareil ne sera activé qu’après validation du code.</p>';
+                    document.getElementById('totp-setup-form').addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        const button = this.querySelector('button[type=submit]');
+                        const feedback = document.getElementById('totp-setup-feedback');
+                        const code = document.getElementById('totp-setup-code').value.trim();
+                        const confirmData = new FormData();
+                        confirmData.append('username', username);
+                        confirmData.append('password', password);
+                        confirmData.append('token', code);
+                        confirmData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+                        button.disabled = true;
+                        feedback.style.display = 'none';
+                        fetch(VERIFY_URL, {
+                            method: 'POST', body: confirmData, credentials: 'same-origin',
+                        }).then(function(response) {
+                            return response.json().then(function(data) {
+                                if (!response.ok || !data.success) throw new Error(data.error || 'Activation impossible.');
+                                window.location.assign(data.redirect);
+                            });
+                        }).catch(function(err) {
+                            feedback.textContent = err.message || 'Impossible de vérifier le code.';
+                            feedback.style.display = 'block';
+                        }).finally(function() { button.disabled = false; });
+                    });
                 });
             } else {
                 return response.json().then(function(data) {
@@ -468,6 +500,10 @@
 
     function hideModal() {
         modal.classList.remove('active');
+        if (qrObjectUrl) {
+            URL.revokeObjectURL(qrObjectUrl);
+            qrObjectUrl = null;
+        }
     }
 
     trigger.addEventListener('click', showModal);

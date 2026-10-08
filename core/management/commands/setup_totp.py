@@ -1,67 +1,76 @@
-"""
-Management command to create/reset a TOTP device for a user.
-Useful when deploying for the first time or when locked out.
+"""Inspect or re-enrol one admin TOTP factor from a trusted server console.
 
-Usage (Render shell / production console):
-    python manage.py setup_totp admin_tus
-    python manage.py setup_totp admin_tus --reset   # delete existing device first
-"""
+A reset is an exceptional, audited recovery operation. It never prints a
+confirmed factor's secret to logs or exposes the secret over the login page.
+The pending factor must be confirmed with a valid code from the authenticator.
 
-from django.core.management.base import BaseCommand, CommandError
+    python manage.py setup_totp admin_tus               # inspect only
+    python manage.py setup_totp admin_tus --reset       # operator-authorized recovery
+"""
+import time
+
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from django_otp.plugins.otp_totp.models import TOTPDevice
-
-User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = "Create (or reset) a TOTP device for a user and display the provisioning secret."
+    help = 'Inspect staff TOTP devices, or explicitly reset them for secure re-enrolment.'
 
     def add_arguments(self, parser):
-        parser.add_argument("username", type=str, help="Username of the target user")
+        parser.add_argument('username', type=str)
         parser.add_argument(
-            "--reset",
-            action="store_true",
-            default=False,
-            help="Delete all existing TOTP devices before creating a new one",
+            '--reset', action='store_true',
+            help='Remove all factors for this user and create one unconfirmed factor.',
         )
 
     def handle(self, *args, **options):
-        username = options["username"]
-        reset = options["reset"]
+        username = options['username']
+        reset = options['reset']
+        User = get_user_model()
 
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            raise CommandError(f"User '{username}' does not exist.")
+        with transaction.atomic():
+            try:
+                user = User.objects.select_for_update().get(username=username)
+            except User.DoesNotExist:
+                raise CommandError('Compte introuvable.')
 
-        if reset:
-            deleted, _ = TOTPDevice.objects.filter(user=user).delete()
-            self.stdout.write(self.style.WARNING(f"Deleted {deleted} existing device(s)."))
+            if not user.is_active or not user.is_staff:
+                raise CommandError('Ce compte ne dispose pas d’un accès administrateur actif.')
 
-        existing = TOTPDevice.objects.filter(user=user, confirmed=True).first()
-        if existing and not reset:
-            self.stdout.write(self.style.WARNING(
-                f"User '{username}' already has a confirmed device: {existing.name}"
-            ))
-            self.stdout.write(f"Secret (base32) : {existing.bin_key.hex()}")
-            self.stdout.write(f"Config URL       : {existing.config_url}")
-            self.stdout.write(
-                "\nUse --reset to delete it and create a fresh device."
+            devices = TOTPDevice.objects.filter(user=user)
+            if not reset:
+                self.stdout.write(
+                    f'Compte {username}: {devices.filter(confirmed=True).count()} '
+                    f'appareil(s) actif(s), {devices.filter(confirmed=False).count()} en attente.'
+                )
+                for device in devices:
+                    current_t = int((time.time() - device.t0) // device.step)
+                    blocked = device.verify_is_allowed()[0] is False
+                    self.stdout.write(
+                        f'  id={device.pk} confirmed={device.confirmed} '
+                        f'drift={device.drift} last_t_ahead={device.last_t > current_t + device.tolerance} '
+                        f'throttled={blocked} failures={device.throttling_failure_count}'
+                    )
+                self.stdout.write('Aucun secret TOTP n’est affiché. Utilisez --reset seulement si nécessaire.')
+                return
+
+            deleted, _ = devices.delete()
+            new_device = TOTPDevice.objects.create(
+                user=user,
+                name='Microsoft Authenticator (en attente)',
+                confirmed=False,
+                tolerance=1,
             )
-            return
-
-        device = TOTPDevice.objects.create(
-            user=user,
-            name=f"CLI-provisioned ({username})",
-            confirmed=True,
-            tolerance=3,  # ±90s — compense le décalage d'horloge cloud
-        )
-
-        self.stdout.write(self.style.SUCCESS(f"\nTOTP device created for '{username}'."))
-        self.stdout.write(f"  Device name : {device.name}")
-        self.stdout.write(f"  Config URL  : {device.config_url}")
-        self.stdout.write(
-            "\nCopy the Config URL into your authenticator app "
-            "(or use the QR code from the admin login page)."
-        )
+            self.stdout.write(
+                self.style.WARNING(
+                    f'RECOVERY user={username}: {deleted} ancien(s) appareil(s) supprimé(s), '
+                    f'nouvel appareil id={new_device.pk} EN ATTENTE de confirmation.'
+                )
+            )
+            self.stdout.write(
+                'Sur la page de connexion, saisissez vos identifiants, choisissez '
+                '« Configurer Microsoft Authenticator », scannez le QR code et '
+                'validez un code dans la fenêtre. Ne diffusez pas le QR code.'
+            )

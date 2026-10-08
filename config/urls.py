@@ -17,7 +17,7 @@ from django_otp.admin import OTPAdminSite
 from apps.pages.healthz import healthz
 from config.sitemaps import StaticViewSitemap, PortfolioSitemap, ChroniquesSitemap
 from core.views_session import session_ping
-from core.views_totp import totp_qr_code
+from core.views_totp import totp_qr_code, totp_verify_setup
 from core.forms import TUSOTPAdminAuthenticationForm
 
 
@@ -48,6 +48,7 @@ class TUSOTPAdminSite(OTPAdminSite):
         from django.urls import reverse
         extra_context = extra_context or {}
         extra_context['totp_qr_url'] = reverse('admin_totp_qr')
+        extra_context['totp_verify_url'] = reverse('admin_totp_verify')
         return super().login(request, extra_context)
 
 
@@ -124,6 +125,7 @@ urlpatterns = [
     path('tus-gestion-secure/diagnostic/', include('apps.diagnostic.urls')),
     # 🛡️ TOTP QR code endpoint (credentials required via POST)
     path('tus-gestion-secure/totp-qr/', totp_qr_code, name='admin_totp_qr'),
+    path('tus-gestion-secure/totp-verify/', totp_verify_setup, name='admin_totp_verify'),
     # 🛡️ Session keep-alive (heartbeat JS in admin calls this every few minutes)
     path('tus-gestion-secure/session-ping/', session_ping, name='session_ping'),
     path('tus-gestion-secure/', admin.site.urls),  # URL admin sécurisée
