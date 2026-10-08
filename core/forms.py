@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from django import forms
 from django.conf import settings
 
@@ -66,6 +68,11 @@ class TUSOTPAdminAuthenticationForm(OTPAdminAuthenticationForm):
     If several TOTP devices exist, keep django-otp's secure default and require
     an explicit device choice.
     """
+
+    def clean_otp_token(self):
+        # Authenticator apps display "123 456" and copy-paste keeps the space,
+        # which django-otp's int() parsing rejects as an invalid token.
+        return re.sub(r"\s+", "", self.cleaned_data.get("otp_token") or "")
 
     def _chosen_device(self, user):
         device = super()._chosen_device(user)
